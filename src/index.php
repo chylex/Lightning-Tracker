@@ -35,6 +35,10 @@ $base_url_path = new UrlString(mb_substr(BASE_URL, $base_url_split + 3));
 
 define('BASE_URL_ENC', $base_url_protocol.$base_url_path->encoded());
 
+// Utilities
+
+require_once 'Pages/Actions/actions.php';
+
 // Route
 
 $route = isset($_GET['route']) ? $_GET['route'] : '';
