@@ -5,6 +5,7 @@ use Logging\Log;
 use Routing\Request;
 use Routing\Router;
 use Routing\RouterException;
+use Routing\UrlString;
 
 if (version_compare(PHP_VERSION, '7.4', '<')){
   die('Lightning Tracker requires PHP 7.4 or newer.');
@@ -22,6 +23,17 @@ spl_autoload_extensions('.php');
 spl_autoload_register();
 
 require_once 'config.php';
+
+$base_url_split = mb_strpos(BASE_URL, '://');
+
+if ($base_url_split === false){
+  die('Base URL is invalid.');
+}
+
+$base_url_protocol = mb_substr(BASE_URL, 0, $base_url_split + 3);
+$base_url_path = new UrlString(mb_substr(BASE_URL, $base_url_split + 3));
+
+define('BASE_URL_ENC', $base_url_protocol.$base_url_path->encoded());
 
 // Route
 
