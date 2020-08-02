@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="No Formatting" pattern="file[LightningTracker]:res/~resources/fonts//*||file[LightningTracker]:res/~resources/css/icons.css" />
+</component>
