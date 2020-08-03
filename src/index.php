@@ -56,6 +56,8 @@ $router->add('&/about', 'Root/AboutController');
 foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'login', 'Mixed/LoginController');
   $router->add($base.'register', 'Mixed/RegisterController');
+  $router->add($base.'account', 'Mixed/AccountController');
+  $router->add($base.'account/security', 'Mixed/AccountSecurityController');
 }
 
 function handle_error(int $code, string $title, string $message): void{

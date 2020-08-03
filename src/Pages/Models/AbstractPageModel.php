@@ -32,6 +32,7 @@ abstract class AbstractPageModel implements IModel{
     $this->setupNavigation($this->nav, $logon_user);
     
     if ($logon_user !== null){
+      $this->nav->addRight(Text::withIcon($logon_user->getNameSafe(), 'user'), '/account');
     }
     else{
       $this->nav->addRight(Text::withIcon('Login', 'enter'), '/login');
