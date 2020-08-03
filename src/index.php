@@ -53,6 +53,9 @@ $router = new Router();
 
 $router->add('&/about', 'Root/AboutController');
 
+$router->add('&/login', 'Mixed/LoginController');
+$router->add('&/register', 'Mixed/RegisterController');
+
 function handle_error(int $code, string $title, string $message): void{
   http_response_code($code);
   $page_model = new BasicRootPageModel(new Request('', '', []));
