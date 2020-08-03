@@ -1,0 +1,82 @@
+form .field-group {
+  margin-bottom: 12px;
+}
+
+form .message {
+  font-size: 15px;
+  margin: 0 0 20px;
+}
+
+form .message .icon {
+  margin-right: 3px;
+}
+
+form .message.success {
+  color: #2a6600;
+}
+
+form .message.error {
+  color: #8c1b1b;
+}
+
+input, select {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #000000;
+  font-size: 15px;
+}
+
+input[type=text],
+input[type=password],
+input[type=email],
+textarea {
+  padding: 7px;
+  width: 100%;
+  border: 1px solid #333333;
+  border-radius: 5px;
+}
+
+input[type=text].invalid,
+input[type=password].invalid,
+input[type=email].invalid,
+textarea.invalid {
+  border: 1px solid #8c1b1b;
+  box-shadow: 0 0 4px -2px #8c1b1b inset;
+}
+
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=email]:focus,
+textarea:focus {
+  outline: none !important;
+  box-shadow: 0 0 4px -2px #1b618c inset;
+}
+
+input[type=text]:disabled,
+input[type=password]:disabled,
+input[type=email]:disabled,
+textarea:disabled {
+  color: #2d2d2d;
+}
+
+textarea {
+  min-height: 75px;
+  height: 140px;
+  resize: vertical;
+}
+
+label {
+  display: inline-block;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+label:not(.disabled) {
+  cursor: pointer;
+}
+
+input[type=checkbox] + label {
+  font-size: 15px;
+  font-weight: normal;
+  vertical-align: 5%;
+}
