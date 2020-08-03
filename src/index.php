@@ -37,6 +37,7 @@ define('BASE_URL_ENC', $base_url_protocol.$base_url_path->encoded());
 
 // Utilities
 
+require_once 'Database/utils.php';
 require_once 'Pages/Actions/actions.php';
 
 // Route
