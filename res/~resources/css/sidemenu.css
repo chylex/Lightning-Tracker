@@ -1,0 +1,54 @@
+nav.sidemenu {
+  margin: 4px 4px 20px;
+  border: 2px solid #0a4163;
+  border-radius: 5px;
+}
+
+nav.sidemenu ul {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+nav.sidemenu li {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+nav.sidemenu li a,
+nav.sidemenu li button {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  color: #111111;
+  font-size: 17px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+nav.sidemenu li button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+nav.sidemenu li a:hover,
+nav.sidemenu li a:focus,
+nav.sidemenu li button:hover,
+nav.sidemenu li button:focus,
+nav.sidemenu li.active a {
+  outline: none;
+  color: #fafafa;
+  background: linear-gradient(#0c527d, #0a4163);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+nav.sidemenu .icon {
+  margin-right: 2px;
+  font-size: 18px;
+  vertical-align: -10%;
+}
