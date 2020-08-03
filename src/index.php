@@ -53,8 +53,10 @@ $router = new Router();
 
 $router->add('&/about', 'Root/AboutController');
 
-$router->add('&/login', 'Mixed/LoginController');
-$router->add('&/register', 'Mixed/RegisterController');
+foreach(['&/', 'tracker/:tracker/&/'] as $base){
+  $router->add($base.'login', 'Mixed/LoginController');
+  $router->add($base.'register', 'Mixed/RegisterController');
+}
 
 function handle_error(int $code, string $title, string $message): void{
   http_response_code($code);

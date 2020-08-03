@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Mixed;
 
 use Database\DB;
+use Database\Objects\TrackerInfo;
 use Database\SQL;
 use Database\Tables\UserTable;
 use Exception;
@@ -20,8 +21,8 @@ class RegisterModel extends BasicMixedPageModel{
   private FormComponent $form;
   private bool $successful_login;
   
-  public function __construct(Request $req, bool $successful_login = false){
-    parent::__construct($req);
+  public function __construct(Request $req, ?TrackerInfo $tracker, bool $successful_login = false){
+    parent::__construct($req, $tracker);
     
     $this->form = new FormComponent();
     
