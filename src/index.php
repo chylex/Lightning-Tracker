@@ -2,10 +2,14 @@
 declare(strict_types = 1);
 
 use Logging\Log;
+use Pages\Models\BasicRootPageModel;
+use Pages\Models\ErrorModel;
+use Pages\Views\ErrorPage;
 use Routing\Request;
 use Routing\Router;
 use Routing\RouterException;
 use Routing\UrlString;
+use function Pages\Actions\view;
 
 if (version_compare(PHP_VERSION, '7.4', '<')){
   die('Lightning Tracker requires PHP 7.4 or newer.');
@@ -49,7 +53,9 @@ $router = new Router();
 
 function handle_error(int $code, string $title, string $message): void{
   http_response_code($code);
-  die($message); // TODO
+  $page_model = new BasicRootPageModel(new Request('', '', []));
+  $error_model = new ErrorModel($page_model, $title, $message);
+  view(new ErrorPage($error_model->load()))->execute();
 }
 
 try{
