@@ -7,6 +7,7 @@ use Exception;
 use Throwable;
 
 final class RouterException extends Exception{
+  public const STATUS_FORBIDDEN = 403;
   public const STATUS_NOT_FOUND = 404;
   public const STATUS_SERVER_ERROR = 500;
   

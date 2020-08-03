@@ -59,14 +59,14 @@ final class UserTable extends AbstractTable{
   public function listUsers(UserFilter $filter = null): array{
     $filter ??= UserFilter::empty();
     
-    $stmt = $this->db->prepare('SELECT id, name, email FROM users '.$filter->generateClauses());
+    $stmt = $this->db->prepare('SELECT id, name, email, role_id, admin FROM users '.$filter->generateClauses());
     $filter->prepareStatement($stmt);
     $stmt->execute();
     
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new UserProfile($res['id'], $res['name'], $res['email']);
+      $results[] = new UserProfile($res['id'], $res['name'], $res['email'], $res['role_id'], (bool)$res['admin']);
     }
     
     return $results;

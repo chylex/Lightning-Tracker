@@ -18,60 +18,78 @@ final class Session{
   
   private static ?Session $instance = null;
   
-  public static function get(): Session{
+  public static function get(): self{
     if (self::$instance === null){
-      self::$instance = new Session();
+      self::$instance = new self();
     }
     
     return self::$instance;
   }
   
-  private bool $logon_looked_up = false;
-  private ?UserProfile $logon_user = null;
-  
-  private function __construct(){
-  }
-  
-  private function checkToken(string $token, bool $renew){
+  private static function checkToken(string $token, bool $renew): SessionLoginInfo{
     try{
       $logins = new UserLoginTable(DB::get());
-      $this->logon_user = $logins->checkLogin($token);
+      $login = SessionLoginInfo::user($logins->checkLogin($token));
       
       if ($renew){
         try{
           $logins->renewToken($token, self::TOKEN_EXPIRATION_TIME);
-          $this->setCookie($token);
+          self::setCookie($token);
         }catch(Exception $e){
           Log::critical($e);
         }
       }
+      
+      return $login;
     }catch(Exception $e){
       Log::critical($e);
-      $this->logon_user = null;
-    }finally{
-      $this->logon_looked_up = true;
+      return SessionLoginInfo::guest();
     }
   }
   
-  private function checkCookie(){
+  private static function checkCookie(): SessionLoginInfo{
     if (isset($_COOKIE[self::COOKIE_NAME])){
-      $this->checkToken($_COOKIE[self::COOKIE_NAME], true);
+      return self::checkToken($_COOKIE[self::COOKIE_NAME], true);
     }
     else{
-      $this->logon_looked_up = true;
+      return SessionLoginInfo::guest();
     }
+  }
+  
+  private static function setCookie(string $token): void{
+    $path = self::COOKIE_PATH;
+    $expire_in_seconds = self::TOKEN_EXPIRATION_TIME * 60;
+    header("Set-Cookie: logon=$token; Max-Age=$expire_in_seconds; Path=$path; HttpOnly; SameSite=Lax");
+  }
+  
+  private static function unsetCookie(): void{
+    $path = self::COOKIE_PATH;
+    header("Set-Cookie: logon=; Max-Age=0; Path=$path; HttpOnly; SameSite=Lax");
+  }
+  
+  private ?SessionLoginInfo $login = null;
+  
+  private function __construct(){
+  }
+  
+  private function getLogin(): SessionLoginInfo{
+    if ($this->login === null){
+      $this->login = self::checkCookie();
+    }
+    
+    return $this->login;
   }
   
   public function getLogonUser(): ?UserProfile{
-    if (!$this->logon_looked_up){
-      $this->checkCookie();
-    }
-  
-    return $this->logon_user;
+    return $this->getLogin()->getLogonUser();
   }
   
   public function isLoggedOn(): bool{
     return $this->getLogonUser() !== null;
+  }
+  
+  public function getPermissions(): Permissions{
+    return $this->getLogin()->getPermissions();
   }
   
   public function tryLoginWithName(string $name): bool{
@@ -89,9 +107,8 @@ final class Session{
   }
   
   public function tryLoginWithId(int $id): bool{
-    if ($this->logon_user !== null){
-      $this->logon_looked_up = true;
-      $this->logon_user = null;
+    if ($this->login !== null){
+      $this->login = SessionLoginInfo::guest();
     }
     
     try{
@@ -99,8 +116,9 @@ final class Session{
       
       $logins = new UserLoginTable(DB::get());
       $logins->addOrRenewToken($id, $token, self::TOKEN_EXPIRATION_TIME);
-      $this->checkToken($token, false);
-      $this->setCookie($token);
+      
+      $this->login = self::checkToken($token, false);
+      self::setCookie($token);
       return true;
     }catch(Exception $e){
       Log::critical($e);
@@ -119,21 +137,9 @@ final class Session{
         unset($_COOKIE[self::COOKIE_NAME]);
       }
     }
-  
-    $this->logon_looked_up = false;
-    $this->logon_user = null;
-    $this->unsetCookie();
-  }
-  
-  private function setCookie(string $token): void{
-    $path = self::COOKIE_PATH;
-    $expire_in_seconds = self::TOKEN_EXPIRATION_TIME * 60;
-    header("Set-Cookie: logon=$token; Max-Age=$expire_in_seconds; Path=$path; HttpOnly; SameSite=Lax");
-  }
-  
-  private function unsetCookie(): void{
-    $path = self::COOKIE_PATH;
-    header("Set-Cookie: logon=; Max-Age=0; Path=$path; HttpOnly; SameSite=Lax");
+    
+    $this->login = null;
+    self::unsetCookie();
   }
 }
 

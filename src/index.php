@@ -74,7 +74,10 @@ try{
   
   $code = $e->getCode();
   
-  if ($code === RouterException::STATUS_NOT_FOUND){
+  if ($code === RouterException::STATUS_FORBIDDEN){
+    handle_error($code, 'Permission Error', 'You do not have permission to perform this action.');
+  }
+  elseif ($code === RouterException::STATUS_NOT_FOUND){
     handle_error($code, 'Not Found', $e->getMessage());
   }
   else{

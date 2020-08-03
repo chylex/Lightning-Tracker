@@ -6,6 +6,7 @@ namespace Routing;
 use Exception;
 use InvalidArgumentException;
 use Pages\IController;
+use Session\PermissionException;
 use Session\Session;
 
 final class Router{
@@ -129,6 +130,8 @@ final class Router{
     try{
       $action = $controller->run($req, Session::get());
       $action->execute();
+    }catch(PermissionException $e){
+      throw new RouterException($e->getMessage(), RouterException::STATUS_FORBIDDEN, $e);
     }catch(Exception $e){
       throw new RouterException($e->getMessage(), RouterException::STATUS_SERVER_ERROR, $e);
     }

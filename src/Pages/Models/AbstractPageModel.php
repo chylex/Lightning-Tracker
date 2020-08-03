@@ -3,12 +3,12 @@ declare(strict_types = 1);
 
 namespace Pages\Models;
 
-use Database\Objects\UserProfile;
 use LogicException;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
 use Pages\IModel;
 use Routing\Request;
+use Session\Permissions;
 use Session\Session;
 
 abstract class AbstractPageModel implements IModel{
@@ -22,14 +22,16 @@ abstract class AbstractPageModel implements IModel{
   }
   
   protected abstract function createNavigation(): NavigationComponent;
-  protected abstract function setupNavigation(NavigationComponent $nav, ?UserProfile $logon_user): void;
+  protected abstract function setupNavigation(NavigationComponent $nav, Permissions $perms): void;
   
   public function load(): IModel{
     $this->is_loaded = true;
-    $logon_user = Session::get()->getLogonUser();
+    
+    $sess = Session::get();
+    $logon_user = $sess->getLogonUser();
     
     $this->nav = $this->createNavigation();
-    $this->setupNavigation($this->nav, $logon_user);
+    $this->setupNavigation($this->nav, $sess->getPermissions());
     
     if ($logon_user !== null){
       $this->nav->addRight(Text::withIcon($logon_user->getNameSafe(), 'user'), '/account');

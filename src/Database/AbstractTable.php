@@ -23,6 +23,15 @@ abstract class AbstractTable{
   }
   
   /**
+   * Fetches the next result.
+   * @param PDOStatement $stmt
+   * @return mixed
+   */
+  protected function fetchNextColumn(PDOStatement $stmt){
+    return $stmt->fetchColumn();
+  }
+  
+  /**
    * Fetches one result and closes the cursor.
    * @param PDOStatement $stmt
    * @return mixed

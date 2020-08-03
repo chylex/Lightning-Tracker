@@ -15,11 +15,18 @@ final class UserLoginTable extends AbstractTable{
   // TODO periodically delete expired tokens
   
   public function checkLogin(string $token): ?UserProfile{
-    $stmt = $this->db->prepare('SELECT u.id, u.name, u.email FROM users u JOIN user_logins ul ON u.id = ul.id WHERE token = ? AND NOW() < ul.expires');
+    $stmt = $this->db->prepare(<<<SQL
+SELECT u.id, u.name, u.email, u.role_id, u.admin
+FROM users u
+JOIN user_logins ul ON u.id = ul.id
+WHERE token = ? AND NOW() < ul.expires
+SQL
+    );
+    
     $stmt->execute([$token]);
     
     $res = $this->fetchOne($stmt);
-    return $res === false ? null : new UserProfile($res['id'], $res['name'], $res['email']);
+    return $res === false ? null : new UserProfile($res['id'], $res['name'], $res['email'], $res['role_id'], (bool)$res['admin']);
   }
   
   public function addOrRenewToken(int $id, string $token, int $expire_in_minutes): void{
@@ -27,7 +34,8 @@ final class UserLoginTable extends AbstractTable{
 INSERT INTO user_logins (id, token, expires)
 VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))
 ON DUPLICATE KEY UPDATE expires = GREATEST(expires, VALUES(expires))
-SQL);
+SQL
+    );
     
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $token);

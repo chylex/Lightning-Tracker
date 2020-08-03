@@ -3,10 +3,10 @@ declare(strict_types = 1);
 
 namespace Pages\Models;
 
-use Database\Objects\UserProfile;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
 use Routing\Request;
+use Session\Permissions;
 
 class BasicRootPageModel extends AbstractPageModel{
   public function __construct(Request $req){
@@ -17,7 +17,7 @@ class BasicRootPageModel extends AbstractPageModel{
     return new NavigationComponent('Lightning Tracker', BASE_URL_ENC, $this->getReq());
   }
   
-  protected function setupNavigation(NavigationComponent $nav, ?UserProfile $logon_user): void{
+  protected function setupNavigation(NavigationComponent $nav, Permissions $perms): void{
     $nav->addLeft(Text::withIcon('About', 'info'), '/about');
   }
 }
