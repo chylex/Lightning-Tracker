@@ -18,6 +18,7 @@ class BasicRootPageModel extends AbstractPageModel{
   }
   
   protected function setupNavigation(NavigationComponent $nav, ?UserProfile $logon_user): void{
+    $nav->addLeft(Text::withIcon('About', 'info'), '/about');
   }
 }
 

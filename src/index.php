@@ -51,6 +51,8 @@ unset($_GET['route']);
 
 $router = new Router();
 
+$router->add('&/about', 'Root/AboutController');
+
 function handle_error(int $code, string $title, string $message): void{
   http_response_code($code);
   $page_model = new BasicRootPageModel(new Request('', '', []));
