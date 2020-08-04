@@ -20,6 +20,8 @@ class BasicRootPageModel extends AbstractPageModel{
   }
   
   protected function setupNavigation(NavigationComponent $nav, Permissions $perms): void{
+    $nav->addLeft(Text::withIcon('Trackers', 'book'), '');
+    
     if ($perms->checkSystem(UsersModel::PERM_LIST)){
       $nav->addLeft(Text::withIcon('Users', 'users'), '/users');
     }

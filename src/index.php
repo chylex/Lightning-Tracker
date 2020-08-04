@@ -51,6 +51,7 @@ unset($_GET['route']);
 
 $router = new Router();
 
+$router->add('&/', 'Root/TrackersController');
 $router->add('&/about', 'Root/AboutController');
 $router->add('&/users', 'Root/UsersController');
 $router->add('&/settings', 'Root/SettingsController');

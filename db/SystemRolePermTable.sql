@@ -2,6 +2,10 @@ CREATE TABLE `system_role_perms` (
 	`role_id`    SMALLINT NOT NULL,
 	`permission` ENUM (
 	    'settings',
+	    'trackers.list',
+	    'trackers.list.hidden',
+	    'trackers.add',
+	    'trackers.edit',
 		'users.list',
 		'users.list.email',
 		'users.add',
