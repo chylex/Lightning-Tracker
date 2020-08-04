@@ -9,6 +9,7 @@ use Pages\Actions\ReloadFormAction;
 use Pages\Components\Forms\Elements\FormButton;
 use Pages\Components\Forms\Elements\FormCheckBox;
 use Pages\Components\Forms\Elements\FormHiddenValue;
+use Pages\Components\Forms\Elements\FormIconButton;
 use Pages\Components\Forms\Elements\FormSplitGroupEnd;
 use Pages\Components\Forms\Elements\FormSplitGroupStart;
 use Pages\Components\Forms\Elements\FormTextArea;
@@ -16,6 +17,7 @@ use Pages\Components\Forms\Elements\FormTextField;
 use Pages\Components\Text;
 use Pages\IViewable;
 use Validation\InvalidField;
+use function Database\protect;
 
 final class FormComponent implements IViewable{
   public const ACTION_KEY = '_Action';
@@ -33,6 +35,7 @@ HTML;
   }
   
   private string $id;
+  private ?string $confirm_message = null;
   
   /**
    * @var IViewable[]
@@ -50,8 +53,20 @@ HTML;
     $this->id = $id;
   }
   
+  public function requireConfirmation(string $message): void{
+    $this->confirm_message = $message;
+  }
+  
   public function addMessage(string $level, Text $text): void{
     $this->messages[] = [$level, $text->getHtml()];
+  }
+  
+  public function startTitledSection(string $title): void{
+    $this->elements[] = Text::plain('<h3>'.$title.'</h3><article>');
+  }
+  
+  public function endTitledSection(): void{
+    $this->elements[] = Text::plain('</article>');
   }
   
   public function startSplitGroup(int $percentage_per_element, ?string $wrapper_class = null): void{
@@ -85,6 +100,12 @@ HTML;
   
   public function addButton(string $type, string $label): FormButton{
     $button = new FormButton($type, $label);
+    $this->elements[] = $button;
+    return $button;
+  }
+  
+  public function addIconButton(string $type, string $icon): FormIconButton{
+    $button = new FormIconButton($type, $icon);
     $this->elements[] = $button;
     return $button;
   }
@@ -177,9 +198,10 @@ HTML;
   
   public function echoBody(): void{
     $action_key = self::ACTION_KEY;
+    $confirm_attr = $this->confirm_message === null ? '' : ' onsubmit="return confirm(\''.protect($this->confirm_message).'\');"';
     
     echo <<<HTML
-<form id="$this->id" action="" method="post">
+<form id="$this->id" action="" method="post"$confirm_attr>
 HTML;
     
     foreach($this->messages as $message){
