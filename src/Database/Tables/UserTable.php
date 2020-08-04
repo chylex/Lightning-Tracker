@@ -5,8 +5,8 @@ namespace Database\Tables;
 
 use Database\AbstractTable;
 use Database\Filters\Types\UserFilter;
+use Database\Objects\UserInfo;
 use Database\Objects\UserLoginInfo;
-use Database\Objects\UserProfile;
 use Exception;
 use PDO;
 
@@ -54,19 +54,25 @@ final class UserTable extends AbstractTable{
   
   /**
    * @param UserFilter|null $filter
-   * @return UserProfile[]
+   * @return UserInfo[]
    */
   public function listUsers(UserFilter $filter = null): array{
     $filter ??= UserFilter::empty();
     
-    $stmt = $this->db->prepare('SELECT id, name, email, role_id, admin FROM users '.$filter->generateClauses());
+    $sql = <<<SQL
+SELECT u.id, u.name, u.email, sr.title AS role_title, u.date_registered
+FROM users u
+LEFT JOIN system_roles sr ON u.role_id = sr.id
+SQL;
+    
+    $stmt = $this->db->prepare($sql.' '.$filter->generateClauses());
     $filter->prepareStatement($stmt);
     $stmt->execute();
     
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new UserProfile($res['id'], $res['name'], $res['email'], $res['role_id'], (bool)$res['admin']);
+      $results[] = new UserInfo($res['id'], $res['name'], $res['email'], $res['role_title'], $res['date_registered']);
     }
     
     return $results;

@@ -155,6 +155,11 @@ button.icon:hover {
   opacity: 1;
 }
 
+span.missing {
+  color: #666666;
+  font-style: italic;
+}
+
 #page-content {
   padding: 24px;
 }

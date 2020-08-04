@@ -52,6 +52,7 @@ unset($_GET['route']);
 $router = new Router();
 
 $router->add('&/about', 'Root/AboutController');
+$router->add('&/users', 'Root/UsersController');
 
 foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'login', 'Mixed/LoginController');

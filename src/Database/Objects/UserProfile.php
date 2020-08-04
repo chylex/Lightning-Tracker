@@ -12,12 +12,12 @@ final class UserProfile{
   private ?int $role_id;
   private bool $admin;
   
-  public function __construct(int $id, string $name, string $email, ?int $role_id, bool $is_admin){
+  public function __construct(int $id, string $name, string $email, ?int $role_id, bool $admin){
     $this->id = $id;
     $this->name = $name;
     $this->email = $email;
     $this->role_id = $role_id;
-    $this->admin = $is_admin;
+    $this->admin = $admin;
   }
   
   public function getId(): int{
@@ -29,15 +29,11 @@ final class UserProfile{
   }
   
   public function getNameSafe(): string{
-    return protect($this->getName());
-  }
-  
-  public function getEmail(): string{
-    return $this->email;
+    return protect($this->name);
   }
   
   public function getEmailSafe(): string{
-    return protect($this->getEmail());
+    return protect($this->email);
   }
   
   public function getRoleId(): ?int{

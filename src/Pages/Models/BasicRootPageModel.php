@@ -5,6 +5,7 @@ namespace Pages\Models;
 
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
+use Pages\Models\Root\UsersModel;
 use Routing\Request;
 use Session\Permissions;
 
@@ -18,6 +19,10 @@ class BasicRootPageModel extends AbstractPageModel{
   }
   
   protected function setupNavigation(NavigationComponent $nav, Permissions $perms): void{
+    if ($perms->checkSystem(UsersModel::PERM_LIST)){
+      $nav->addLeft(Text::withIcon('Users', 'users'), '/users');
+    }
+    
     $nav->addLeft(Text::withIcon('About', 'info'), '/about');
   }
 }

@@ -1,7 +1,10 @@
 CREATE TABLE `system_role_perms` (
 	`role_id`    SMALLINT NOT NULL,
 	`permission` ENUM (
-		'TODO') NOT NULL,
+		'users.list',
+		'users.list.email',
+		'users.add',
+		'users.edit') NOT NULL,
 	PRIMARY KEY (`role_id`, `permission`),
 	FOREIGN KEY (`role_id`)
 		REFERENCES system_roles (`id`)

@@ -68,10 +68,7 @@ class RegisterModel extends BasicMixedPageModel{
     $password = $data['Password'];
     $password_repeated = $data['PasswordRepeated'];
     
-    $validator = new Validator(); // TODO deduplicate validation of same fields in other places
-    $validator->str('Name', $name)->notEmpty();
-    $validator->str('Email', $email)->notEmpty()->contains('@', 'Email is not valid.');
-    $validator->str('Password', $password)->minLength(7)->maxLength(72);
+    $validator = self::validateUserFields($name, $email, $password);
     $validator->str('PasswordRepeated', $password_repeated)->isTrue(fn($v): bool => $v === $password, 'Passwords do not match.');
     
     try{
@@ -88,30 +85,44 @@ class RegisterModel extends BasicMixedPageModel{
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());
     }catch(PDOException $e){
-      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION){
-        try{
-          $users = new UserTable(DB::get());
-          
-          if ($users->checkEmailExists($email)){
-            $this->form->invalidateField('Email', 'User with this email already exists.');
-            return false;
-          }
-          elseif ($users->checkNameExists($name)){
-            $this->form->invalidateField('Name', 'User with this name already exists.');
-            return false;
-          }
-        }catch(Exception $e){
-          $this->form->onGeneralError($e);
-          return false;
-        }
+      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION && self::checkDuplicateUser($this->form, $name, $email)){
+        return false;
       }
-  
+      
       $this->form->onGeneralError($e);
     }catch(Exception $e){
       $this->form->onGeneralError($e);
     }
     
     return false;
+  }
+  
+  public static function validateUserFields(string $name, string $email, string $password): Validator{
+    $validator = new Validator();
+    $validator->str('Name', $name)->notEmpty();
+    $validator->str('Email', $email)->notEmpty()->contains('@', 'Email is not valid.');
+    $validator->str('Password', $password)->minLength(7)->maxLength(72);
+    return $validator;
+  }
+  
+  public static function checkDuplicateUser(FormComponent $form, string $name, string $email): bool{
+    try{
+      $users = new UserTable(DB::get());
+      
+      if ($users->checkEmailExists($email)){
+        $form->invalidateField('Email', 'User with this email already exists.');
+        return false;
+      }
+      elseif ($users->checkNameExists($name)){
+        $form->invalidateField('Name', 'User with this name already exists.');
+        return false;
+      }
+      
+      return true;
+    }catch(Exception $e){
+      $form->onGeneralError($e);
+      return false;
+    }
   }
 }
 

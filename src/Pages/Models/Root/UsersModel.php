@@ -1,0 +1,188 @@
+<?php
+declare(strict_types = 1);
+
+namespace Pages\Models\Root;
+
+use Database\DB;
+use Database\Filters\AbstractFilter;
+use Database\Filters\Pagination;
+use Database\Filters\Types\UserFilter;
+use Database\SQL;
+use Database\Tables\UserTable;
+use Exception;
+use Pages\Components\DateTimeComponent;
+use Pages\Components\Forms\FormComponent;
+use Pages\Components\Table\TableComponent;
+use Pages\IModel;
+use Pages\Models\BasicRootPageModel;
+use Pages\Models\Mixed\RegisterModel;
+use PDOException;
+use Routing\Request;
+use Session\Permissions;
+use Session\Session;
+use Validation\ValidationException;
+
+class UsersModel extends BasicRootPageModel{
+  public const ACTION_CREATE = 'Create';
+  public const ACTION_DELETE = 'Delete';
+  
+  public const PERM_LIST = 'users.list';
+  public const PERM_LIST_EMAIL = 'users.list.email';
+  public const PERM_ADD = 'users.add';
+  public const PERM_EDIT = 'users.edit';
+  
+  private const USERS_PER_PAGE = 15;
+  
+  private Permissions $perms;
+  private TableComponent $table;
+  private ?FormComponent $form;
+  
+  public function __construct(Request $req, Permissions $perms){
+    parent::__construct($req);
+    
+    $this->perms = $perms;
+    $this->perms->requireSystem(self::PERM_LIST);
+    
+    $this->table = new TableComponent();
+    $this->table->ifEmpty('No users found.');
+    
+    $this->table->addColumn('Username')->bold();
+    
+    if ($perms->checkSystem(self::PERM_LIST_EMAIL)){
+      $this->table->addColumn('Email');
+    }
+    
+    $this->table->addColumn('Role');
+    $this->table->addColumn('Registration Time')->tight()->right();
+    
+    if ($perms->checkSystem(self::PERM_EDIT)){
+      $this->table->addColumn('Actions')->tight()->right();
+    }
+    
+    if ($perms->checkSystem(self::PERM_ADD)){
+      $this->form = new FormComponent(self::ACTION_CREATE);
+      $this->form->startTitledSection('Create User');
+      
+      $this->form->addTextField('Name')
+                 ->label('Username')
+                 ->type('text')
+                 ->autocomplete('username');
+      
+      $this->form->addTextField('Password')
+                 ->type('password')
+                 ->autocomplete('new-password');
+      
+      $this->form->addTextField('Email')
+                 ->type('email')
+                 ->autocomplete('email');
+      
+      $this->form->addButton('submit', 'Create User')
+                 ->icon('pencil');
+      
+      $this->form->endTitledSection();
+    }
+    else{
+      $this->form = null;
+    }
+  }
+  
+  public function load(): IModel{
+    parent::load();
+    
+    $logon_user = Session::get()->getLogonUser();
+    $logon_user_id = $logon_user === null ? -1 : $logon_user->getId();
+    
+    $filter = new UserFilter();
+    $users = new UserTable(DB::get());
+    $total_count = $users->countUsers();
+    
+    $pagination = Pagination::fromGet(AbstractFilter::GET_PAGE, $total_count, self::USERS_PER_PAGE);
+    $filter = $filter->page($pagination);
+    
+    foreach($users->listUsers($filter) as $user){
+      $user_id = $user->getId();
+      $row = [$user->getNameSafe()];
+      
+      if ($this->perms->checkSystem(self::PERM_LIST_EMAIL)){
+        $row[] = $user->getEmailSafe();
+      }
+      
+      $row[] = $user->getRoleTitleSafe() ?? '<span class="missing">none</span>';
+      $row[] = new DateTimeComponent($user->getRegistrationDate());
+      
+      if ($this->perms->checkSystem(self::PERM_EDIT)){
+        if ($user_id === $logon_user_id){
+          $row[] = '';
+        }
+        else{
+          $form = new FormComponent(self::ACTION_DELETE);
+          $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
+          $form->addHidden('User', strval($user_id));
+          $form->addIconButton('submit', 'trash');
+          $row[] = $form;
+        }
+      }
+      
+      $this->table->addRow($row);
+    }
+    
+    $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('users');
+    
+    return $this;
+  }
+  
+  public function getUserTable(): TableComponent{
+    return $this->table;
+  }
+  
+  public function getCreateForm(): ?FormComponent{
+    return $this->form;
+  }
+  
+  public function createUser(array $data): bool{
+    $this->perms->requireSystem(self::PERM_ADD);
+    
+    if (!$this->form->accept($data)){
+      return false;
+    }
+    
+    $name = $data['Name'];
+    $email = $data['Email'];
+    $password = $data['Password'];
+    
+    $validator = RegisterModel::validateUserFields($name, $email, $password);
+    
+    try{
+      $validator->validate();
+      $users = new UserTable(DB::get());
+      $users->addUser($name, $email, $password);
+      return true;
+    }catch(ValidationException $e){
+      $this->form->invalidateFields($e->getFields());
+    }catch(PDOException $e){
+      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION && RegisterModel::checkDuplicateUser($this->form, $name, $email)){
+        return false;
+      }
+      
+      $this->form->onGeneralError($e);
+    }catch(Exception $e){
+      $this->form->onGeneralError($e);
+    }
+    
+    return false;
+  }
+  
+  public function deleteUser(array $data): bool{ // TODO make it a dedicated page with additional checks
+    $this->perms->requireSystem(self::PERM_EDIT);
+    
+    if (!isset($data['User']) || !is_numeric($data['User'])){
+      return false;
+    }
+    
+    $users = new UserTable(DB::get());
+    $users->deleteById((int)$data['User']);
+    return true;
+  }
+}
+
+?>
