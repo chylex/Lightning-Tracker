@@ -53,6 +53,7 @@ $router = new Router();
 
 $router->add('&/about', 'Root/AboutController');
 $router->add('&/users', 'Root/UsersController');
+$router->add('&/settings', 'Root/SettingsController');
 
 foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'login', 'Mixed/LoginController');

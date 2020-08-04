@@ -1,6 +1,7 @@
 CREATE TABLE `system_role_perms` (
 	`role_id`    SMALLINT NOT NULL,
 	`permission` ENUM (
+	    'settings',
 		'users.list',
 		'users.list.email',
 		'users.add',
