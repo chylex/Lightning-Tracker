@@ -29,7 +29,8 @@ input, select {
 input[type=text],
 input[type=password],
 input[type=email],
-textarea {
+textarea,
+select {
   padding: 7px;
   width: 100%;
   border: 1px solid #333333;
@@ -39,7 +40,8 @@ textarea {
 input[type=text].invalid,
 input[type=password].invalid,
 input[type=email].invalid,
-textarea.invalid {
+textarea.invalid,
+select.invalid {
   border: 1px solid #8c1b1b;
   box-shadow: 0 0 4px -2px #8c1b1b inset;
 }
@@ -47,7 +49,8 @@ textarea.invalid {
 input[type=text]:focus,
 input[type=password]:focus,
 input[type=email]:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   outline: none !important;
   box-shadow: 0 0 4px -2px #1b618c inset;
 }
@@ -55,7 +58,8 @@ textarea:focus {
 input[type=text]:disabled,
 input[type=password]:disabled,
 input[type=email]:disabled,
-textarea:disabled {
+textarea:disabled,
+select:disabled {
   color: #2d2d2d;
 }
 
@@ -63,6 +67,60 @@ textarea {
   min-height: 75px;
   height: 140px;
   resize: vertical;
+}
+
+select {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
+
+select[size] {
+  padding: 0;
+  overflow: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+select:not([size]) {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3E%3Cpath d='M3.996,5l3.996,-5l-7.992,0l3.996,5Z'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) 50%;
+  background-size: 11px;
+}
+
+@supports (-moz-appearance: none) {
+  select:not([size]) {
+    padding: 7px 3px;
+  }
+
+  option:checked {
+    color: #ffffff;
+    box-shadow: 0 0 0 100px #2b5e7d inset;
+  }
+}
+
+@supports not (-moz-appearance: none) {
+  select[size]::-webkit-scrollbar {
+    width: 0;
+    display: none;
+  }
+
+  select:not([size]) select:focus option:checked {
+    color: #ffffff;
+    box-shadow: 0 0 0 100px #2b5e7d inset;
+  }
+}
+
+option {
+  padding: 7px;
+  outline: none;
+}
+
+option.icon:before {
+  /*noinspection CssNoGenericFontName*/
+  font-family: 'icomoon' !important;
+  margin-right: 5px;
+  line-height: 17px;
+  vertical-align: -6%;
 }
 
 label {

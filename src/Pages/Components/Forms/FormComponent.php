@@ -101,6 +101,13 @@ HTML;
     return $field;
   }
   
+  public function addSelect(string $name): FormSelect{
+    $field = new FormSelect($this->id.'-'.$name, $name);
+    $this->elements[] = $field;
+    $this->fields[$name] = $field;
+    return $field;
+  }
+  
   public function addButton(string $type, string $label): FormButton{
     $button = new FormButton($type, $label);
     $this->elements[] = $button;
