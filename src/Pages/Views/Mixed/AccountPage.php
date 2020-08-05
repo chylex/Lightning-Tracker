@@ -62,8 +62,8 @@ HTML;
     
     $form = new FormComponent();
     $form->startSplitGroup(50);
-    $form->addTextField('Name')->label('Username')->value($logon_user->getNameSafe())->disabled();
-    $form->addTextField('Email')->value($logon_user->getEmailSafe())->disabled();
+    $form->addTextField('Name')->label('Username')->value($logon_user->getNameSafe())->disable();
+    $form->addTextField('Email')->value($logon_user->getEmailSafe())->disable();
     $form->endSplitGroup();
     
     echo <<<HTML

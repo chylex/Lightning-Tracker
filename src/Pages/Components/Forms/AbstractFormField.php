@@ -19,7 +19,7 @@ abstract class AbstractFormField implements IFormField{
     return $this;
   }
   
-  public function disabled(): self{
+  public function disable(): self{
     $this->disabled = true;
     return $this;
   }
@@ -30,6 +30,10 @@ abstract class AbstractFormField implements IFormField{
   
   public function addError(string $message): void{
     $this->errors[] = $message;
+  }
+  
+  public function isDisabled(): bool{
+    return $this->disabled;
   }
   
   public function acceptsMissingField(): bool{

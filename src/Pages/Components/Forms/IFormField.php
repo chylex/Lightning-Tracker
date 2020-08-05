@@ -7,11 +7,12 @@ use Pages\IViewable;
 
 interface IFormField extends IViewable{
   public function value(string $value): IFormField;
-  public function disabled(): IFormField;
+  public function disable(): IFormField;
   
   public function getName(): string;
   public function addError(string $message): void;
   
+  public function isDisabled(): bool;
   public function acceptsMissingField(): bool;
 }
 

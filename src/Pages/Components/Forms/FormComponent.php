@@ -10,6 +10,7 @@ use Pages\Components\Forms\Elements\FormButton;
 use Pages\Components\Forms\Elements\FormCheckBox;
 use Pages\Components\Forms\Elements\FormHiddenValue;
 use Pages\Components\Forms\Elements\FormIconButton;
+use Pages\Components\Forms\Elements\FormSelect;
 use Pages\Components\Forms\Elements\FormSplitGroupEnd;
 use Pages\Components\Forms\Elements\FormSplitGroupStart;
 use Pages\Components\Forms\Elements\FormTextArea;
@@ -35,6 +36,8 @@ HTML;
   }
   
   private string $id;
+  private bool $is_filled = false;
+  
   private ?string $confirm_message = null;
   
   /**
@@ -120,12 +123,22 @@ HTML;
     $this->elements[] = Text::plain($html);
   }
   
+  public function isFilled(): bool{
+    return $this->is_filled;
+  }
+  
   /**
    * Fills form fields using the provided data.
    * @param array $data
    */
   public function fill(array $data){
+    $this->is_filled = true;
+    
     foreach($this->fields as $name => $field){
+      if ($field->isDisabled()){
+        continue;
+      }
+      
       if (isset($data[$name]) || $field->acceptsMissingField()){
         $field->value($data[$name] ?? null);
       }
@@ -141,10 +154,16 @@ HTML;
     if (!isset($data[self::ACTION_KEY]) || $data[self::ACTION_KEY] !== $this->id){
       return false;
     }
-    
+  
+    $this->is_filled = true;
     $filled_fields = 0;
     
     foreach($this->fields as $name => $field){
+      if ($field->isDisabled()){
+        $filled_fields++;
+        continue;
+      }
+      
       if (isset($data[$name]) || $field->acceptsMissingField()){
         $field->value($data[$name] ?? null);
         $filled_fields++;
