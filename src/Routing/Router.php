@@ -106,11 +106,11 @@ final class Router{
         continue;
       }
       
-      throw new RouterException("Page '$path' does not exist.", RouterException::STATUS_NOT_FOUND);
+      throw new RouterException("Page '$path' does not exist.", RouterException::STATUS_NOT_FOUND, null);
     }
     
     if (!array_key_exists('/', $route)){
-      throw new RouterException("Page '$path' does not exist.", RouterException::STATUS_NOT_FOUND);
+      throw new RouterException("Page '$path' does not exist.", RouterException::STATUS_NOT_FOUND, null);
     }
     
     $route_info = $route['/'];
@@ -131,9 +131,9 @@ final class Router{
       $action = $controller->run($req, Session::get());
       $action->execute();
     }catch(PermissionException $e){
-      throw new RouterException($e->getMessage(), RouterException::STATUS_FORBIDDEN, $e);
+      throw new RouterException($e->getMessage(), RouterException::STATUS_FORBIDDEN, $req, $e);
     }catch(Exception $e){
-      throw new RouterException($e->getMessage(), RouterException::STATUS_SERVER_ERROR, $e);
+      throw new RouterException($e->getMessage(), RouterException::STATUS_SERVER_ERROR, $req, $e);
     }
   }
 }

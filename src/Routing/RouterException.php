@@ -11,8 +11,15 @@ final class RouterException extends Exception{
   public const STATUS_NOT_FOUND = 404;
   public const STATUS_SERVER_ERROR = 500;
   
-  public function __construct(string $message, int $code, Throwable $previous = null){
+  private ?Request $req;
+  
+  public function __construct(string $message, int $code, ?Request $req, Throwable $previous = null){
     parent::__construct($message, $code, $previous);
+    $this->req = $req;
+  }
+  
+  public function getReq(): ?Request{
+    return $this->req;
   }
 }
 

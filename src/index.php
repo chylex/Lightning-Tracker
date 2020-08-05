@@ -63,9 +63,9 @@ foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'account/security', 'Mixed/AccountSecurityController');
 }
 
-function handle_error(int $code, string $title, string $message): void{
+function handle_error(int $code, string $title, string $message, ?Request $req = null): void{
   http_response_code($code);
-  $page_model = new BasicRootPageModel(new Request('', '', []));
+  $page_model = new BasicRootPageModel($req ?? new Request('', '', []));
   $error_model = new ErrorModel($page_model, $title, $message);
   view(new ErrorPage($error_model->load()))->execute();
 }
@@ -76,15 +76,16 @@ try{
   Log::critical($e);
   
   $code = $e->getCode();
+  $req = $e->getReq();
   
   if ($code === RouterException::STATUS_FORBIDDEN){
-    handle_error($code, 'Permission Error', 'You do not have permission to perform this action.');
+    handle_error($code, 'Permission Error', 'You do not have permission to perform this action.', $req);
   }
   elseif ($code === RouterException::STATUS_NOT_FOUND){
-    handle_error($code, 'Not Found', $e->getMessage());
+    handle_error($code, 'Not Found', $e->getMessage(), $req);
   }
   else{
-    handle_error($code, 'Fatal Error', 'An error occurred while handling your request.');
+    handle_error($code, 'Fatal Error', 'An error occurred while handling your request.', $req);
   }
 }catch(Exception $e){
   Log::critical($e);
