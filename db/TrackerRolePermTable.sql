@@ -1,7 +1,7 @@
 CREATE TABLE tracker_role_perms (
 	`role_id`    INT NOT NULL,
 	`permission` ENUM (
-		'TODO') NOT NULL,
+		'settings') NOT NULL,
 	PRIMARY KEY (`role_id`, `permission`),
 	FOREIGN KEY (`role_id`)
 		REFERENCES tracker_roles (`id`)

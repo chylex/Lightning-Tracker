@@ -56,6 +56,8 @@ $router->add('&/about', 'Root/AboutController');
 $router->add('&/users', 'Root/UsersController');
 $router->add('&/settings', 'Root/SettingsController');
 
+$router->add('tracker/:tracker/&/settings', 'Tracker/SettingsController');
+
 foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'login', 'Mixed/LoginController');
   $router->add($base.'register', 'Mixed/RegisterController');

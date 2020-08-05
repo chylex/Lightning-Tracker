@@ -61,6 +61,14 @@ final class TrackerTable extends AbstractTable{
     }
   }
   
+  public function changeSettings(int $id, string $name, bool $hidden){
+    $stmt = $this->db->prepare('UPDATE trackers SET name = ?, hidden = ? WHERE id = ?');
+    $stmt->bindValue(1, $name);
+    $stmt->bindValue(2, $hidden, PDO::PARAM_BOOL);
+    $stmt->bindValue(3, $id, PDO::PARAM_INT);
+    $stmt->execute();
+  }
+  
   public function countTrackers(TrackerFilter $filter = null): ?int{
     $filter ??= TrackerFilter::empty();
     
@@ -111,13 +119,6 @@ final class TrackerTable extends AbstractTable{
     $stmt = $this->db->prepare('SELECT 1 FROM trackers WHERE url = ?');
     $stmt->execute([$url]);
     return (bool)$this->fetchOneColumn($stmt);
-  }
-  
-  public function setHidden(int $id, bool $hidden){
-    $stmt = $this->db->prepare('UPDATE trackers SET hidden = ? WHERE id = ?');
-    $stmt->bindValue(1, $hidden, PDO::PARAM_BOOL);
-    $stmt->bindValue(2, $id, PDO::PARAM_INT);
-    $stmt->execute();
   }
   
   public function isHidden(int $id): bool{

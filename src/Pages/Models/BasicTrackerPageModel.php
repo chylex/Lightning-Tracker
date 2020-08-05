@@ -6,6 +6,7 @@ namespace Pages\Models;
 use Database\Objects\TrackerInfo;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
+use Pages\Models\Tracker\SettingsModel;
 use Routing\Request;
 use Session\Permissions;
 
@@ -22,6 +23,9 @@ class BasicTrackerPageModel extends AbstractPageModel{
   }
   
   protected function setupNavigation(NavigationComponent $nav, Permissions $perms): void{
+    if ($perms->checkTracker($this->tracker, SettingsModel::PERM)){
+      $nav->addLeft(Text::withIcon('Settings', 'wrench'), '/settings');
+    }
   }
   
   public function getTracker(): TrackerInfo{
