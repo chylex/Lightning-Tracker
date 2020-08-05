@@ -3,34 +3,42 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
+use Database\Tables\Traits\PermTable;
 use Database\AbstractTable;
+use Database\DB;
 use Database\Objects\RoleInfo;
 use Database\Objects\UserProfile;
 use PDO;
+use PDOException;
 
 final class SystemPermTable extends AbstractTable{
+  use PermTable;
+  
+  private const GUEST_PERMS = ['trackers.view'];
+  private const LOGON_PERMS = ['trackers.view'];
+  
   public function __construct(PDO $db){
     parent::__construct($db);
+  }
+  
+  protected function getDB(): PDO{
+    return $this->db;
   }
   
   public function addRole(string $title, array $perms): void{
     $this->db->beginTransaction();
     
-    $stmt = $this->db->prepare('INSERT INTO system_roles (title) VALUES (?)');
-    $stmt->execute([$title]);
-    
-    if (!empty($perms)){
-      $values = implode(',', array_map(fn($ignore): string => '(LAST_INSERT_ID(), ?)', $perms));
-      $stmt = $this->db->prepare('INSERT INTO system_role_perms (role_id, permission) VALUES '.$values);
+    try{
+      $stmt = $this->db->prepare('INSERT INTO system_roles (title) VALUES (?)');
+      $stmt->execute([$title]);
       
-      for($i = 0, $count = count($perms); $i < $count; $i++){
-        $stmt->bindValue($i + 1, $perms[$i]);
-      }
+      $this->addPermissions('INSERT INTO system_role_perms (role_id, permission) VALUES ()', $perms);
       
-      $stmt->execute();
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+      throw $e;
     }
-    
-    $this->db->commit();
   }
   
   /**
@@ -39,14 +47,7 @@ final class SystemPermTable extends AbstractTable{
   public function listRoles(): array{
     $stmt = $this->db->prepare('SELECT id, title FROM system_roles ORDER BY id ASC');
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new RoleInfo($res['id'], $res['title']);
-    }
-    
-    return $results;
+    return $this->fetchRoles($stmt);
   }
   
   /**
@@ -54,23 +55,18 @@ final class SystemPermTable extends AbstractTable{
    * @return string[]
    */
   public function listPerms(?UserProfile $user): array{
-    $role_id = $user === null ? null : $user->getRoleId();
+    if ($user === null){
+      return self::GUEST_PERMS;
+    }
     
-    if ($role_id === null){
-      return []; // TODO guest permissions
+    if ($user->getRoleId() === null){
+      return self::LOGON_PERMS;
     }
     
     $stmt = $this->db->prepare('SELECT permission FROM system_role_perms WHERE role_id = ?');
-    $stmt->bindValue(1, $role_id, PDO::PARAM_INT);
+    $stmt->bindValue(1, $user->getRoleId(), PDO::PARAM_INT);
     $stmt->execute();
-  
-    $results = [];
-  
-    while(($res = $this->fetchNextColumn($stmt)) !== false){
-      $results[] = $res;
-    }
-  
-    return $results;
+    return $this->fetchPerms($stmt);
   }
   
   public function deleteById(int $id): void{
