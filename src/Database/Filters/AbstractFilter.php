@@ -44,12 +44,12 @@ abstract class AbstractFilter{
   
   public abstract function prepareStatement(PDOStatement $stmt): void;
   
-  public final function generateClauses(bool $is_count_query = false): string{
+  public final function generateClauses(bool $is_count_query = false, ?string $table_name = null): string{
     $clauses = $is_count_query ? [
-        'WHERE' => $this->generateWhereClause()
+        'WHERE' => $this->generateWhereClause($table_name)
     ] : [
-        'WHERE'    => $this->generateWhereClause(),
-        'ORDER BY' => $this->generateOrderByClause(),
+        'WHERE'    => $this->generateWhereClause($table_name),
+        'ORDER BY' => $this->generateOrderByClause($table_name),
         'LIMIT'    => $this->generateLimitClause()
     ];
     
@@ -64,7 +64,7 @@ abstract class AbstractFilter{
     return implode(' ', $used);
   }
   
-  protected function generateWhereClause(): string{
+  protected function generateWhereClause(?string $table_name): string{
     $cols = [];
     
     foreach($this->getWhereColumns() as $field => $type){
@@ -74,7 +74,7 @@ abstract class AbstractFilter{
       
       switch($type){
         case self::OP_EQ:
-          $cols[] = "`$field` = :$field";
+          $cols[] = self::field($table_name, $field)." = :$field";
           break;
         
         case self::OP_LIKE:
@@ -89,7 +89,7 @@ abstract class AbstractFilter{
     return empty($cols) ? '' : implode(' AND ', $cols);
   }
   
-  protected function generateOrderByClause(): string{
+  protected function generateOrderByClause(?string $table_name): string{
     $cols = [];
     
     foreach($this->getOrderByColumns() as $field => $type){
@@ -100,7 +100,7 @@ abstract class AbstractFilter{
       switch($type){
         case self::ORDER_ASC:
         case self::ORDER_DESC:
-          $cols[] = "`$field` $type";
+          $cols[] = self::field($table_name, $field).' '.$type;
           break;
         
         default:
@@ -113,6 +113,10 @@ abstract class AbstractFilter{
   
   protected function generateLimitClause(): string{
     return $this->limit_offset === null ? '' : (int)$this->limit_offset.', '.(int)$this->limit_count;
+  }
+  
+  protected static final function field(?string $table_name, string $field_name): string{
+    return $table_name === null ? "`$field_name`" : "`$table_name`.`$field_name`";
   }
 }
 
