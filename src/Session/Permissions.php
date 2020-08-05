@@ -7,6 +7,7 @@ use Database\DB;
 use Database\Objects\TrackerInfo;
 use Database\Objects\UserProfile;
 use Database\Tables\SystemPermTable;
+use Database\Tables\TrackerPermTable;
 use Exception;
 use Logging\Log;
 
@@ -40,15 +41,20 @@ final class Permissions{
   }
   
   public function checkTracker(TrackerInfo $tracker, string $permission): bool{
-    if ($this->user !== null && $this->user->isAdmin()){
+    if ($this->user !== null && ($this->user->isAdmin() || $tracker->getOwnerId() === $this->user->getId())){
       return true;
     }
     
     $id = $tracker->getId();
     
     if (!isset($this->tracker[$id])){
-      // TODO read
-      $this->tracker[$id] = [];
+      try{
+        $perms = new TrackerPermTable(DB::get(), $tracker);
+        $this->tracker[$id] = $perms->listPerms($this->user);
+      }catch(Exception $e){
+        Log::critical($e);
+        $this->tracker[$id] = [];
+      }
     }
     
     return in_array($permission, $this->tracker[$id]);

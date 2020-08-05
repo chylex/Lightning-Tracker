@@ -8,25 +8,57 @@ use Database\Filters\Types\TrackerFilter;
 use Database\Objects\TrackerInfo;
 use Database\Objects\TrackerVisibilityInfo;
 use Database\Objects\UserProfile;
+use Exception;
 use PDO;
+use PDOException;
 
 final class TrackerTable extends AbstractTable{
   public function __construct(PDO $db){
     parent::__construct($db);
   }
   
+  /**
+   * @param string $name
+   * @param string $url
+   * @param bool $hidden
+   * @param UserProfile $owner
+   * @throws Exception
+   */
   public function addTracker(string $name, string $url, bool $hidden, UserProfile $owner): void{
-    $stmt = $this->db->prepare(<<<SQL
-INSERT INTO trackers (name, url, hidden, owner)
-VALUES (:name, :url, :hidden, :owner_id)
-SQL
-    );
+    $this->db->beginTransaction();
     
-    $stmt->bindValue('name', $name);
-    $stmt->bindValue('url', $url);
-    $stmt->bindValue('hidden', $hidden, PDO::PARAM_BOOL);
-    $stmt->bindValue('owner_id', $owner->getId(), PDO::PARAM_INT);
-    $stmt->execute();
+    try{
+      $stmt = $this->db->prepare('INSERT INTO trackers (name, url, hidden, owner_id) VALUES (:name, :url, :hidden, :owner_id)');
+      
+      $stmt->bindValue('name', $name);
+      $stmt->bindValue('url', $url);
+      $stmt->bindValue('hidden', $hidden, PDO::PARAM_BOOL);
+      $stmt->bindValue('owner_id', $owner->getId(), PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $stmt = $this->db->query('SELECT LAST_INSERT_ID()');
+      $stmt->execute();
+      
+      $id = $this->fetchOneColumn($stmt);
+      
+      if ($id === false){
+        $this->db->rollBack();
+        throw new Exception('Could not retrieve tracker ID.');
+      }
+      
+      $tracker = new TrackerInfo($id, $name, $url, $owner->getId());
+      $perms = new TrackerPermTable($this->db, $tracker);
+      
+      // TODO add initial permission setup
+      $perms->addRole('Administrator', []);
+      $perms->addRole('Moderator', []);
+      $perms->addRole('User', []);
+      
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+      throw $e;
+    }
   }
   
   public function countTrackers(TrackerFilter $filter = null): ?int{
@@ -47,14 +79,14 @@ SQL
   public function listTrackers(TrackerFilter $filter = null): array{
     $filter ??= TrackerFilter::empty();
     
-    $stmt = $this->db->prepare('SELECT id, name, url FROM trackers '.$filter->generateClauses());
+    $stmt = $this->db->prepare('SELECT id, name, url, owner_id FROM trackers '.$filter->generateClauses());
     $filter->prepareStatement($stmt);
     $stmt->execute();
     
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new TrackerInfo($res['id'], $res['name'], $res['url']);
+      $results[] = new TrackerInfo($res['id'], $res['name'], $res['url'], $res['owner_id']);
     }
     
     return $results;
@@ -62,17 +94,17 @@ SQL
   
   public function getInfoFromUrl(string $url, ?UserProfile $profile): ?TrackerVisibilityInfo{
     $user_visibility_clause = $profile === null ? '' : TrackerFilter::getUserVisibilityClause();
-    $stmt = $this->db->prepare('SELECT id, name, (hidden = FALSE'.$user_visibility_clause.') AS visible FROM trackers WHERE url = :url');
+    $stmt = $this->db->prepare('SELECT id, name, owner_id, (hidden = FALSE'.$user_visibility_clause.') AS visible FROM trackers WHERE url = :url');
     $stmt->bindValue('url', $url);
     
     if ($profile !== null){
-      $stmt->bindValue('user_id', $profile->getId());
+      TrackerFilter::bindUserVisibility($stmt, $profile);
     }
     
     $stmt->execute();
     
     $res = $this->fetchOne($stmt);
-    return $res === false ? null : new TrackerVisibilityInfo(new TrackerInfo($res['id'], $res['name'], $url), (bool)$res['visible']);
+    return $res === false ? null : new TrackerVisibilityInfo(new TrackerInfo($res['id'], $res['name'], $url, $res['owner_id']), (bool)$res['visible']);
   }
   
   public function checkUrlExists(string $url): bool{

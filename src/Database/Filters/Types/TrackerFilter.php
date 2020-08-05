@@ -10,8 +10,16 @@ use PDOStatement;
 use function Database\bind;
 
 final class TrackerFilter extends AbstractFilter{
-  public static function getUserVisibilityClause(): string{
-    return ' OR owner = :user_id'; // TODO
+  public static function getUserVisibilityClause(?string $table_name = null): string{
+    // TODO have roles which ban the user instead?
+    return
+        ' OR '.self::field($table_name, 'owner_id').' = :user_id_1'.
+        ' OR EXISTS(SELECT 1 FROM tracker_members tm WHERE tm.tracker_id = '.self::field($table_name, 'id').' AND tm.user_id = :user_id_2)';
+  }
+  
+  public static function bindUserVisibility(PDOStatement $stmt, UserProfile $user): void{
+    bind($stmt, 'user_id_1', $user->getId(), PDO::PARAM_INT);
+    bind($stmt, 'user_id_2', $user->getId(), PDO::PARAM_INT);
   }
   
   public static function empty(): self{
@@ -46,18 +54,18 @@ final class TrackerFilter extends AbstractFilter{
     ];
   }
   
-  protected function generateWhereClause(): string{
-    $clause = parent::generateWhereClause();
+  protected function generateWhereClause(?string $table_name): string{
+    $clause = parent::generateWhereClause($table_name);
     
     if ($this->visible_to_set){
       if (!empty($clause)){
         $clause .= ' AND ';
       }
       
-      $clause .= ' (hidden = FALSE';
+      $clause .= ' ('.self::field($table_name, 'hidden').' = FALSE';
       
       if ($this->visible_to !== null){
-        $clause .= self::getUserVisibilityClause();
+        $clause .= self::getUserVisibilityClause($table_name);
       }
       
       $clause .= ')';
@@ -77,7 +85,7 @@ final class TrackerFilter extends AbstractFilter{
     bind($stmt, 'url', $this->url);
     
     if ($this->visible_to !== null){
-      bind($stmt, 'user_id', $this->visible_to->getId(), PDO::PARAM_INT);
+      self::bindUserVisibility($stmt, $this->visible_to);
     }
   }
 }
