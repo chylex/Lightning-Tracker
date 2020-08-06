@@ -1,0 +1,69 @@
+.issue-tag:before {
+  display: inline-block;
+  content: "";
+  width: 12px;
+  height: 12px;
+  margin-right: 2px;
+  border-radius: 6px;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.75) inset, 0 0 3px rgba(0, 0, 0, 0.15) inset;
+}
+
+option.issue-tag:before {
+  margin-right: 5px;
+}
+
+.issue-status-open:before {
+  background-color: #d9d9d9;
+}
+
+.issue-status-in-progress:before {
+  background-color: #dfd925;
+}
+
+.issue-status-ready-to-test:before {
+  background-color: #0cbad5;
+}
+
+.issue-status-blocked:before {
+  background-color: #f72319;
+}
+
+.issue-status-finished:before {
+  background-color: #00d000;
+}
+
+.issue-status-rejected:before {
+  background-color: #939393;
+}
+
+.issue-priority-low:before {
+  background-color: #00d000;
+}
+
+.issue-priority-medium:before {
+  background-color: #dfd925;
+}
+
+.issue-priority-high:before {
+  background-color: #f72319;
+}
+
+.issue-scale-tiny:before {
+  background-color: #00d000;
+}
+
+.issue-scale-small:before {
+  background-color: #a9ea0f;
+}
+
+.issue-scale-medium:before {
+  background-color: #dfd925;
+}
+
+.issue-scale-large:before {
+  background-color: #f28d0a;
+}
+
+.issue-scale-massive:before {
+  background-color: #f72319;
+}
