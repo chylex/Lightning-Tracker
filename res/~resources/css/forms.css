@@ -29,6 +29,7 @@ input, select {
 input[type=text],
 input[type=password],
 input[type=email],
+input[type=number],
 textarea,
 select {
   padding: 7px;
@@ -40,6 +41,7 @@ select {
 input[type=text].invalid,
 input[type=password].invalid,
 input[type=email].invalid,
+input[type=number].invalid,
 textarea.invalid,
 select.invalid {
   border: 1px solid #8c1b1b;
@@ -49,6 +51,7 @@ select.invalid {
 input[type=text]:focus,
 input[type=password]:focus,
 input[type=email]:focus,
+input[type=number]:focus,
 textarea:focus,
 select:focus {
   outline: none !important;
@@ -58,6 +61,7 @@ select:focus {
 input[type=text]:disabled,
 input[type=password]:disabled,
 input[type=email]:disabled,
+input[type=number]:disabled,
 textarea:disabled,
 select:disabled {
   color: #2d2d2d;
