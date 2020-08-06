@@ -3,7 +3,8 @@ CREATE TABLE tracker_role_perms (
 	`permission` ENUM (
 		'settings',
 		'members.list',
-		'members.manage') NOT NULL,
+		'members.manage',
+		'milestones.edit') NOT NULL,
 	PRIMARY KEY (`role_id`, `permission`),
 	FOREIGN KEY (`role_id`)
 		REFERENCES tracker_roles (`id`)

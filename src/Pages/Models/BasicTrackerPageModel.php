@@ -24,6 +24,8 @@ class BasicTrackerPageModel extends AbstractPageModel{
   }
   
   protected function setupNavigation(NavigationComponent $nav, Permissions $perms): void{
+    $nav->addLeft(Text::withIcon('Milestones', 'calendar'), '/milestones');
+    
     if ($perms->checkTracker($this->tracker, MembersModel::PERM_LIST)){
       $nav->addLeft(Text::withIcon('Members', 'users'), '/members');
     }

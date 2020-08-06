@@ -122,6 +122,12 @@ span.icon {
 .icon-forward:before {
   content: "\ea20";
 }
+.icon-circle-up:before {
+  content: "\ea41";
+}
+.icon-circle-down:before {
+  content: "\ea43";
+}
 .icon-checkbox-checked:before {
   content: "\ea52";
 }
