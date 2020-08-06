@@ -57,6 +57,7 @@ $router->add('&/users', 'Root/UsersController');
 $router->add('&/settings', 'Root/SettingsController');
 
 $router->add('tracker/:tracker/&', 'Tracker/DashboardController');
+$router->add('tracker/:tracker/&/issues', 'Tracker/IssuesController');
 $router->add('tracker/:tracker/&/milestones', 'Tracker/MilestonesController');
 $router->add('tracker/:tracker/&/members', 'Tracker/MembersController');
 $router->add('tracker/:tracker/&/settings', 'Tracker/SettingsController');
