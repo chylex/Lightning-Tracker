@@ -18,6 +18,7 @@ HTML;
   
   private string $base_url;
   private string $active_url_normalized;
+  private ?Text $title = null;
   
   public function __construct(string $home_url, Request $req){
     $this->base_url = rtrim($home_url.'/'.$req->getBasePath()->encoded(), '/');
@@ -28,6 +29,11 @@ HTML;
    * @var IViewable[]
    */
   private array $items = [];
+  
+  public function setTitle(Text $title): SidemenuComponent{
+    $this->title = $title;
+    return $this;
+  }
   
   public function addLink(Text $title, string $url): void{
     $item = new SidemenuItem($title, $this->base_url.$url);
@@ -47,6 +53,16 @@ HTML;
   
   /** @noinspection HtmlMissingClosingTag */
   public function echoBody(): void{
+    if (empty($this->items)){
+      return;
+    }
+    
+    if ($this->title !== null){
+      echo '<h3>';
+      $this->title->echoBody();
+      echo '</h3>';
+    }
+    
     echo <<<HTML
 <nav class="sidemenu">
   <ul>
