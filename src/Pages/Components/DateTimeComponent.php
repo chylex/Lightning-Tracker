@@ -7,13 +7,18 @@ use Pages\IViewable;
 
 final class DateTimeComponent implements IViewable{
   private int $datetime;
+  private bool $date_only;
   
-  public function __construct(string $datetime){
+  public function __construct(string $datetime, bool $date_only = false){
     $this->datetime = strtotime($datetime);
+    $this->date_only = $date_only;
   }
   
   public function echoBody(): void{
-    echo '<time datetime="'.date(DATE_RFC3339, $this->datetime).'">'.date('d M Y, H:i e', $this->datetime).'</time>';
+    $standard = date(DATE_RFC3339, $this->datetime);
+    $readable = date($this->date_only ? 'd M Y, e' : 'd M Y, H:i e', $this->datetime);
+    
+    echo '<time datetime="'.$standard.'" data-kind="'.($this->date_only ? 'date' : 'datetime').'">'.$readable.'</time>';
   }
 }
 
