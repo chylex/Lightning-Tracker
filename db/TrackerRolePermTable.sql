@@ -5,7 +5,9 @@ CREATE TABLE tracker_role_perms (
 		'members.list',
 		'members.manage',
 		'milestones.edit',
-		'issues.create') NOT NULL,
+		'issues.create',
+		'issues.edit.all',
+		'issues.delete.all') NOT NULL,
 	PRIMARY KEY (`role_id`, `permission`),
 	FOREIGN KEY (`role_id`)
 		REFERENCES tracker_roles (`id`)

@@ -22,6 +22,8 @@ class IssuesModel extends BasicTrackerPageModel{
   private const ISSUES_PER_PAGE = 15;
   
   public const PERM_CREATE = 'issues.create';
+  public const PERM_EDIT_ALL = 'issues.edit.all';
+  public const PERM_DELETE_ALL = 'issues.delete.all';
   
   private Permissions $perms;
   private TableComponent $table;

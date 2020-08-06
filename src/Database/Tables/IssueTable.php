@@ -106,6 +106,13 @@ SQL
                            $res['author_id'] === null ? null : new IssueUser($res['author_id'], $res['author_name']),
                            $res['assignee_id'] === null ? null : new IssueUser($res['assignee_id'], $res['assignee_name']));
   }
+  
+  public function deleteById(int $id): void{
+    $stmt = $this->db->prepare('DELETE FROM issues WHERE issue_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+  }
 }
 
 ?>
