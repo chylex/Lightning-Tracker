@@ -151,10 +151,6 @@ HTML;
     $this->is_filled = true;
     
     foreach($this->fields as $name => $field){
-      if ($field->isDisabled()){
-        continue;
-      }
-      
       if (isset($data[$name]) || $field->acceptsMissingField()){
         $field->value($data[$name] ?? null);
       }
