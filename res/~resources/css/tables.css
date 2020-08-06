@@ -110,6 +110,10 @@ td .icon.faded {
   color: #444444;
 }
 
+td form {
+  display: inline;
+}
+
 div.pagination {
   display: flex;
   font-size: 15px;
