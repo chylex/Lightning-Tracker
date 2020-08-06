@@ -44,6 +44,31 @@ abstract class AbstractFilter{
   
   public abstract function prepareStatement(PDOStatement $stmt): void;
   
+  public final function injectClauses(string $sql, ?string $table_name = null): string{
+    $clauses = [
+        '# WHERE' => ['WHERE', $this->generateWhereClause($table_name)],
+        '# ORDER' => ['ORDER BY', $this->generateOrderByClause($table_name)],
+        '# LIMIT' => ['LIMIT', $this->generateLimitClause()]
+    ];
+    
+    $sql = str_replace("\r", '', $sql);
+    
+    foreach($clauses as $comment => $data){
+      $name = $data[0];
+      $contents = $data[1];
+      $replacement = empty($contents) ? '' : $name.' '.$contents;
+      
+      $count = 0;
+      $sql = preg_replace('/^'.$comment.'$/m', $replacement, $sql, -1, $count);
+      
+      if ($count !== 1){
+        throw new LogicException('Invalid amount of SQL clause "'.$comment.'" comments ('.$count.').');
+      }
+    }
+    
+    return $sql;
+  }
+  
   public final function generateClauses(bool $is_count_query = false, ?string $table_name = null): string{
     $clauses = $is_count_query ? [
         'WHERE' => $this->generateWhereClause($table_name)
