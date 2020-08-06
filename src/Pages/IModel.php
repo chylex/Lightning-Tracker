@@ -8,6 +8,7 @@ use Pages\Components\Navigation\NavigationComponent;
 interface IModel{
   /**
    * Loads data into the model.
+   *
    * @return $this
    */
   public function load(): IModel;

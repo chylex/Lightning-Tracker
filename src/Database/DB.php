@@ -11,7 +11,7 @@ final class DB{
 SET time_zone = "+00:00",
     sql_mode = "STRICT_ALL_TABLES,NO_ENGINE_SUBSTITUTION"
 SQL;
-
+  
   /**
    * @return PDO
    * @throws PDOException

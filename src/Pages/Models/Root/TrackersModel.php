@@ -25,7 +25,7 @@ use Validation\Validator;
 class TrackersModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
   public const ACTION_DELETE = 'Delete';
-
+  
   public const PERM_LIST = 'trackers.list';
   public const PERM_LIST_HIDDEN = 'trackers.list.hidden';
   public const PERM_ADD = 'trackers.add';
@@ -39,7 +39,7 @@ class TrackersModel extends BasicRootPageModel{
   
   public function __construct(Request $req, Permissions $perms){
     parent::__construct($req);
-  
+    
     $this->perms = $perms;
     
     $this->table = new TableComponent();
@@ -130,11 +130,11 @@ class TrackersModel extends BasicRootPageModel{
     $name = $data['Name'];
     $url = $data['Url'];
     $hidden = (bool)($data['Hidden'] ?? false);
-  
+    
     $validator = new Validator();
     $validator->str('Name', $name)->notEmpty();
     $validator->str('Url', $url)->notEmpty()->notContains('/')->notContains('\\');
-  
+    
     try{
       $validator->validate();
       $trackers = new TrackerTable(DB::get());
@@ -156,12 +156,12 @@ class TrackersModel extends BasicRootPageModel{
           return false;
         }
       }
-  
+      
       $this->form->onGeneralError($e);
     }catch(Exception $e){
       $this->form->onGeneralError($e);
     }
-  
+    
     return false;
   }
   

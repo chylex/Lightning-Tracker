@@ -30,7 +30,7 @@ class AccountModel extends BasicMixedPageModel{
     
     $this->menu_links->addLink(Text::withIcon('Profile', 'user'), '/account');
     $this->menu_links->addLink(Text::withIcon('Security', 'key'), '/account/security');
-  
+    
     $this->menu_actions->addActionButton(Text::withIcon('Logout', 'switch'), self::ACTION_LOGOUT);
     
     return $this;

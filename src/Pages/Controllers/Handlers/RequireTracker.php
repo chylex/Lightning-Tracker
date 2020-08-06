@@ -28,7 +28,7 @@ class RequireTracker implements IControlHandler{
     if ($url === null){
       $page_model = new BasicRootPageModel($req);
       $error_model = new ErrorModel($page_model, 'Tracker Error', 'Tracker is missing in the URL.');
-  
+      
       return view(new ErrorPage($error_model->load()));
     }
     

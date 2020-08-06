@@ -69,7 +69,7 @@ final class TrackerTable extends AbstractTable{
     $stmt->execute();
   }
   
-  public function countTrackers(TrackerFilter $filter = null): ?int{
+  public function countTrackers(?TrackerFilter $filter = null): ?int{
     $filter ??= TrackerFilter::empty();
     
     $stmt = $this->db->prepare('SELECT COUNT(*) FROM trackers '.$filter->generateClauses(true));
@@ -84,7 +84,7 @@ final class TrackerTable extends AbstractTable{
    * @param TrackerFilter|null $filter
    * @return TrackerInfo[]
    */
-  public function listTrackers(TrackerFilter $filter = null): array{
+  public function listTrackers(?TrackerFilter $filter = null): array{
     $filter ??= TrackerFilter::empty();
     
     $stmt = $this->db->prepare('SELECT id, name, url, owner_id FROM trackers '.$filter->generateClauses());

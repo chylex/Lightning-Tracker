@@ -179,9 +179,17 @@ class UsersModel extends BasicRootPageModel{
       return false;
     }
     
-    $users = new UserTable(DB::get());
-    $users->deleteById((int)$data['User']);
-    return true;
+    try{
+      $users = new UserTable(DB::get());
+      $users->deleteById((int)$data['User']);
+      return true;
+    }catch(PDOException $e){
+      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION){
+        // TODO show message with reason which foreign key checks failed, i.e. cannot delete tracker owner
+      }
+      
+      throw $e;
+    }
   }
 }
 

@@ -3,11 +3,10 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
-use Database\Tables\Traits\PermTable;
 use Database\AbstractTable;
-use Database\DB;
 use Database\Objects\RoleInfo;
 use Database\Objects\UserProfile;
+use Database\Tables\Traits\PermTable;
 use PDO;
 use PDOException;
 

@@ -23,18 +23,18 @@ class SettingsController extends AbstractHandlerController{
   protected function finally(Request $req, Session $sess): IAction{
     $model = new SettingsModel($req);
     $data = $req->getData();
-  
+    
     if (!empty($data)){
       $form = $model->getForm();
       $action = $form->accept($data);
-    
+      
       if (($action === $model::ACTION_REMOVE_BACKUP && $model->removeBackupFile()) ||
           ($action === $model::ACTION_UPDATE_SETTINGS && $model->updateConfig($data))
       ){
         return $form->reload($data);
       }
     }
-  
+    
     return view(new SettingsPage($model->load()));
   }
 }

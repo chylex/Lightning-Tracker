@@ -19,11 +19,11 @@ trait PermTable{
     
     $values = implode(',', array_map(fn($ignore): string => '(LAST_INSERT_ID(), ?)', $perms));
     $stmt = $this->db->prepare(str_replace('()', $values, $sql_base));
-  
+    
     for($i = 0, $count = count($perms); $i < $count; $i++){
       $stmt->bindValue($i + 1, $perms[$i]);
     }
-  
+    
     $stmt->execute();
   }
   
@@ -33,11 +33,11 @@ trait PermTable{
    */
   protected final function fetchRoles(PDOStatement $stmt): array{
     $results = [];
-  
+    
     while(($res = $this->fetchNext($stmt)) !== false){
       $results[] = new RoleInfo($res['id'], $res['title']);
     }
-  
+    
     return $results;
   }
   
@@ -47,11 +47,11 @@ trait PermTable{
    */
   protected final function fetchPerms(PDOStatement $stmt): array{
     $results = [];
-  
+    
     while(($res = $this->fetchNextColumn($stmt)) !== false){
       $results[] = $res;
     }
-  
+    
     return $results;
   }
 }

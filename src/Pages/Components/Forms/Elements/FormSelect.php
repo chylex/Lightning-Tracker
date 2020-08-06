@@ -75,7 +75,7 @@ HTML;
       echo '<option value="'.$option[0].'"'.$class.$selected.'>'.$option[1].'</option>';
     }
     
-echo <<<HTML
+    echo <<<HTML
   </select>
 HTML;
     

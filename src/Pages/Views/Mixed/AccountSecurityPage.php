@@ -22,7 +22,7 @@ class AccountSecurityPage extends AccountPage{
 <h3>Change Password</h3>
 <article>
 HTML;
-
+    
     $this->model->getChangePasswordForm()->echoBody();
     
     echo <<<HTML

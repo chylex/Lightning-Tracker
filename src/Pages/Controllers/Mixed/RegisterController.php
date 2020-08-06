@@ -41,7 +41,7 @@ class RegisterController extends AbstractHandlerController{
     if ($sess->isLoggedOn()){
       return redirect([BASE_URL_ENC, $req->getBasePath()->encoded()]);
     }
-  
+    
     $model = new RegisterModel($req, $this->tracker);
     $data = $req->getData();
     

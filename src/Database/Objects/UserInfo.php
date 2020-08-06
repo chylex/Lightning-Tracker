@@ -10,14 +10,14 @@ final class UserInfo{
   private string $name;
   private string $email;
   private ?string $role_title;
-  private string $registration_date;
+  private string $date_registered;
   
-  public function __construct(int $id, string $name, string $email, ?string $role_title, string $registration_date){
+  public function __construct(int $id, string $name, string $email, ?string $role_title, string $date_registered){
     $this->id = $id;
     $this->name = $name;
     $this->email = $email;
     $this->role_title = $role_title;
-    $this->registration_date = $registration_date;
+    $this->date_registered = $date_registered;
   }
   
   public function getId(): int{
@@ -37,7 +37,7 @@ final class UserInfo{
   }
   
   public function getRegistrationDate(): string{
-    return $this->registration_date;
+    return $this->date_registered;
   }
 }
 

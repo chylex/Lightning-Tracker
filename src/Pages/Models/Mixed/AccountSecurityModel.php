@@ -43,7 +43,7 @@ class AccountSecurityModel extends AccountModel{
     
     $form->addButton('submit', 'Change Password')
          ->icon('pencil');
-  
+    
     $this->change_password_form = $form;
   }
   

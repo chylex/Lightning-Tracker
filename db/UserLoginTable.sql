@@ -6,8 +6,8 @@ CREATE TABLE `user_logins` (
 	UNIQUE KEY (`token`),
 	FOREIGN KEY (`id`)
 		REFERENCES `users` (`id`)
-		ON DELETE CASCADE
 		ON UPDATE CASCADE
+		ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE utf8mb4_general_ci

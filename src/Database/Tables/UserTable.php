@@ -41,7 +41,7 @@ final class UserTable extends AbstractTable{
     $stmt->execute();
   }
   
-  public function countUsers(UserFilter $filter = null): ?int{
+  public function countUsers(?UserFilter $filter = null): ?int{
     $filter ??= UserFilter::empty();
     
     $stmt = $this->db->prepare('SELECT COUNT(*) FROM users '.$filter->generateClauses(true));
@@ -56,7 +56,7 @@ final class UserTable extends AbstractTable{
    * @param UserFilter|null $filter
    * @return UserInfo[]
    */
-  public function listUsers(UserFilter $filter = null): array{
+  public function listUsers(?UserFilter $filter = null): array{
     $filter ??= UserFilter::empty();
     
     $sql = <<<SQL

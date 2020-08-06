@@ -136,6 +136,7 @@ HTML;
   
   /**
    * Fills form fields using the provided data.
+   *
    * @param array $data
    */
   public function fill(array $data){
@@ -154,6 +155,7 @@ HTML;
   
   /**
    * Refills form fields using the provided data, given that the form ID matches.
+   *
    * @param array $data
    * @return string|bool Truthy if all fields were present, indicating that the form is ready for validation. The truthy value is the submit button value if present, or true if no button had a set value.
    */
@@ -161,7 +163,7 @@ HTML;
     if (!isset($data[self::ACTION_KEY]) || $data[self::ACTION_KEY] !== $this->id){
       return false;
     }
-  
+    
     $this->is_filled = true;
     $filled_fields = 0;
     
@@ -180,7 +182,7 @@ HTML;
     if ($filled_fields !== count($this->fields)){
       return false;
     }
-  
+    
     if (isset($data[self::RELOADED_KEY])){
       if (isset($data[self::MESSAGES_KEY])){
         array_push($this->messages, ...$data[self::MESSAGES_KEY]);
@@ -194,6 +196,7 @@ HTML;
   
   /**
    * Reloads the form, saving data and form messages in a session.
+   *
    * @param array $data
    * @return ReloadFormAction
    */
@@ -248,7 +251,7 @@ HTML;
       }
       
       $element->echoBody();
-  
+      
       /** @noinspection PhpUnusedLocalVariableInspection */
       foreach($groups as $group){
         echo '</div>';

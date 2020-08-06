@@ -87,9 +87,9 @@ SQL;
   }
   
   public function removeUserId(int $user_id){
-    $stmt = $this->db->prepare('DELETE FROM tracker_members WHERE tracker_id = ? AND user_id = ?');
-    $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
-    $stmt->bindValue(2, $user_id, PDO::PARAM_INT);
+    $stmt = $this->db->prepare('DELETE FROM tracker_members WHERE user_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
   }
 }

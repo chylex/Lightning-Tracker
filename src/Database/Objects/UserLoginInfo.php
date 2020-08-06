@@ -13,7 +13,7 @@ final class UserLoginInfo{
    */
   public static function hashPassword(string $password): string{
     $hash = password_hash($password, PASSWORD_BCRYPT);
-  
+    
     if (!$hash){
       throw new Exception('Fatal error, hashing function failed.');
     }

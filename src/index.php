@@ -67,6 +67,8 @@ foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'account/security', 'Mixed/AccountSecurityController');
 }
 
+// TODO CSRF
+
 function handle_error(int $code, string $title, string $message, ?Request $req = null): void{
   http_response_code($code);
   $page_model = new BasicRootPageModel($req ?? new Request('', '', []));

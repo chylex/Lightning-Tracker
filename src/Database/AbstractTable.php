@@ -15,6 +15,7 @@ abstract class AbstractTable{
   
   /**
    * Fetches the next result.
+   *
    * @param PDOStatement $stmt
    * @return mixed
    */
@@ -24,6 +25,7 @@ abstract class AbstractTable{
   
   /**
    * Fetches the next result.
+   *
    * @param PDOStatement $stmt
    * @return mixed
    */
@@ -33,6 +35,7 @@ abstract class AbstractTable{
   
   /**
    * Fetches one result and closes the cursor.
+   *
    * @param PDOStatement $stmt
    * @return mixed
    */
@@ -44,6 +47,7 @@ abstract class AbstractTable{
   
   /**
    * Fetches one result and closes the cursor.
+   *
    * @param PDOStatement $stmt
    * @return mixed
    */
