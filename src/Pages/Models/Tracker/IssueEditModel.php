@@ -49,8 +49,13 @@ class IssueEditModel extends BasicTrackerPageModel{
     $this->perms = $perms;
     $this->issue_id = $issue_id;
     
-    $issues = new IssueTable(DB::get(), $this->getTracker());
-    $this->issue = $issues->getIssueDetail($this->issue_id);
+    if ($issue_id !== null){
+      $issues = new IssueTable(DB::get(), $this->getTracker());
+      $this->issue = $issues->getIssueDetail($this->issue_id);
+    }
+    else{
+      $this->issue = null;
+    }
     
     $this->form = new FormComponent();
     $this->form->addHTML(<<<HTML
@@ -59,7 +64,7 @@ class IssueEditModel extends BasicTrackerPageModel{
 HTML
     );
     
-    $this->form->startTitledSection('Edit');
+    $this->form->startTitledSection('Details');
     $this->form->addTextField('Title');
     
     $this->form->startSplitGroup(33, 'issue-edit-triple-select');
