@@ -33,3 +33,18 @@
     padding-right: 0;
   }
 }
+
+.issue-description h4 {
+  margin: 20px 0;
+  font-size: 30px;
+}
+
+.issue-description h5 {
+  margin: 20px 0;
+  font-size: 23px;
+}
+
+.issue-description h6 {
+  margin: 20px 0;
+  font-size: 18px;
+}

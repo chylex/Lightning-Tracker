@@ -18,7 +18,19 @@ final class MarkdownComponent implements IViewable{
   }
   
   public function echoBody(): void{
-    echo protect($this->text); // TODO
+    $parser = new MarkdownParser();
+    $iter = new UnicodeIterator();
+    
+    $lines = mb_split("\n", $this->text);
+    $output = '';
+    
+    foreach($lines as $line){
+      $iter->prepare($line);
+      $parser->parseLine($iter, $output);
+    }
+    
+    $parser->closeParser($output);
+    echo $output;
   }
 }
 

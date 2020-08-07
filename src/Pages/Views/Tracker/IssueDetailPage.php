@@ -87,7 +87,7 @@ HTML;
     </article>
     
     <h3>Description</h3>
-    <article>
+    <article class="issue-description">
 HTML;
     
     $issue->getDescription()->echoBody();
