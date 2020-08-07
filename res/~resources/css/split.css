@@ -1,0 +1,133 @@
+.split-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.split-wrapper > div {
+  padding: 0 12px;
+}
+
+.split-wrapper > div:first-child {
+  margin-left: -12px;
+}
+
+.split-wrapper > div:last-child {
+  margin-right: -12px;
+}
+
+@media (max-width: 640px) {
+  .split-collapse-640 {
+    flex-wrap: wrap;
+  }
+
+  .split-collapse-640.split-collapse-reversed {
+    flex-wrap: wrap-reverse;
+  }
+
+  .split-collapse-640 > div {
+    flex: 1 1 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+    max-width: unset;
+  }
+
+  .split-collapse-640:not(.split-collapse-reversed) > div:first-child {
+    margin-bottom: 25px;
+  }
+
+  .split-collapse-640.split-collapse-reversed > div:last-child {
+    margin-bottom: 25px;
+  }
+}
+
+@media (max-width: 800px) {
+  .split-collapse-800 {
+    flex-wrap: wrap;
+  }
+
+  .split-collapse-800.split-collapse-reversed {
+    flex-wrap: wrap-reverse;
+  }
+
+  .split-collapse-800 > div {
+    flex: 1 1 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+    max-width: unset;
+  }
+
+  .split-collapse-800:not(.split-collapse-reversed) > div:first-child {
+    margin-bottom: 25px;
+  }
+
+  .split-collapse-800.split-collapse-reversed > div:last-child {
+    margin-bottom: 25px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .split-collapse-1024 {
+    flex-wrap: wrap;
+  }
+
+  .split-collapse-1024.split-collapse-reversed {
+    flex-wrap: wrap-reverse;
+  }
+
+  .split-collapse-1024 > div {
+    flex: 1 1 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+    max-width: unset;
+  }
+
+  .split-collapse-1024:not(.split-collapse-reversed) > div:first-child {
+    margin-bottom: 25px;
+  }
+
+  .split-collapse-1024.split-collapse-reversed > div:last-child {
+    margin-bottom: 25px;
+  }
+}
+
+.split-20 {
+  flex: 1 1 20%;
+}
+
+.split-25 {
+  flex: 1 1 25%;
+}
+
+.split-30 {
+  flex: 1 1 30%;
+}
+
+.split-33 {
+  flex: 1 1 33.3333%;
+}
+
+.split-50 {
+  flex: 1 1 50%;
+}
+
+.split-70 {
+  flex: 1 1 70%;
+}
+
+.split-75 {
+  flex: 1 1 75%;
+}
+
+.split-80 {
+  flex: 1 1 80%;
+}
+
+.split-100 {
+  flex: 1 1 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
