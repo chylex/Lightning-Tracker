@@ -27,7 +27,7 @@ final class Validator{
   /**
    * @throws ValidationException
    */
-  public function validate(){
+  public function validate(): void{
     $errors = [];
     
     foreach($this->validators as $validator){

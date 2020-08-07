@@ -7,10 +7,6 @@ use Exception;
 use Throwable;
 
 final class ValidationException extends Exception{
-  public static function forField(string $field, string $message): ValidationException{
-    return new ValidationException([new InvalidField($field, $message)]);
-  }
-  
   /**
    * @var InvalidField[]
    */

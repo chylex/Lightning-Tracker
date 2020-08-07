@@ -61,7 +61,7 @@ final class TrackerTable extends AbstractTable{
     }
   }
   
-  public function changeSettings(int $id, string $name, bool $hidden){
+  public function changeSettings(int $id, string $name, bool $hidden): void{
     $stmt = $this->db->prepare('UPDATE trackers SET name = ?, hidden = ? WHERE id = ?');
     $stmt->bindValue(1, $name);
     $stmt->bindValue(2, $hidden, PDO::PARAM_BOOL);

@@ -16,7 +16,7 @@ final class MilestoneTable extends AbstractTrackerTable{
     parent::__construct($db, $tracker);
   }
   
-  public function addMilestone(string $title){
+  public function addMilestone(string $title): void{
     $this->db->beginTransaction();
     
     try{
@@ -43,7 +43,7 @@ final class MilestoneTable extends AbstractTrackerTable{
     }
   }
   
-  public function moveMilestoneUp(int $id){
+  public function moveMilestoneUp(int $id): void{
     $this->db->beginTransaction();
     
     try{
@@ -61,7 +61,7 @@ final class MilestoneTable extends AbstractTrackerTable{
     }
   }
   
-  public function moveMilestoneDown(int $id){
+  public function moveMilestoneDown(int $id): void{
     $this->db->beginTransaction();
     
     try{
@@ -90,7 +90,7 @@ final class MilestoneTable extends AbstractTrackerTable{
     }
   }
   
-  private function swapMilestonesInternal(int $id, int $current_ordering, int $other_ordering){
+  private function swapMilestonesInternal(int $id, int $current_ordering, int $other_ordering): void{
     $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE ordering = ? AND tracker_id = ?');
     $stmt->bindValue(1, $current_ordering, PDO::PARAM_INT);
     $stmt->bindValue(2, $other_ordering, PDO::PARAM_INT);
@@ -166,7 +166,7 @@ SQL;
     return $results;
   }
   
-  public function deleteById(int $id){
+  public function deleteById(int $id): void{
     $this->db->beginTransaction();
     
     try{

@@ -17,7 +17,7 @@ class AccountSecurityPage extends AccountPage{
     return parent::getTitle().' - Security';
   }
   
-  protected function echoAccountPageColumn(){
+  protected function echoAccountPageColumn(): void{
     echo <<<HTML
 <h3>Change Password</h3>
 <article>

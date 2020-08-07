@@ -23,7 +23,7 @@ class SettingsPage extends AbstractPage{
     return self::LAYOUT_CONDENSED;
   }
   
-  protected function echoPageHead(){
+  protected function echoPageHead(): void{
     FormComponent::echoHead();
   }
   

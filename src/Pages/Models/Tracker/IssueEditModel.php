@@ -30,7 +30,7 @@ class IssueEditModel extends BasicTrackerPageModel{
    * @param FormSelect $select
    * @param AbstractIssueTag[] $items
    */
-  private static function setupIssueTagOptions(FormSelect $select, array $items){
+  private static function setupIssueTagOptions(FormSelect $select, array $items): void{
     foreach($items as $item){
       $select->addOption($item->getId(), $item->getTitle(), 'issue-tag issue-'.$item->getKind().'-'.$item->getId());
     }
@@ -39,8 +39,8 @@ class IssueEditModel extends BasicTrackerPageModel{
   private Permissions $perms;
   private FormComponent $form;
   
-  private ?IssueDetail $issue = null;
   private ?int $issue_id;
+  private ?IssueDetail $issue;
   
   /** @noinspection HtmlMissingClosingTag */
   public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms, ?int $issue_id){

@@ -28,7 +28,7 @@ class TrackersPage extends AbstractPage{
     return self::LAYOUT_FULL;
   }
   
-  protected function echoPageHead(){
+  protected function echoPageHead(): void{
     TableComponent::echoHead();
     FormComponent::echoHead();
   }

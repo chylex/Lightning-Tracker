@@ -6,7 +6,7 @@ namespace Pages\Components;
 use Pages\IViewable;
 
 final class ProgressBarComponent implements IViewable{
-  public static function echoHead(){
+  public static function echoHead(): void{
     echo <<<HTML
 <link rel="stylesheet" type="text/css" href="~resources/css/progressbar.css">
 HTML;

@@ -147,7 +147,7 @@ HTML;
    *
    * @param array $data
    */
-  public function fill(array $data){
+  public function fill(array $data): void{
     $this->is_filled = true;
     
     foreach($this->fields as $name => $field){
@@ -210,7 +210,7 @@ HTML;
     return new ReloadFormAction($data);
   }
   
-  public function invalidateField(string $name, string $message){
+  public function invalidateField(string $name, string $message): void{
     $this->fields[$name]->addError($message);
   }
   

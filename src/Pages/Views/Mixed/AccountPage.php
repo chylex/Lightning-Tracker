@@ -28,7 +28,7 @@ class AccountPage extends AbstractPage{
     return self::LAYOUT_CONDENSED;
   }
   
-  protected function echoPageHead(){
+  protected function echoPageHead(): void{
     SidemenuComponent::echoHead();
     FormComponent::echoHead();
   }
@@ -57,7 +57,7 @@ HTML;
 HTML;
   }
   
-  protected function echoAccountPageColumn(){
+  protected function echoAccountPageColumn(): void{
     $logon_user = $this->model->getLogonUser();
     
     $form = new FormComponent();

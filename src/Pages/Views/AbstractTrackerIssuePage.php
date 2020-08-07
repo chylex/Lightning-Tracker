@@ -31,7 +31,7 @@ HTML;
     return self::LAYOUT_FULL;
   }
   
-  protected final function echoPageHead(){
+  protected final function echoPageHead(): void{
     FormComponent::echoHead();
     SidemenuComponent::echoHead();
     ProgressBarComponent::echoHead();

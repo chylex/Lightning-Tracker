@@ -23,7 +23,7 @@ class LoginPage extends AbstractPage{
     return self::LAYOUT_COMPACT;
   }
   
-  protected function echoPageHead(){
+  protected function echoPageHead(): void{
     FormComponent::echoHead();
   }
   

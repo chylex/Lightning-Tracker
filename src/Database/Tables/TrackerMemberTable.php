@@ -86,7 +86,7 @@ SQL;
     return (bool)$this->fetchOneColumn($stmt);
   }
   
-  public function removeUserId(int $user_id){
+  public function removeUserId(int $user_id): void{
     $stmt = $this->db->prepare('DELETE FROM tracker_members WHERE user_id = ? AND tracker_id = ?');
     $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
