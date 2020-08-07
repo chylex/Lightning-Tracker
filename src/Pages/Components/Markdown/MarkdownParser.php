@@ -8,12 +8,25 @@ use function Database\protect;
 final class MarkdownParser{
   private const SPACE = 32;
   private const HASH = 35;
+  private const LEFT_SQUARE_BRACKET = 91;
+  private const RIGHT_SQUARE_BRACKET = 93;
+  private const LOWERCASE_X = 120;
+  private const UPPERCASE_X = 88;
+  
+  private string $output = '';
+  
+  private ?string $checkbox_name;
+  private int $checkbox_count = 0;
   
   private bool $last_line_empty = false;
   private bool $is_paragraph_open = false;
   
+  public function __construct(?string $checkbox_name = null){
+    $this->checkbox_name = $checkbox_name;
+  }
+  
   /** @noinspection HtmlMissingClosingTag */
-  public function parseLine(UnicodeIterator $iter, string &$output): void{
+  public function parseLine(UnicodeIterator $iter): void{
     if (!$iter->valid()){
       $this->last_line_empty = true;
       return;
@@ -22,8 +35,17 @@ final class MarkdownParser{
     $heading = $this->parseHeading($iter);
     
     if ($heading !== null){
-      $this->closeParagraph($output);
-      $output .= $heading;
+      $this->closeParagraph();
+      $this->output .= $heading;
+      return;
+    }
+    
+    $iter->reset();
+    $checkbox = $this->parseCheckBox($iter);
+    
+    if ($checkbox !== null){
+      $this->closeParagraph();
+      $this->output .= $checkbox;
       return;
     }
     
@@ -36,28 +58,29 @@ final class MarkdownParser{
     }
     
     if ($this->last_line_empty){
-      $this->closeParagraph($output);
+      $this->closeParagraph();
     }
     
     if (!$this->is_paragraph_open){
-      $output .= '<p>';
+      $this->output .= '<p>';
     }
     else{
-      $output .= ' ';
+      $this->output .= ' ';
     }
-    
-    $output .= $rest;
+  
+    $this->output .= $rest;
     $this->is_paragraph_open = true;
   }
   
-  public function closeParser(string &$output): void{
-    $this->closeParagraph($output);
+  public function closeParser(): MarkdownParseResult{
+    $this->closeParagraph();
+    return new MarkdownParseResult($this->output, $this->checkbox_count);
   }
   
-  private function closeParagraph(string &$output): void{
+  private function closeParagraph(): void{
     if ($this->is_paragraph_open){
       $this->is_paragraph_open = false;
-      $output .= '</p>';
+      $this->output .= '</p>';
     }
     
     $this->last_line_empty = false;
@@ -71,7 +94,7 @@ final class MarkdownParser{
     }
     
     $count = 1;
-  
+    
     foreach($iter as $code){
       if ($code === self::HASH){
         $count++;
@@ -92,6 +115,55 @@ final class MarkdownParser{
     $rest = trim($this->restToString($iter));
     
     return "<$tag>$rest</$tag>";
+  }
+  
+  private function parseCheckBox(UnicodeIterator $iter): ?string{
+    if ($iter->move() !== self::LEFT_SQUARE_BRACKET){
+      return null;
+    }
+    
+    $next = $iter->move();
+    $checked = false;
+    
+    if ($next === self::LOWERCASE_X || $next === self::UPPERCASE_X){
+      $checked = true;
+      $next = $iter->move();
+    }
+    elseif ($next === self::SPACE){
+      $next = $iter->move();
+    }
+    
+    if ($next !== self::RIGHT_SQUARE_BRACKET){
+      return null;
+    }
+    
+    ++$this->checkbox_count;
+    
+    $rest = trim($this->restToString($iter));
+    $checked_attr = $checked ? ' checked' : '';
+    
+    if ($checked){
+      $rest = '<del>'.$rest.'</del>';
+    }
+    
+    if ($this->checkbox_name === null){
+      return <<<HTML
+<div class="field-group">
+  <input type="checkbox"$checked_attr disabled>
+  <label class="disabled">$rest</label>
+</div>
+HTML;
+    }
+    else{
+      $id = $this->checkbox_name.'-'.$this->checkbox_count;
+      
+      return <<<HTML
+<div class="field-group">
+  <input id="$id" name="$this->checkbox_name[]" type="checkbox" value="$this->checkbox_count"$checked_attr>
+  <label for="$id">$rest</label>
+</div>
+HTML;
+    }
   }
   
   private function restToString(UnicodeIterator $iter): string{

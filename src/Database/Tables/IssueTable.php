@@ -117,6 +117,30 @@ SQL
     $stmt->execute();
   }
   
+  public function updateIssueTasks(int $id, string $description, int $progress): void{
+    if ($progress === 100){
+      $status_from = 'in-progress';
+      $status_to = 'ready-to-test';
+    }
+    else{
+      $status_from = 'open';
+      $status_to = 'in-progress';
+    }
+    
+    $stmt = $this->db->prepare(<<<SQL
+UPDATE issues
+SET description = ?, progress = ?, status = IF(status = '$status_from', '$status_to', status)
+WHERE issue_id = ? AND tracker_id = ?
+SQL
+    );
+    
+    $stmt->bindValue(1, $description);
+    $stmt->bindValue(2, $progress, PDO::PARAM_INT);
+    $stmt->bindValue(3, $id, PDO::PARAM_INT);
+    $stmt->bindValue(4, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+  }
+  
   public function countIssues(?IssueFilter $filter = null): ?int{
     $filter = $this->prepareFilter($filter ?? IssueFilter::empty());
     
@@ -204,6 +228,14 @@ SQL
                            $res['milestone_title'],
                            $res['author_id'] === null ? null : new IssueUser($res['author_id'], $res['author_name']),
                            $res['assignee_id'] === null ? null : new IssueUser($res['assignee_id'], $res['assignee_name']));
+  }
+  
+  public function getIssueDescription(int $id): string{
+    $stmt = $this->db->prepare('SELECT description FROM issues WHERE issue_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    return $this->fetchOneColumn($stmt);
   }
   
   public function deleteById(int $id): void{

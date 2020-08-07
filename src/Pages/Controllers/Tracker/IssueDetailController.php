@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Controllers\Tracker;
 
 use Database\Objects\TrackerInfo;
+use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractTrackerController;
 use Pages\IAction;
 use Pages\Models\BasicTrackerPageModel;
@@ -13,6 +14,7 @@ use Pages\Views\ErrorPage;
 use Pages\Views\Tracker\IssueDetailPage;
 use Routing\Request;
 use Session\Session;
+use function Pages\Actions\reload;
 use function Pages\Actions\view;
 
 class IssueDetailController extends AbstractTrackerController{
@@ -25,8 +27,19 @@ class IssueDetailController extends AbstractTrackerController{
       
       return view(new ErrorPage($error_model->load()));
     }
-    
+  
     $model = new IssueDetailModel($req, $tracker, $sess->getPermissions(), (int)$issue_id);
+    $data = $req->getData();
+    
+    if (!empty($data)){
+      $action = $data[FormComponent::ACTION_KEY] ?? '';
+      
+      if ($action === $model::ACTION_UPDATE_TASKS){
+        $model->updateCheckboxes($data);
+        return reload();
+      }
+    }
+    
     return view(new IssueDetailPage($model->load()));
   }
 }

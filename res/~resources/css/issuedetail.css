@@ -48,3 +48,7 @@
   margin: 20px 0;
   font-size: 18px;
 }
+
+.issue-description input[type=checkbox] {
+  margin-left: 1px;
+}

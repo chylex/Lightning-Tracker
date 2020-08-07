@@ -8,29 +8,36 @@ use function Database\protect;
 
 final class MarkdownComponent implements IViewable{
   private string $text;
+  private ?string $checkbox_name = null;
   
   public function __construct(string $text){
     $this->text = $text;
+  }
+  
+  public function setCheckboxNameForEditing(string $checkbox_name): MarkdownComponent{
+    $this->checkbox_name = $checkbox_name;
+    return $this;
   }
   
   public function getRawTextSafe(): string{
     return protect($this->text);
   }
   
-  public function echoBody(): void{
-    $parser = new MarkdownParser();
+  public function parse(): MarkdownParseResult{
+    $parser = new MarkdownParser($this->checkbox_name);
     $iter = new UnicodeIterator();
-    
     $lines = mb_split("\n", $this->text);
-    $output = '';
     
     foreach($lines as $line){
       $iter->prepare($line);
-      $parser->parseLine($iter, $output);
+      $parser->parseLine($iter);
     }
     
-    $parser->closeParser($output);
-    echo $output;
+    return $parser->closeParser();
+  }
+  
+  public function echoBody(): void{
+    $this->parse()->echoBody();
   }
 }
 
