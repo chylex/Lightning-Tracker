@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Root;
 
+use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Models\Root\UsersModel;
@@ -27,6 +28,7 @@ class UsersPage extends AbstractPage{
   protected function echoPageHead(){
     TableComponent::echoHead();
     FormComponent::echoHead();
+    DateTimeComponent::echoHead();
   }
   
   /** @noinspection HtmlMissingClosingTag */

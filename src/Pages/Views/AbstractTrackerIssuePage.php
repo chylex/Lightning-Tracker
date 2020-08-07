@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views;
 
+use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Sidemenu\SidemenuComponent;
@@ -34,6 +35,7 @@ HTML;
     FormComponent::echoHead();
     SidemenuComponent::echoHead();
     ProgressBarComponent::echoHead();
+    DateTimeComponent::echoHead();
     
     echo <<<HTML
 <link rel="stylesheet" type="text/css" href="~resources/css/issues.css">

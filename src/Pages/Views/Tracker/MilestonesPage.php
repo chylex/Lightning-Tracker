@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Tracker;
 
+use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Table\TableComponent;
@@ -29,6 +30,7 @@ class MilestonesPage extends AbstractTrackerPage{
     TableComponent::echoHead();
     FormComponent::echoHead();
     ProgressBarComponent::echoHead();
+    DateTimeComponent::echoHead();
   }
   
   /** @noinspection HtmlMissingClosingTag */

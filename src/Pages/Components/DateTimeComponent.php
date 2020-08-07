@@ -6,6 +6,12 @@ namespace Pages\Components;
 use Pages\IViewable;
 
 final class DateTimeComponent implements IViewable{
+  public static function echoHead(): void{
+    echo <<<HTML
+<script type="text/javascript" src="~resources/js/datetime.js"></script>
+HTML;
+  }
+  
   private int $datetime;
   private bool $date_only;
   
