@@ -61,6 +61,7 @@ $router->add('tracker/:tracker/&/issues', 'Tracker/IssuesController');
 $router->add('tracker/:tracker/&/issues/new', 'Tracker/IssueEditController');
 $router->add('tracker/:tracker/&/issues/:id', 'Tracker/IssueDetailController');
 $router->add('tracker/:tracker/&/issues/:id/edit', 'Tracker/IssueEditController');
+$router->add('tracker/:tracker/&/issues/:id/delete', 'Tracker/IssueDeleteController');
 $router->add('tracker/:tracker/&/milestones', 'Tracker/MilestonesController');
 $router->add('tracker/:tracker/&/members', 'Tracker/MembersController');
 $router->add('tracker/:tracker/&/settings', 'Tracker/SettingsController');

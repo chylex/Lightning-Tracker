@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Controllers\Tracker;
 
 use Database\Objects\TrackerInfo;
-use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractTrackerController;
 use Pages\IAction;
 use Pages\Models\BasicTrackerPageModel;
@@ -14,7 +13,6 @@ use Pages\Views\ErrorPage;
 use Pages\Views\Tracker\IssueDetailPage;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
 class IssueDetailController extends AbstractTrackerController{
@@ -29,17 +27,6 @@ class IssueDetailController extends AbstractTrackerController{
     }
     
     $model = new IssueDetailModel($req, $tracker, $sess->getPermissions(), (int)$issue_id);
-    $data = $req->getData();
-    
-    if (!empty($data)){
-      $action = $data[FormComponent::ACTION_KEY] ?? '';
-      
-      if ($action === $model::ACTION_DELETE){
-        $model->deleteIssue();
-        return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'issues']);
-      }
-    }
-    
     return view(new IssueDetailPage($model->load()));
   }
 }

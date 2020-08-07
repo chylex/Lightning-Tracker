@@ -16,8 +16,6 @@ use Session\Permissions;
 use Session\Session;
 
 class IssueDetailModel extends BasicTrackerPageModel{
-  public const ACTION_DELETE = 'Delete';
-  
   private ?IssueDetail $issue = null;
   private int $issue_id;
   
@@ -53,7 +51,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
       }
       
       if ($this->perms->checkTracker($tracker, IssuesModel::PERM_DELETE_ALL)){
-        $this->menu_actions->addActionButton(Text::withIcon('Delete Issue', 'trash'), self::ACTION_DELETE);
+        $this->menu_actions->addLink(Text::withIcon('Delete Issue', 'trash'), '/issues/'.$this->issue_id.'/delete');
       }
     }
     
@@ -70,14 +68,6 @@ class IssueDetailModel extends BasicTrackerPageModel{
   
   public function getMenuActions(): SidemenuComponent{
     return $this->menu_actions;
-  }
-  
-  public function deleteIssue(): void{ // TODO make it a dedicated page with additional checks (critical since this one doesn't ask first)
-    $tracker = $this->getTracker();
-    $this->perms->requireTracker($tracker, IssuesModel::PERM_DELETE_ALL); // TODO allow deleting own issues?
-    
-    $issues = new IssueTable(DB::get(), $tracker);
-    $issues->deleteById($this->issue_id);
   }
 }
 
