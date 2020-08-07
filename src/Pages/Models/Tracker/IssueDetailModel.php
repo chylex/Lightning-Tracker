@@ -18,6 +18,7 @@ use Session\Session;
 class IssueDetailModel extends BasicTrackerPageModel{
   private ?IssueDetail $issue = null;
   private int $issue_id;
+  private bool $can_edit;
   
   private Permissions $perms;
   private SidemenuComponent $menu_actions;
@@ -43,10 +44,22 @@ class IssueDetailModel extends BasicTrackerPageModel{
     $issues = new IssueTable(DB::get(), $tracker);
     $issue = $issues->getIssueDetail($this->issue_id);
     
-    if ($issue !== null){
+    if ($issue === null){
+      $this->can_edit = false;
+    }
+    else{
+      $author = $issue->getAuthor();
+      $assignee = $issue->getAssignee();
+      
       $this->issue = $issue;
       
-      if ($logon_user_id === $issue->getAuthor()->getId() || $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL)){
+      $this->can_edit = (
+          ($author !== null && $logon_user_id === $author->getId()) ||
+          ($assignee !== null && $logon_user_id === $assignee->getId()) ||
+          $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL)
+      );
+      
+      if ($this->can_edit){
         $this->menu_actions->addLink(Text::withIcon('Edit Issue', 'pencil'), '/issues/'.$this->issue_id.'/edit');
       }
       
