@@ -26,6 +26,7 @@ header_remove('x-powered-by');
 spl_autoload_extensions('.php');
 spl_autoload_register();
 
+/** @noinspection PhpIncludeInspection */
 require_once 'config.php';
 
 $base_url_split = mb_strpos(BASE_URL, '://');
