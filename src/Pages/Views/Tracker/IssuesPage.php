@@ -46,6 +46,7 @@ HTML;
     
     $split->addLeft($this->model->getIssueTable());
     $split->addRightIfNotNull($this->model->getMenuActions());
+    $split->addRightIfNotNull($this->model->getActiveMilestoneComponent());
     
     $split->echoBody();
   }

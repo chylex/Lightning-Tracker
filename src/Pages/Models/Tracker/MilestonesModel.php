@@ -9,6 +9,7 @@ use Database\Filters\Pagination;
 use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\TrackerInfo;
 use Database\Tables\MilestoneTable;
+use Database\Tables\TrackerUserSettingsTable;
 use Exception;
 use Pages\Components\CompositeComponent;
 use Pages\Components\DateTimeComponent;
@@ -20,13 +21,15 @@ use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
 use Session\Permissions;
+use Session\Session;
 use Validation\ValidationException;
 use Validation\Validator;
 
 class MilestonesModel extends BasicTrackerPageModel{
   public const ACTION_CREATE = 'Create';
-  public const ACTION_DELETE = 'Delete';
   public const ACTION_MOVE = 'Move';
+  public const ACTION_TOGGLE_ACTIVE = 'ToggleActive';
+  public const ACTION_DELETE = 'Delete';
   
   private const ACTION_MOVE_UP = 'Up';
   private const ACTION_MOVE_DOWN = 'Down';
@@ -48,6 +51,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $this->table->ifEmpty('No milestones found.');
     
     $this->table->addColumn('Title')->width(65)->bold();
+    $this->table->addColumn('Active')->tight()->center();
     $this->table->addColumn('Issues')->tight();
     $this->table->addColumn('Progress')->width(35);
     $this->table->addColumn('Last Updated')->tight()->right();
@@ -78,25 +82,33 @@ class MilestonesModel extends BasicTrackerPageModel{
     $pagination = Pagination::fromGet(AbstractFilter::GET_PAGE, $total_count, self::MILESTONES_PER_PAGE);
     $filter = $filter->page($pagination);
     
+    $active_milestone = $this->getActiveMilestone();
+    $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
+    
     foreach($milestones->listMilestones($filter) as $milestone){
+      $milestone_id = $milestone->getId();
+      $milestone_id_str = strval($milestone_id);
       $update_date = $milestone->getLastUpdateDate();
       
+      $form_toggle_active = new FormComponent(self::ACTION_TOGGLE_ACTIVE);
+      $form_toggle_active->addHidden('Milestone', $milestone_id_str);
+      $form_toggle_active->addIconButton('submit', $milestone_id === $active_milestone_id ? 'radio-checked' : 'radio-unchecked');
+      
       $row = [$milestone->getTitleSafe(),
+              $form_toggle_active,
               $milestone->getClosedIssues().' / '.$milestone->getTotalIssues(),
               new ProgressBarComponent($milestone->getPercentageDone()),
               $update_date === null ? Text::plain('<div class="center-text">-</div>') : new DateTimeComponent($update_date, true)];
       
       if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
-        $milestone_id = strval($milestone->getId());
-        
         $form_move = new FormComponent(self::ACTION_MOVE);
-        $form_move->addHidden('Milestone', $milestone_id);
+        $form_move->addHidden('Milestone', $milestone_id_str);
         $form_move->addIconButton('submit', 'circle-up')->value(self::ACTION_MOVE_UP);
         $form_move->addIconButton('submit', 'circle-down')->value(self::ACTION_MOVE_DOWN);
         
         $form_delete = new FormComponent(self::ACTION_DELETE);
         $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
-        $form_delete->addHidden('Milestone', $milestone_id);
+        $form_delete->addHidden('Milestone', $milestone_id_str);
         $form_delete->addIconButton('submit', 'trash');
         
         $row[] = new CompositeComponent($form_move, $form_delete);
@@ -170,6 +182,22 @@ class MilestonesModel extends BasicTrackerPageModel{
     }
     
     return false;
+  }
+  
+  public function toggleActiveMilestone(array $data): bool{
+    if (!isset($data['Milestone']) || !is_numeric($data['Milestone'])){
+      return false;
+    }
+    
+    $logon_user = Session::get()->getLogonUser();
+    
+    if ($logon_user === null){
+      return false;
+    }
+    
+    $settings = new TrackerUserSettingsTable(DB::get(), $this->getTracker());
+    $settings->toggleActiveMilestone($logon_user, (int)$data['Milestone']);
+    return true;
   }
   
   public function deleteMilestone(array $data): bool{ // TODO make it a dedicated page with additional checks

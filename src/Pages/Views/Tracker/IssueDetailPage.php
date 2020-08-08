@@ -46,6 +46,7 @@ class IssueDetailPage extends AbstractTrackerIssuePage{
     
     $split->addLeft(new IssueDetailComponent($this->model));
     $split->addRightIfNotNull($this->model->getMenuActions());
+    $split->addRightIfNotNull($this->model->getActiveMilestoneComponent());
     
     $split->echoBody();
   }
