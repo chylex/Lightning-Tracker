@@ -7,6 +7,7 @@ use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Sidemenu\SidemenuComponent;
+use Pages\Components\SplitComponent;
 use Pages\Models\BasicTrackerPageModel;
 
 abstract class AbstractTrackerIssuePage extends AbstractTrackerPage{
@@ -32,6 +33,7 @@ HTML;
   }
   
   protected final function echoPageHead(): void{
+    SplitComponent::echoHead();
     FormComponent::echoHead();
     SidemenuComponent::echoHead();
     ProgressBarComponent::echoHead();

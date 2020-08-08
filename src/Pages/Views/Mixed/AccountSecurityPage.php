@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Mixed;
 
+use Pages\IViewable;
 use Pages\Models\Mixed\AccountSecurityModel;
 
 class AccountSecurityPage extends AccountPage{
@@ -17,17 +18,8 @@ class AccountSecurityPage extends AccountPage{
     return parent::getTitle().' - Security';
   }
   
-  protected function echoAccountPageColumn(): void{
-    echo <<<HTML
-<h3>Change Password</h3>
-<article>
-HTML;
-    
-    $this->model->getChangePasswordForm()->echoBody();
-    
-    echo <<<HTML
-</article>
-HTML;
+  protected function getAccountPageColumn(): IViewable{
+    return $this->model->getChangePasswordForm();
   }
 }
 

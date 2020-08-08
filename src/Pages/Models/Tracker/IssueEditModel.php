@@ -59,7 +59,7 @@ class IssueEditModel extends BasicTrackerPageModel{
     
     $this->form = new FormComponent();
     $this->form->addHTML(<<<HTML
-<div class="split-wrapper">
+<div class="split-wrapper split-collapse-640">
   <div class="split-75">
 HTML
     );
@@ -84,13 +84,9 @@ HTML
     
     $this->form->endTitledSection();
     
-    $this->form->startTitledSection('Confirm');
-    $this->form->addButton('submit', $issue_id === null ? 'New Issue' : 'Edit Issue')->icon('pencil');
-    $this->form->endTitledSection();
-    
     $this->form->addHTML(<<<HTML
   </div>
-  <div class="split-25 min-width-250">
+  <div class="split-25 min-width-200 max-width-400">
 HTML
     );
     
@@ -128,6 +124,10 @@ HTML
 </div>
 HTML
     );
+    
+    $this->form->startTitledSection('Confirm');
+    $this->form->addButton('submit', $issue_id === null ? 'New Issue' : 'Edit Issue')->icon('pencil');
+    $this->form->endTitledSection();
   }
   
   public function load(): IModel{

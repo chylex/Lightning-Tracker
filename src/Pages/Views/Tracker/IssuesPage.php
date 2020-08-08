@@ -6,6 +6,7 @@ namespace Pages\Views\Tracker;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Sidemenu\SidemenuComponent;
+use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Models\Tracker\IssuesModel;
 use Pages\Views\AbstractTrackerPage;
@@ -27,6 +28,7 @@ class IssuesPage extends AbstractTrackerPage{
   }
   
   protected function echoPageHead(): void{
+    SplitComponent::echoHead();
     TableComponent::echoHead();
     FormComponent::echoHead();
     SidemenuComponent::echoHead();
@@ -37,26 +39,15 @@ class IssuesPage extends AbstractTrackerPage{
 HTML;
   }
   
-  /** @noinspection HtmlMissingClosingTag */
   protected function echoPageBody(): void{
-    echo <<<HTML
-<div class="split-wrapper">
-  <div class="split-80">
-HTML;
+    $split = new SplitComponent(80);
+    $split->collapseAt(1024, true);
+    $split->setRightWidthLimits(250, 400);
     
-    $this->model->getIssueTable()->echoBody();
+    $split->addLeft($this->model->getIssueTable());
+    $split->addRightIfNotNull($this->model->getMenuActions());
     
-    echo <<<HTML
-  </div>
-  <div class="split-20 min-width-250">
-HTML;
-    
-    $this->model->getMenuActions()->echoBody();
-    
-    echo <<<HTML
-  </div>
-</div>
-HTML;
+    $split->echoBody();
   }
 }
 

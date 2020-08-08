@@ -5,6 +5,7 @@ namespace Pages\Views\Root;
 
 use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
+use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Models\Root\UsersModel;
 use Pages\Views\AbstractPage;
@@ -26,33 +27,21 @@ class UsersPage extends AbstractPage{
   }
   
   protected function echoPageHead(): void{
+    SplitComponent::echoHead();
     TableComponent::echoHead();
     FormComponent::echoHead();
     DateTimeComponent::echoHead();
   }
   
-  /** @noinspection HtmlMissingClosingTag */
   protected function echoPageBody(): void{
-    echo <<<HTML
-<div class="split-wrapper">
-  <div class="split-75">
-HTML;
+    $split = new SplitComponent(75);
+    $split->collapseAt(800, true);
+    $split->setRightWidthLimits(250, 500);
     
-    $this->model->getUserTable()->echoBody();
+    $split->addLeft($this->model->getUserTable());
+    $split->addRightIfNotNull($this->model->getCreateForm());
     
-    echo <<<HTML
-  </div>
-  <div class="split-25 min-width-250">
-HTML;
-    
-    if ($this->model->getCreateForm() !== null){
-      $this->model->getCreateForm()->echoBody();
-    }
-    
-    echo <<<HTML
-  </div>
-</div>
-HTML;
+    $split->echoBody();
   }
 }
 

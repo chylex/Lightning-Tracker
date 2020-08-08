@@ -21,6 +21,7 @@ class AccountSecurityModel extends AccountModel{
     parent::__construct($req, $logon_user, $tracker);
     
     $form = new FormComponent('ChangePassword');
+    $form->startTitledSection('Change Password');
     
     $form->addTextField('OldPassword')
          ->label('Current Password')
@@ -44,6 +45,7 @@ class AccountSecurityModel extends AccountModel{
     $form->addButton('submit', 'Change Password')
          ->icon('pencil');
     
+    $form->endTitledSection();
     $this->change_password_form = $form;
   }
   

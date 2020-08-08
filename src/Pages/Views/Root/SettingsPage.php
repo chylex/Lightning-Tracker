@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Views\Root;
 
 use Pages\Components\Forms\FormComponent;
+use Pages\Components\SplitComponent;
 use Pages\Models\Root\SettingsModel;
 use Pages\Views\AbstractPage;
 
@@ -24,6 +25,7 @@ class SettingsPage extends AbstractPage{
   }
   
   protected function echoPageHead(): void{
+    SplitComponent::echoHead();
     FormComponent::echoHead();
   }
   

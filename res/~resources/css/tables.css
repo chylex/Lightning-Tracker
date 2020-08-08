@@ -116,11 +116,13 @@ td form {
 
 div.pagination {
   display: flex;
+  flex-wrap: wrap;
   font-size: 15px;
+  margin-bottom: -7px;
 }
 
 div.pagination ul.pages {
-  margin: 0 0 0 -4px;
+  margin: 0 0 7px -4px;
   padding: 0;
   list-style: none;
 }
@@ -164,7 +166,7 @@ div.pagination ul.pages li .icon {
 
 div.pagination .element-info {
   flex: 1 0 auto;
-  margin: 0 0 0 25px;
+  margin: 0 0 7px 25px;
   text-align: right;
   font-weight: bold;
 }

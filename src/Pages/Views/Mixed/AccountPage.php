@@ -5,6 +5,9 @@ namespace Pages\Views\Mixed;
 
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Sidemenu\SidemenuComponent;
+use Pages\Components\SplitComponent;
+use Pages\Components\Text;
+use Pages\IViewable;
 use Pages\Models\Mixed\AccountModel;
 use Pages\Views\AbstractPage;
 
@@ -29,53 +32,36 @@ class AccountPage extends AbstractPage{
   }
   
   protected function echoPageHead(): void{
+    SplitComponent::echoHead();
     SidemenuComponent::echoHead();
     FormComponent::echoHead();
   }
   
-  /** @noinspection HtmlMissingClosingTag */
   protected function echoPageBody(): void{
-    echo <<<HTML
-<div class="split-wrapper">
-  <div class="split-25">
-    <h3>Menu</h3>
-HTML;
+    $split = new SplitComponent(25);
+    $split->collapseAt(800);
+    $split->setLeftWidthLimits(250);
     
-    $this->model->getMenuLinks()->echoBody();
-    $this->model->getMenuActions()->echoBody();
+    $split->addLeft(Text::plain('<h3>Menu</h3>'));
+    $split->addLeft($this->model->getMenuLinks());
+    $split->addLeft($this->model->getMenuActions());
+    $split->addRight($this->getAccountPageColumn());
     
-    echo <<<HTML
-  </div>
-  <main class="split-75">
-HTML;
-    
-    $this->echoAccountPageColumn();
-    
-    echo <<<HTML
-  </main>
-</div>
-HTML;
+    $split->echoBody();
   }
   
-  protected function echoAccountPageColumn(): void{
+  protected function getAccountPageColumn(): IViewable{
     $logon_user = $this->model->getLogonUser();
     
     $form = new FormComponent();
+    $form->startTitledSection('General');
     $form->startSplitGroup(50);
     $form->addTextField('Name')->label('Username')->value($logon_user->getNameSafe())->disable();
     $form->addTextField('Email')->value($logon_user->getEmailSafe())->disable();
     $form->endSplitGroup();
+    $form->endTitledSection();
     
-    echo <<<HTML
-<h3>General</h3>
-<article>
-HTML;
-    
-    $form->echoBody();
-    
-    echo <<<HTML
-</article>
-HTML;
+    return $form;
   }
 }
 

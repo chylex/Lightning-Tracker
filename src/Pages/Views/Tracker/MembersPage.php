@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Views\Tracker;
 
 use Pages\Components\Forms\FormComponent;
+use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Models\Tracker\MembersModel;
 use Pages\Views\AbstractTrackerPage;
@@ -25,32 +26,20 @@ class MembersPage extends AbstractTrackerPage{
   }
   
   protected function echoPageHead(): void{
+    SplitComponent::echoHead();
     TableComponent::echoHead();
     FormComponent::echoHead();
   }
   
-  /** @noinspection HtmlMissingClosingTag */
   protected function echoPageBody(): void{
-    echo <<<HTML
-<div class="split-wrapper">
-  <div class="split-75">
-HTML;
+    $split = new SplitComponent(75);
+    $split->collapseAt(800, true);
+    $split->setRightWidthLimits(250, 400);
     
-    $this->model->getMemberTable()->echoBody();
+    $split->addLeft($this->model->getMemberTable());
+    $split->addRightIfNotNull($this->model->getInviteForm());
     
-    echo <<<HTML
-  </div>
-  <div class="split-25 min-width-250">
-HTML;
-    
-    if ($this->model->getInviteForm() !== null){
-      $this->model->getInviteForm()->echoBody();
-    }
-    
-    echo <<<HTML
-  </div>
-</div>
-HTML;
+    $split->echoBody();
   }
 }
 

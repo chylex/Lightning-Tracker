@@ -33,7 +33,7 @@ class SettingsModel extends BasicRootPageModel{
     
     $this->form = new FormComponent();
     $this->form->addHTML(<<<HTML
-<div class="split-wrapper">
+<div class="split-wrapper split-collapse-640">
   <div class="split-50">
 HTML
     );

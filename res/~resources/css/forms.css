@@ -138,6 +138,7 @@ label {
   font-weight: bold;
 }
 
+input[type=checkbox]:not(:disabled),
 label:not(.disabled) {
   cursor: pointer;
 }
@@ -146,4 +147,7 @@ input[type=checkbox] + label {
   font-size: 15px;
   font-weight: normal;
   vertical-align: 5%;
+  /* extends clickable label area to cover space between it and the checkbox */
+  margin-left: -7px;
+  padding-left: 7px;
 }
