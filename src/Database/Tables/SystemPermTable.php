@@ -7,14 +7,15 @@ use Database\AbstractTable;
 use Database\Objects\RoleInfo;
 use Database\Objects\UserProfile;
 use Database\Tables\Traits\PermTable;
+use Pages\Models\Root\TrackersModel;
 use PDO;
 use PDOException;
 
 final class SystemPermTable extends AbstractTable{
   use PermTable;
   
-  private const GUEST_PERMS = ['trackers.view'];
-  private const LOGON_PERMS = ['trackers.view'];
+  private const GUEST_PERMS = [TrackersModel::PERM_LIST];
+  private const LOGON_PERMS = [TrackersModel::PERM_LIST];
   
   public function __construct(PDO $db){
     parent::__construct($db);

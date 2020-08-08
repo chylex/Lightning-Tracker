@@ -9,6 +9,10 @@ use Database\Objects\TrackerInfo;
 use Database\Objects\TrackerVisibilityInfo;
 use Database\Objects\UserProfile;
 use Exception;
+use Pages\Models\Tracker\IssuesModel;
+use Pages\Models\Tracker\MembersModel;
+use Pages\Models\Tracker\MilestonesModel;
+use Pages\Models\Tracker\SettingsModel;
 use PDO;
 use PDOException;
 
@@ -49,10 +53,26 @@ final class TrackerTable extends AbstractTable{
       $tracker = new TrackerInfo($id, $name, $url, $owner->getId());
       $perms = new TrackerPermTable($this->db, $tracker);
       
-      // TODO add initial permission setup
-      $perms->addRole('Administrator', []);
-      $perms->addRole('Moderator', []);
-      $perms->addRole('User', []);
+      $perms_reporter = [
+          IssuesModel::PERM_CREATE
+      ];
+      
+      $perms_moderator = array_merge($perms_reporter, [
+          IssuesModel::PERM_EDIT_ALL,
+          IssuesModel::PERM_DELETE_ALL,
+          MembersModel::PERM_LIST,
+          // TODO banning users
+      ]);
+      
+      $perms_admin = array_merge($perms_moderator, [
+          MilestonesModel::PERM_EDIT,
+          MembersModel::PERM_MANAGE,
+          SettingsModel::PERM
+      ]);
+      
+      $perms->addRole('Administrator', $perms_admin);
+      $perms->addRole('Moderator', $perms_moderator);
+      $perms->addRole('Reporter', $perms_reporter);
       
       $this->db->commit();
     }catch(PDOException $e){
