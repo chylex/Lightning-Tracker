@@ -1,4 +1,4 @@
-CREATE TABLE `trackers` (
+CREATE TABLE IF NOT EXISTS `trackers` (
 	`id`       INT NOT NULL AUTO_INCREMENT,
 	`name`     VARCHAR(32) NOT NULL,
 	`url`      VARCHAR(32) NOT NULL,

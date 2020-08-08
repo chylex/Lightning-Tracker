@@ -1,7 +1,7 @@
-CREATE TABLE `tracker_members` (
-	`tracker_id` INT NOT NULL,
-	`user_id`    INT NOT NULL,
-	`role_id`    INT NULL,
+CREATE TABLE IF NOT EXISTS `tracker_user_settings` (
+	`tracker_id`       INT NOT NULL,
+	`user_id`          INT NOT NULL,
+	`active_milestone` INT DEFAULT NULL,
 	PRIMARY KEY (`tracker_id`, `user_id`),
 	FOREIGN KEY (`tracker_id`)
 		REFERENCES `trackers` (`id`)
@@ -11,12 +11,12 @@ CREATE TABLE `tracker_members` (
 		REFERENCES `users` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
-	FOREIGN KEY (`role_id`)
-		REFERENCES `tracker_roles` (`id`)
+	FOREIGN KEY (`active_milestone`)
+		REFERENCES `milestones` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	FOREIGN KEY (`role_id`, `tracker_id`) # Ensures the role-tracker pair is always valid.
-		REFERENCES `tracker_roles` (`id`, `tracker_id`)
+	FOREIGN KEY (`active_milestone`, `tracker_id`) # Ensures the milestone-tracker pair is always valid.
+		REFERENCES `milestones` (`id`, `tracker_id`)
 		ON UPDATE NO ACTION
 		ON DELETE NO ACTION
 ) ENGINE = InnoDB

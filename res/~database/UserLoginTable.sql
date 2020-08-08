@@ -1,4 +1,4 @@
-CREATE TABLE `user_logins` (
+CREATE TABLE IF NOT EXISTS `user_logins` (
 	`id`      INT NOT NULL,
 	`token`   VARCHAR(255) NOT NULL,
 	`expires` DATETIME NOT NULL,

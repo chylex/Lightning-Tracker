@@ -1,4 +1,4 @@
-CREATE TABLE `milestones` (
+CREATE TABLE IF NOT EXISTS `milestones` (
 	`id`         INT NOT NULL AUTO_INCREMENT,
 	`tracker_id` INT NOT NULL,
 	`ordering`   INT NOT NULL,

@@ -26,8 +26,14 @@ header_remove('x-powered-by');
 spl_autoload_extensions('.php');
 spl_autoload_register();
 
-/** @noinspection PhpIncludeInspection */
-require_once 'config.php';
+if (file_exists('config.php')){
+  /** @noinspection PhpIncludeInspection */
+  require_once 'config.php';
+}
+else{
+  require_once 'install.php';
+  return;
+}
 
 $base_url_split = mb_strpos(BASE_URL, '://');
 

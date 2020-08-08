@@ -1,4 +1,4 @@
-CREATE TABLE `system_roles` (
+CREATE TABLE IF NOT EXISTS `system_roles` (
 	`id`    SMALLINT NOT NULL AUTO_INCREMENT,
 	`title` VARCHAR(32) NOT NULL,
 	PRIMARY KEY (`id`),

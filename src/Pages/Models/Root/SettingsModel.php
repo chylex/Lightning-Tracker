@@ -3,12 +3,12 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Root;
 
+use Configuration\SystemConfig;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Pages\Models\BasicRootPageModel;
 use Routing\Request;
 use Validation\ValidationException;
-use Validation\Validator;
 use function Database\protect;
 
 class SettingsModel extends BasicRootPageModel{
@@ -20,10 +20,6 @@ class SettingsModel extends BasicRootPageModel{
   public const ACTION_REMOVE_BACKUP = 'RemoveBackup';
   
   public const PERM = 'settings';
-  
-  private static function validateProtocol(string $url): bool{
-    return mb_substr($url, 0, 7) === 'http://' || mb_substr($url, 0, 8) === 'https://';
-  }
   
   private FormComponent $form;
   
@@ -97,25 +93,10 @@ HTML;
   }
   
   public function updateConfig(array $data): bool{
-    $sys_enable_registration = ($data['SysEnableRegistration'] ?? false) ? 'true' : 'false';
-    $base_url = rtrim($data['BaseUrl'], '/');
-    $db_name = $data['DbName'];
-    $db_host = $data['DbHost'];
-    $db_user = $data['DbUser'];
-    $db_password = $data['DbPassword'];
-    
-    $validator = new Validator();
-    
-    $validator->str('BaseUrl', $base_url)
-              ->isTrue(fn($v): bool => filter_var(idn_to_ascii($base_url), FILTER_VALIDATE_URL) !== false, 'Base URL is not valid.')
-              ->isTrue(fn($v): bool => self::validateProtocol($v), 'Base URL must specify either the HTTP or HTTPS protocol.');
-    
-    $validator->str('DbName', $db_name, 'Name')->notEmpty();
-    $validator->str('DbHost', $db_host, 'Host')->notEmpty();
-    $validator->str('DbUser', $db_user, 'User')->notEmpty();
+    $config = new SystemConfig($data);
     
     try{
-      $validator->validate();
+      $config->validate();
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());
       return false;
@@ -126,28 +107,7 @@ HTML;
       return false;
     }
     
-    $base_url = addcslashes($base_url, '\'\\');
-    $db_name = addcslashes($db_name, '\'\\');
-    $db_host = addcslashes($db_host, '\'\\');
-    $db_user = addcslashes($db_user, '\'\\');
-    $db_password = addcslashes($db_password, '\'\\');
-    
-    /** @noinspection ALL */
-    $contents = <<<PHP
-<?php
-define('SYS_ENABLE_REGISTRATION', $sys_enable_registration);
-
-define('BASE_URL', '$base_url');
-
-define('DB_DRIVER', 'mysql');
-define('DB_NAME', '$db_name');
-define('DB_HOST', '$db_host');
-define('DB_USER', '$db_user');
-define('DB_PASSWORD', '$db_password');
-?>
-PHP;
-    
-    if (!file_put_contents(self::CONFIG_FILE, $contents, LOCK_EX)){
+    if (!file_put_contents(self::CONFIG_FILE, $config->generate(), LOCK_EX)){
       $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Error updating \'config.php\'.'));
       return false;
     }
