@@ -22,7 +22,7 @@ CREATE TABLE `issues` (
 		REFERENCES `users` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	FOREIGN KEY (`assignee_id`)
+	FOREIGN KEY (`assignee_id`) # Can be a non-member, but only if an already assigned user's membership got revoked.
 		REFERENCES `users` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
@@ -30,6 +30,10 @@ CREATE TABLE `issues` (
 		REFERENCES `milestones` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
+	FOREIGN KEY (`milestone_id`, `tracker_id`) # Ensures the milestone-tracker pair is always valid.
+		REFERENCES `milestones` (`id`, `tracker_id`)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION,
 	FOREIGN KEY (`scale`)
 		REFERENCES `issue_weights` (`scale`)
 		ON UPDATE RESTRICT

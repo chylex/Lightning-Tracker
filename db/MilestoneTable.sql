@@ -4,6 +4,7 @@ CREATE TABLE `milestones` (
 	`ordering`   INT NOT NULL,
 	`title`      VARCHAR(64) NOT NULL,
 	PRIMARY KEY (`id`),
+	KEY (`id`, `tracker_id`), # Needed for milestone-tracker pair checks.
 	FOREIGN KEY (`tracker_id`)
 		REFERENCES `trackers` (`id`)
 		ON UPDATE CASCADE
