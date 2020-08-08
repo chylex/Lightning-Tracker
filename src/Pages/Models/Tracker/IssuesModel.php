@@ -84,8 +84,8 @@ class IssuesModel extends BasicTrackerPageModel{
     return $this->table;
   }
   
-  public function getMenuActions(): SidemenuComponent{
-    return $this->menu_actions;
+  public function getMenuActions(): ?SidemenuComponent{
+    return $this->menu_actions->getIfNotEmpty();
   }
 }
 

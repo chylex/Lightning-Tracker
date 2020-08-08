@@ -51,6 +51,10 @@ HTML;
     $this->items[] = new SidemenuActionButton($title, $action);
   }
   
+  public function getIfNotEmpty(): ?SidemenuComponent{
+    return empty($this->items) ? null : $this;
+  }
+  
   /** @noinspection HtmlMissingClosingTag */
   public function echoBody(): void{
     if (empty($this->items)){

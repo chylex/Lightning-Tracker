@@ -100,8 +100,8 @@ class IssueDetailModel extends BasicTrackerPageModel{
     return $this->description;
   }
   
-  public function getMenuActions(): SidemenuComponent{
-    return $this->menu_actions;
+  public function getMenuActions(): ?SidemenuComponent{
+    return $this->menu_actions->getIfNotEmpty();
   }
   
   public function updateCheckboxes(array $data): void{
