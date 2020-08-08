@@ -230,8 +230,6 @@ HTML
         $id = $this->issue_id;
       }
       
-      // TODO ensure edits update milestone update date
-      
       return $id;
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());

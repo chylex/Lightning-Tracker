@@ -8,19 +8,19 @@ use function Database\protect;
 final class MilestoneInfo{
   private int $id;
   private string $title;
-  private string $date_updated;
   
   private int $closed_issues;
   private int $total_issues;
   private ?int $percentage_done;
+  private ?string $date_updated;
   
-  public function __construct(int $id, string $title, string $date_updated, int $closed_issues, int $total_issues, ?int $percentage_done){
+  public function __construct(int $id, string $title, int $closed_issues, int $total_issues, ?int $percentage_done, ?string $date_updated){
     $this->id = $id;
     $this->title = $title;
-    $this->date_updated = $date_updated;
     $this->closed_issues = $closed_issues;
     $this->total_issues = $total_issues;
     $this->percentage_done = $percentage_done;
+    $this->date_updated = $date_updated;
   }
   
   public function getId(): int{
@@ -29,10 +29,6 @@ final class MilestoneInfo{
   
   public function getTitleSafe(): string{
     return protect($this->title);
-  }
-  
-  public function getLastUpdateDate(): string{
-    return $this->date_updated;
   }
   
   public function getClosedIssues(): int{
@@ -45,6 +41,10 @@ final class MilestoneInfo{
   
   public function getPercentageDone(): ?int{
     return $this->percentage_done;
+  }
+  
+  public function getLastUpdateDate(): ?string{
+    return $this->date_updated;
   }
 }
 

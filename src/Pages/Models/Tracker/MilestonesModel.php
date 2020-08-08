@@ -15,6 +15,7 @@ use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
@@ -78,10 +79,12 @@ class MilestonesModel extends BasicTrackerPageModel{
     $filter = $filter->page($pagination);
     
     foreach($milestones->listMilestones($filter) as $milestone){
+      $update_date = $milestone->getLastUpdateDate();
+      
       $row = [$milestone->getTitleSafe(),
               $milestone->getClosedIssues().' / '.$milestone->getTotalIssues(),
               new ProgressBarComponent($milestone->getPercentageDone()),
-              new DateTimeComponent($milestone->getLastUpdateDate(), true)];
+              $update_date === null ? Text::plain('<div class="center-text">-</div>') : new DateTimeComponent($update_date, true)];
       
       if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
         $milestone_id = strval($milestone->getId());

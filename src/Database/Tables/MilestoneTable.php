@@ -31,7 +31,7 @@ final class MilestoneTable extends AbstractTrackerTable{
         throw new LogicException('Error calculating milestone order.');
       }
       
-      $stmt = $this->db->prepare('INSERT INTO milestones (tracker_id, ordering, title, date_updated) VALUES (?, ?, ?, NOW())');
+      $stmt = $this->db->prepare('INSERT INTO milestones (tracker_id, ordering, title) VALUES (?, ?, ?)');
       $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
       $stmt->bindValue(2, $order, PDO::PARAM_INT);
       $stmt->bindValue(3, $title);
@@ -135,10 +135,10 @@ final class MilestoneTable extends AbstractTrackerTable{
     $sql = <<<SQL
 SELECT m.id                                                             AS id,
        m.title                                                          AS title,
-       m.date_updated                                                   AS date_updated,
        COUNT(CASE WHEN i.status IN ('finished', 'rejected') THEN 1 END) AS closed_issues,
        COUNT(i.issue_id)                                                AS total_issues,
-       FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS percentage_done
+       FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS percentage_done,
+       MAX(i.date_updated)                                              AS date_updated
 FROM milestones m
 LEFT JOIN issues i ON m.id = i.milestone_id
 LEFT JOIN issue_weights iw ON i.scale = iw.scale
@@ -157,10 +157,10 @@ SQL;
     while(($res = $this->fetchNext($stmt)) !== false){
       $results[] = new MilestoneInfo($res['id'],
                                      $res['title'],
-                                     $res['date_updated'],
                                      $res['closed_issues'],
                                      $res['total_issues'],
-                                     $res['percentage_done'] === null ? null : (int)$res['percentage_done']);
+                                     $res['percentage_done'] === null ? null : (int)$res['percentage_done'],
+                                     $res['date_updated']);
     }
     
     return $results;

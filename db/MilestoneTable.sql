@@ -1,9 +1,8 @@
 CREATE TABLE `milestones` (
-	`id`           INT NOT NULL AUTO_INCREMENT,
-	`tracker_id`   INT NOT NULL,
-	`ordering`     INT NOT NULL,
-	`title`        VARCHAR(64) NOT NULL,
-	`date_updated` DATE NOT NULL,
+	`id`         INT NOT NULL AUTO_INCREMENT,
+	`tracker_id` INT NOT NULL,
+	`ordering`   INT NOT NULL,
+	`title`      VARCHAR(64) NOT NULL,
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`tracker_id`)
 		REFERENCES `trackers` (`id`)
