@@ -2,8 +2,7 @@ Options +FollowSymLinks -Indexes
 
 RewriteEngine On
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/~resources/
 RewriteRule ^(.*)$ index.php?route=$1 [QSA,B,L]
 
 <IfModule mod_deflate.c>
@@ -16,3 +15,8 @@ AddOutputFilterByType DEFLATE application/json
 AddOutputFilterByType DEFLATE image/svg+xml
 AddOutputFilterByType DEFLATE application/x-font-ttf
 </IfModule>
+
+<FilesMatch "\.(css|js|png|gif|svg|ttf|woff|woff2)$">
+# Expire in 365 days
+Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
