@@ -129,7 +129,10 @@ SQL
     
     $stmt = $this->db->prepare(<<<SQL
 UPDATE issues
-SET description = ?, progress = ?, status = IF(status = '$status_from', '$status_to', status)
+SET description = ?,
+    progress = ?,
+    status = IF(status = '$status_from', '$status_to', status),
+    date_updated = NOW()
 WHERE issue_id = ? AND tracker_id = ?
 SQL
     );
