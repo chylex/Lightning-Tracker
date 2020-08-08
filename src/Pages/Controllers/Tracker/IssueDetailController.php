@@ -27,7 +27,7 @@ class IssueDetailController extends AbstractTrackerController{
       
       return view(new ErrorPage($error_model->load()));
     }
-  
+    
     $model = new IssueDetailModel($req, $tracker, $sess->getPermissions(), (int)$issue_id);
     $data = $req->getData();
     

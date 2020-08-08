@@ -79,9 +79,9 @@ SQL;
   }
   
   public function checkMembershipExists(int $user_id): bool{
-    $stmt = $this->db->prepare('SELECT 1 FROM tracker_members WHERE tracker_id = ? AND user_id = ?');
-    $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
-    $stmt->bindValue(2, $user_id, PDO::PARAM_INT);
+    $stmt = $this->db->prepare('SELECT 1 FROM tracker_members WHERE user_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     return (bool)$this->fetchOneColumn($stmt);
   }

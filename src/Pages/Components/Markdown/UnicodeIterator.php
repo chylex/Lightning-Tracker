@@ -65,7 +65,7 @@ final class UnicodeIterator implements Iterator{
     }
     elseif ($ord < self::LEN4){
       $this->last_size = 4;
-  
+      
       $b2 = $this->text[$this->pos + 1] ?? '\0';
       $b3 = $this->text[$this->pos + 2] ?? '\0';
       $b4 = $this->text[$this->pos + 3] ?? '\0';

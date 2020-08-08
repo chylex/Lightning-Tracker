@@ -201,7 +201,7 @@ FROM issues
 LEFT JOIN users author ON issues.author_id = author.id
 LEFT JOIN users assignee ON issues.assignee_id = assignee.id
 LEFT JOIN milestones milestone ON issues.milestone_id = milestone.id
-WHERE issues.tracker_id = :tracker_id AND issues.issue_id = :issue_id
+WHERE issues.issue_id = :issue_id AND issues.tracker_id = :tracker_id
 SQL
     );
     

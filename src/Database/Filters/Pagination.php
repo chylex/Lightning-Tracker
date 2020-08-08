@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Database\Filters;
 
 class Pagination{
-  public static function fromGet(string $key, int $total_elements, int $elements_per_page): Pagination{
+  public static function fromGet(string $key, int $total_elements, int $elements_per_page): self{
     return new Pagination((int)($_GET[$key] ?? 1), $total_elements, $elements_per_page);
   }
   

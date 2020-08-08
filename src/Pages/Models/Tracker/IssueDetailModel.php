@@ -111,7 +111,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
     $checked_indices = array_map(fn($i): int => intval($i), $data[self::CHECKBOX_NAME] ?? []);
     $index = 0;
     
-    $description = preg_replace_callback('/^\[[ xX]?]/mu', function(array $matches) use($checked_indices, &$index): string{
+    $description = preg_replace_callback('/^\[[ xX]?]/mu', function(array $matches) use ($checked_indices, &$index): string{
       return in_array(++$index, $checked_indices) ? '[x]' : '[ ]';
     }, $description);
     

@@ -88,16 +88,16 @@ tr.link > td:last-child > a {
   padding-right: 16px;
 }
 
-td.bold {
-  font-weight: bold;
-}
-
 td.center {
   text-align: center;
 }
 
 td.right {
   text-align: right;
+}
+
+td.bold {
+  font-weight: bold;
 }
 
 td .icon {

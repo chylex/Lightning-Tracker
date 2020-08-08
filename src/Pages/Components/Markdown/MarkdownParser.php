@@ -67,7 +67,7 @@ final class MarkdownParser{
     else{
       $this->output .= ' ';
     }
-  
+    
     $this->output .= $rest;
     $this->is_paragraph_open = true;
   }
