@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Markdown;
 
+use Pages\Models\Tracker\IssueEditModel;
 use function Database\protect;
 
 final class MarkdownParser{
@@ -10,8 +11,6 @@ final class MarkdownParser{
   private const HASH = 35;
   private const LEFT_SQUARE_BRACKET = 91;
   private const RIGHT_SQUARE_BRACKET = 93;
-  private const LOWERCASE_X = 120;
-  private const UPPERCASE_X = 88;
   
   private string $output = '';
   
@@ -125,7 +124,7 @@ final class MarkdownParser{
     $next = $iter->move();
     $checked = false;
     
-    if ($next === self::LOWERCASE_X || $next === self::UPPERCASE_X){
+    if (in_array($next, array_map(fn($checked_char): int => ord($checked_char), IssueEditModel::TASK_CHECKED_CHARS), true)){
       $checked = true;
       $next = $iter->move();
     }

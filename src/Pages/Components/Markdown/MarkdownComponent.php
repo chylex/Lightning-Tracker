@@ -19,6 +19,10 @@ final class MarkdownComponent implements IViewable{
     return $this;
   }
   
+  public function getRawText(): string{
+    return $this->text;
+  }
+  
   public function getRawTextSafe(): string{
     return protect($this->text);
   }

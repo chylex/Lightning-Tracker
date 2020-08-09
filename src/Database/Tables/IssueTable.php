@@ -113,25 +113,24 @@ SQL
     $stmt->bindValue('scale', $scale->getId());
     $stmt->bindValue('status', $status->getId());
     $stmt->bindValue('progress', $progress, PDO::PARAM_INT);
-    
     $stmt->execute();
   }
   
   public function updateIssueTasks(int $id, string $description, int $progress): void{
     if ($progress === 100){
-      $status_from = 'in-progress';
-      $status_to = 'ready-to-test';
+      $condition = 'status = \'open\' OR status = \'in-progress\'';
+      $auto_status = 'ready-to-test';
     }
     else{
-      $status_from = 'open';
-      $status_to = 'in-progress';
+      $condition = 'status = \'open\'';
+      $auto_status = 'in-progress';
     }
     
     $stmt = $this->db->prepare(<<<SQL
 UPDATE issues
 SET description = ?,
     progress = ?,
-    status = IF(status = '$status_from', '$status_to', status),
+    status = IF($condition, '$auto_status', status),
     date_updated = NOW()
 WHERE issue_id = ? AND tracker_id = ?
 SQL

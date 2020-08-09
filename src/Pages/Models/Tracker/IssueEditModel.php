@@ -26,6 +26,29 @@ use Validation\ValidationException;
 use Validation\Validator;
 
 class IssueEditModel extends BasicTrackerPageModel{
+  public const TASK_REGEX = '/^\[([ xX]?)]/mu';
+  public const TASK_CHECKED_CHARS = ['x', 'X'];
+  
+  private static function calculateTaskProgress(string $description): ?int{
+    $task_matches = [];
+    $task_count = preg_match_all(self::TASK_REGEX, $description, $task_matches);
+    
+    if ($task_count > 0){
+      $task_checked_count = 0;
+      
+      foreach($task_matches[1] as $match){
+        if (in_array($match, self::TASK_CHECKED_CHARS, true)){
+          ++$task_checked_count;
+        }
+      }
+      
+      return (int)floor(100.0 * $task_checked_count / $task_count);
+    }
+    else{
+      return null;
+    }
+  }
+  
   /**
    * @param FormSelect $select
    * @param AbstractIssueTag[] $items
@@ -221,6 +244,29 @@ HTML
         $id = $issues->addIssue($new_issue_author, $title, $description, $type, $priority, $scale, $status, $progress, $milestone, $assignee);
       }
       else{
+        if ($progress === $this->issue->getProgress()){
+          $prev_task_progress = self::calculateTaskProgress($this->issue->getDescription()->getRawText());
+          $new_task_progress = self::calculateTaskProgress($description);
+          
+          if ($prev_task_progress !== $new_task_progress && $new_task_progress !== null){
+            $progress = $new_task_progress;
+            
+            $prev_status = $this->issue->getStatus()->getId();
+            $new_status = $status->getId();
+            
+            if ($prev_status === $new_status){ // same logic as in IssueTable (updateIssueTasks)
+              if ($progress === 100){
+                if ($prev_status === 'open' || $prev_status === 'in-progress'){
+                  $status = IssueStatus::get('ready-to-test');
+                }
+              }
+              elseif ($prev_status === 'open'){
+                $status = IssueStatus::get('in-progress');
+              }
+            }
+          }
+        }
+        
         if (!$this->perms->checkTracker($tracker, MembersModel::PERM_LIST)){
           $prev_assignee = $this->issue === null ? null : $this->issue->getAssignee();
           $assignee = $prev_assignee === null ? null : $prev_assignee->getId();
