@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `user_logins` (
 	`id`      INT NOT NULL,
-	`token`   VARCHAR(255) NOT NULL,
+	`token`   VARCHAR(191) NOT NULL, # Size limit needed due to low key size limits in older versions of MySQL.
 	`expires` DATETIME NOT NULL,
 	PRIMARY KEY (`id`, `token`),
 	UNIQUE KEY (`token`),
