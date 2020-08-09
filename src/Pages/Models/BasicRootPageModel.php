@@ -8,6 +8,7 @@ use Pages\Components\Text;
 use Pages\Models\Root\SettingsModel;
 use Pages\Models\Root\UsersModel;
 use Routing\Request;
+use Routing\UrlString;
 use Session\Permissions;
 
 class BasicRootPageModel extends AbstractPageModel{
@@ -16,7 +17,7 @@ class BasicRootPageModel extends AbstractPageModel{
   }
   
   protected function createNavigation(): NavigationComponent{
-    return new NavigationComponent('Lightning Tracker', BASE_URL_ENC, $this->getReq());
+    return new NavigationComponent('Lightning Tracker', BASE_URL_ENC, new UrlString(''), $this->getReq()->getRelativePath());
   }
   
   protected function setupNavigation(NavigationComponent $nav, Permissions $perms): void{

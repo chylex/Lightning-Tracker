@@ -6,6 +6,7 @@ namespace Pages\Components\Navigation;
 use Pages\Components\Text;
 use Pages\IViewable;
 use Routing\Request;
+use Routing\UrlString;
 
 final class NavigationComponent implements IViewable{
   public static function echoHead(): void{
@@ -29,11 +30,11 @@ HTML;
    */
   private array $right = [];
   
-  public function __construct(string $title, string $home_url, Request $req){
+  public function __construct(string $title, string $home_url, UrlString $base_path, UrlString $relative_path){
     $this->title = $title;
     $this->home_url = $home_url;
-    $this->base_url = rtrim($home_url.'/'.$req->getBasePath()->encoded(), '/');
-    $this->active_path_normalized = trim($req->getRelativePath()->raw(), '/');
+    $this->base_url = rtrim($home_url.'/'.$base_path->encoded(), '/');
+    $this->active_path_normalized = trim($relative_path->raw(), '/');
   }
   
   private function createNavItem(Text $title, string $url): NavigationItem{

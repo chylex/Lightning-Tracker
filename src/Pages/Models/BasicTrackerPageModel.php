@@ -32,7 +32,7 @@ class BasicTrackerPageModel extends AbstractPageModel{
   }
   
   protected function createNavigation(): NavigationComponent{
-    return new NavigationComponent($this->tracker->getNameSafe(), BASE_URL_ENC, $this->getReq());
+    return new NavigationComponent($this->tracker->getNameSafe(), BASE_URL_ENC, $this->getReq()->getBasePath(), $this->getReq()->getRelativePath());
   }
   
   protected function setupNavigation(NavigationComponent $nav, Permissions $perms): void{
