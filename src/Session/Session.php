@@ -29,7 +29,8 @@ final class Session{
   private static function checkToken(string $token, bool $renew): SessionLoginInfo{
     try{
       $logins = new UserLoginTable(DB::get());
-      $login = SessionLoginInfo::user($logins->checkLogin($token));
+      $login = $logins->checkLogin($token);
+      $login = $login === null ? SessionLoginInfo::guest() : SessionLoginInfo::user($login);
       
       if ($renew){
         try{
