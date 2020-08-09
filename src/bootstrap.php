@@ -58,6 +58,19 @@ if (TRACKER_MIGRATION_VERSION > INSTALLED_MIGRATION_VERSION){
   require_once 'update.php';
 }
 
+// Protection
+
+if (!empty($_POST) && isset($_SERVER['HTTP_ORIGIN'])){
+  $hostname = parse_url($_SERVER['HTTP_ORIGIN'] ?? 'null', PHP_URL_HOST);
+  
+  // Checking the Origin header and setting SameSite=Lax on the login
+  // token cookie should be sufficient for preventing CSRF.
+  
+  if ($hostname === null || $hostname !== parse_url(BASE_URL, PHP_URL_HOST)){
+    die('Could not validate the origin of your request.');
+  }
+}
+
 // Route
 
 require_once 'Pages/Actions/actions.php';
@@ -88,8 +101,6 @@ foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'account', 'Mixed/AccountController');
   $router->add($base.'account/security', 'Mixed/AccountSecurityController');
 }
-
-// TODO CSRF
 
 function handle_error(int $code, string $title, string $message, ?Request $req = null): void{
   http_response_code($code);

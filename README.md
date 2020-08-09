@@ -1,6 +1,6 @@
 Lightning Tracker is a work-in-progress issue tracker built for PHP 7.4+ and MySQL 5.6+.
 
-**I do not recommend using the tracker at this moment.** The current version lacks a fully-fledged permission system, protection against CSRF, and many upcoming major features.
+**I do not recommend using the tracker at this moment.** The current version lacks a fully-fledged permission system and many upcoming major features.
 
 ## Installation Guide
 
