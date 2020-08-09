@@ -28,7 +28,12 @@ header_remove('x-powered-by');
 // Bootstrap
 
 spl_autoload_extensions('.php');
-spl_autoload_register();
+spl_autoload_register(function($class){
+  // default autoload implementation is garbage because
+  // it converts paths to lowercase and breaks on linux
+  /** @noinspection PhpIncludeInspection */
+  require __DIR__.'/'.str_replace('\\', '/', $class).'.php';
+});
 
 if (file_exists('config.php')){
   /** @noinspection PhpIncludeInspection */
