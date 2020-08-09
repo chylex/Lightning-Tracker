@@ -16,7 +16,7 @@ class AboutPage extends AbstractPage{
   }
   
   protected function getHeading(): string{
-    return 'About Lightning Tracker '.TRACKER_VERSION;
+    return 'About Lightning Tracker '.TRACKER_PUBLIC_VERSION;
   }
   
   protected function getLayout(): string{

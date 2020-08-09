@@ -15,7 +15,11 @@ if (version_compare(PHP_VERSION, '7.4', '<')){
   die('Lightning Tracker requires PHP 7.4 or newer.');
 }
 
-define('TRACKER_VERSION', '0.1');
+define('TRACKER_PUBLIC_VERSION', '0.1');
+define('TRACKER_MIGRATION_VERSION', 1);
+
+define('CONFIG_FILE', __DIR__.'/config.php');
+define('CONFIG_BACKUP_FILE', __DIR__.'/config.old.php');
 
 setlocale(LC_ALL, 'C');
 date_default_timezone_set('UTC');
@@ -45,6 +49,12 @@ $base_url_protocol = mb_substr(BASE_URL, 0, $base_url_split + 3);
 $base_url_path = new UrlString(mb_substr(BASE_URL, $base_url_split + 3));
 
 define('BASE_URL_ENC', $base_url_protocol.$base_url_path->encoded());
+
+// Migration
+
+if (TRACKER_MIGRATION_VERSION > INSTALLED_MIGRATION_VERSION){
+  require_once 'update.php';
+}
 
 // Utilities
 

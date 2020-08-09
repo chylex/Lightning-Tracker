@@ -59,7 +59,7 @@ $conflicts = [];
 // Installation
 
 if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
-  $config = new SystemConfig($_POST);
+  $config = SystemConfig::fromForm($_POST);
   
   try{
     $config->validate();

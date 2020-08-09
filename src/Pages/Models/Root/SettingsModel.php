@@ -12,10 +12,6 @@ use Validation\ValidationException;
 use function Database\protect;
 
 class SettingsModel extends BasicRootPageModel{
-  private const ROOT_FOLDER = __DIR__.'/../../../';
-  private const CONFIG_FILE = self::ROOT_FOLDER.'config.php';
-  private const BACKUP_FILE = self::ROOT_FOLDER.'config.old.php';
-  
   public const ACTION_UPDATE_SETTINGS = 'UpdateSettings';
   public const ACTION_REMOVE_BACKUP = 'RemoveBackup';
   
@@ -68,7 +64,7 @@ HTML
     
     $this->form->addButton('submit', 'Update Settings')->value(self::ACTION_UPDATE_SETTINGS)->icon('pencil');
     
-    if (file_exists(self::BACKUP_FILE)){
+    if (file_exists(CONFIG_BACKUP_FILE)){
       $this->form->addButton('submit', 'Remove Backup File')->value(self::ACTION_REMOVE_BACKUP)->icon('trash');
     }
     
@@ -82,7 +78,7 @@ HTML;
   }
   
   public function removeBackupFile(): bool{
-    if (@unlink(self::BACKUP_FILE)){
+    if (@unlink(CONFIG_BACKUP_FILE)){
       $this->form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Backup file removed.'));
       return true;
     }
@@ -93,7 +89,7 @@ HTML;
   }
   
   public function updateConfig(array $data): bool{
-    $config = new SystemConfig($data);
+    $config = SystemConfig::fromForm($data);
     
     try{
       $config->validate();
@@ -102,12 +98,12 @@ HTML;
       return false;
     }
     
-    if (!copy(self::CONFIG_FILE, self::BACKUP_FILE)){
+    if (!copy(CONFIG_FILE, CONFIG_BACKUP_FILE)){
       $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Error creating backup of \'config.php\'.'));
       return false;
     }
     
-    if (!file_put_contents(self::CONFIG_FILE, $config->generate(), LOCK_EX)){
+    if (!file_put_contents(CONFIG_FILE, $config->generate(), LOCK_EX)){
       $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Error updating \'config.php\'.'));
       return false;
     }

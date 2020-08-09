@@ -1,7 +1,8 @@
 <?php
-define('BASE_URL', 'http://localhost');
+define('INSTALLED_MIGRATION_VERSION', TRACKER_MIGRATION_VERSION);
 
 define('SYS_ENABLE_REGISTRATION', true);
+define('BASE_URL', 'http://localhost');
 
 define('DB_DRIVER', 'mysql');
 define('DB_NAME', 'tracker');

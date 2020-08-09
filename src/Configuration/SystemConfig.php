@@ -11,20 +11,33 @@ final class SystemConfig{
     return mb_substr($url, 0, 7) === 'http://' || mb_substr($url, 0, 8) === 'https://';
   }
   
-  private string $sys_enable_registration;
+  public static function fromForm(array $data): SystemConfig{
+    return new SystemConfig(boolval($data['SysEnableRegistration'] ?? false),
+                            rtrim($data['BaseUrl'], '/'),
+                            $data['DbName'],
+                            $data['DbHost'],
+                            $data['DbUser'],
+                            $data['DbPassword']);
+  }
+  
+  public static function fromCurrentInstallation(): SystemConfig{
+    return new SystemConfig(SYS_ENABLE_REGISTRATION, BASE_URL, DB_NAME, DB_HOST, DB_USER, DB_PASSWORD);
+  }
+  
+  private bool $sys_enable_registration;
   private string $base_url;
   private string $db_name;
   private string $db_host;
   private string $db_user;
   private string $db_password;
   
-  public function __construct(array $data){
-    $this->sys_enable_registration = ($data['SysEnableRegistration'] ?? false) ? 'true' : 'false';
-    $this->base_url = rtrim($data['BaseUrl'], '/');
-    $this->db_name = $data['DbName'];
-    $this->db_host = $data['DbHost'];
-    $this->db_user = $data['DbUser'];
-    $this->db_password = $data['DbPassword'];
+  private function __construct(bool $sys_enable_registration, string $base_url, string $db_name, string $db_host, string $db_user, string $db_password){
+    $this->sys_enable_registration = $sys_enable_registration;
+    $this->base_url = $base_url;
+    $this->db_name = $db_name;
+    $this->db_host = $db_host;
+    $this->db_user = $db_user;
+    $this->db_password = $db_password;
   }
   
   /**
@@ -45,7 +58,8 @@ final class SystemConfig{
   }
   
   public function generate(): string{
-    $sys_enable_registration = $this->sys_enable_registration;
+    $migration_version = TRACKER_MIGRATION_VERSION;
+    $sys_enable_registration = $this->sys_enable_registration ? 'true' : 'false';
     $base_url = addcslashes($this->base_url, '\'\\');
     $db_name = addcslashes($this->db_name, '\'\\');
     $db_host = addcslashes($this->db_host, '\'\\');
@@ -55,8 +69,9 @@ final class SystemConfig{
     /** @noinspection ALL */
     $contents = <<<PHP
 <?php
-define('SYS_ENABLE_REGISTRATION', $sys_enable_registration);
+define('INSTALLED_MIGRATION_VERSION', $migration_version);
 
+define('SYS_ENABLE_REGISTRATION', $sys_enable_registration);
 define('BASE_URL', '$base_url');
 
 define('DB_DRIVER', 'mysql');
