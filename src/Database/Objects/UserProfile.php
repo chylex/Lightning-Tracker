@@ -32,8 +32,8 @@ final class UserProfile{
     return protect($this->name);
   }
   
-  public function getEmailSafe(): string{
-    return protect($this->email);
+  public function getEmail(): string{
+    return $this->email;
   }
   
   public function getSystemRoleId(): ?int{

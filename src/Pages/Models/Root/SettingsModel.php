@@ -9,7 +9,6 @@ use Pages\Components\Text;
 use Pages\Models\BasicRootPageModel;
 use Routing\Request;
 use Validation\ValidationException;
-use function Database\protect;
 
 class SettingsModel extends BasicRootPageModel{
   public const ACTION_UPDATE_SETTINGS = 'UpdateSettings';
@@ -35,7 +34,7 @@ HTML
     $this->form->endTitledSection();
     
     $this->form->startTitledSection('Site');
-    $this->form->addTextField('BaseUrl')->label('Base URL')->value(protect(BASE_URL));
+    $this->form->addTextField('BaseUrl')->label('Base URL')->value(BASE_URL);
     $this->form->endTitledSection();
     
     $this->form->addHTML(<<<HTML
@@ -45,10 +44,10 @@ HTML
     );
     
     $this->form->startTitledSection('Database');
-    $this->form->addTextField('DbName')->label('Name')->value(protect(DB_NAME));
-    $this->form->addTextField('DbHost')->label('Host')->value(protect(DB_HOST));
-    $this->form->addTextField('DbUser')->label('User')->value(protect(DB_USER));
-    $this->form->addTextField('DbPassword')->label('Password')->type('password')->autocomplete('new-password')->value(protect(DB_PASSWORD));
+    $this->form->addTextField('DbName')->label('Name')->value(DB_NAME);
+    $this->form->addTextField('DbHost')->label('Host')->value(DB_HOST);
+    $this->form->addTextField('DbUser')->label('User')->value(DB_USER);
+    $this->form->addTextField('DbPassword')->label('Password')->type('password')->autocomplete('new-password')->value(DB_PASSWORD);
     $this->form->endTitledSection();
     
     $this->form->addHTML(<<<HTML

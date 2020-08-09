@@ -26,7 +26,7 @@ class SettingsModel extends BasicTrackerPageModel{
     $this->form = new FormComponent();
     $this->form->startTitledSection('Tracker');
     $this->form->addTextField('Name');
-    $this->form->addTextField('Url')->value($tracker->getUrlSafe())->disable();
+    $this->form->addTextField('Url')->value($tracker->getUrl())->disable();
     $this->form->addCheckBox('Hidden')->label('Hidden From Non-Members');
     $this->form->addButton('submit', 'Update Settings')->icon('pencil');
     $this->form->endTitledSection();

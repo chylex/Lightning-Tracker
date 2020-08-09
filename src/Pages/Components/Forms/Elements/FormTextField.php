@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Components\Forms\Elements;
 
 use Pages\Components\Forms\AbstractFormField;
+use function Database\protect;
 
 final class FormTextField extends AbstractFormField{
   private string $id;
@@ -34,6 +35,7 @@ final class FormTextField extends AbstractFormField{
   public function echoBody(): void{
     $name = $this->getName();
     $label = $this->label ?? $name;
+    $value = protect($this->value);
     
     $autocomplete_attr = $this->autocomplete === null ? '' : ' autocomplete="'.$this->autocomplete.'"';
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
@@ -42,7 +44,7 @@ final class FormTextField extends AbstractFormField{
     echo <<<HTML
 <div class="field-group">
   <label for="$this->id"$disabled_class>$label</label>
-  <input id="$this->id" name="$name" type="$this->type" value="$this->value"$autocomplete_attr$disabled_attr>
+  <input id="$this->id" name="$name" type="$this->type" value="$value"$autocomplete_attr$disabled_attr>
 HTML;
     
     $this->echoErrors();

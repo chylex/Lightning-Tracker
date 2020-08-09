@@ -6,6 +6,7 @@ use Database\DB;
 use Database\Objects\UserLoginInfo;
 use Routing\UrlString;
 use Validation\ValidationException;
+use function Database\protect;
 
 // Constants
 
@@ -26,7 +27,6 @@ $base_path = new UrlString($_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']);
 
 $base_url_raw = $base_protocol.$base_path->raw();
 $base_url_encoded = $base_protocol.$base_path->encoded();
-$base_url_protected = htmlspecialchars($base_protocol.$base_path->raw(), ENT_HTML5 | ENT_QUOTES | ENT_SUBSTITUTE);
 
 $submit_action = $_POST[$action_key] ?? $action_value_install;
 $conflict_action = $submit_action === $action_value_conflict_confirm ? ($_POST[$conflict_resolution_key] ?? '') : '';
@@ -42,7 +42,7 @@ if ($submit_action === $action_value_conflict_confirm && (
 $form_section_install = true;
 $form_section_conflict = false;
 
-$value_base_url = $_POST['BaseUrl'] ?? $base_url_protected;
+$value_base_url = $_POST['BaseUrl'] ?? $base_url_raw;
 $value_sys_enable_registration = (bool)($_POST['SysEnableRegistration'] ?? 'on');
 $value_admin_name = $_POST['AdminName'] ?? '';
 $value_admin_password = $_POST['AdminPassword'] ?? '';
@@ -258,6 +258,16 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
 }
 
 // Page Layout
+
+$value_base_url = protect($value_base_url);
+$value_admin_name = protect($value_admin_name);
+$value_admin_password = protect($value_admin_password);
+$value_admin_password_repeated = protect($value_admin_password_repeated);
+$value_admin_email = protect($value_admin_email);
+$value_db_name = protect($value_db_name);
+$value_db_host = protect($value_db_host);
+$value_db_user = protect($value_db_user);
+$value_db_password = protect($value_db_password);
 
 $sys_enable_registration_checked_attr = $value_sys_enable_registration ? ' checked' : '';
 

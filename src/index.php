@@ -35,6 +35,8 @@ spl_autoload_register(function($class){
   require __DIR__.'/'.str_replace('\\', '/', $class).'.php';
 });
 
+require_once 'Database/utils.php';
+
 if (file_exists('config.php')){
   /** @noinspection PhpIncludeInspection */
   require_once 'config.php';
@@ -61,12 +63,9 @@ if (TRACKER_MIGRATION_VERSION > INSTALLED_MIGRATION_VERSION){
   require_once 'update.php';
 }
 
-// Utilities
-
-require_once 'Database/utils.php';
-require_once 'Pages/Actions/actions.php';
-
 // Route
+
+require_once 'Pages/Actions/actions.php';
 
 $route = isset($_GET['route']) ? $_GET['route'] : '';
 unset($_GET['route']);
