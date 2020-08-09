@@ -7,15 +7,21 @@ use Pages\Components\Text;
 use Pages\IViewable;
 
 final class IssueType{
+  public const FEATURE = 'feature';
+  public const ENHANCEMENT = 'enhancement';
+  public const BUG = 'bug';
+  public const CRASH = 'crash';
+  public const TASK = 'task';
+  
   private static array $all;
   private static self $unknown;
   
   public static function init(): void{
-    $types = [new IssueType('feature', 'Feature', 'leaf'),
-              new IssueType('enhancement', 'Enhancement', 'wand'),
-              new IssueType('bug', 'Bug', 'bug'),
-              new IssueType('crash', 'Crash', 'fire'),
-              new IssueType('task', 'Task', 'clock')];
+    $types = [new IssueType(self::FEATURE, 'Feature', 'leaf'),
+              new IssueType(self::ENHANCEMENT, 'Enhancement', 'wand'),
+              new IssueType(self::BUG, 'Bug', 'bug'),
+              new IssueType(self::CRASH, 'Crash', 'fire'),
+              new IssueType(self::TASK, 'Task', 'clock')];
     
     self::$all = [];
     

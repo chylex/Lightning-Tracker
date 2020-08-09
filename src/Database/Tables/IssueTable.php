@@ -118,11 +118,11 @@ SQL
   
   public function updateIssueTasks(int $id, string $description, int $progress): void{
     if ($progress === 100){
-      $condition = 'status = \'open\' OR status = \'in-progress\'';
+      $condition = 'status = \''.IssueStatus::OPEN.'\' OR status = \''.IssueStatus::IN_PROGRESS.'\'';
       $auto_status = 'ready-to-test';
     }
     else{
-      $condition = 'status = \'open\'';
+      $condition = 'status = \''.IssueStatus::OPEN.'\'';
       $auto_status = 'in-progress';
     }
     

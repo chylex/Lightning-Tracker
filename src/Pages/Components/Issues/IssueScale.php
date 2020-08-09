@@ -4,15 +4,21 @@ declare(strict_types = 1);
 namespace Pages\Components\Issues;
 
 final class IssueScale extends AbstractIssueTag{
+  public const TINY = 'tiny';
+  public const SMALL = 'small';
+  public const MEDIUM = 'medium';
+  public const LARGE = 'large';
+  public const MASSIVE = 'massive';
+  
   private static array $all;
   private static self $unknown;
   
   public static function init(): void{
-    self::$all = self::setup([new IssueScale('tiny', 'Tiny'),
-                              new IssueScale('small', 'Small'),
-                              new IssueScale('medium', 'Medium'),
-                              new IssueScale('large', 'Large'),
-                              new IssueScale('massive', 'Massive')]);
+    self::$all = self::setup([new IssueScale(self::TINY, 'Tiny'),
+                              new IssueScale(self::SMALL, 'Small'),
+                              new IssueScale(self::MEDIUM, 'Medium'),
+                              new IssueScale(self::LARGE, 'Large'),
+                              new IssueScale(self::MASSIVE, 'Massive')]);
     
     self::$unknown = new IssueScale('unknown', 'Unknown');
   }

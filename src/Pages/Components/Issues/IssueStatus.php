@@ -4,16 +4,23 @@ declare(strict_types = 1);
 namespace Pages\Components\Issues;
 
 final class IssueStatus extends AbstractIssueTag{
+  public const OPEN = 'open';
+  public const IN_PROGRESS = 'in-progress';
+  public const READY_TO_TEST = 'ready-to-test';
+  public const BLOCKED = 'blocked';
+  public const FINISHED = 'finished';
+  public const REJECTED = 'rejected';
+  
   private static array $all;
   private static self $unknown;
   
   public static function init(): void{
-    self::$all = self::setup([new IssueStatus('open', 'Open'),
-                              new IssueStatus('in-progress', 'In Progress'),
-                              new IssueStatus('ready-to-test', 'Ready To Test'),
-                              new IssueStatus('blocked', 'Blocked'),
-                              new IssueStatus('finished', 'Finished'),
-                              new IssueStatus('rejected', 'Rejected')]);
+    self::$all = self::setup([new IssueStatus(self::OPEN, 'Open'),
+                              new IssueStatus(self::IN_PROGRESS, 'In Progress'),
+                              new IssueStatus(self::READY_TO_TEST, 'Ready To Test'),
+                              new IssueStatus(self::BLOCKED, 'Blocked'),
+                              new IssueStatus(self::FINISHED, 'Finished'),
+                              new IssueStatus(self::REJECTED, 'Rejected')]);
     
     self::$unknown = new IssueStatus('unknown', 'Unknown');
   }

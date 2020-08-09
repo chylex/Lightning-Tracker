@@ -4,13 +4,17 @@ declare(strict_types = 1);
 namespace Pages\Components\Issues;
 
 final class IssuePriority extends AbstractIssueTag{
+  public const LOW = 'low';
+  public const MEDIUM = 'medium';
+  public const HIGH = 'high';
+  
   private static array $all;
   private static self $unknown;
   
   public static function init(): void{
-    self::$all = self::setup([new IssuePriority('low', 'Low'),
-                              new IssuePriority('medium', 'Medium'),
-                              new IssuePriority('high', 'High')]);
+    self::$all = self::setup([new IssuePriority(self::LOW, 'Low'),
+                              new IssuePriority(self::MEDIUM, 'Medium'),
+                              new IssuePriority(self::HIGH, 'High')]);
     
     self::$unknown = new IssuePriority('unknown', 'Unknown');
   }

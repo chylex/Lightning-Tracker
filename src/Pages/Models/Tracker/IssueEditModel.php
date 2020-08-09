@@ -158,8 +158,8 @@ HTML
     
     if (!$this->form->isFilled()){
       if ($this->issue_id === null){
-        $this->form->fill(['Type'   => 'feature',
-                           'Status' => 'open']);
+        $this->form->fill(['Type'   => IssueType::FEATURE,
+                           'Status' => IssueStatus::OPEN]);
       }
       elseif ($this->issue !== null){
         $issue = $this->issue;
@@ -256,12 +256,12 @@ HTML
             
             if ($prev_status === $new_status){ // same logic as in IssueTable (updateIssueTasks)
               if ($progress === 100){
-                if ($prev_status === 'open' || $prev_status === 'in-progress'){
-                  $status = IssueStatus::get('ready-to-test');
+                if ($prev_status === IssueStatus::OPEN || $prev_status === IssueStatus::IN_PROGRESS){
+                  $status = IssueStatus::get(IssueStatus::READY_TO_TEST);
                 }
               }
-              elseif ($prev_status === 'open'){
-                $status = IssueStatus::get('in-progress');
+              elseif ($prev_status === IssueStatus::OPEN){
+                $status = IssueStatus::get(IssueStatus::IN_PROGRESS);
               }
             }
           }
