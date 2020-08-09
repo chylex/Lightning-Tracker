@@ -158,8 +158,10 @@ HTML
     
     if (!$this->form->isFilled()){
       if ($this->issue_id === null){
-        $this->form->fill(['Type'   => IssueType::FEATURE,
-                           'Status' => IssueStatus::OPEN]);
+        $this->form->fill(['Type'     => IssueType::FEATURE,
+                           'Priority' => IssuePriority::MEDIUM,
+                           'Scale'    => IssueScale::MEDIUM,
+                           'Status'   => IssueStatus::OPEN]);
       }
       elseif ($this->issue !== null){
         $issue = $this->issue;

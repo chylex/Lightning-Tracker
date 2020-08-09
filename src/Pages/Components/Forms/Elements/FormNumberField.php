@@ -36,10 +36,12 @@ final class FormNumberField extends AbstractFormField{
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
     $disabled_class = $this->disabled === false ? '' : ' class="disabled"';
     
+    // TODO rewrite steps using JS to avoid form validation
+    
     echo <<<HTML
 <div class="field-group">
   <label for="$this->id"$disabled_class>$label</label>
-  <input id="$this->id" name="$name" type="number" min="$this->min" max="$this->max" step="$this->step" value="$this->value"$disabled_attr>
+  <input id="$this->id" name="$name" type="number" min="$this->min" max="$this->max" data-step="$this->step" value="$this->value"$disabled_attr>
 HTML;
     
     $this->echoErrors();
