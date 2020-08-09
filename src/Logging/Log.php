@@ -8,7 +8,6 @@ use Exception;
 final class Log{
   public static function critical(Exception $e): void{
     error_log($e->getMessage());
-    // TODO
   }
 }
 

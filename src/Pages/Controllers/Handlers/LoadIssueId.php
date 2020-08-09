@@ -23,7 +23,7 @@ class LoadIssueId implements IControlHandler{
     $this->issue_id_ref = &$issue_id_ref;
   }
   
-  public function allowMissing(): LoadIssueId{
+  public function allowMissing(): self{
     $this->optional = true;
     return $this;
   }

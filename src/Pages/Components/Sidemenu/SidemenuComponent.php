@@ -30,7 +30,7 @@ HTML;
    */
   private array $items = [];
   
-  public function setTitle(Text $title): SidemenuComponent{
+  public function setTitle(Text $title): self{
     $this->title = $title;
     return $this;
   }

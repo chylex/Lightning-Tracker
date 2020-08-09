@@ -7,7 +7,7 @@ use Database\Objects\TrackerInfo;
 use Generator;
 use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractHandlerController;
-use Pages\Controllers\Handlers\OptionallyLoadTracker;
+use Pages\Controllers\Handlers\LoadTracker;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\IControlHandler;
 use Pages\IAction;
@@ -23,7 +23,7 @@ class AccountController extends AbstractHandlerController{
   
   protected final function prerequisites(): Generator{
     yield new RequireLoginState(true);
-    yield new OptionallyLoadTracker($this->tracker);
+    yield (new LoadTracker($this->tracker))->allowMissing();
     
     yield new class implements IControlHandler{
       public function run(Request $req, Session $sess): ?IAction{

@@ -5,7 +5,7 @@ namespace Pages\Controllers;
 
 use Database\Objects\TrackerInfo;
 use Generator;
-use Pages\Controllers\Handlers\RequireTracker;
+use Pages\Controllers\Handlers\LoadTracker;
 use Pages\IAction;
 use Routing\Request;
 use Session\Session;
@@ -14,7 +14,7 @@ abstract class AbstractTrackerController extends AbstractHandlerController{
   private ?TrackerInfo $tracker;
   
   protected final function prerequisites(): Generator{
-    yield new RequireTracker($this->tracker);
+    yield new LoadTracker($this->tracker);
     yield from $this->trackerHandlers($this->tracker);
   }
   
@@ -22,6 +22,7 @@ abstract class AbstractTrackerController extends AbstractHandlerController{
     return $this->runTracker($req, $sess, $this->tracker);
   }
   
+  /** @noinspection PhpUnusedParameterInspection */
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield from [];
   }

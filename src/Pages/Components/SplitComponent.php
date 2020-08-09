@@ -74,7 +74,7 @@ HTML;
     return $this;
   }
   
-  private function getWidthLimitClass(?array &$limits): string{
+  private function getWidthLimitClass(?array $limits): string{
     if ($limits === null){
       return '';
     }

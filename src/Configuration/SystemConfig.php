@@ -69,6 +69,8 @@ final class SystemConfig{
     /** @noinspection ALL */
     $contents = <<<PHP
 <?php
+declare(strict_types = 1);
+
 define('INSTALLED_MIGRATION_VERSION', $migration_version);
 
 define('SYS_ENABLE_REGISTRATION', $sys_enable_registration);

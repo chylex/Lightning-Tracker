@@ -12,7 +12,7 @@ final class FormSelect extends AbstractFormField{
   private bool $optional = false;
   
   /**
-   * @var array
+   * @var FormSelectOption[]
    */
   private array $options = [];
   
@@ -36,7 +36,7 @@ final class FormSelect extends AbstractFormField{
     return $this;
   }
   
-  public function value(?string $value): AbstractFormField{
+  public function value(?string $value): self{
     if ($this->optional && $value === null){
       return $this;
     }
@@ -46,7 +46,7 @@ final class FormSelect extends AbstractFormField{
   }
   
   public function addOption(string $value, string $html, ?string $class = null): self{
-    $this->options[] = [$value, $html, $class]; // TODO ugly
+    $this->options[] = new FormSelectOption($value, $html, $class);
     return $this;
   }
   
@@ -70,9 +70,8 @@ final class FormSelect extends AbstractFormField{
 HTML;
     
     foreach($this->options as $option){
-      $class = $option[2] === null ? '' : ' class="'.$option[2].'"';
-      $selected = $option[0] !== $this->value ? '' : ' selected';
-      echo '<option value="'.$option[0].'"'.$class.$selected.'>'.$option[1].'</option>';
+      $option->selectIfValue($this->value);
+      $option->echoBody();
     }
     
     echo <<<HTML

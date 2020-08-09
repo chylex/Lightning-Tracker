@@ -4,8 +4,12 @@ declare(strict_types = 1);
 namespace Database\Filters;
 
 class Pagination{
+  public static function empty(): self{
+    return new self(1, 0, 1);
+  }
+  
   public static function fromGet(string $key, int $total_elements, int $elements_per_page): self{
-    return new Pagination((int)($_GET[$key] ?? 1), $total_elements, $elements_per_page);
+    return new self((int)($_GET[$key] ?? 1), $total_elements, $elements_per_page);
   }
   
   private int $current_page;

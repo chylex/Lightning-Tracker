@@ -15,15 +15,26 @@ use Routing\Request;
 use Session\Session;
 use function Pages\Actions\view;
 
-class RequireTracker implements IControlHandler{
+class LoadTracker implements IControlHandler{
   private ?TrackerInfo $tracker_ref;
+  private bool $optional = false;
   
   public function __construct(?TrackerInfo &$tracker_ref){
     $this->tracker_ref = &$tracker_ref;
   }
   
+  public function allowMissing(): self{
+    $this->optional = true;
+    return $this;
+  }
+  
   public function run(Request $req, Session $sess): ?IAction{
     $url = $req->getParam('tracker');
+    
+    if ($url === null && $this->optional){
+      $this->tracker_ref = null;
+      return null;
+    }
     
     if ($url === null){
       $page_model = new BasicRootPageModel($req);

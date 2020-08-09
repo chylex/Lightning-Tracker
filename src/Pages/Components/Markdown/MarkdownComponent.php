@@ -14,7 +14,7 @@ final class MarkdownComponent implements IViewable{
     $this->text = $text;
   }
   
-  public function setCheckboxNameForEditing(string $checkbox_name): MarkdownComponent{
+  public function setCheckboxNameForEditing(string $checkbox_name): self{
     $this->checkbox_name = $checkbox_name;
     return $this;
   }

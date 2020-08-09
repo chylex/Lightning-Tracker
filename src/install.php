@@ -230,21 +230,23 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     }catch(Exception $e){
       $errors[] = 'Error reading database setup files: '.$e->getMessage();
     }
-    
-    if ($conflict_action !== $conflict_resolution_reuse){
-      try{
-        $stmt = $db->prepare('INSERT INTO users (name, email, password, admin, date_registered) VALUES (?, ?, ?, TRUE, NOW())');
-        $stmt->bindValue(1, $value_admin_name);
-        $stmt->bindValue(2, $value_admin_email);
-        $stmt->bindValue(3, UserLoginInfo::hashPassword($value_admin_password));
-        $stmt->execute();
-      }catch(Exception $e){
-        $errors[] = 'Error setting up administrator account: '.$e->getMessage();
-      }
+  }
+  
+  // Administrator Account
+  
+  if (empty($errors) && $conflict_action !== $conflict_resolution_reuse){
+    try{
+      $stmt = $db->prepare('INSERT INTO users (name, email, password, admin, date_registered) VALUES (?, ?, ?, TRUE, NOW())');
+      $stmt->bindValue(1, $value_admin_name);
+      $stmt->bindValue(2, $value_admin_email);
+      $stmt->bindValue(3, UserLoginInfo::hashPassword($value_admin_password));
+      $stmt->execute();
+    }catch(Exception $e){
+      $errors[] = 'Error setting up administrator account: '.$e->getMessage();
     }
   }
   
-  // Configuration File Generation
+  // Configuration File
   
   if (empty($errors) && !file_put_contents(__DIR__.'/config.php', $config->generate(), LOCK_EX)){
     $errors[] = 'Error creating \'config.php\'.';

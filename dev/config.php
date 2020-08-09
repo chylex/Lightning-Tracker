@@ -1,4 +1,6 @@
 <?php
+declare(strict_types = 1);
+
 define('INSTALLED_MIGRATION_VERSION', TRACKER_MIGRATION_VERSION);
 
 define('SYS_ENABLE_REGISTRATION', true);

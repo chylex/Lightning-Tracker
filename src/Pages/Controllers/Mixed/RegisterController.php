@@ -6,7 +6,7 @@ namespace Pages\Controllers\Mixed;
 use Database\Objects\TrackerInfo;
 use Generator;
 use Pages\Controllers\AbstractHandlerController;
-use Pages\Controllers\Handlers\OptionallyLoadTracker;
+use Pages\Controllers\Handlers\LoadTracker;
 use Pages\IAction;
 use Pages\Models\BasicMixedPageModel;
 use Pages\Models\ErrorModel;
@@ -22,7 +22,7 @@ class RegisterController extends AbstractHandlerController{
   private ?TrackerInfo $tracker;
   
   protected function prerequisites(): Generator{
-    yield new OptionallyLoadTracker($this->tracker);
+    yield (new LoadTracker($this->tracker))->allowMissing();
   }
   
   protected function finally(Request $req, Session $sess): IAction{

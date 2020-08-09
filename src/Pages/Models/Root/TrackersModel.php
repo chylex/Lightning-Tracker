@@ -106,7 +106,7 @@ class TrackersModel extends BasicRootPageModel{
       $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('trackers');
     }
     else{
-      $this->table->setPaginationFooter($this->getReq(), new Pagination(1, 0, 1))->elementName('trackers'); // TODO ugly, simplify
+      $this->table->setPaginationFooter($this->getReq(), Pagination::empty())->elementName('trackers');
     }
     
     return $this;

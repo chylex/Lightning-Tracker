@@ -59,12 +59,12 @@ final class SystemPermTable extends AbstractTable{
       return self::GUEST_PERMS;
     }
     
-    if ($user->getRoleId() === null){
+    if ($user->getSystemRoleId() === null){
       return self::LOGON_PERMS;
     }
     
     $stmt = $this->db->prepare('SELECT permission FROM system_role_perms WHERE role_id = ?');
-    $stmt->bindValue(1, $user->getRoleId(), PDO::PARAM_INT);
+    $stmt->bindValue(1, $user->getSystemRoleId(), PDO::PARAM_INT);
     $stmt->execute();
     return $this->fetchPerms($stmt);
   }

@@ -6,7 +6,7 @@ namespace Pages\Controllers\Mixed;
 use Database\Objects\TrackerInfo;
 use Generator;
 use Pages\Controllers\AbstractHandlerController;
-use Pages\Controllers\Handlers\OptionallyLoadTracker;
+use Pages\Controllers\Handlers\LoadTracker;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\IAction;
 use Pages\Models\Mixed\LoginModel;
@@ -21,7 +21,7 @@ class LoginController extends AbstractHandlerController{
   
   protected function prerequisites(): Generator{
     yield new RequireLoginState(false);
-    yield new OptionallyLoadTracker($this->tracker);
+    yield (new LoadTracker($this->tracker))->allowMissing();
   }
   
   protected function finally(Request $req, Session $sess): IAction{

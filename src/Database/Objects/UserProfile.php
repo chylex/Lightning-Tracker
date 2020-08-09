@@ -9,14 +9,14 @@ final class UserProfile{
   private int $id;
   private string $name;
   private string $email;
-  private ?int $role_id;
+  private ?int $sys_role_id;
   private bool $admin;
   
-  public function __construct(int $id, string $name, string $email, ?int $role_id, bool $admin){
+  public function __construct(int $id, string $name, string $email, ?int $sys_role_id, bool $admin){
     $this->id = $id;
     $this->name = $name;
     $this->email = $email;
-    $this->role_id = $role_id;
+    $this->sys_role_id = $sys_role_id;
     $this->admin = $admin;
   }
   
@@ -36,8 +36,8 @@ final class UserProfile{
     return protect($this->email);
   }
   
-  public function getRoleId(): ?int{
-    return $this->role_id;
+  public function getSystemRoleId(): ?int{
+    return $this->sys_role_id;
   }
   
   public function isAdmin(): bool{
