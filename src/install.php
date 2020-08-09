@@ -289,7 +289,7 @@ echo <<<HTML
     
     <title>Lightning Tracker - Install</title>
     
-    <base href="$base_url_encoded">
+    <base href="$base_url_encoded/">
     <link rel="icon" type="image/png" href="~resources/img/favicon.png">
     <link rel="stylesheet" type="text/css" href="~resources/css/main.css">
     <link rel="stylesheet" type="text/css" href="~resources/css/split.css">

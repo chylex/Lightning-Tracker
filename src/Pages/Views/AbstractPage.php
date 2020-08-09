@@ -47,7 +47,7 @@ abstract class AbstractPage implements IViewable{
     
     <title>$title</title>
     
-    <base href="$base_url">
+    <base href="$base_url/">
     <link rel="icon" type="image/png" href="~resources/img/favicon.png">
     <link rel="stylesheet" type="text/css" href="~resources/css/main.css">
     <link rel="stylesheet" type="text/css" href="~resources/css/icons.css">
