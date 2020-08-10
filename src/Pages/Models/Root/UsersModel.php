@@ -46,13 +46,16 @@ class UsersModel extends BasicRootPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No users found.');
     
-    $this->table->addColumn('Username')->bold();
     
     if ($perms->checkSystem(self::PERM_LIST_EMAIL)){
-      $this->table->addColumn('Email');
+      $this->table->addColumn('Username')->width(40)->bold();
+      $this->table->addColumn('Email')->width(40);
+    }
+    else{
+      $this->table->addColumn('Username')->width(80)->bold();
     }
     
-    $this->table->addColumn('Role');
+    $this->table->addColumn('Role')->width(20);
     $this->table->addColumn('Registration Time')->tight()->right();
     
     if ($perms->checkSystem(self::PERM_EDIT)){

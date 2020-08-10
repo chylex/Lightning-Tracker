@@ -45,8 +45,8 @@ class MembersModel extends BasicTrackerPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No members found.');
     
-    $this->table->addColumn('Username')->bold();
-    $this->table->addColumn('Role');
+    $this->table->addColumn('Username')->width(60)->bold();
+    $this->table->addColumn('Role')->width(40);
     
     if ($perms->checkTracker($tracker, self::PERM_MANAGE)){
       $this->table->addColumn('Actions')->right()->tight();
