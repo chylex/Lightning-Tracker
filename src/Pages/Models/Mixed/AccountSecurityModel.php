@@ -22,6 +22,7 @@ class AccountSecurityModel extends AccountModel{
     
     $form = new FormComponent('ChangePassword');
     $form->startTitledSection('Change Password');
+    $form->setMessagePlacementHere();
     
     $form->addTextField('OldPassword')
          ->label('Current Password')

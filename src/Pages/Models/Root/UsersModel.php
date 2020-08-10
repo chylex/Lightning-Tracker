@@ -62,6 +62,7 @@ class UsersModel extends BasicRootPageModel{
     if ($perms->checkSystem(self::PERM_ADD)){
       $this->form = new FormComponent(self::ACTION_CREATE);
       $this->form->startTitledSection('Create User');
+      $this->form->setMessagePlacementHere();
       
       $this->form->addTextField('Name')
                  ->label('Username')

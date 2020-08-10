@@ -55,6 +55,7 @@ class AccountPage extends AbstractPage{
     
     $form = new FormComponent();
     $form->startTitledSection('General');
+    $form->setMessagePlacementHere();
     $form->startSplitGroup(50);
     $form->addTextField('Name')->label('Username')->value($logon_user->getName())->disable();
     $form->addTextField('Email')->value($logon_user->getEmail())->disable();

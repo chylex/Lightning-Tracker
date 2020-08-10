@@ -52,6 +52,7 @@ class TrackersModel extends BasicRootPageModel{
     if ($perms->checkSystem(self::PERM_ADD)){
       $this->form = new FormComponent(self::ACTION_CREATE);
       $this->form->startTitledSection('Create Tracker');
+      $this->form->setMessagePlacementHere();
       
       $this->form->addTextField('Name')->type('text');
       $this->form->addTextField('Url')->type('text');

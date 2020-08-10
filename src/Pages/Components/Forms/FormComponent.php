@@ -10,6 +10,7 @@ use Pages\Components\Forms\Elements\FormButton;
 use Pages\Components\Forms\Elements\FormCheckBox;
 use Pages\Components\Forms\Elements\FormHiddenValue;
 use Pages\Components\Forms\Elements\FormIconButton;
+use Pages\Components\Forms\Elements\FormMessageList;
 use Pages\Components\Forms\Elements\FormNumberField;
 use Pages\Components\Forms\Elements\FormSelect;
 use Pages\Components\Forms\Elements\FormSplitGroupEnd;
@@ -46,17 +47,18 @@ HTML;
   /**
    * @var IViewable[]
    */
-  private array $elements = [];
+  private array $elements;
+  private FormMessageList $message_list;
   
   /**
    * @var IFormField[]
    */
   private array $fields = [];
   
-  private array $messages = [];
-  
   public function __construct($id = 'Form'){
     $this->id = $id;
+    $this->message_list = new FormMessageList();
+    $this->elements = [$this->message_list];
   }
   
   public function requireConfirmation(string $message): void{
@@ -64,7 +66,17 @@ HTML;
   }
   
   public function addMessage(string $level, Text $text): void{
-    $this->messages[] = [$level, $text->getHtml()];
+    $this->message_list->addMessage($level, $text);
+  }
+  
+  public function setMessagePlacementHere(): void{
+    $key = array_search($this->message_list, $this->elements);
+    
+    if ($key !== false){
+      unset($this->elements[$key]);
+    }
+    
+    $this->elements[] = $this->message_list;
   }
   
   public function startTitledSection(string $title): void{
@@ -191,7 +203,7 @@ HTML;
     
     if (isset($data[self::RELOADED_KEY])){
       if (isset($data[self::MESSAGES_KEY])){
-        array_push($this->messages, ...$data[self::MESSAGES_KEY]);
+        $this->message_list->appendMessages($data[self::MESSAGES_KEY]);
       }
       
       return false; // TODO prevents infinite reloading, but ugly
@@ -207,7 +219,7 @@ HTML;
    * @return ReloadFormAction
    */
   public function reload(array $data): ReloadFormAction{
-    $data[self::MESSAGES_KEY] = $this->messages;
+    $data[self::MESSAGES_KEY] = $this->message_list->getMessages();
     $data[self::RELOADED_KEY] = true;
     return new ReloadFormAction($data);
   }
@@ -238,12 +250,6 @@ HTML;
     echo <<<HTML
 <form id="$this->id" action="" method="post"$confirm_attr>
 HTML;
-    
-    foreach($this->messages as $message){
-      $level = $message[0];
-      $text = $message[1];
-      echo '<p class="message '.$level.'">'.$text.'</p>';
-    }
     
     $groups = [];
     

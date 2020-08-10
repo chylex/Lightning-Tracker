@@ -60,7 +60,8 @@ HTML
      Current configuration file will be backed up as 'config.old.php'.</p>
 HTML
     );
-    
+  
+    $this->form->setMessagePlacementHere();
     $this->form->addButton('submit', 'Update Settings')->value(self::ACTION_UPDATE_SETTINGS)->icon('pencil');
     
     if (file_exists(CONFIG_BACKUP_FILE)){

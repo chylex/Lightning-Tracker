@@ -52,6 +52,7 @@ class MembersModel extends BasicTrackerPageModel{
       
       $this->form = new FormComponent(self::ACTION_INVITE);
       $this->form->startTitledSection('Invite User');
+      $this->form->setMessagePlacementHere();
       
       $this->form->addTextField('Name')
                  ->label('Username')

@@ -58,6 +58,7 @@ class MilestonesModel extends BasicTrackerPageModel{
       
       $this->form = new FormComponent(self::ACTION_CREATE);
       $this->form->startTitledSection('Create Milestone');
+      $this->form->setMessagePlacementHere();
       $this->form->addTextField('Title')->type('text');
       $this->form->addButton('submit', 'Create Milestone')->icon('pencil');
       $this->form->endTitledSection();
