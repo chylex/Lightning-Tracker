@@ -57,3 +57,23 @@
   margin-left: 1px;
   margin-bottom: 5px;
 }
+
+.issue-description del {
+  text-decoration: none;
+}
+
+.issue-description del:after {
+  content: '';
+  display: block;
+  position: relative;
+  top: -9px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  margin-bottom: -2px;
+  background-color: #000000;
+}
+
+.issue-description del:hover:after {
+  display: none;
+}
