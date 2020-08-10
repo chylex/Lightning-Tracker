@@ -11,6 +11,14 @@ final class MilestoneFilter extends AbstractTrackerIdFilter{
     return new self();
   }
   
+  protected function getSortingColumns(): array{
+    return [
+        'title',
+        'progress',
+        'date_updated'
+    ];
+  }
+  
   protected function getDefaultOrderByColumns(): array{
     return [
         'm.ordering' => Sorting::SQL_ASC

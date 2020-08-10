@@ -41,8 +41,8 @@ class MembersModel extends BasicTrackerPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No members found.');
     
-    $this->table->addColumn('Username')->width(60)->bold();
-    $this->table->addColumn('Role')->width(40);
+    $this->table->addColumn('Username')->sort('name')->width(60)->bold();
+    $this->table->addColumn('Role')->sort('role_title')->width(40);
     
     if ($perms->checkTracker($tracker, self::PERM_MANAGE)){
       $this->table->addColumn('Actions')->right()->tight();
@@ -90,6 +90,7 @@ class MembersModel extends BasicTrackerPageModel{
     $total_count = $members->countMembers($filter);
     
     $pagination = $filter->page($total_count);
+    $sorting = $filter->sort($this->getReq());
     
     foreach($members->listMembers($filter) as $member){
       $row = [$member->getUserNameSafe(),
@@ -113,6 +114,7 @@ class MembersModel extends BasicTrackerPageModel{
       $this->table->addRow($row);
     }
     
+    $this->table->setupColumnSorting($sorting);
     $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('members');
     
     return $this;

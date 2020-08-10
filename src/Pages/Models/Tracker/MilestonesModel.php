@@ -46,11 +46,11 @@ class MilestonesModel extends BasicTrackerPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No milestones found.');
     
-    $this->table->addColumn('Title')->width(65)->bold();
+    $this->table->addColumn('Title')->sort('title')->width(65)->bold();
     $this->table->addColumn('Active')->tight()->center();
     $this->table->addColumn('Issues')->tight();
-    $this->table->addColumn('Progress')->width(35);
-    $this->table->addColumn('Last Updated')->tight()->right();
+    $this->table->addColumn('Progress')->sort('progress')->width(35);
+    $this->table->addColumn('Last Updated')->sort('date_updated')->tight()->right();
     
     if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
       $this->table->addColumn('Actions')->tight()->right();
@@ -77,6 +77,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $total_count = $milestones->countMilestones($filter);
     
     $pagination = $filter->page($total_count);
+    $sorting = $filter->sort($this->getReq());
     
     $active_milestone = $this->getActiveMilestone();
     $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
@@ -116,6 +117,7 @@ class MilestonesModel extends BasicTrackerPageModel{
       $this->table->addRow($row);
     }
     
+    $this->table->setupColumnSorting($sorting);
     $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('milestones');
     
     return $this;

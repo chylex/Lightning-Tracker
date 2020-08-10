@@ -75,9 +75,15 @@ final class TrackerFilter extends AbstractFilter{
     return $clause;
   }
   
+  protected function getSortingColumns(): array{
+    return [
+        'name'
+    ];
+  }
+  
   protected function getDefaultOrderByColumns(): array{
     return [
-        'id' => Sorting::SQL_ASC
+        'name' => Sorting::SQL_ASC
     ];
   }
   

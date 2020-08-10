@@ -11,6 +11,13 @@ final class TrackerMemberFilter extends AbstractTrackerIdFilter{
     return new self();
   }
   
+  protected function getSortingColumns(): array{
+    return [
+        'name',
+        'role_title'
+    ];
+  }
+  
   protected function getDefaultOrderByColumns(): array{
     return [
         'role_order' => Sorting::SQL_ASC,

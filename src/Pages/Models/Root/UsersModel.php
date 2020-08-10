@@ -44,15 +44,15 @@ class UsersModel extends BasicRootPageModel{
     
     
     if ($perms->checkSystem(self::PERM_LIST_EMAIL)){
-      $this->table->addColumn('Username')->width(40)->bold();
+      $this->table->addColumn('Username')->sort('name')->width(40)->bold();
       $this->table->addColumn('Email')->width(40);
     }
     else{
-      $this->table->addColumn('Username')->width(80)->bold();
+      $this->table->addColumn('Username')->sort('name')->width(80)->bold();
     }
     
-    $this->table->addColumn('Role')->width(20);
-    $this->table->addColumn('Registration Time')->tight()->right();
+    $this->table->addColumn('Role')->sort('role_title')->width(20);
+    $this->table->addColumn('Registration Time')->sort('date_registered')->tight()->right();
     
     if ($perms->checkSystem(self::PERM_EDIT)){
       $this->table->addColumn('Actions')->tight()->right();
@@ -97,6 +97,7 @@ class UsersModel extends BasicRootPageModel{
     $total_count = $users->countUsers();
     
     $pagination = $filter->page($total_count);
+    $sorting = $filter->sort($this->getReq());
     
     foreach($users->listUsers($filter) as $user){
       $user_id = $user->getId();
@@ -125,6 +126,7 @@ class UsersModel extends BasicRootPageModel{
       $this->table->addRow($row);
     }
     
+    $this->table->setupColumnSorting($sorting);
     $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('users');
     
     return $this;

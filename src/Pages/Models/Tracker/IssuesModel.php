@@ -34,11 +34,11 @@ class IssuesModel extends BasicTrackerPageModel{
     $this->table->ifEmpty('No issues found.');
     
     $this->table->addColumn('')->tight()->collapsed();
-    $this->table->addColumn('Title')->width(70)->bold();
-    $this->table->addColumn('Priority')->tight();
-    $this->table->addColumn('Scale')->tight();
+    $this->table->addColumn('Title')->sort('title')->width(70)->bold();
+    $this->table->addColumn('Priority')->sort('priority')->tight();
+    $this->table->addColumn('Scale')->sort('scale')->tight();
     $this->table->addColumn('Status')->tight();
-    $this->table->addColumn('Progress')->width(30);
+    $this->table->addColumn('Progress')->sort('progress')->width(30);
     
     $this->menu_actions = new SidemenuComponent(BASE_URL_ENC, $req);
     $this->menu_actions->setTitle(Text::plain('Actions'));
@@ -54,6 +54,7 @@ class IssuesModel extends BasicTrackerPageModel{
     $total_count = $issues->countIssues($filter);
     
     $pagination = $filter->page($total_count);
+    $sorting = $filter->sort($this->getReq());
     
     foreach($issues->listIssues($filter) as $issue){
       $row = $this->table->addRow([$issue->getType()->getViewable(true),
@@ -66,6 +67,7 @@ class IssuesModel extends BasicTrackerPageModel{
       $row->link($this->getReq()->getBasePath()->encoded().'/issues/'.$issue->getId());
     }
     
+    $this->table->setupColumnSorting($sorting);
     $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('issues');
     
     if ($this->perms->checkTracker($tracker, self::PERM_CREATE)){

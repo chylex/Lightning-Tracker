@@ -33,9 +33,17 @@ final class UserFilter extends AbstractFilter{
     ];
   }
   
+  protected function getSortingColumns(): array{
+    return [
+        'name',
+        'role_title',
+        'date_registered'
+    ];
+  }
+  
   protected function getDefaultOrderByColumns(): array{
     return [
-        'id' => Sorting::SQL_ASC
+        'date_registered' => Sorting::SQL_ASC
     ];
   }
   

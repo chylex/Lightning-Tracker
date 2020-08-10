@@ -137,7 +137,7 @@ SELECT m.id                                                             AS id,
        m.title                                                          AS title,
        COUNT(CASE WHEN i.status IN ('finished', 'rejected') THEN 1 END) AS closed_issues,
        COUNT(i.issue_id)                                                AS total_issues,
-       FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS percentage_done,
+       FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS progress,
        MAX(i.date_updated)                                              AS date_updated
 FROM milestones m
 LEFT JOIN issues i ON m.id = i.milestone_id
@@ -159,7 +159,7 @@ SQL;
                                      $res['title'],
                                      $res['closed_issues'],
                                      $res['total_issues'],
-                                     $res['percentage_done'] === null ? null : (int)$res['percentage_done'],
+                                     $res['progress'] === null ? null : (int)$res['progress'],
                                      $res['date_updated']);
     }
     

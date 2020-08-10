@@ -11,6 +11,15 @@ final class IssueFilter extends AbstractTrackerIdFilter{
     return new self();
   }
   
+  protected function getSortingColumns(): array{
+    return [
+        'title',
+        'priority',
+        'scale',
+        'progress'
+    ];
+  }
+  
   protected function getDefaultOrderByColumns(): array{
     return [
         'issue_id' => Sorting::SQL_DESC

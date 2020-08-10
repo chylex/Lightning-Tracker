@@ -42,7 +42,7 @@ class TrackersModel extends BasicRootPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No trackers found. Some trackers may not be visible to your account.');
     
-    $this->table->addColumn('Name')->width(50)->bold();
+    $this->table->addColumn('Name')->sort('name')->width(50)->bold();
     $this->table->addColumn('Link')->width(50);
     
     if ($perms->checkSystem(self::PERM_EDIT)){
@@ -80,6 +80,7 @@ class TrackersModel extends BasicRootPageModel{
       $total_count = $trackers->countTrackers($filter);
       
       $pagination = $filter->page($total_count);
+      $sorting = $filter->sort($this->getReq());
       
       foreach($trackers->listTrackers($filter) as $tracker){
         $tracker_id = $tracker->getId();
@@ -100,6 +101,7 @@ class TrackersModel extends BasicRootPageModel{
         $this->table->addRow($row);
       }
       
+      $this->table->setupColumnSorting($sorting);
       $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('trackers');
     }
     else{
