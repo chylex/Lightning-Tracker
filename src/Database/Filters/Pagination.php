@@ -4,12 +4,18 @@ declare(strict_types = 1);
 namespace Database\Filters;
 
 class Pagination{
+  public const GET_PAGE = 'page';
+  public const COOKIE_ELEMENTS = 'pagination_elements';
+  
   public static function empty(): self{
     return new self(1, 0, 1);
   }
   
-  public static function fromGet(string $key, int $total_elements, int $elements_per_page): self{
-    return new self((int)($_GET[$key] ?? 1), $total_elements, $elements_per_page);
+  public static function fromGlobals(int $total_elements): self{
+    $current_page = (int)($_GET[self::GET_PAGE] ?? 1);
+    $elements_per_page = (int)($_COOKIE[self::COOKIE_ELEMENTS] ?? 15);
+    
+    return new self($current_page, $total_elements, $elements_per_page);
   }
   
   private int $current_page;

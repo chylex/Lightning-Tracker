@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Tracker;
 
 use Database\DB;
-use Database\Filters\AbstractFilter;
 use Database\Filters\Pagination;
 use Database\Filters\Types\TrackerMemberFilter;
 use Database\Objects\TrackerInfo;
@@ -28,8 +27,6 @@ class MembersModel extends BasicTrackerPageModel{
   
   public const PERM_LIST = 'members.list';
   public const PERM_MANAGE = 'members.manage';
-  
-  private const USERS_PER_PAGE = 15;
   
   private Permissions $perms;
   private TableComponent $table;
@@ -92,7 +89,7 @@ class MembersModel extends BasicTrackerPageModel{
     $members = new TrackerMemberTable(DB::get(), $tracker);
     $total_count = $members->countMembers($filter);
     
-    $pagination = Pagination::fromGet(AbstractFilter::GET_PAGE, $total_count, self::USERS_PER_PAGE);
+    $pagination = Pagination::fromGlobals($total_count);
     $filter = $filter->page($pagination);
     
     foreach($members->listMembers($filter) as $member){

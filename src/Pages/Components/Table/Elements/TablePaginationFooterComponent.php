@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Table\Elements;
 
-use Database\Filters\AbstractFilter;
 use Database\Filters\Pagination;
 use Pages\IViewable;
 use Routing\Request;
@@ -71,7 +70,7 @@ HTML;
   
   private function echoPageNumber(int $page, string $text): void{
     $active = $this->pagination->getCurrentPage() === $page ? ' class="active"' : '';
-    $link = BASE_URL_ENC.'/'.$this->req->pathWithGet(AbstractFilter::GET_PAGE, $page);
+    $link = BASE_URL_ENC.'/'.$this->req->pathWithGet(Pagination::GET_PAGE, $page);
     
     echo <<<HTML
 <li$active>
@@ -81,7 +80,7 @@ HTML;
   }
   
   private function echoPageIcon(int $page, string $icon): void{
-    $link = BASE_URL_ENC.'/'.$this->req->pathWithGet(AbstractFilter::GET_PAGE, $page);
+    $link = BASE_URL_ENC.'/'.$this->req->pathWithGet(Pagination::GET_PAGE, $page);
     
     echo <<<HTML
 <li>

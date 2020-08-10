@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Root;
 
 use Database\DB;
-use Database\Filters\AbstractFilter;
 use Database\Filters\Pagination;
 use Database\Filters\Types\UserFilter;
 use Database\SQL;
@@ -30,8 +29,6 @@ class UsersModel extends BasicRootPageModel{
   public const PERM_LIST_EMAIL = 'users.list.email';
   public const PERM_ADD = 'users.add';
   public const PERM_EDIT = 'users.edit';
-  
-  private const USERS_PER_PAGE = 15;
   
   private Permissions $perms;
   private TableComponent $table;
@@ -99,7 +96,7 @@ class UsersModel extends BasicRootPageModel{
     $users = new UserTable(DB::get());
     $total_count = $users->countUsers();
     
-    $pagination = Pagination::fromGet(AbstractFilter::GET_PAGE, $total_count, self::USERS_PER_PAGE);
+    $pagination = Pagination::fromGlobals($total_count);
     $filter = $filter->page($pagination);
     
     foreach($users->listUsers($filter) as $user){

@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Tracker;
 
 use Database\DB;
-use Database\Filters\AbstractFilter;
 use Database\Filters\Pagination;
 use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\TrackerInfo;
@@ -35,8 +34,6 @@ class MilestonesModel extends BasicTrackerPageModel{
   private const ACTION_MOVE_DOWN = 'Down';
   
   public const PERM_EDIT = 'milestones.edit';
-  
-  private const MILESTONES_PER_PAGE = 15;
   
   private Permissions $perms;
   private TableComponent $table;
@@ -79,7 +76,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $milestones = new MilestoneTable(DB::get(), $this->getTracker());
     $total_count = $milestones->countMilestones($filter);
     
-    $pagination = Pagination::fromGet(AbstractFilter::GET_PAGE, $total_count, self::MILESTONES_PER_PAGE);
+    $pagination = Pagination::fromGlobals($total_count);
     $filter = $filter->page($pagination);
     
     $active_milestone = $this->getActiveMilestone();

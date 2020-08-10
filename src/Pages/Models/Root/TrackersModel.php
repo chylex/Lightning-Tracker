@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Root;
 
 use Database\DB;
-use Database\Filters\AbstractFilter;
 use Database\Filters\Pagination;
 use Database\Filters\Types\TrackerFilter;
 use Database\Objects\UserProfile;
@@ -30,8 +29,6 @@ class TrackersModel extends BasicRootPageModel{
   public const PERM_LIST_HIDDEN = 'trackers.list.hidden';
   public const PERM_ADD = 'trackers.add';
   public const PERM_EDIT = 'trackers.edit';
-  
-  private const TRACKERS_PER_PAGE = 15;
   
   private Permissions $perms;
   private TableComponent $table;
@@ -81,7 +78,7 @@ class TrackersModel extends BasicRootPageModel{
       $trackers = new TrackerTable(DB::get());
       $total_count = $trackers->countTrackers($filter);
       
-      $pagination = Pagination::fromGet(AbstractFilter::GET_PAGE, $total_count, self::TRACKERS_PER_PAGE);
+      $pagination = Pagination::fromGlobals($total_count);
       $filter = $filter->page($pagination);
       
       foreach($trackers->listTrackers($filter) as $tracker){

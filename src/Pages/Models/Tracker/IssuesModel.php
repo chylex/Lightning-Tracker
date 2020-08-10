@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Tracker;
 
 use Database\DB;
-use Database\Filters\AbstractFilter;
 use Database\Filters\Pagination;
 use Database\Filters\Types\IssueFilter;
 use Database\Objects\TrackerInfo;
@@ -19,8 +18,6 @@ use Routing\Request;
 use Session\Permissions;
 
 class IssuesModel extends BasicTrackerPageModel{
-  private const ISSUES_PER_PAGE = 15;
-  
   public const PERM_CREATE = 'issues.create';
   public const PERM_EDIT_ALL = 'issues.edit.all';
   public const PERM_DELETE_ALL = 'issues.delete.all';
@@ -57,7 +54,7 @@ class IssuesModel extends BasicTrackerPageModel{
     $issues = new IssueTable(DB::get(), $tracker);
     $total_count = $issues->countIssues($filter);
     
-    $pagination = Pagination::fromGet(AbstractFilter::GET_PAGE, $total_count, self::ISSUES_PER_PAGE);
+    $pagination = Pagination::fromGlobals($total_count);
     $filter = $filter->page($pagination);
     
     foreach($issues->listIssues($filter) as $issue){

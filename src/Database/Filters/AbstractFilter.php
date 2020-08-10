@@ -7,8 +7,6 @@ use LogicException;
 use PDOStatement;
 
 abstract class AbstractFilter{
-  public const GET_PAGE = 'page';
-  
   protected const OP_EQ = 'eq';
   protected const OP_LIKE = 'like';
   
