@@ -5,6 +5,7 @@ namespace Database\Filters;
 
 use LogicException;
 use PDOStatement;
+use Routing\Request;
 
 abstract class AbstractFilter{
   protected const OP_EQ = 'eq';
@@ -13,37 +14,22 @@ abstract class AbstractFilter{
   public static abstract function empty(): self;
   
   private ?Sorting $sorting = null;
-  private ?int $limit_offset = null;
-  private ?int $limit_count = null;
+  private ?Pagination $pagination = null;
   
-  public function sort(Sorting $sorting): self{
-    $this->sorting = $sorting;
-    return $this;
+  public function sort(Request $req): Sorting{
+    $this->sorting = Sorting::fromGlobals($req, $this->getSortingColumns());
+    return $this->sorting;
   }
   
-  /**
-   * @param int $offset
-   * @param int $count
-   * @return $this
-   */
-  public function limit(int $offset, int $count): self{
-    $this->limit_offset = $offset;
-    $this->limit_count = $count;
-    return $this;
-  }
-  
-  /**
-   * @param Pagination $pagination
-   * @return $this
-   */
-  public function page(Pagination $pagination): self{
-    return $this->limit(($pagination->getCurrentPage() - 1) * $pagination->getElementsPerPage(), $pagination->getElementsPerPage());
+  public function page(int $total_elements): Pagination{
+    $this->pagination = Pagination::fromGlobals($total_elements);
+    return $this->pagination;
   }
   
   protected abstract function getWhereColumns(): array;
   protected abstract function getDefaultOrderByColumns(): array;
   
-  public function getSortingColumns(): array{
+  protected function getSortingColumns(): array{
     return [];
   }
   
@@ -143,7 +129,14 @@ abstract class AbstractFilter{
   }
   
   protected function generateLimitClause(): string{
-    return $this->limit_offset === null ? '' : (int)$this->limit_offset.', '.(int)$this->limit_count;
+    if ($this->pagination === null){
+      return '';
+    }
+    
+    $limit_offset = ($this->pagination->getCurrentPage() - 1) * $this->pagination->getElementsPerPage();
+    $limit_count = $this->pagination->getElementsPerPage();
+    
+    return (int)$limit_offset.', '.(int)$limit_count;
   }
   
   protected static final function field(?string $table_name, string $field_name): string{

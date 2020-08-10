@@ -79,8 +79,7 @@ class TrackersModel extends BasicRootPageModel{
       $trackers = new TrackerTable(DB::get());
       $total_count = $trackers->countTrackers($filter);
       
-      $pagination = Pagination::fromGlobals($total_count);
-      $filter = $filter->page($pagination);
+      $pagination = $filter->page($total_count);
       
       foreach($trackers->listTrackers($filter) as $tracker){
         $tracker_id = $tracker->getId();

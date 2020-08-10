@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Tracker;
 
 use Database\DB;
-use Database\Filters\Pagination;
 use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\TrackerInfo;
 use Database\Tables\MilestoneTable;
@@ -77,8 +76,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $milestones = new MilestoneTable(DB::get(), $this->getTracker());
     $total_count = $milestones->countMilestones($filter);
     
-    $pagination = Pagination::fromGlobals($total_count);
-    $filter = $filter->page($pagination);
+    $pagination = $filter->page($total_count);
     
     $active_milestone = $this->getActiveMilestone();
     $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();

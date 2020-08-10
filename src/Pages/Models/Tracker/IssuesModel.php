@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Tracker;
 
 use Database\DB;
-use Database\Filters\Pagination;
 use Database\Filters\Types\IssueFilter;
 use Database\Objects\TrackerInfo;
 use Database\Tables\IssueTable;
@@ -54,8 +53,7 @@ class IssuesModel extends BasicTrackerPageModel{
     $issues = new IssueTable(DB::get(), $tracker);
     $total_count = $issues->countIssues($filter);
     
-    $pagination = Pagination::fromGlobals($total_count);
-    $filter = $filter->page($pagination);
+    $pagination = $filter->page($total_count);
     
     foreach($issues->listIssues($filter) as $issue){
       $row = $this->table->addRow([$issue->getType()->getViewable(true),

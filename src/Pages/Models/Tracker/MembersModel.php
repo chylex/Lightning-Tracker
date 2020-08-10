@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Tracker;
 
 use Database\DB;
-use Database\Filters\Pagination;
 use Database\Filters\Types\TrackerMemberFilter;
 use Database\Objects\TrackerInfo;
 use Database\SQL;
@@ -90,8 +89,7 @@ class MembersModel extends BasicTrackerPageModel{
     $members = new TrackerMemberTable(DB::get(), $tracker);
     $total_count = $members->countMembers($filter);
     
-    $pagination = Pagination::fromGlobals($total_count);
-    $filter = $filter->page($pagination);
+    $pagination = $filter->page($total_count);
     
     foreach($members->listMembers($filter) as $member){
       $row = [$member->getUserNameSafe(),

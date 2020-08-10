@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models\Root;
 
 use Database\DB;
-use Database\Filters\Pagination;
 use Database\Filters\Types\UserFilter;
 use Database\SQL;
 use Database\Tables\UserTable;
@@ -97,8 +96,7 @@ class UsersModel extends BasicRootPageModel{
     $users = new UserTable(DB::get());
     $total_count = $users->countUsers();
     
-    $pagination = Pagination::fromGlobals($total_count);
-    $filter = $filter->page($pagination);
+    $pagination = $filter->page($total_count);
     
     foreach($users->listUsers($filter) as $user){
       $user_id = $user->getId();
