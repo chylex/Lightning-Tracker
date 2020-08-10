@@ -7,8 +7,10 @@ use Pages\IViewable;
 
 final class ProgressBarComponent implements IViewable{
   public static function echoHead(): void{
+    $v = TRACKER_RESOURCE_VERSION;
+    
     echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/progressbar.css">
+<link rel="stylesheet" type="text/css" href="~resources/css/progressbar.css?v=$v">
 HTML;
   }
   

@@ -10,8 +10,10 @@ use Routing\UrlString;
 
 final class NavigationComponent implements IViewable{
   public static function echoHead(): void{
+    $v = TRACKER_RESOURCE_VERSION;
+    
     echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/navigation.css">
+<link rel="stylesheet" type="text/css" href="~resources/css/navigation.css?v=$v">
 HTML;
   }
   
@@ -59,10 +61,12 @@ HTML;
   
   /** @noinspection HtmlMissingClosingTag */
   public function echoBody(): void{
+    $v = TRACKER_RESOURCE_VERSION;
+    
     echo <<<HTML
 <nav id="navigation">
   <header class="title">
-    <a href="$this->home_url"><img src="~resources/img/logo.png" aria-label="Lightning Tracker Homepage" alt="" width="36" height="48"></a>
+    <a href="$this->home_url"><img src="~resources/img/logo.png?v=$v" aria-label="Lightning Tracker Homepage" alt="" width="36" height="48"></a>
     <h1><a href="$this->base_url">$this->title</a></h1>
   </header>
   

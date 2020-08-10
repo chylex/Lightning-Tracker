@@ -12,6 +12,7 @@ use Routing\UrlString;
 use function Pages\Actions\view;
 
 define('TRACKER_PUBLIC_VERSION', '0.1');
+define('TRACKER_RESOURCE_VERSION', 1);
 define('TRACKER_MIGRATION_VERSION', 1);
 
 define('CONFIG_FILE', __DIR__.'/config.php');

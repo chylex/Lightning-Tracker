@@ -280,6 +280,8 @@ $form_section_conflict_style = $form_section_conflict ? '' : ' style="display:no
 $form_section_install_button = $form_section_install ? 'submit' : 'button';
 $form_section_conflict_button = $form_section_conflict ? 'submit' : 'button';
 
+$v = TRACKER_RESOURCE_VERSION;
+
 echo <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -290,11 +292,11 @@ echo <<<HTML
     <title>Lightning Tracker - Install</title>
     
     <base href="$base_url_encoded/">
-    <link rel="icon" type="image/png" href="~resources/img/favicon.png">
-    <link rel="stylesheet" type="text/css" href="~resources/css/main.css">
-    <link rel="stylesheet" type="text/css" href="~resources/css/split.css">
-    <link rel="stylesheet" type="text/css" href="~resources/css/icons.css">
-    <link rel="stylesheet" type="text/css" href="~resources/css/forms.css">
+    <link rel="icon" type="image/png" href="~resources/img/favicon.png?v=$v">
+    <link rel="stylesheet" type="text/css" href="~resources/css/main.css?v=$v">
+    <link rel="stylesheet" type="text/css" href="~resources/css/split.css?v=$v">
+    <link rel="stylesheet" type="text/css" href="~resources/css/icons.css?v=$v">
+    <link rel="stylesheet" type="text/css" href="~resources/css/forms.css?v=$v">
   </head>
   <body>
     <main id="page-content" class="condensed">

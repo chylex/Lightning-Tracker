@@ -34,8 +34,10 @@ class IssuesPage extends AbstractTrackerPage{
     SidemenuComponent::echoHead();
     ProgressBarComponent::echoHead();
     
+    $v = TRACKER_RESOURCE_VERSION;
+    
     echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/issues.css">
+<link rel="stylesheet" type="text/css" href="~resources/css/issues.css?v=$v">
 HTML;
   }
   

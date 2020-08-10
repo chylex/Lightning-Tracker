@@ -34,6 +34,8 @@ abstract class AbstractPage implements IViewable{
   /** @noinspection HtmlMissingClosingTag */
   public final function echoBody(): void{
     $base_url = BASE_URL_ENC;
+    $v = TRACKER_RESOURCE_VERSION;
+    
     $title = $this->getTitle();
     $heading = $this->getHeading();
     $layout = $this->getLayout();
@@ -55,9 +57,9 @@ abstract class AbstractPage implements IViewable{
     <title>$title</title>
     
     <base href="$base_url/">
-    <link rel="icon" type="image/png" href="~resources/img/favicon.png">
-    <link rel="stylesheet" type="text/css" href="~resources/css/main.css">
-    <link rel="stylesheet" type="text/css" href="~resources/css/icons.css">
+    <link rel="icon" type="image/png" href="~resources/img/favicon.png?v=$v">
+    <link rel="stylesheet" type="text/css" href="~resources/css/main.css?v=$v">
+    <link rel="stylesheet" type="text/css" href="~resources/css/icons.css?v=$v">
 HTML;
     
     NavigationComponent::echoHead();

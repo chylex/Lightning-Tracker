@@ -12,8 +12,10 @@ use Routing\Request;
 
 class TableComponent implements IViewable{
   public static function echoHead(): void{
+    $v = TRACKER_RESOURCE_VERSION;
+    
     echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/tables.css">
+<link rel="stylesheet" type="text/css" href="~resources/css/tables.css?v=$v">
 HTML;
   }
   

@@ -39,9 +39,11 @@ HTML;
     ProgressBarComponent::echoHead();
     DateTimeComponent::echoHead();
     
+    $v = TRACKER_RESOURCE_VERSION;
+    
     echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/issues.css">
-<link rel="stylesheet" type="text/css" href="~resources/css/issuedetail.css">
+<link rel="stylesheet" type="text/css" href="~resources/css/issues.css?v=$v">
+<link rel="stylesheet" type="text/css" href="~resources/css/issuedetail.css?v=$v">
 HTML;
   }
   

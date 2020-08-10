@@ -31,8 +31,10 @@ final class FormComponent implements IViewable{
   public const MESSAGE_ERROR = 'error';
   
   public static function echoHead(): void{
+    $v = TRACKER_RESOURCE_VERSION;
+    
     echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/forms.css">
+<link rel="stylesheet" type="text/css" href="~resources/css/forms.css?v=$v">
 HTML;
   }
   
