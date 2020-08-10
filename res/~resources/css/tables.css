@@ -110,8 +110,8 @@ td.bold {
 }
 
 td .icon {
-  font-size: 18px;
-  vertical-align: -10%;
+  font-size: 20px;
+  vertical-align: -5%;
 }
 
 td .icon.faded {
@@ -119,11 +119,11 @@ td .icon.faded {
 }
 
 td button.icon + button.icon {
-  margin-left: 4px;
+  margin-left: 5px;
 }
 
 td button.icon.flush-left {
-  margin-left: 0;
+  margin-left: 1px;
 }
 
 td form {

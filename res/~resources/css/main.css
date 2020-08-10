@@ -187,8 +187,7 @@ span.missing {
 }
 
 #page-content article {
-  margin-left: 12px;
-  margin-right: 12px;
+  margin: 20px 12px;
 }
 
 .min-width-200 {
