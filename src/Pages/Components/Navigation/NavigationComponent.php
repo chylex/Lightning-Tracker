@@ -44,7 +44,7 @@ HTML;
     
     $url_trim = trim($url, '/');
     
-    if ((empty($url_trim) && empty($this->active_path_normalized)) || (!empty($url_trim) && strpos($this->active_path_normalized, $url_trim) === 0)){
+    if ((empty($url_trim) && empty($this->active_path_normalized)) || (!empty($url_trim) && mb_strpos($this->active_path_normalized, $url_trim) === 0)){
       $item = $item->active();
     }
     

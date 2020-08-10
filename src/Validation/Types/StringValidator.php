@@ -26,7 +26,7 @@ class StringValidator extends AbstractFieldValidator{
   }
   
   public function contains(string $needle, ?string $message = null): self{
-    if ($this->noError() && strpos($this->value, $needle) === false){
+    if ($this->noError() && mb_strpos($this->value, $needle) === false){
       $this->fail($message ?? $this->label.' must contain \''.$needle.'\'.');
     }
     
@@ -34,7 +34,7 @@ class StringValidator extends AbstractFieldValidator{
   }
   
   public function notContains(string $needle, ?string $message = null): self{
-    if ($this->noError() && strpos($this->value, $needle) !== false){
+    if ($this->noError() && mb_strpos($this->value, $needle) !== false){
       $this->fail($message ?? $this->label.' must not contain \''.$needle.'\'.');
     }
     

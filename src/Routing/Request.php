@@ -41,7 +41,7 @@ final class Request{
   }
   
   public function getRelativePath(): UrlString{
-    return new UrlString(substr($this->full_path, strlen($this->base_path)));
+    return new UrlString(mb_substr($this->full_path, mb_strlen($this->base_path)));
   }
   
   public function getParam(string $name): ?string{

@@ -83,7 +83,7 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     $errors[] = 'Administrator passwords do not match.';
   }
   
-  if (strpos($value_admin_email, '@') === false){
+  if (mb_strpos($value_admin_email, '@') === false){
     $errors[] = 'Administrator email is invalid.';
   }
   
