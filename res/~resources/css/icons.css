@@ -105,6 +105,9 @@ span.icon {
 .icon-list-bulleted:before {
   content: "\e9bb";
 }
+.icon-eye:before {
+  content: "\e9ce";
+}
 .icon-warning:before {
   content: "\ea07";
 }

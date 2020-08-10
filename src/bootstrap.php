@@ -100,6 +100,7 @@ foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'login', 'Mixed/LoginController');
   $router->add($base.'register', 'Mixed/RegisterController');
   $router->add($base.'account', 'Mixed/AccountController');
+  $router->add($base.'account/appearance', 'Mixed/AccountAppearanceController');
   $router->add($base.'account/security', 'Mixed/AccountSecurityController');
 }
 
