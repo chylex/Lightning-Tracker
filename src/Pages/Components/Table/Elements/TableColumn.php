@@ -3,10 +3,13 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Table\Elements;
 
+use Database\Filters\Sorting;
 use Pages\IViewable;
 
 class TableColumn implements IViewable{
   private string $title;
+  private ?Sorting $sorting = null;
+  private ?string $sort_key = null;
   private ?int $width_percentage = null;
   private ?string $align = null;
   private bool $collapsed = false;
@@ -14,6 +17,11 @@ class TableColumn implements IViewable{
   
   public function __construct(string $title){
     $this->title = $title;
+  }
+  
+  public function sort(?string $sort_key = null): self{
+    $this->sort_key = $sort_key ?? $this->title;
+    return $this;
   }
   
   public function width(int $width_percentage): self{
@@ -46,6 +54,12 @@ class TableColumn implements IViewable{
     return $this;
   }
   
+  public function setupSorting(Sorting $sorting): void{
+    if ($this->sort_key !== null && $sorting->isSortable($this->sort_key)){
+      $this->sorting = $sorting;
+    }
+  }
+  
   private function getClassAttr(): string{
     $classes = [];
     
@@ -69,7 +83,20 @@ class TableColumn implements IViewable{
     $width = $perc === null ? '' : ($perc === 0 ? ' style="width:0px"' : ' width="'.$perc.'%"');
     
     echo '<th'.$width.$this->getClassAttr().'>';
-    echo $this->title;
+    
+    if ($this->sorting === null){
+      echo $this->title;
+    }
+    else{
+      $sort_cycle_link = $this->sorting->generateCycledLink($this->sort_key);
+      $sort_order = $this->sorting->getSortDirection($this->sort_key);
+      $sort_icon = $sort_order === Sorting::SQL_ASC ? 'sort-asc' : ($sort_order === Sorting::SQL_DESC ? 'sort-desc' : 'sort-default');
+      
+      echo '<a href="'.$sort_cycle_link.'">';
+      echo $this->title;
+      echo ' <span class="sort '.$sort_icon.'"></span></a>';
+    }
+    
     echo '</th>';
   }
   

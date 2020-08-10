@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Components\Table;
 
 use Database\Filters\Pagination;
+use Database\Filters\Sorting;
 use Pages\Components\Table\Elements\TableColumn;
 use Pages\Components\Table\Elements\TablePaginationFooterComponent;
 use Pages\Components\Table\Elements\TableRow;
@@ -51,6 +52,12 @@ HTML;
   
   public function ifEmpty(string $empty_html): void{
     $this->empty_html = $empty_html;
+  }
+  
+  public function setupColumnSorting(Sorting $sorting){
+    foreach($this->columns as $column){
+      $column->setupSorting($sorting);
+    }
   }
   
   public function setPaginationFooter(Request $req, Pagination $pagination): TablePaginationFooterComponent{

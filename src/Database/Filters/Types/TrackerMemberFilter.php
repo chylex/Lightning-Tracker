@@ -4,16 +4,17 @@ declare(strict_types = 1);
 namespace Database\Filters\Types;
 
 use Database\Filters\AbstractTrackerIdFilter;
+use Database\Filters\Sorting;
 
 final class TrackerMemberFilter extends AbstractTrackerIdFilter{
   public static function empty(): self{
     return new self();
   }
   
-  protected function getOrderByColumns(): array{
+  protected function getDefaultOrderByColumns(): array{
     return [
-        'role_order' => self::ORDER_ASC,
-        'user_id'    => self::ORDER_DESC
+        'role_order' => Sorting::SQL_ASC,
+        'user_id'    => Sorting::SQL_DESC
     ];
   }
 }

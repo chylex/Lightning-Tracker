@@ -59,9 +59,21 @@ final class Request{
    */
   public function pathWithGet(string $key, $new_value): string{
     $data = $_GET;
-    $data[$key] = $new_value;
     
-    return $this->getFullPath()->encoded().'/?'.http_build_query($data);
+    if ($new_value === null){
+      unset($data[$key]);
+    }
+    else{
+      $data[$key] = $new_value;
+    }
+    
+    $query = http_build_query($data);
+    
+    if (!empty($query)){
+      $query = '/?'.$query;
+    }
+    
+    return $this->getFullPath()->encoded().$query;
   }
 }
 

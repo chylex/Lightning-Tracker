@@ -10,13 +10,16 @@ abstract class AbstractFilter{
   protected const OP_EQ = 'eq';
   protected const OP_LIKE = 'like';
   
-  protected const ORDER_ASC = 'ASC';
-  protected const ORDER_DESC = 'DESC';
-  
   public static abstract function empty(): self;
   
+  private ?Sorting $sorting = null;
   private ?int $limit_offset = null;
   private ?int $limit_count = null;
+  
+  public function sort(Sorting $sorting): self{
+    $this->sorting = $sorting;
+    return $this;
+  }
   
   /**
    * @param int $offset
@@ -38,7 +41,11 @@ abstract class AbstractFilter{
   }
   
   protected abstract function getWhereColumns(): array;
-  protected abstract function getOrderByColumns(): array;
+  protected abstract function getDefaultOrderByColumns(): array;
+  
+  public function getSortingColumns(): array{
+    return [];
+  }
   
   public abstract function prepareStatement(PDOStatement $stmt): void;
   
@@ -114,20 +121,21 @@ abstract class AbstractFilter{
   
   protected function generateOrderByClause(?string $table_name): string{
     $cols = [];
+    $rules = $this->sorting === null ? $this->getDefaultOrderByColumns() : $this->sorting->getRules();
     
-    foreach($this->getOrderByColumns() as $field => $type){
-      if (!$type){
+    foreach($rules as $field => $direction){
+      if (!$direction){
         continue;
       }
       
-      switch($type){
-        case self::ORDER_ASC:
-        case self::ORDER_DESC:
-          $cols[] = self::field($table_name, $field).' '.$type;
+      switch($direction){
+        case Sorting::SQL_ASC:
+        case Sorting::SQL_DESC:
+          $cols[] = self::field($table_name, $field).' '.$direction;
           break;
         
         default:
-          throw new LogicException("Invalid sort direction '$type'.");
+          throw new LogicException("Invalid sort direction '$direction'.");
       }
     }
     

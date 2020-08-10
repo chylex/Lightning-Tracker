@@ -43,6 +43,32 @@ th, td {
   white-space: nowrap;
 }
 
+th a,
+th a:visited {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+th span.sort {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  vertical-align: -10%;
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+}
+
+th span.sort.sort-default {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8,2.2l5,5l-10,0l5,-5Z'/%3E%3Cpath d='M8,14.5l-5,-5l10,0l-5,5Z'/%3E%3C/svg%3E%0A") no-repeat;
+}
+
+th span.sort.sort-asc {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8,5.7l5,5l-10,-0l5,-5Z'/%3E%3C/svg%3E%0A") no-repeat;
+}
+
+th span.sort.sort-desc {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8,11.3l-5,-5l10,0l-5,5Z'/%3E%3C/svg%3E%0A") no-repeat;
+}
+
 tr.link > td {
   padding: 0;
 }

@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 if (width === null){
                     cell.style.overflow = "hidden";
                     cell.style.textOverflow = "ellipsis";
-                    cell.title = cell.innerText;
+                    cell.title = cell.innerText.trim();
                 }
                 else{
                     cell.style.width = width + "px";

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Filters\Types;
 
 use Database\Filters\AbstractFilter;
+use Database\Filters\Sorting;
 use PDOStatement;
 use function Database\bind;
 
@@ -32,9 +33,9 @@ final class UserFilter extends AbstractFilter{
     ];
   }
   
-  protected function getOrderByColumns(): array{
+  protected function getDefaultOrderByColumns(): array{
     return [
-        'id' => self::ORDER_ASC
+        'id' => Sorting::SQL_ASC
     ];
   }
   
