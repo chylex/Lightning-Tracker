@@ -142,7 +142,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $title = $data['Title'];
     
     $validator = new Validator();
-    $validator->str('Title', $title)->notEmpty();
+    $validator->str('Title', $title)->notEmpty()->maxLength(64);
     
     try{
       $validator->validate();

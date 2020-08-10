@@ -99,8 +99,8 @@ class RegisterModel extends BasicMixedPageModel{
   
   public static function validateUserFields(string $name, string $email, string $password): Validator{
     $validator = new Validator();
-    $validator->str('Name', $name)->notEmpty();
-    $validator->str('Email', $email)->notEmpty()->contains('@', 'Email is not valid.');
+    $validator->str('Name', $name)->notEmpty()->maxLength(32);
+    $validator->str('Email', $email)->notEmpty()->maxLength(191)->contains('@', 'Email is not valid.');
     $validator->str('Password', $password)->minLength(7)->maxLength(72);
     return $validator;
   }

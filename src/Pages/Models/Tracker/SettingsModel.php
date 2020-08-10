@@ -60,7 +60,7 @@ class SettingsModel extends BasicTrackerPageModel{
     $hidden = (bool)($data['Hidden'] ?? false);
     
     $validator = new Validator();
-    $validator->str('Name', $name)->notEmpty();
+    $validator->str('Name', $name)->notEmpty()->maxLength(32);
     
     try{
       $validator->validate();

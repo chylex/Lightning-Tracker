@@ -130,8 +130,8 @@ class TrackersModel extends BasicRootPageModel{
     $hidden = (bool)($data['Hidden'] ?? false);
     
     $validator = new Validator();
-    $validator->str('Name', $name)->notEmpty();
-    $validator->str('Url', $url)->notEmpty()->notContains('/')->notContains('\\');
+    $validator->str('Name', $name)->notEmpty()->maxLength(32);
+    $validator->str('Url', $url)->notEmpty()->maxLength(32)->notContains('/')->notContains('\\');
     
     try{
       $validator->validate();
