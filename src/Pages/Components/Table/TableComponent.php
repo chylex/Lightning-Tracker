@@ -16,6 +16,7 @@ class TableComponent implements IViewable{
     
     echo <<<HTML
 <link rel="stylesheet" type="text/css" href="~resources/css/tables.css?v=$v">
+<script type="text/javascript" src="~resources/js/tables.js?v=$v"></script>
 HTML;
   }
   
