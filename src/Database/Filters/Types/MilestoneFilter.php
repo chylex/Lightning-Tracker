@@ -13,7 +13,7 @@ final class MilestoneFilter extends AbstractTrackerIdFilter{
   
   protected function getDefaultOrderByColumns(): array{
     return [
-        'ordering' => Sorting::SQL_ASC
+        'm.ordering' => Sorting::SQL_ASC
     ];
   }
 }

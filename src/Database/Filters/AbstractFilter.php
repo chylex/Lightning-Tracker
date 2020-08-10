@@ -35,10 +35,10 @@ abstract class AbstractFilter{
   
   public abstract function prepareStatement(PDOStatement $stmt): void;
   
-  public final function injectClauses(string $sql, ?string $table_name = null): string{
+  public final function injectClauses(string $sql, ?string $where_table_name = null): string{
     $clauses = [
-        '# WHERE' => ['WHERE', $this->generateWhereClause($table_name)],
-        '# ORDER' => ['ORDER BY', $this->generateOrderByClause($table_name)],
+        '# WHERE' => ['WHERE', $this->generateWhereClause($where_table_name)],
+        '# ORDER' => ['ORDER BY', $this->generateOrderByClause()],
         '# LIMIT' => ['LIMIT', $this->generateLimitClause()]
     ];
     
@@ -60,12 +60,12 @@ abstract class AbstractFilter{
     return $sql;
   }
   
-  public final function generateClauses(bool $is_count_query = false, ?string $table_name = null): string{
+  public final function generateClauses(bool $is_count_query = false, ?string $where_table_name = null): string{
     $clauses = $is_count_query ? [
-        'WHERE' => $this->generateWhereClause($table_name)
+        'WHERE' => $this->generateWhereClause($where_table_name)
     ] : [
-        'WHERE'    => $this->generateWhereClause($table_name),
-        'ORDER BY' => $this->generateOrderByClause($table_name),
+        'WHERE'    => $this->generateWhereClause($where_table_name),
+        'ORDER BY' => $this->generateOrderByClause(),
         'LIMIT'    => $this->generateLimitClause()
     ];
     
@@ -105,7 +105,7 @@ abstract class AbstractFilter{
     return empty($cols) ? '' : implode(' AND ', $cols);
   }
   
-  protected function generateOrderByClause(?string $table_name): string{
+  protected function generateOrderByClause(): string{
     $cols = [];
     $rules = $this->sorting === null ? $this->getDefaultOrderByColumns() : $this->sorting->getRules();
     
@@ -117,7 +117,10 @@ abstract class AbstractFilter{
       switch($direction){
         case Sorting::SQL_ASC:
         case Sorting::SQL_DESC:
-          $cols[] = self::field($table_name, $field).' '.$direction;
+          $field_period = strpos($field, '.');
+          $table_name = $field_period === false ? null : substr($field, 0, $field_period);
+          $field_name = $field_period === false ? $field : substr($field, $field_period + 1);
+          $cols[] = self::field($table_name, $field_name).' '.$direction;
           break;
         
         default:
