@@ -96,7 +96,7 @@ class TrackersModel extends BasicRootPageModel{
           $form = new FormComponent(self::ACTION_DELETE);
           $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
           $form->addHidden('Tracker', strval($tracker_id));
-          $form->addIconButton('submit', 'trash');
+          $form->addIconButton('submit', 'circle-cross')->color('red');
           $row[] = $form;
         }
         

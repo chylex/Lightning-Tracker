@@ -149,7 +149,7 @@ HTML
     );
     
     $this->form->startTitledSection('Confirm');
-    $this->form->addButton('submit', $issue_id === null ? 'New Issue' : 'Edit Issue')->icon('pencil');
+    $this->form->addButton('submit', $issue_id === null ? 'Add Issue' : 'Edit Issue')->icon('checkmark');
     $this->form->endTitledSection();
   }
   

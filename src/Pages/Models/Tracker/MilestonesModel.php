@@ -92,7 +92,7 @@ class MilestonesModel extends BasicTrackerPageModel{
       
       $form_toggle_active = new FormComponent(self::ACTION_TOGGLE_ACTIVE);
       $form_toggle_active->addHidden('Milestone', $milestone_id_str);
-      $form_toggle_active->addIconButton('submit', $milestone_id === $active_milestone_id ? 'radio-checked' : 'radio-unchecked');
+      $form_toggle_active->addIconButton('submit', $milestone_id === $active_milestone_id ? 'radio-checked' : 'radio-unchecked')->color('purple');
       
       $row = [$milestone->getTitleSafe(),
               $form_toggle_active,
@@ -103,13 +103,13 @@ class MilestonesModel extends BasicTrackerPageModel{
       if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
         $form_move = new FormComponent(self::ACTION_MOVE);
         $form_move->addHidden('Milestone', $milestone_id_str);
-        $form_move->addIconButton('submit', 'circle-up')->value(self::ACTION_MOVE_UP);
-        $form_move->addIconButton('submit', 'circle-down')->value(self::ACTION_MOVE_DOWN);
+        $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
+        $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
         
         $form_delete = new FormComponent(self::ACTION_DELETE);
         $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
         $form_delete->addHidden('Milestone', $milestone_id_str);
-        $form_delete->addIconButton('submit', 'trash');
+        $form_delete->addIconButton('submit', 'circle-cross')->color('red')->flushLeft();
         
         $row[] = new CompositeComponent($form_move, $form_delete);
       }

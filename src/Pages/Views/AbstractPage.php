@@ -38,6 +38,13 @@ abstract class AbstractPage implements IViewable{
     $heading = $this->getHeading();
     $layout = $this->getLayout();
     
+    if (empty($heading)){
+      $layout .= ' pad-top';
+    }
+    else{
+      $heading = '<h2>'.$heading.'</h2>';
+    }
+    
     echo <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -65,7 +72,7 @@ HTML;
     
     echo <<<HTML
     <main id="page-content" class="$layout">
-      <h2>$heading</h2>
+      $heading
 HTML;
     
     $this->echoPageBody();

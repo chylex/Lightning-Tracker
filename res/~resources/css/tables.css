@@ -17,6 +17,15 @@ thead {
   box-shadow: 0 1px 0 0 #000;
 }
 
+tbody > tr {
+  height: 44px;
+}
+
+tbody > tr:first-child,
+tbody > tr:last-child {
+  height: 45px;
+}
+
 tbody > tr:nth-child(2n) {
   background: #f2f2f2;
 }
@@ -103,11 +112,18 @@ td.bold {
 td .icon {
   font-size: 18px;
   vertical-align: -10%;
-  margin-right: 3px;
 }
 
 td .icon.faded {
   color: #444444;
+}
+
+td button.icon + button.icon {
+  margin-left: 4px;
+}
+
+td button.icon.flush-left {
+  margin-left: 0;
 }
 
 td form {

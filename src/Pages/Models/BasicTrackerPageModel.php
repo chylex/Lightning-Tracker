@@ -85,7 +85,7 @@ class BasicTrackerPageModel extends AbstractPageModel{
       return null;
     }
     
-    return new CompositeComponent(Text::plain('<h3>Active Milestone</h3><article>'),
+    return new CompositeComponent(Text::plain('<h3>Active Milestone</h3><article><h4>'.$milestone->getTitleSafe().'</h4>'),
                                   new ProgressBarComponent($milestone->getPercentageDone()),
                                   Text::plain('</article>'));
   }

@@ -32,6 +32,16 @@ span.icon {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-color-red {
+  color: #7c010e;
+}
+.icon-color-blue {
+  color: #044196;
+}
+.icon-color-purple {
+  color: #710288;
+}
+
 .icon-pencil:before {
   content: "\e905";
 }
@@ -84,7 +94,7 @@ span.icon {
   content: "\e9a9";
 }
 .icon-trash:before {
-  content: "\e9ac";
+  content: "\e9ad";
 }
 .icon-switch:before {
   content: "\e9b6";
@@ -103,6 +113,9 @@ span.icon {
 }
 .icon-info:before {
   content: "\ea0c";
+}
+.icon-circle-cross:before {
+  content: "\ea0d";
 }
 .icon-blocked:before {
   content: "\ea0e";

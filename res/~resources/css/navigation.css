@@ -18,8 +18,10 @@
   transition: opacity 0.175s ease;
 }
 
-#navigation > .title a:hover {
+#navigation > .title a:hover,
+#navigation > .title a:focus {
   opacity: 0.75;
+  outline: none;
 }
 
 #navigation > .title > a {

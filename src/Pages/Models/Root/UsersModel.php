@@ -118,7 +118,7 @@ class UsersModel extends BasicRootPageModel{
           $form = new FormComponent(self::ACTION_DELETE);
           $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
           $form->addHidden('User', strval($user_id));
-          $form->addIconButton('submit', 'trash');
+          $form->addIconButton('submit', 'circle-cross')->color('red');
           $row[] = $form;
         }
       }

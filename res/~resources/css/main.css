@@ -97,6 +97,10 @@ h3:first-child {
   margin-top: 0;
 }
 
+h4 {
+  margin: -2px 0 9px;
+}
+
 div.center-text {
   text-align: center;
 }
@@ -176,6 +180,10 @@ span.missing {
 #page-content.compact {
   max-width: 500px;
   margin: 0 auto;
+}
+
+#page-content.pad-top {
+  padding-top: 48px;
 }
 
 #page-content article {
