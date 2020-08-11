@@ -6,7 +6,7 @@ table {
   font-size: 15px;
 }
 
-thead, tfoot {
+thead, tfoot, details.filtering > summary {
   color: #ffffff;
   background: linear-gradient(#0c6ba6, #0a5e91);
   text-align: left;
@@ -154,6 +154,85 @@ td button.icon.flush-left {
 
 td form {
   display: inline;
+}
+
+details.filtering {
+  margin-bottom: 10px;
+}
+
+details[open].filtering .hide-if-open,
+details:not([open]).filtering .show-if-open {
+  display: none;
+}
+
+details[open].filtering .show-if-open,
+details:not([open]).filtering .hide-if-open {
+  display: inline;
+}
+
+details.filtering > summary {
+  border: 1px solid #073e61;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 9px 12px 8px;
+  box-shadow: 0 1px 0 0 #000;
+  cursor: pointer;
+  list-style: none;
+}
+
+details.filtering > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.filtering > summary .icon {
+  margin-right: 4px;
+  font-size: 13px;
+}
+
+details.filtering > article {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 15px 2px !important;
+}
+
+details.filtering > article > div {
+  flex: 0 1 100%;
+  max-width: 225px;
+  margin: 0 8px 10px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+details.filtering > article > div.buttons {
+  align-self: flex-end;
+  margin-top: 3px;
+}
+
+details.filtering > article > div.buttons button.styled {
+  margin: 0 3px 0 0;
+  padding: 3px 7px 4px 8px;
+  font-size: 16px;
+}
+
+details.filtering > article > div.buttons button.styled .icon {
+  margin: 0;
+}
+
+details.filtering > article label {
+  display: block;
+}
+
+details.filtering > article input[type="text"] {
+  padding: 4px 7px;
+}
+
+details.filtering > article input[type="checkbox"] + label {
+  display: inline;
+}
+
+details.filtering details.multiselect > article {
+  width: 225px;
 }
 
 div.pagination {

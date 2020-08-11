@@ -3,9 +3,11 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Table;
 
+use Database\Filters\Filtering;
 use Database\Filters\Pagination;
 use Database\Filters\Sorting;
 use Pages\Components\Table\Elements\TableColumn;
+use Pages\Components\Table\Elements\TableFilteringHeaderComponent;
 use Pages\Components\Table\Elements\TablePaginationFooterComponent;
 use Pages\Components\Table\Elements\TableRow;
 use Pages\IViewable;
@@ -32,6 +34,7 @@ HTML;
   private array $rows = [];
   
   private ?string $empty_html = null;
+  private ?IViewable $header = null;
   private ?IViewable $footer = null;
   
   public function addColumn(string $title): TableColumn{
@@ -60,14 +63,22 @@ HTML;
     }
   }
   
+  public function setFilteringHeader(Filtering $filtering): TableFilteringHeaderComponent{
+    $this->header = new TableFilteringHeaderComponent($filtering);
+    return $this->header;
+  }
+  
   public function setPaginationFooter(Request $req, Pagination $pagination): TablePaginationFooterComponent{
-    $footer = new TablePaginationFooterComponent($req, $pagination);
-    $this->footer = $footer;
-    return $footer;
+    $this->footer = new TablePaginationFooterComponent($req, $pagination);
+    return $this->footer;
   }
   
   /** @noinspection HtmlMissingClosingTag */
   public function echoBody(): void{
+    if ($this->header !== null){
+      $this->header->echoBody();
+    }
+    
     echo <<<HTML
 <table>
   <thead>

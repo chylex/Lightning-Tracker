@@ -13,8 +13,14 @@ abstract class AbstractFilter{
   
   public static abstract function empty(): self;
   
+  private ?Filtering $filtering = null;
   private ?Sorting $sorting = null;
   private ?Pagination $pagination = null;
+  
+  public function filter(): Filtering{
+    $this->filtering = Filtering::fromGlobals($this->getFilteringColumns());
+    return $this->filtering;
+  }
   
   public function sort(Request $req): Sorting{
     $this->sorting = Sorting::fromGlobals($req, $this->getSortingColumns());
@@ -27,12 +33,16 @@ abstract class AbstractFilter{
   }
   
   protected abstract function getWhereColumns(): array;
-  protected abstract function getDefaultOrderByColumns(): array;
+  
+  protected function getFilteringColumns(): array{
+    return []; // TODO
+  }
   
   protected function getSortingColumns(): array{
     return [];
   }
   
+  protected abstract function getDefaultOrderByColumns(): array;
   public abstract function prepareStatement(PDOStatement $stmt): void;
   
   public final function injectClauses(string $sql, ?string $where_table_name = null): string{
