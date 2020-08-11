@@ -17,13 +17,14 @@ abstract class AbstractTrackerIdFilter extends AbstractFilter{
     return $this;
   }
   
-  protected function getWhereColumns(): array{
+  protected function getDefaultWhereColumns(): array{
     return [
-        'tracker_id' => self::OP_EQ
+        self::field($this->tracker_id_prefix, 'tracker_id').' = :tracker_id'
     ];
   }
   
   public function prepareStatement(PDOStatement $stmt): void{
+    parent::prepareStatement($stmt);
     bind($stmt, 'tracker_id', $this->tracker_id, PDO::PARAM_INT);
   }
 }

@@ -79,6 +79,10 @@ final class Sorting{
     return $this->rules;
   }
   
+  public function isEmpty(): bool{
+    return empty($this->rules);
+  }
+  
   public function generateCycledLink(string $column): string{
     if (!$this->isSortable($column)){
       throw new LogicException('Cannot cycle a non-sortable column.');

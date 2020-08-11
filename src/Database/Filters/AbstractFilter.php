@@ -11,14 +11,22 @@ use PDOStatement;
 use Routing\Request;
 
 abstract class AbstractFilter{
-  protected const OP_EQ = 'eq';
-  protected const OP_LIKE = 'like';
-  
   public static abstract function empty(): self;
   
   private ?Filtering $filtering = null;
   private ?Sorting $sorting = null;
   private ?Pagination $pagination = null;
+  
+  /**
+   * @var IWhereCondition[]
+   */
+  private array $current_where_conditions = []; // TODO ugly
+  
+  public function isEmpty(): bool{
+    $f = $this->filtering;
+    $s = $this->sorting;
+    return ($f === null || $f->isEmpty()) && ($s === null || $s->isEmpty()) && $this->pagination === null;
+  }
   
   public function filter(): Filtering{
     $this->filtering = Filtering::fromGlobals($this->getFilteringColumns());
@@ -35,18 +43,34 @@ abstract class AbstractFilter{
     return $this->pagination;
   }
   
-  protected abstract function getWhereColumns(): array;
+  /**
+   * @param string $field
+   * @param mixed $value
+   * @return IWhereCondition|null
+   */
+  protected function getFilterWhereCondition(string $field, $value): ?IWhereCondition{
+    return null;
+  }
   
   protected function getFilteringColumns(): array{
-    return []; // TODO
+    return [];
   }
   
   protected function getSortingColumns(): array{
     return [];
   }
   
+  protected function getDefaultWhereColumns(): array{
+    return [];
+  }
+  
   protected abstract function getDefaultOrderByColumns(): array;
-  public abstract function prepareStatement(PDOStatement $stmt): void;
+  
+  public function prepareStatement(PDOStatement $stmt): void{
+    foreach($this->current_where_conditions as $condition){
+      $condition->prepareStatement($stmt);
+    }
+  }
   
   public final function injectClauses(string $sql): string{
     $clauses = [
@@ -94,28 +118,21 @@ abstract class AbstractFilter{
   }
   
   protected function generateWhereClause(): string{
-    $cols = [];
+    $conditions = $this->getDefaultWhereColumns();
+    $this->current_where_conditions = [];
     
-    foreach($this->getWhereColumns() as $field => $type){
-      if (!$type){
-        continue;
-      }
-      
-      switch($type){
-        case self::OP_EQ:
-          $cols[] = "`$field` = :$field";
-          break;
+    if ($this->filtering !== null){
+      foreach($this->filtering->getRules() as $field => $value){
+        $condition = $this->getFilterWhereCondition($field, $value);
         
-        case self::OP_LIKE:
-          $cols[] = "`$field` LIKE CONCAT('%', :$field, '%')";
-          break;
-        
-        default:
-          throw new LogicException("Invalid filter operator '$type'.");
+        if ($condition !== null){
+          $conditions[] = $condition->getSql();
+          $this->current_where_conditions[] = $condition;
+        }
       }
     }
     
-    return empty($cols) ? '' : implode(' AND ', $cols);
+    return implode(' AND ', $conditions);
   }
   
   protected function generateOrderByClause(): string{
@@ -155,7 +172,7 @@ abstract class AbstractFilter{
     return (int)$limit_offset.', '.(int)$limit_count;
   }
   
-  protected static final function field(?string $table_name, string $field_name): string{
+  public static final function field(?string $table_name, string $field_name): string{
     return $table_name === null ? "`$field_name`" : "`$table_name`.`$field_name`";
   }
 }

@@ -6,8 +6,9 @@ namespace Database\Filters\General;
 final class Filtering{
   public const GET_FILTER = 'filter';
   
-  public const TYPE_TEXT = 0;
-  public const TYPE_MULTISELECT = 1;
+  public const TYPE_PROHIBITED = 0;
+  public const TYPE_TEXT = 1;
+  public const TYPE_MULTISELECT = 2;
   
   public const RULE_SEPARATOR = '.';
   public const KEY_VALUE_SEPARATOR = '~';
@@ -81,8 +82,12 @@ final class Filtering{
     $this->rules = $rules;
   }
   
+  private function getFilterType(string $field): int{
+    return $this->fields[$field] ?? self::TYPE_PROHIBITED;
+  }
+  
   public function isFilterable(string $field): bool{
-    return isset($this->fields[$field]);
+    return $this->getFilterType($field) !== self::TYPE_PROHIBITED;
   }
   
   /**
@@ -92,11 +97,15 @@ final class Filtering{
    */
   public function getFilter(string $field, int $type){
     $rule = $this->rules[$field] ?? null;
-    return $rule === null || $this->fields[$field] !== $type ? null : $rule;
+    return $rule === null || $this->getFilterType($field) !== $type ? null : $rule;
   }
   
   public function getRules(): array{
     return $this->rules;
+  }
+  
+  public function isEmpty(): bool{
+    return empty($this->rules);
   }
 }
 

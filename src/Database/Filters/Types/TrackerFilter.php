@@ -27,32 +27,13 @@ final class TrackerFilter extends AbstractFilter{
     return new self();
   }
   
-  private ?string $name = null;
-  private ?string $url = null;
   private ?UserProfile $visible_to = null;
   private bool $visible_to_set = false;
-  
-  public function name(string $name): self{
-    $this->name = $name;
-    return $this;
-  }
-  
-  public function url(string $url): self{
-    $this->url = $url;
-    return $this;
-  }
   
   public function visibleTo(?UserProfile $visible_to): self{
     $this->visible_to = $visible_to;
     $this->visible_to_set = true;
     return $this;
-  }
-  
-  protected function getWhereColumns(): array{
-    return [
-        'name' => $this->name === null ? null : self::OP_LIKE,
-        'url'  => $this->url === null ? null : self::OP_LIKE
-    ];
   }
   
   protected function generateWhereClause(): string{
@@ -88,8 +69,7 @@ final class TrackerFilter extends AbstractFilter{
   }
   
   public function prepareStatement(PDOStatement $stmt): void{
-    bind($stmt, 'name', $this->name);
-    bind($stmt, 'url', $this->url);
+    parent::prepareStatement($stmt);
     
     if ($this->visible_to !== null){
       self::bindUserVisibility($stmt, $this->visible_to);
