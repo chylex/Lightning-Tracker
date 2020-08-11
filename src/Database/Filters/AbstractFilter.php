@@ -3,6 +3,9 @@ declare(strict_types = 1);
 
 namespace Database\Filters;
 
+use Database\Filters\General\Filtering;
+use Database\Filters\General\Pagination;
+use Database\Filters\General\Sorting;
 use LogicException;
 use PDOStatement;
 use Routing\Request;

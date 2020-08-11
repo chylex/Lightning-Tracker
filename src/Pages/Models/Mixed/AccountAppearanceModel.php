@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Mixed;
 
-use Database\Filters\Pagination;
+use Database\Filters\General\Pagination;
 use Database\Objects\TrackerInfo;
 use Database\Objects\UserProfile;
 use Pages\Components\Forms\FormComponent;

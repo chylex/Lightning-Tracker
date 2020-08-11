@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Table\Elements;
 
-use Database\Filters\Filtering;
+use Database\Filters\General\Filtering;
 use LogicException;
 use Pages\Components\Forms\Elements\FormSelectMultiple;
 use Pages\Components\Forms\Elements\FormTextField;

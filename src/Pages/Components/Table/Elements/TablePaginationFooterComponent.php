@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Table\Elements;
 
-use Database\Filters\Pagination;
+use Database\Filters\General\Pagination;
 use Pages\IViewable;
 use Routing\Request;
 

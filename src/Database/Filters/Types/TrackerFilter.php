@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Database\Filters\Types;
 
 use Database\Filters\AbstractFilter;
-use Database\Filters\Sorting;
+use Database\Filters\General\Sorting;
 use Database\Objects\UserProfile;
 use PDO;
 use PDOStatement;

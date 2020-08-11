@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Database\Filters;
+namespace Database\Filters\General;
 
-class Filtering{
+final class Filtering{
   public const GET_FILTER = 'filter';
   
   public const TYPE_TEXT = 0;

@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Table\Elements;
 
-use Database\Filters\Sorting;
+use Database\Filters\General\Sorting;
 use Pages\IViewable;
 
 final class TableColumn implements IViewable{

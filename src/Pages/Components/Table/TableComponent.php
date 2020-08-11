@@ -3,9 +3,9 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Table;
 
-use Database\Filters\Filtering;
-use Database\Filters\Pagination;
-use Database\Filters\Sorting;
+use Database\Filters\General\Filtering;
+use Database\Filters\General\Pagination;
+use Database\Filters\General\Sorting;
 use Pages\Components\Table\Elements\TableColumn;
 use Pages\Components\Table\Elements\TableFilteringHeaderComponent;
 use Pages\Components\Table\Elements\TablePaginationFooterComponent;

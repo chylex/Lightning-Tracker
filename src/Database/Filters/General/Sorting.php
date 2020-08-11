@@ -1,12 +1,12 @@
 <?php
 declare(strict_types = 1);
 
-namespace Database\Filters;
+namespace Database\Filters\General;
 
 use LogicException;
 use Routing\Request;
 
-class Sorting{
+final class Sorting{
   public const GET_SORT = 'sort';
   
   public const SQL_ASC = 'ASC';

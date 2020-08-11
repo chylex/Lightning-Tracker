@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Root;
 
 use Database\DB;
-use Database\Filters\Pagination;
+use Database\Filters\General\Pagination;
 use Database\Filters\Types\TrackerFilter;
 use Database\Objects\UserProfile;
 use Database\SQL;

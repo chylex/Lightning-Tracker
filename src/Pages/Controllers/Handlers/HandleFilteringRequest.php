@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Handlers;
 
-use Database\Filters\Filtering;
+use Database\Filters\General\Filtering;
 use Pages\Actions\RedirectAction;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\Elements\TableFilteringHeaderComponent;

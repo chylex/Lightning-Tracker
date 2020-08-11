@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Database\Filters;
+namespace Database\Filters\General;
 
-class Pagination{
+final class Pagination{
   public const GET_PAGE = 'page';
   public const COOKIE_ELEMENTS = 'pagination_elements';
   
