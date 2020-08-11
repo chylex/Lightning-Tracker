@@ -9,36 +9,11 @@ use Routing\Request;
 class Sorting{
   public const GET_SORT = 'sort';
   
-  private const KEY_ASC = 'a';
-  private const KEY_DESC = 'd';
-  
   public const SQL_ASC = 'ASC';
   public const SQL_DESC = 'DESC';
   
-  private static function keyToSql(string $key): ?string{
-    switch($key){
-      case self::KEY_ASC:
-        return self::SQL_ASC;
-      
-      case self::KEY_DESC:
-        return self::SQL_DESC;
-    }
-    
-    return null;
-  }
-  
-  private static function sqlToKey(string $sql): string{
-    switch($sql){
-      case self::SQL_ASC:
-        return self::KEY_ASC;
-      
-      case self::SQL_DESC:
-        return self::KEY_DESC;
-      
-      default:
-        throw new LogicException('Invalid SQL order direction.');
-    }
-  }
+  private const RULE_SEPARATOR = '.';
+  private const REVERSE_DIRECTION_CHAR = '~';
   
   /**
    * @param Request $req
@@ -53,19 +28,20 @@ class Sorting{
       return new Sorting($req, $columns, $rules);
     }
     
-    foreach(explode(',', $rule_str) as $rule){
-      $colon = mb_strpos($rule, ':');
-      $direction = null;
+    foreach(explode(self::RULE_SEPARATOR, $rule_str) as $rule){
+      if (empty($rule)){
+        continue;
+      }
       
-      if ($colon === false){
-        $direction = self::SQL_ASC;
+      if ($rule[0] === self::REVERSE_DIRECTION_CHAR){
+        $direction = self::SQL_DESC;
+        $rule = substr($rule, 1);
       }
       else{
-        $direction = self::keyToSql(mb_substr($rule, $colon + 1));
-        $rule = mb_substr($rule, 0, $colon);
+        $direction = self::SQL_ASC;
       }
       
-      if ($direction !== null && in_array($rule, $columns)){
+      if (in_array($rule, $columns)){
         $rules[$rule] = $direction;
       }
     }
@@ -124,10 +100,10 @@ class Sorting{
     $new_rules_str = [];
     
     foreach($new_rules as $column => $direction){
-      $new_rules_str[] = $column.':'.self::sqlToKey($direction);
+      $new_rules_str[] = ($direction === self::SQL_DESC ? self::REVERSE_DIRECTION_CHAR : '').$column;
     }
     
-    return $this->req->pathWithGet(self::GET_SORT, empty($new_rules_str) ? null : implode(',', $new_rules_str));
+    return $this->req->pathWithGet(self::GET_SORT, empty($new_rules_str) ? null : implode(self::RULE_SEPARATOR, $new_rules_str));
   }
 }
 
