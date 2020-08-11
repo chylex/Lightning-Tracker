@@ -13,7 +13,7 @@ use Database\Tables\TrackerMemberTable;
 use Exception;
 use Pages\Components\Forms\Elements\FormSelect;
 use Pages\Components\Forms\FormComponent;
-use Pages\Components\Issues\AbstractIssueTag;
+use Pages\Components\Issues\IIssueTag;
 use Pages\Components\Issues\IssuePriority;
 use Pages\Components\Issues\IssueScale;
 use Pages\Components\Issues\IssueStatus;
@@ -51,11 +51,11 @@ class IssueEditModel extends BasicTrackerPageModel{
   
   /**
    * @param FormSelect $select
-   * @param AbstractIssueTag[] $items
+   * @param IIssueTag[] $items
    */
   private static function setupIssueTagOptions(FormSelect $select, array $items): void{
     foreach($items as $item){
-      $select->addOption($item->getId(), $item->getTitle(), 'issue-tag issue-'.$item->getKind().'-'.$item->getId());
+      $select->addOption($item->getId(), $item->getTitle(), $item->getTagClass());
     }
   }
   
@@ -91,16 +91,9 @@ HTML
     $this->form->addTextField('Title');
     
     $this->form->startSplitGroup(33, 'issue-edit-triple-select');
-    
-    $select_type = $this->form->addSelect('Type')->optional();
-    
-    foreach(IssueType::list() as $type){
-      $select_type->addOption($type->getId(), $type->getTitle(), 'icon icon-'.$type->getIcon());
-    }
-    
+    self::setupIssueTagOptions($this->form->addSelect('Type')->optional(), IssueType::list());
     self::setupIssueTagOptions($this->form->addSelect('Priority')->optional(), IssuePriority::list());
     self::setupIssueTagOptions($this->form->addSelect('Scale')->optional(), IssueScale::list());
-    
     $this->form->endSplitGroup();
     
     $this->form->addTextArea('Description');

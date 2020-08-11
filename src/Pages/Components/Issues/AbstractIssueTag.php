@@ -5,7 +5,7 @@ namespace Pages\Components\Issues;
 
 use Pages\IViewable;
 
-abstract class AbstractIssueTag implements IViewable{
+abstract class AbstractIssueTag implements IIssueTag, IViewable{
   /**
    * @param self[] $items
    * @return array
@@ -39,19 +39,19 @@ abstract class AbstractIssueTag implements IViewable{
     $this->title = $title;
   }
   
-  public function getKind(): string{
-    return $this->kind;
-  }
-  
-  public function getId(): string{
+  public final function getId(): string{
     return $this->id;
   }
   
-  public function getTitle(): string{
+  public final function getTitle(): string{
     return $this->title;
   }
   
-  public function echoBody(): void{
+  public final function getTagClass(): string{
+    return 'issue-tag issue-'.$this->kind.'-'.$this->id;
+  }
+  
+  public final function echoBody(): void{
     echo <<<HTML
 <span class="issue-tag issue-$this->kind-$this->id"> $this->title</span>
 HTML;

@@ -6,7 +6,7 @@ namespace Pages\Components\Issues;
 use Pages\Components\Text;
 use Pages\IViewable;
 
-final class IssueType{
+final class IssueType implements IIssueTag{
   public const FEATURE = 'feature';
   public const ENHANCEMENT = 'enhancement';
   public const BUG = 'bug';
@@ -65,8 +65,8 @@ final class IssueType{
     return $this->title;
   }
   
-  public function getIcon(): string{
-    return $this->icon;
+  public function getTagClass(): string{
+    return 'icon icon-'.$this->icon;
   }
   
   public function getViewable(bool $icon_only): IViewable{
