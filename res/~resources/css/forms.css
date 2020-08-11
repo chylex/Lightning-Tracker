@@ -136,6 +136,53 @@ option.icon:before {
   vertical-align: -6%;
 }
 
+details.multiselect > summary {
+  border: 1px solid #333333;
+  border-radius: 5px;
+  padding: 4px 28px 4px 7px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3E%3Cpath d='M3.996,5l3.996,-5l-7.992,0l3.996,5Z'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) 50% / 11px;
+  overflow: hidden;
+  font-style: italic;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  list-style: none;
+}
+
+details.multiselect > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.multiselect > article {
+  position: absolute;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 235px;
+  margin: 4px 0 0 !important;
+  padding: 6px 5px 1px;
+  border: 1px solid #333333;
+  border-radius: 5px;
+  background-color: #ffffff;
+  z-index: 100;
+}
+
+details.multiselect > article .field-group {
+  margin: 1px 0;
+}
+
+details.multiselect > article .icon {
+  font-size: 13px;
+}
+
+details.multiselect > article .issue-tag {
+  opacity: 0.3;
+  margin-left: -20px;
+}
+
+details.multiselect > article .issue-tag:before {
+  border-radius: 0;
+  box-shadow: none;
+}
+
 label {
   display: inline-block;
   margin-bottom: 4px;

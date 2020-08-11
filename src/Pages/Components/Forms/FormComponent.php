@@ -13,6 +13,7 @@ use Pages\Components\Forms\Elements\FormIconButton;
 use Pages\Components\Forms\Elements\FormMessageList;
 use Pages\Components\Forms\Elements\FormNumberField;
 use Pages\Components\Forms\Elements\FormSelect;
+use Pages\Components\Forms\Elements\FormSelectMultiple;
 use Pages\Components\Forms\Elements\FormSplitGroupEnd;
 use Pages\Components\Forms\Elements\FormSplitGroupStart;
 use Pages\Components\Forms\Elements\FormTextArea;
@@ -36,6 +37,7 @@ final class FormComponent implements IViewable{
     
     echo <<<HTML
 <link rel="stylesheet" type="text/css" href="~resources/css/forms.css?v=$v">
+<script type="text/javascript" src="~resources/js/forms.js?v=$v"></script>
 HTML;
   }
   
@@ -125,6 +127,13 @@ HTML;
   
   public function addSelect(string $name): FormSelect{
     $field = new FormSelect($this->id.'-'.$name, $name);
+    $this->elements[] = $field;
+    $this->fields[$name] = $field;
+    return $field;
+  }
+  
+  public function addSelectMultiple(string $name): FormSelectMultiple{
+    $field = new FormSelectMultiple($this->id.'-'.$name, $name);
     $this->elements[] = $field;
     $this->fields[$name] = $field;
     return $field;
