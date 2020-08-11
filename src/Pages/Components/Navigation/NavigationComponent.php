@@ -5,7 +5,6 @@ namespace Pages\Components\Navigation;
 
 use Pages\Components\Text;
 use Pages\IViewable;
-use Routing\Request;
 use Routing\UrlString;
 
 final class NavigationComponent implements IViewable{

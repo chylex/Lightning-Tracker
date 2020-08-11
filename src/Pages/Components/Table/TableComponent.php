@@ -11,7 +11,7 @@ use Pages\Components\Table\Elements\TableRow;
 use Pages\IViewable;
 use Routing\Request;
 
-class TableComponent implements IViewable{
+final class TableComponent implements IViewable{
   public static function echoHead(): void{
     $v = TRACKER_RESOURCE_VERSION;
     

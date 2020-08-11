@@ -56,7 +56,6 @@ HTML;
   </div>
 </article>
 HTML;
-  
   }
 }
 

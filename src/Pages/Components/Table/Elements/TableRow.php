@@ -5,7 +5,7 @@ namespace Pages\Components\Table\Elements;
 
 use Pages\IViewable;
 
-class TableRow implements IViewable{
+final class TableRow implements IViewable{
   private array $columns_ref;
   private array $values;
   

@@ -6,7 +6,7 @@ namespace Pages\Components\Table\Elements;
 use Database\Filters\Sorting;
 use Pages\IViewable;
 
-class TableColumn implements IViewable{
+final class TableColumn implements IViewable{
   private string $title;
   private ?Sorting $sorting = null;
   private ?string $sort_key = null;

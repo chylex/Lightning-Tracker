@@ -7,7 +7,7 @@ use Database\Filters\Pagination;
 use Pages\IViewable;
 use Routing\Request;
 
-class TablePaginationFooterComponent implements IViewable{
+final class TablePaginationFooterComponent implements IViewable{
   private Request $req;
   private Pagination $pagination;
   
