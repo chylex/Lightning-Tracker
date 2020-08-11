@@ -55,18 +55,18 @@ final class TrackerFilter extends AbstractFilter{
     ];
   }
   
-  protected function generateWhereClause(?string $table_name): string{
-    $clause = parent::generateWhereClause($table_name);
+  protected function generateWhereClause(): string{
+    $clause = parent::generateWhereClause();
     
     if ($this->visible_to_set){
       if (!empty($clause)){
         $clause .= ' AND ';
       }
       
-      $clause .= ' ('.self::field($table_name, 'hidden').' = FALSE';
+      $clause .= ' (hidden = FALSE';
       
       if ($this->visible_to !== null){
-        $clause .= self::getUserVisibilityClause($table_name);
+        $clause .= self::getUserVisibilityClause();
       }
       
       $clause .= ')';

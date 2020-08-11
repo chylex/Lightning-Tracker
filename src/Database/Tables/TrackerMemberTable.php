@@ -38,7 +38,7 @@ final class TrackerMemberTable extends AbstractTrackerTable{
    * @return TrackerMember[]
    */
   public function listMembers(?TrackerMemberFilter $filter = null): array{
-    $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty());
+    $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'sub');
     
     $sql = <<<SQL
 SELECT user_id, u.name AS name, role_title, role_order
@@ -63,7 +63,7 @@ FROM (
 JOIN users u ON sub.user_id = u.id
 SQL;
     
-    $stmt = $this->db->prepare($sql.' '.$filter->generateClauses(false, 'sub'));
+    $stmt = $this->db->prepare($sql.' '.$filter->generateClauses(false));
     $filter->prepareStatement($stmt);
     $stmt->bindValue('tracker_id_1', $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->bindValue('tracker_id_2', $this->getTrackerId(), PDO::PARAM_INT);

@@ -19,8 +19,8 @@ abstract class AbstractTrackerTable extends AbstractTable{
     return $this->tracker_id;
   }
   
-  protected function prepareFilter(AbstractTrackerIdFilter $filter): AbstractTrackerIdFilter{
-    return $filter->internalSetTracker($this->getTrackerId());
+  protected function prepareFilter(AbstractTrackerIdFilter $filter, ?string $table_name = null): AbstractTrackerIdFilter{
+    return $filter->internalSetTracker($this->getTrackerId(), $table_name);
   }
 }
 

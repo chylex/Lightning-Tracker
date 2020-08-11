@@ -48,9 +48,9 @@ abstract class AbstractFilter{
   protected abstract function getDefaultOrderByColumns(): array;
   public abstract function prepareStatement(PDOStatement $stmt): void;
   
-  public final function injectClauses(string $sql, ?string $where_table_name = null): string{
+  public final function injectClauses(string $sql): string{
     $clauses = [
-        '# WHERE' => ['WHERE', $this->generateWhereClause($where_table_name)],
+        '# WHERE' => ['WHERE', $this->generateWhereClause()],
         '# ORDER' => ['ORDER BY', $this->generateOrderByClause()],
         '# LIMIT' => ['LIMIT', $this->generateLimitClause()]
     ];
@@ -73,11 +73,11 @@ abstract class AbstractFilter{
     return $sql;
   }
   
-  public final function generateClauses(bool $is_count_query = false, ?string $where_table_name = null): string{
+  public final function generateClauses(bool $is_count_query = false): string{
     $clauses = $is_count_query ? [
-        'WHERE' => $this->generateWhereClause($where_table_name)
+        'WHERE' => $this->generateWhereClause()
     ] : [
-        'WHERE'    => $this->generateWhereClause($where_table_name),
+        'WHERE'    => $this->generateWhereClause(),
         'ORDER BY' => $this->generateOrderByClause(),
         'LIMIT'    => $this->generateLimitClause()
     ];
@@ -93,7 +93,7 @@ abstract class AbstractFilter{
     return implode(' ', $used);
   }
   
-  protected function generateWhereClause(?string $table_name): string{
+  protected function generateWhereClause(): string{
     $cols = [];
     
     foreach($this->getWhereColumns() as $field => $type){
@@ -103,7 +103,7 @@ abstract class AbstractFilter{
       
       switch($type){
         case self::OP_EQ:
-          $cols[] = self::field($table_name, $field)." = :$field";
+          $cols[] = "`$field` = :$field";
           break;
         
         case self::OP_LIKE:

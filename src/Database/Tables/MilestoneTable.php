@@ -130,7 +130,7 @@ final class MilestoneTable extends AbstractTrackerTable{
    * @return MilestoneInfo[]
    */
   public function listMilestones(?MilestoneFilter $filter = null): array{
-    $filter = $this->prepareFilter($filter ?? MilestoneFilter::empty());
+    $filter = $this->prepareFilter($filter ?? MilestoneFilter::empty(), 'm');
     
     $sql = <<<SQL
 SELECT m.id                                                             AS id,
@@ -148,7 +148,7 @@ GROUP BY m.id, m.title
 # LIMIT
 SQL;
     
-    $stmt = $this->db->prepare($filter->injectClauses($sql, 'm'));
+    $stmt = $this->db->prepare($filter->injectClauses($sql));
     $filter->prepareStatement($stmt);
     $stmt->execute();
     

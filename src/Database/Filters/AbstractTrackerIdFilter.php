@@ -9,9 +9,11 @@ use function Database\bind;
 
 abstract class AbstractTrackerIdFilter extends AbstractFilter{
   private int $tracker_id;
+  private ?string $tracker_id_prefix = null;
   
-  public function internalSetTracker(int $tracker_id): self{
+  public function internalSetTracker(int $tracker_id, ?string $table_name): self{
     $this->tracker_id = $tracker_id;
+    $this->tracker_id_prefix = $table_name;
     return $this;
   }
   
