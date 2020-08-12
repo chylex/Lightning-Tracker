@@ -98,4 +98,35 @@ document.addEventListener("DOMContentLoaded", function(){
             characterData: true,
         });
     }
+    
+    /**
+     * @param {Element} field
+     */
+    function clearFormField(field){
+        const tag = field.tagName;
+        const type = field.getAttribute("type");
+        
+        if (tag === "TEXTAREA" || tag === "SELECT" || (tag === "INPUT" && (type === "text" || type === "password" || type === "email"))){
+            field.value = "";
+        }
+        else if (tag === "INPUT" && type === "checkbox"){
+            field.checked = false;
+        }
+    }
+    
+    for(/** @type HTMLElement */ const filtering of document.querySelectorAll("details.filtering")){
+        const form = filtering.closest("form");
+        const clear = filtering.querySelector("button[data-clear-form]");
+        
+        if (form !== null && clear !== null){
+            clear.addEventListener("click", function(e){
+                e.preventDefault();
+                form.reset();
+                
+                for(const field of form.elements){
+                    clearFormField(field);
+                }
+            });
+        }
+    }
 });
