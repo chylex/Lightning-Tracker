@@ -161,14 +161,14 @@ SQL
   public function listIssues(?IssueFilter $filter = null): array{
     $filter = $this->prepareFilter($filter ?? IssueFilter::empty());
     
-    $stmt = $this->db->prepare('SELECT issue_id, title, type, priority, scale, status, progress, date_created, date_updated FROM issues '.$filter->generateClauses());
+    $stmt = $this->db->prepare('SELECT issue_id AS id, title, type, priority, scale, status, progress, date_created, date_updated FROM issues '.$filter->generateClauses());
     $filter->prepareStatement($stmt);
     $stmt->execute();
     
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new IssueInfo($res['issue_id'],
+      $results[] = new IssueInfo($res['id'],
                                  $res['title'],
                                  IssueType::get($res['type']),
                                  IssuePriority::get($res['priority']),

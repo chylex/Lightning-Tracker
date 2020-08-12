@@ -67,3 +67,8 @@ option.issue-tag:before {
 .issue-scale-massive:before {
   background-color: #f72319;
 }
+
+.issue-id {
+  font-size: 0.9em;
+  letter-spacing: 0.5px;
+}

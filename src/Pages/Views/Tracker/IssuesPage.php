@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Tracker;
 
+use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Sidemenu\SidemenuComponent;
@@ -33,6 +34,7 @@ class IssuesPage extends AbstractTrackerPage{
     FormComponent::echoHead();
     SidemenuComponent::echoHead();
     ProgressBarComponent::echoHead();
+    DateTimeComponent::echoHead();
     
     $v = TRACKER_RESOURCE_VERSION;
     

@@ -9,6 +9,7 @@ use Database\Objects\TrackerInfo;
 use Database\Tables\IssueTable;
 use Database\Tables\MilestoneTable;
 use Database\Tables\TrackerMemberTable;
+use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\Elements\FormSelectMultiple;
 use Pages\Components\Issues\IIssueTag;
 use Pages\Components\Issues\IssuePriority;
@@ -53,11 +54,13 @@ class IssuesModel extends BasicTrackerPageModel{
     $this->table->ifEmpty('No issues found.');
     
     $this->table->addColumn('')->tight()->collapsed();
-    $this->table->addColumn('Title')->sort('title')->width(70)->bold();
+    $this->table->addColumn('ID')->sort('id')->tight()->collapsed()->right()->bold();
+    $this->table->addColumn('Title')->sort('title')->width(70)->collapsed()->bold();
     $this->table->addColumn('Priority')->sort('priority')->tight();
     $this->table->addColumn('Scale')->sort('scale')->tight();
     $this->table->addColumn('Status')->tight();
     $this->table->addColumn('Progress')->sort('progress')->width(30);
+    $this->table->addColumn('Last Update')->sort('date_updated')->tight();
     
     $this->menu_actions = new SidemenuComponent(BASE_URL_ENC, $req);
     $this->menu_actions->setTitle(Text::plain('Actions'));
@@ -81,11 +84,13 @@ class IssuesModel extends BasicTrackerPageModel{
     
     foreach($issues->listIssues($filter) as $issue){
       $row = $this->table->addRow([$issue->getType()->getViewable(true),
+                                   '<span class="issue-id">#'.$issue->getId().'</span>',
                                    $issue->getTitleSafe(),
                                    $issue->getPriority(),
                                    $issue->getScale(),
                                    $issue->getStatus(),
-                                   new ProgressBarComponent($issue->getProgress())]);
+                                   new ProgressBarComponent($issue->getProgress()),
+                                   new DateTimeComponent($issue->getLastUpdateDate())]);
       
       $row->link($this->getReq()->getBasePath()->encoded().'/issues/'.$issue->getId());
     }

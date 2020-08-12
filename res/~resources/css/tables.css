@@ -107,8 +107,8 @@ tbody > tr:last-child.link > td > a {
 th.collapsed,
 td.collapsed,
 tr.link > td.collapsed > a {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 tr:not(.link) th:first-child,
