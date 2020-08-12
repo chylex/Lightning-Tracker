@@ -67,4 +67,18 @@ document.addEventListener("DOMContentLoaded", function(){
             }
         }
     }
+    
+    for(/** @type HTMLInputElement */ const range of document.querySelectorAll("input[type='number']")){
+        const step = range.getAttribute("data-step");
+        
+        if (step !== null){
+            range.addEventListener("focus", function(){
+                range.step = step;
+            });
+            
+            range.addEventListener("blur", function(){
+                range.step = "";
+            });
+        }
+    }
 });

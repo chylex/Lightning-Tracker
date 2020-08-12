@@ -32,12 +32,10 @@ final class FormNumberField extends AbstractFormField{
   public function echoBody(): void{
     $name = $this->getName();
     $label = $this->label ?? $name;
-    $value = (int)$this->value;
+    $value = min($this->max, max($this->min, (int)$this->value));
     
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
     $disabled_class = $this->disabled === false ? '' : ' class="disabled"';
-    
-    // TODO rewrite steps using JS to avoid form validation
     
     echo <<<HTML
 <div class="field-group">
