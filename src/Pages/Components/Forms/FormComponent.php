@@ -32,6 +32,8 @@ final class FormComponent implements IViewable{
   public const MESSAGE_SUCCESS = 'success';
   public const MESSAGE_ERROR = 'error';
   
+  private static $global_counter = 0;
+  
   public static function echoHead(): void{
     $v = TRACKER_RESOURCE_VERSION;
     
@@ -42,6 +44,7 @@ HTML;
   }
   
   private string $id;
+  private string $action;
   private bool $is_filled = false;
   
   private ?string $confirm_message = null;
@@ -57,8 +60,10 @@ HTML;
    */
   private array $fields = [];
   
-  public function __construct($id = 'Form'){
-    $this->id = $id;
+  public function __construct(string $id = 'Form'){
+    $this->id = $id.'-'.(++self::$global_counter);
+    $this->action = $id;
+    
     $this->message_list = new FormMessageList();
     $this->elements = [$this->message_list];
   }
@@ -187,7 +192,7 @@ HTML;
    * @return string|bool Truthy if all fields were present, indicating that the form is ready for validation. The truthy value is the submit button value if present, or true if no button had a set value.
    */
   public function accept(array $data){
-    if (!isset($data[self::ACTION_KEY]) || $data[self::ACTION_KEY] !== $this->id){
+    if (!isset($data[self::ACTION_KEY]) || $data[self::ACTION_KEY] !== $this->action){
       return false;
     }
     
@@ -284,7 +289,7 @@ HTML;
     }
     
     echo <<<HTML
-  <input type="hidden" name="$action_key" value="$this->id">
+  <input type="hidden" name="$action_key" value="$this->action">
 </form>
 HTML;
   }
