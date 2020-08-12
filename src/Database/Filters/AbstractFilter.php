@@ -137,7 +137,7 @@ abstract class AbstractFilter{
   
   protected function generateOrderByClause(): string{
     $cols = [];
-    $rules = $this->sorting === null ? $this->getDefaultOrderByColumns() : $this->sorting->getRules();
+    $rules = $this->sorting === null || $this->sorting->isEmpty() ? $this->getDefaultOrderByColumns() : $this->sorting->getRules();
     
     foreach($rules as $field => $direction){
       if (!$direction){
