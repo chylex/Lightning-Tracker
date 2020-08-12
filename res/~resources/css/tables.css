@@ -193,20 +193,22 @@ details.filtering > summary .icon {
 details.filtering > article {
   display: flex;
   flex-wrap: wrap;
-  margin: 15px 2px !important;
+  margin: -3px 2px 27px !important;
 }
 
 details.filtering > article > div {
   flex: 0 1 100%;
   max-width: 225px;
-  margin: 0 8px 10px;
+  max-height: 50px;
+  margin: 20px 8px 0;
   font-size: 15px;
   white-space: nowrap;
 }
 
 details.filtering > article > div.buttons {
+  flex: 0 0 auto;
   align-self: flex-end;
-  margin-top: 3px;
+  margin: 15px 8px 0;
 }
 
 details.filtering > article > div.buttons button.styled {
