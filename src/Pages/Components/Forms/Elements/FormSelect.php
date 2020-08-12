@@ -38,7 +38,7 @@ final class FormSelect extends AbstractFormField{
   
   public function value(?string $value): self{
     if ($this->optional && $value === null){
-      return $this;
+      return parent::value('');
     }
     else{
       return parent::value($value);
