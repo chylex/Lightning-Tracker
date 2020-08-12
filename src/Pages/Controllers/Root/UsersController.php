@@ -6,6 +6,7 @@ namespace Pages\Controllers\Root;
 use Generator;
 use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractHandlerController;
+use Pages\Controllers\Handlers\HandleFilteringRequest;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireSystemPermission;
 use Pages\IAction;
@@ -20,6 +21,7 @@ class UsersController extends AbstractHandlerController{
   protected function prerequisites(): Generator{
     yield new RequireLoginState(true);
     yield new RequireSystemPermission(UsersModel::PERM_LIST);
+    yield new HandleFilteringRequest();
   }
   
   protected function finally(Request $req, Session $sess): IAction{

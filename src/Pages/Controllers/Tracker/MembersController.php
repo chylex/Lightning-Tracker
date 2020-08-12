@@ -7,6 +7,7 @@ use Database\Objects\TrackerInfo;
 use Generator;
 use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractTrackerController;
+use Pages\Controllers\Handlers\HandleFilteringRequest;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
 use Pages\Models\Tracker\MembersModel;
@@ -19,6 +20,7 @@ use function Pages\Actions\view;
 class MembersController extends AbstractTrackerController{
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireTrackerPermission($tracker, MembersModel::PERM_LIST);
+    yield new HandleFilteringRequest();
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{

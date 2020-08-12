@@ -87,8 +87,9 @@ class MembersModel extends BasicTrackerPageModel{
     
     $filter = new TrackerMemberFilter();
     $members = new TrackerMemberTable(DB::get(), $tracker);
-    $total_count = $members->countMembers($filter);
     
+    $filtering = $filter->filter();
+    $total_count = $members->countMembers($filter);
     $pagination = $filter->page($total_count);
     $sorting = $filter->sort($this->getReq());
     
@@ -116,6 +117,18 @@ class MembersModel extends BasicTrackerPageModel{
     
     $this->table->setupColumnSorting($sorting);
     $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('members');
+    
+    $header = $this->table->setFilteringHeader($filtering);
+    $header->addTextField('name')->label('Username');
+    
+    $filtering_role = $header->addMultiSelect('role')->label('Role');
+    $filtering_role->addOption('', '<span class="missing">(Default)</span>');
+    $filtering_role->addOption('Owner', 'Owner');
+    
+    foreach((new TrackerPermTable(DB::get(), $tracker))->listRoles() as $role){
+      $title = $role->getTitleSafe();
+      $filtering_role->addOption($title, $title);
+    }
     
     return $this;
   }

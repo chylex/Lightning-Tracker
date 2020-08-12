@@ -3,9 +3,11 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Root;
 
+use Generator;
 use Pages\Components\Forms\FormComponent;
+use Pages\Controllers\AbstractHandlerController;
+use Pages\Controllers\Handlers\HandleFilteringRequest;
 use Pages\IAction;
-use Pages\IController;
 use Pages\Models\Root\TrackersModel;
 use Pages\Views\Root\TrackersPage;
 use Routing\Request;
@@ -13,8 +15,12 @@ use Session\Session;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
 
-class TrackersController implements IController{
-  public function run(Request $req, Session $sess): IAction{
+class TrackersController extends AbstractHandlerController{
+  protected function prerequisites(): Generator{
+    yield new HandleFilteringRequest();
+  }
+  
+  protected function finally(Request $req, Session $sess): IAction{
     $model = new TrackersModel($req, $sess->getPermissions());
     $data = $req->getData();
     

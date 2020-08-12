@@ -6,6 +6,7 @@ namespace Pages\Models\Root;
 use Database\DB;
 use Database\Filters\Types\UserFilter;
 use Database\SQL;
+use Database\Tables\SystemPermTable;
 use Database\Tables\UserTable;
 use Exception;
 use Pages\Components\DateTimeComponent;
@@ -92,10 +93,13 @@ class UsersModel extends BasicRootPageModel{
     $logon_user = Session::get()->getLogonUser();
     $logon_user_id = $logon_user === null ? -1 : $logon_user->getId();
     
-    $filter = new UserFilter();
-    $users = new UserTable(DB::get());
-    $total_count = $users->countUsers();
+    $can_see_email = $this->perms->checkSystem(self::PERM_LIST_EMAIL);
     
+    $filter = new UserFilter($can_see_email);
+    $users = new UserTable(DB::get());
+    
+    $filtering = $filter->filter();
+    $total_count = $users->countUsers($filter);
     $pagination = $filter->page($total_count);
     $sorting = $filter->sort($this->getReq());
     
@@ -103,7 +107,7 @@ class UsersModel extends BasicRootPageModel{
       $user_id = $user->getId();
       $row = [$user->getNameSafe()];
       
-      if ($this->perms->checkSystem(self::PERM_LIST_EMAIL)){
+      if ($can_see_email){
         $row[] = $user->getEmailSafe();
       }
       
@@ -128,6 +132,21 @@ class UsersModel extends BasicRootPageModel{
     
     $this->table->setupColumnSorting($sorting);
     $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('users');
+    
+    $header = $this->table->setFilteringHeader($filtering);
+    $header->addTextField('name')->label('Username');
+    
+    if ($can_see_email){
+      $header->addTextField('email')->label('Email');
+    }
+    
+    $filtering_role = $header->addMultiSelect('role')->label('Role');
+    $filtering_role->addOption('', '<span class="missing">(None)</span>');
+    
+    foreach((new SystemPermTable(DB::get()))->listRoles() as $role){
+      $title = $role->getTitleSafe();
+      $filtering_role->addOption($title, $title);
+    }
     
     return $this;
   }

@@ -4,7 +4,10 @@ declare(strict_types = 1);
 namespace Database\Filters\Types;
 
 use Database\Filters\AbstractFilter;
+use Database\Filters\Conditions\FieldLike;
+use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
+use Database\Filters\IWhereCondition;
 use Database\Objects\UserProfile;
 use PDO;
 use PDOStatement;
@@ -54,6 +57,24 @@ final class TrackerFilter extends AbstractFilter{
     }
     
     return $clause;
+  }
+  
+  protected function getFilteringColumns(): array{
+    return [
+        'name' => Filtering::TYPE_TEXT,
+        'url'  => Filtering::TYPE_TEXT
+    ];
+  }
+  
+  protected function getFilterWhereCondition(string $field, $value): ?IWhereCondition{
+    switch($field){
+      case 'name':
+      case 'url':
+        return new FieldLike($field, $value);
+      
+      default:
+        return null;
+    }
   }
   
   protected function getSortingColumns(): array{

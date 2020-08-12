@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Tables;
 
 use Database\AbstractTrackerTable;
+use Database\Filters\AbstractTrackerIdFilter;
 use Database\Filters\Types\TrackerMemberFilter;
 use Database\Objects\TrackerInfo;
 use Database\Objects\TrackerMember;
@@ -12,6 +13,12 @@ use PDO;
 final class TrackerMemberTable extends AbstractTrackerTable{
   public function __construct(PDO $db, TrackerInfo $tracker){
     parent::__construct($db, $tracker);
+  }
+  
+  protected function prepareFilter(AbstractTrackerIdFilter $filter, ?string $table_name = null): TrackerMemberFilter{
+    $filter = parent::prepareFilter($filter, $table_name);
+    /** @var TrackerMemberFilter $filter */
+    return $filter; // TODO ugly workaround
   }
   
   public function setRole(int $user_id, ?int $role_id): void{
@@ -23,14 +30,18 @@ final class TrackerMemberTable extends AbstractTrackerTable{
   }
   
   public function countMembers(?TrackerMemberFilter $filter = null): ?int{
-    $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty());
-    
-    $stmt = $this->db->prepare('SELECT COUNT(*) FROM tracker_members '.$filter->generateClauses(true));
-    $filter->prepareStatement($stmt);
-    $stmt->execute();
-    
-    $count = $this->fetchOneColumn($stmt);
-    return $count === false ? null : (int)$count;
+    if ($filter === null || $filter->isEmpty()){
+      $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty());
+      $stmt = $this->db->prepare('SELECT COUNT(*) + 1 FROM tracker_members '.$filter->generateClauses(true)); // +1 for owner
+      $filter->prepareStatement($stmt);
+      $stmt->execute();
+      
+      $count = $this->fetchOneColumn($stmt);
+      return $count === false ? null : (int)$count;
+    }
+    else{
+      return count($this->listMembers($filter)); // TODO fix this mess by introducing a proper un-assignable un-deletable role for the owner
+    }
   }
   
   /**
@@ -39,6 +50,7 @@ final class TrackerMemberTable extends AbstractTrackerTable{
    */
   public function listMembers(?TrackerMemberFilter $filter = null): array{
     $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'sub');
+    $filter->setRoleTitleColumn(null, 'role_title');
     
     $sql = <<<SQL
 SELECT user_id, u.name AS name, role_title, role_order

@@ -44,7 +44,13 @@ final class UserTable extends AbstractTable{
   public function countUsers(?UserFilter $filter = null): ?int{
     $filter ??= UserFilter::empty();
     
-    $stmt = $this->db->prepare('SELECT COUNT(*) FROM users '.$filter->generateClauses(true));
+    if ($filter->isEmpty()){
+      $stmt = $this->db->prepare('SELECT COUNT(*) FROM users '.$filter->generateClauses(true));
+    }
+    else{
+      $stmt = $this->db->prepare('SELECT COUNT(*) FROM users LEFT JOIN system_roles sr ON sr.id = users.role_id '.$filter->generateClauses(true));
+    }
+    
     $filter->prepareStatement($stmt);
     $stmt->execute();
     

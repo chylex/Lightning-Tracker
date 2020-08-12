@@ -77,8 +77,9 @@ class TrackersModel extends BasicRootPageModel{
       }
       
       $trackers = new TrackerTable(DB::get());
-      $total_count = $trackers->countTrackers($filter);
       
+      $filtering = $filter->filter();
+      $total_count = $trackers->countTrackers($filter);
       $pagination = $filter->page($total_count);
       $sorting = $filter->sort($this->getReq());
       
@@ -103,6 +104,10 @@ class TrackersModel extends BasicRootPageModel{
       
       $this->table->setupColumnSorting($sorting);
       $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('trackers');
+      
+      $header = $this->table->setFilteringHeader($filtering);
+      $header->addTextField('name')->label('Name');
+      $header->addTextField('url')->label('Link');
     }
     else{
       $this->table->setPaginationFooter($this->getReq(), Pagination::empty())->elementName('trackers');
