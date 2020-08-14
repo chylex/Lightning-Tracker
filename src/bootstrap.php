@@ -48,10 +48,13 @@ if ($base_url_split === false){
   die('Base URL is invalid.');
 }
 
+$base_url_path = parse_url(BASE_URL, PHP_URL_PATH) ?? '/';
 $base_url_protocol = mb_substr(BASE_URL, 0, $base_url_split + 3);
-$base_url_path = new UrlString(mb_substr(BASE_URL, $base_url_split + 3));
+$base_url_domain_path = mb_substr(BASE_URL, $base_url_split + 3);
 
-define('BASE_URL_ENC', $base_url_protocol.$base_url_path->encoded());
+define('BASE_PATH', $base_url_path);
+define('BASE_PATH_ENC', (new UrlString($base_url_path))->encoded());
+define('BASE_URL_ENC', $base_url_protocol.(new UrlString($base_url_domain_path))->encoded());
 
 // Migration
 

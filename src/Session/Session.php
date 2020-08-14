@@ -11,9 +11,7 @@ use Exception;
 use Logging\Log;
 
 final class Session{
-  private const COOKIE_PATH = '/';
   private const COOKIE_NAME = 'logon';
-  
   private const TOKEN_EXPIRATION_TIME = 365 * 24 * 60;
   
   private static ?Session $instance = null;
@@ -58,13 +56,13 @@ final class Session{
   }
   
   private static function setCookie(string $token): void{
-    $path = self::COOKIE_PATH;
+    $path = BASE_PATH_ENC;
     $expire_in_seconds = self::TOKEN_EXPIRATION_TIME * 60;
     header("Set-Cookie: logon=$token; Max-Age=$expire_in_seconds; Path=$path; HttpOnly; SameSite=Lax");
   }
   
   private static function unsetCookie(): void{
-    $path = self::COOKIE_PATH;
+    $path = BASE_PATH_ENC;
     header("Set-Cookie: logon=; Max-Age=0; Path=$path; HttpOnly; SameSite=Lax");
   }
   
