@@ -6,6 +6,7 @@ namespace Pages\Controllers\Tracker;
 use Database\Objects\TrackerInfo;
 use Generator;
 use Pages\Controllers\AbstractTrackerController;
+use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
 use Pages\Models\Tracker\SettingsModel;
@@ -16,6 +17,7 @@ use function Pages\Actions\view;
 
 class SettingsController extends AbstractTrackerController{
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
+    yield new RequireLoginState(true);
     yield new RequireTrackerPermission($tracker, SettingsModel::PERM);
   }
   

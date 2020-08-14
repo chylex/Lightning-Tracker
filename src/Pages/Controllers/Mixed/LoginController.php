@@ -29,7 +29,9 @@ class LoginController extends AbstractHandlerController{
     $data = $req->getData();
     
     if (!empty($data) && $model->loginUser($data, $sess)){
-      return redirect([BASE_URL_ENC, isset($_GET['return']) ? ltrim($_GET['return'], '/') : '']);
+      $return = $_GET['return'] ?? '';
+      $return = strpos($return, '://') === false ? ltrim($return, '/') : '';
+      return redirect([BASE_URL_ENC, $return]);
     }
     
     return view(new LoginPage($model->load()));
