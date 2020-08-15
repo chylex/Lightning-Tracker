@@ -98,6 +98,7 @@ $router->add('tracker/:tracker/&/issues/:id/delete', 'Tracker/IssueDeleteControl
 $router->add('tracker/:tracker/&/milestones', 'Tracker/MilestonesController');
 $router->add('tracker/:tracker/&/members', 'Tracker/MembersController');
 $router->add('tracker/:tracker/&/settings', 'Tracker/SettingsController');
+$router->add('tracker/:tracker/&/delete', 'Root/TrackerDeleteController');
 
 foreach(['&/', 'tracker/:tracker/&/'] as $base){
   $router->add($base.'login', 'Mixed/LoginController');

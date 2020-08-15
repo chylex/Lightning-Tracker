@@ -27,9 +27,7 @@ class TrackersController extends AbstractHandlerController{
     if (!empty($data)){
       $action = $data[FormComponent::ACTION_KEY] ?? '';
       
-      if (($action === $model::ACTION_CREATE && $model->createTracker($data, $sess->getLogonUser())) ||
-          (($action === $model::ACTION_DELETE && $model->deleteTracker($data)))
-      ){
+      if ($action === $model::ACTION_CREATE && $model->createTracker($data, $sess->getLogonUser())){
         return reload();
       }
     }

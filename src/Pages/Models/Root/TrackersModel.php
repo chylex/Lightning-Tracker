@@ -23,7 +23,6 @@ use Validation\Validator;
 
 class TrackersModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
-  public const ACTION_DELETE = 'Delete';
   
   public const PERM_LIST = 'trackers.list';
   public const PERM_LIST_HIDDEN = 'trackers.list.hidden';
@@ -84,19 +83,13 @@ class TrackersModel extends BasicRootPageModel{
       $sorting = $filter->sort($this->getReq());
       
       foreach($trackers->listTrackers($filter) as $tracker){
-        $tracker_id = $tracker->getId();
-        
         $url = BASE_URL_ENC.'/tracker/'.rawurlencode($tracker->getUrl());
         $link = '<a href="'.$url.'" class="plain">'.$tracker->getUrlSafe().' <span class="icon icon-out"></span></a>';
         
         $row = [$tracker->getNameSafe(), $link];
         
         if ($this->perms->checkSystem(self::PERM_EDIT)){
-          $form = new FormComponent(self::ACTION_DELETE);
-          $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
-          $form->addHidden('Tracker', strval($tracker_id));
-          $form->addIconButton('submit', 'circle-cross')->color('red');
-          $row[] = $form;
+          $row[] = '<a href="'.$url.'/delete" class="icon"><span class="icon icon-circle-cross icon-color-red"></span></a>';
         }
         
         $this->table->addRow($row);
@@ -167,18 +160,6 @@ class TrackersModel extends BasicRootPageModel{
     }
     
     return false;
-  }
-  
-  public function deleteTracker(array $data): bool{ // TODO make it a dedicated page with additional checks
-    $this->perms->requireSystem(self::PERM_EDIT);
-    
-    if (!isset($data['Tracker']) || !is_numeric($data['Tracker'])){
-      return false;
-    }
-    
-    $trackers = new TrackerTable(DB::get());
-    $trackers->deleteById((int)$data['Tracker']);
-    return true;
   }
 }
 

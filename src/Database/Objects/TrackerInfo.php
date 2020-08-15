@@ -22,6 +22,10 @@ final class TrackerInfo{
     return $this->id;
   }
   
+  public function getName(): string{
+    return $this->name;
+  }
+  
   public function getNameSafe(): string{
     return protect($this->name);
   }
