@@ -5,7 +5,6 @@ namespace Pages\Controllers\Root;
 
 use Database\Objects\TrackerInfo;
 use Generator;
-use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractTrackerController;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireSystemPermission;
@@ -26,14 +25,9 @@ class TrackerDeleteController extends AbstractTrackerController{
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $model = new TrackerDeleteModel($req, $tracker);
-    $data = $req->getData();
     
-    if (!empty($data)){
-      $action = $data[FormComponent::ACTION_KEY] ?? '';
-      
-      if ($action === $model::ACTION_CONFIRM && $model->deleteTracker($data)){
-        return redirect([BASE_URL_ENC]);
-      }
+    if ($req->getAction() === $model::ACTION_CONFIRM && $model->deleteTracker($req->getData())){
+      return redirect([BASE_URL_ENC]);
     }
     
     return view(new TrackerDeletePage($model->load()));

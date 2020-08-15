@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Controllers\Root;
 
 use Generator;
-use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractHandlerController;
 use Pages\Controllers\Handlers\HandleFilteringRequest;
 use Pages\IAction;
@@ -22,14 +21,9 @@ class TrackersController extends AbstractHandlerController{
   
   protected function finally(Request $req, Session $sess): IAction{
     $model = new TrackersModel($req, $sess->getPermissions());
-    $data = $req->getData();
     
-    if (!empty($data)){
-      $action = $data[FormComponent::ACTION_KEY] ?? '';
-      
-      if ($action === $model::ACTION_CREATE && $model->createTracker($data, $sess->getLogonUser())){
-        return reload();
-      }
+    if ($req->getAction() === $model::ACTION_CREATE && $model->createTracker($req->getData(), $sess->getLogonUser())){
+      return reload();
     }
     
     return view(new TrackersPage($model->load()));

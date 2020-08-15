@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Routing;
 
+use Pages\Components\Forms\FormComponent;
+
 final class Request{
   public static function prepareSession(array $data): void{
     session_start();
@@ -50,6 +52,10 @@ final class Request{
   
   public function getData(): array{
     return $this->data;
+  }
+  
+  public function getAction(): ?string{
+    return $this->data[FormComponent::ACTION_KEY] ?? null;
   }
   
   /**

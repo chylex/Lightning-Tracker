@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Controllers\Root;
 
 use Generator;
-use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractHandlerController;
 use Pages\Controllers\Handlers\HandleFilteringRequest;
 use Pages\Controllers\Handlers\RequireLoginState;
@@ -26,10 +25,10 @@ class UsersController extends AbstractHandlerController{
   
   protected function finally(Request $req, Session $sess): IAction{
     $model = new UsersModel($req, $sess->getPermissions());
-    $data = $req->getData();
+    $action = $req->getAction();
     
-    if (!empty($data)){
-      $action = $data[FormComponent::ACTION_KEY] ?? '';
+    if ($action !== null){
+      $data = $req->getData();
       
       if (($action === $model::ACTION_CREATE && $model->createUser($data)) ||
           ($action === $model::ACTION_DELETE && $model->deleteUser($data))

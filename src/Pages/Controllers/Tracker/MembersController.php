@@ -5,7 +5,6 @@ namespace Pages\Controllers\Tracker;
 
 use Database\Objects\TrackerInfo;
 use Generator;
-use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractTrackerController;
 use Pages\Controllers\Handlers\HandleFilteringRequest;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
@@ -25,10 +24,10 @@ class MembersController extends AbstractTrackerController{
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $model = new MembersModel($req, $tracker, $sess->getPermissions());
-    $data = $req->getData();
+    $action = $req->getAction();
     
-    if (!empty($data)){
-      $action = $data[FormComponent::ACTION_KEY] ?? '';
+    if ($action !== null){
+      $data = $req->getData();
       
       if (($action === $model::ACTION_INVITE && $model->inviteUser($data)) ||
           ($action === $model::ACTION_REMOVE && $model->removeMember($data))

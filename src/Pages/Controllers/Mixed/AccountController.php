@@ -5,7 +5,6 @@ namespace Pages\Controllers\Mixed;
 
 use Database\Objects\TrackerInfo;
 use Generator;
-use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractHandlerController;
 use Pages\Controllers\Handlers\LoadTracker;
 use Pages\Controllers\Handlers\RequireLoginState;
@@ -27,9 +26,7 @@ class AccountController extends AbstractHandlerController{
     
     yield new class implements IControlHandler{
       public function run(Request $req, Session $sess): ?IAction{
-        $action = $req->getData()[FormComponent::ACTION_KEY] ?? '';
-        
-        if ($action === AccountModel::ACTION_LOGOUT){
+        if ($req->getAction() === AccountModel::ACTION_LOGOUT){
           $sess->destroyCurrentLogin();
           return redirect([BASE_URL_ENC, $req->getBasePath()->encoded()]);
         }

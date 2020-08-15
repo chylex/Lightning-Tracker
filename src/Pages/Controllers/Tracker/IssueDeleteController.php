@@ -5,7 +5,6 @@ namespace Pages\Controllers\Tracker;
 
 use Database\Objects\TrackerInfo;
 use Generator;
-use Pages\Components\Forms\FormComponent;
 use Pages\Controllers\AbstractTrackerController;
 use Pages\Controllers\Handlers\LoadIssueId;
 use Pages\Controllers\Handlers\RequireLoginState;
@@ -30,14 +29,9 @@ class IssueDeleteController extends AbstractTrackerController{
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $model = new IssueDeleteModel($req, $tracker, $this->issue_id);
-    $data = $req->getData();
     
-    if (!empty($data)){
-      $action = $data[FormComponent::ACTION_KEY] ?? '';
-      
-      if ($action === $model::ACTION_CONFIRM && $model->deleteIssue($data)){
-        return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'issues']);
-      }
+    if ($req->getAction() === $model::ACTION_CONFIRM && $model->deleteIssue($req->getData())){
+      return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'issues']);
     }
     
     return view(new IssueDeletePage($model->load()));
