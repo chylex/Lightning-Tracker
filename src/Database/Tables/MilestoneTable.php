@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Tables;
 
 use Database\AbstractTrackerTable;
+use Database\Filters\AbstractFilter;
 use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\MilestoneInfo;
 use Database\Objects\TrackerInfo;
@@ -117,8 +118,7 @@ final class MilestoneTable extends AbstractTrackerTable{
   public function countMilestones(?MilestoneFilter $filter = null): ?int{
     $filter = $this->prepareFilter($filter ?? MilestoneFilter::empty());
     
-    $stmt = $this->db->prepare('SELECT COUNT(*) FROM milestones '.$filter->generateClauses(true));
-    $filter->prepareStatement($stmt);
+    $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM milestones', AbstractFilter::STMT_COUNT);
     $stmt->execute();
     
     $count = $this->fetchOneColumn($stmt);
@@ -148,8 +148,7 @@ GROUP BY m.id, m.title
 # LIMIT
 SQL;
     
-    $stmt = $this->db->prepare($filter->injectClauses($sql));
-    $filter->prepareStatement($stmt);
+    $stmt = $filter->prepare($this->db, $sql, AbstractFilter::STMT_SELECT_INJECT);
     $stmt->execute();
     
     $results = [];

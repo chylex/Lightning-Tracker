@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Tables;
 
 use Database\AbstractTable;
+use Database\Filters\AbstractFilter;
 use Database\Filters\Types\UserFilter;
 use Database\Objects\UserInfo;
 use Database\Objects\UserLoginInfo;
@@ -45,13 +46,12 @@ final class UserTable extends AbstractTable{
     $filter ??= UserFilter::empty();
     
     if ($filter->isEmpty()){
-      $stmt = $this->db->prepare('SELECT COUNT(*) FROM users '.$filter->generateClauses(true));
+      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM users', AbstractFilter::STMT_COUNT);
     }
     else{
-      $stmt = $this->db->prepare('SELECT COUNT(*) FROM users LEFT JOIN system_roles sr ON sr.id = users.role_id '.$filter->generateClauses(true));
+      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM users LEFT JOIN system_roles sr ON sr.id = users.role_id', AbstractFilter::STMT_COUNT);
     }
     
-    $filter->prepareStatement($stmt);
     $stmt->execute();
     
     $count = $this->fetchOneColumn($stmt);
@@ -71,8 +71,7 @@ FROM users u
 LEFT JOIN system_roles sr ON u.role_id = sr.id
 SQL;
     
-    $stmt = $this->db->prepare($sql.' '.$filter->generateClauses());
-    $filter->prepareStatement($stmt);
+    $stmt = $filter->prepare($this->db, $sql);
     $stmt->execute();
     
     $results = [];

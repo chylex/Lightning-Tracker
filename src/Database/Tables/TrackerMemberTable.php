@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Tables;
 
 use Database\AbstractTrackerTable;
+use Database\Filters\AbstractFilter;
 use Database\Filters\AbstractTrackerIdFilter;
 use Database\Filters\Types\TrackerMemberFilter;
 use Database\Objects\TrackerInfo;
@@ -32,8 +33,8 @@ final class TrackerMemberTable extends AbstractTrackerTable{
   public function countMembers(?TrackerMemberFilter $filter = null): ?int{
     if ($filter === null || $filter->isEmpty()){
       $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty());
-      $stmt = $this->db->prepare('SELECT COUNT(*) + 1 FROM tracker_members '.$filter->generateClauses(true)); // +1 for owner
-      $filter->prepareStatement($stmt);
+      
+      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) + 1 FROM tracker_members', AbstractFilter::STMT_COUNT); // +1 for owner
       $stmt->execute();
       
       $count = $this->fetchOneColumn($stmt);
@@ -75,8 +76,7 @@ FROM (
 JOIN users u ON sub.user_id = u.id
 SQL;
     
-    $stmt = $this->db->prepare($sql.' '.$filter->generateClauses(false));
-    $filter->prepareStatement($stmt);
+    $stmt = $filter->prepare($this->db, $sql);
     $stmt->bindValue('tracker_id_1', $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->bindValue('tracker_id_2', $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();

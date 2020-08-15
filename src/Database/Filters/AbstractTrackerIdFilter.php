@@ -17,15 +17,28 @@ abstract class AbstractTrackerIdFilter extends AbstractFilter{
     return $this;
   }
   
-  protected function getDefaultWhereColumns(): array{
-    return [
-        self::field($this->tracker_id_prefix, 'tracker_id').' = :tracker_id'
-    ];
-  }
-  
-  public function prepareStatement(PDOStatement $stmt): void{
-    parent::prepareStatement($stmt);
-    bind($stmt, 'tracker_id', $this->tracker_id, PDO::PARAM_INT);
+  protected function generateWhereConditions(): array{
+    $conditions = parent::generateWhereConditions();
+    
+    $conditions[] = new class($this->tracker_id_prefix, $this->tracker_id) implements IWhereCondition{
+      private ?string $tracker_id_prefix;
+      private int $tracker_id;
+      
+      public function __construct(?string $tracker_id_prefix, int $tracker_id){
+        $this->tracker_id_prefix = $tracker_id_prefix;
+        $this->tracker_id = $tracker_id;
+      }
+      
+      public function getSql(): string{
+        return AbstractTrackerIdFilter::field($this->tracker_id_prefix, 'tracker_id').' = :tracker_id';
+      }
+      
+      public function prepareStatement(PDOStatement $stmt): void{
+        bind($stmt, 'tracker_id', $this->tracker_id, PDO::PARAM_INT);
+      }
+    };
+    
+    return $conditions;
   }
 }
 

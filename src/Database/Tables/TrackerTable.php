@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Tables;
 
 use Database\AbstractTable;
+use Database\Filters\AbstractFilter;
 use Database\Filters\Types\TrackerFilter;
 use Database\Objects\TrackerInfo;
 use Database\Objects\TrackerVisibilityInfo;
@@ -92,8 +93,7 @@ final class TrackerTable extends AbstractTable{
   public function countTrackers(?TrackerFilter $filter = null): ?int{
     $filter ??= TrackerFilter::empty();
     
-    $stmt = $this->db->prepare('SELECT COUNT(*) FROM trackers '.$filter->generateClauses(true));
-    $filter->prepareStatement($stmt);
+    $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM trackers', AbstractFilter::STMT_COUNT);
     $stmt->execute();
     
     $count = $this->fetchOneColumn($stmt);
@@ -107,8 +107,7 @@ final class TrackerTable extends AbstractTable{
   public function listTrackers(?TrackerFilter $filter = null): array{
     $filter ??= TrackerFilter::empty();
     
-    $stmt = $this->db->prepare('SELECT id, name, url, owner_id FROM trackers '.$filter->generateClauses());
-    $filter->prepareStatement($stmt);
+    $stmt = $filter->prepare($this->db, 'SELECT id, name, url, owner_id FROM trackers');
     $stmt->execute();
     
     $results = [];

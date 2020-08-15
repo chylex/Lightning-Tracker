@@ -7,20 +7,20 @@ use Database\Filters\General\Filtering;
 use Database\Filters\General\Pagination;
 use Database\Filters\General\Sorting;
 use LogicException;
+use PDO;
 use PDOStatement;
 use Routing\Request;
 
 abstract class AbstractFilter{
+  public const STMT_SELECT_APPEND = 0;
+  public const STMT_SELECT_INJECT = 1;
+  public const STMT_COUNT = 2;
+  
   public static abstract function empty(): self;
   
   private ?Filtering $filtering = null;
   private ?Sorting $sorting = null;
   private ?Pagination $pagination = null;
-  
-  /**
-   * @var IWhereCondition[]
-   */
-  private array $current_where_conditions = []; // TODO ugly
   
   public function isEmpty(): bool{
     $f = $this->filtering;
@@ -60,82 +60,79 @@ abstract class AbstractFilter{
     return [];
   }
   
-  protected function getDefaultWhereColumns(): array{
-    return [];
-  }
-  
   protected abstract function getDefaultOrderByColumns(): array;
   
-  public function prepareStatement(PDOStatement $stmt): void{
-    foreach($this->current_where_conditions as $condition){
+  public final function prepare(PDO $db, string $sql, int $type = self::STMT_SELECT_APPEND): PDOStatement{
+    $conditions = $this->generateWhereConditions();
+    $where = implode(' AND ', array_map(fn($condition): string => $condition->getSql(), $conditions));
+    
+    if ($type === self::STMT_SELECT_INJECT){
+      $clauses = [
+          '# WHERE' => ['WHERE', $where],
+          '# ORDER' => ['ORDER BY', $this->generateOrderByClause()],
+          '# LIMIT' => ['LIMIT', $this->generateLimitClause()]
+      ];
+      
+      $sql = str_replace("\r", '', $sql);
+      
+      foreach($clauses as $comment => $data){
+        $name = $data[0];
+        $contents = $data[1];
+        $replacement = empty($contents) ? '' : $name.' '.$contents;
+        
+        $count = 0;
+        $sql = preg_replace('/^'.$comment.'$/m', $replacement, $sql, -1, $count);
+        
+        if ($count !== 1){
+          throw new LogicException('Invalid amount of SQL clause "'.$comment.'" comments ('.$count.').');
+        }
+      }
+    }
+    else{
+      $clauses = $type === self::STMT_COUNT ? [
+          'WHERE' => $where
+      ] : [
+          'WHERE'    => $where,
+          'ORDER BY' => $this->generateOrderByClause(),
+          'LIMIT'    => $this->generateLimitClause()
+      ];
+      
+      foreach($clauses as $name => $contents){
+        if (!empty($contents)){
+          $sql .= " $name $contents";
+        }
+      }
+    }
+    
+    $stmt = $db->prepare($sql);
+    
+    foreach($conditions as $condition){
       $condition->prepareStatement($stmt);
     }
+    
+    return $stmt;
   }
   
-  public final function injectClauses(string $sql): string{
-    $clauses = [
-        '# WHERE' => ['WHERE', $this->generateWhereClause()],
-        '# ORDER' => ['ORDER BY', $this->generateOrderByClause()],
-        '# LIMIT' => ['LIMIT', $this->generateLimitClause()]
-    ];
-    
-    $sql = str_replace("\r", '', $sql);
-    
-    foreach($clauses as $comment => $data){
-      $name = $data[0];
-      $contents = $data[1];
-      $replacement = empty($contents) ? '' : $name.' '.$contents;
-      
-      $count = 0;
-      $sql = preg_replace('/^'.$comment.'$/m', $replacement, $sql, -1, $count);
-      
-      if ($count !== 1){
-        throw new LogicException('Invalid amount of SQL clause "'.$comment.'" comments ('.$count.').');
-      }
-    }
-    
-    return $sql;
-  }
-  
-  public final function generateClauses(bool $is_count_query = false): string{
-    $clauses = $is_count_query ? [
-        'WHERE' => $this->generateWhereClause()
-    ] : [
-        'WHERE'    => $this->generateWhereClause(),
-        'ORDER BY' => $this->generateOrderByClause(),
-        'LIMIT'    => $this->generateLimitClause()
-    ];
-    
-    $used = [];
-    
-    foreach($clauses as $name => $contents){
-      if (!empty($contents)){
-        $used[] = $name.' '.$contents;
-      }
-    }
-    
-    return implode(' ', $used);
-  }
-  
-  protected function generateWhereClause(): string{
-    $conditions = $this->getDefaultWhereColumns();
-    $this->current_where_conditions = [];
+  /**
+   * @return IWhereCondition[]
+   */
+  protected function generateWhereConditions(): array{
+    $conditions = [];
     
     if ($this->filtering !== null){
       foreach($this->filtering->getRules() as $field => $value){
         $condition = $this->getFilterWhereCondition($field, $value);
         
         if ($condition !== null){
-          $conditions[] = $condition->getSql();
-          $this->current_where_conditions[] = $condition;
+          $conditions[] = $condition;
         }
       }
     }
     
-    return implode(' AND ', $conditions);
+    return $conditions;
   }
   
-  protected function generateOrderByClause(): string{
+  private function generateOrderByClause(): string{
     $cols = [];
     $rules = $this->sorting === null || $this->sorting->isEmpty() ? $this->getDefaultOrderByColumns() : $this->sorting->getRules();
     
@@ -161,7 +158,7 @@ abstract class AbstractFilter{
     return empty($cols) ? '' : implode(', ', $cols);
   }
   
-  protected function generateLimitClause(): string{
+  private function generateLimitClause(): string{
     if ($this->pagination === null){
       return '';
     }

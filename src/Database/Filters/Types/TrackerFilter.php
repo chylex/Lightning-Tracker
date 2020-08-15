@@ -39,24 +39,36 @@ final class TrackerFilter extends AbstractFilter{
     return $this;
   }
   
-  protected function generateWhereClause(): string{
-    $clause = parent::generateWhereClause();
+  protected function generateWhereConditions(): array{
+    $conditions = parent::generateWhereConditions();
     
     if ($this->visible_to_set){
-      if (!empty($clause)){
-        $clause .= ' AND ';
-      }
-      
-      $clause .= ' (hidden = FALSE';
-      
-      if ($this->visible_to !== null){
-        $clause .= self::getUserVisibilityClause();
-      }
-      
-      $clause .= ')';
+      $conditions[] = new class($this->visible_to) implements IWhereCondition{
+        private ?UserProfile $visible_to;
+        
+        public function __construct(?UserProfile $visible_to){
+          $this->visible_to = $visible_to;
+        }
+        
+        public function getSql(): string{
+          $clause = '(hidden = FALSE';
+          
+          if ($this->visible_to !== null){
+            $clause .= TrackerFilter::getUserVisibilityClause();
+          }
+          
+          return $clause.')';
+        }
+        
+        public function prepareStatement(PDOStatement $stmt): void{
+          if ($this->visible_to !== null){
+            TrackerFilter::bindUserVisibility($stmt, $this->visible_to);
+          }
+        }
+      };
     }
     
-    return $clause;
+    return $conditions;
   }
   
   protected function getFilteringColumns(): array{
@@ -87,14 +99,6 @@ final class TrackerFilter extends AbstractFilter{
     return [
         'name' => Sorting::SQL_ASC
     ];
-  }
-  
-  public function prepareStatement(PDOStatement $stmt): void{
-    parent::prepareStatement($stmt);
-    
-    if ($this->visible_to !== null){
-      self::bindUserVisibility($stmt, $this->visible_to);
-    }
   }
 }
 

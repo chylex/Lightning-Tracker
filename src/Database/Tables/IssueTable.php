@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Tables;
 
 use Database\AbstractTrackerTable;
+use Database\Filters\AbstractFilter;
 use Database\Filters\Types\IssueFilter;
 use Database\Objects\IssueDetail;
 use Database\Objects\IssueInfo;
@@ -146,8 +147,7 @@ SQL
   public function countIssues(?IssueFilter $filter = null): ?int{
     $filter = $this->prepareFilter($filter ?? IssueFilter::empty());
     
-    $stmt = $this->db->prepare('SELECT COUNT(*) FROM issues '.$filter->generateClauses(true));
-    $filter->prepareStatement($stmt);
+    $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues', AbstractFilter::STMT_COUNT);
     $stmt->execute();
     
     $count = $this->fetchOneColumn($stmt);
@@ -161,8 +161,7 @@ SQL
   public function listIssues(?IssueFilter $filter = null): array{
     $filter = $this->prepareFilter($filter ?? IssueFilter::empty());
     
-    $stmt = $this->db->prepare('SELECT issue_id AS id, title, type, priority, scale, status, progress, date_created, date_updated FROM issues '.$filter->generateClauses());
-    $filter->prepareStatement($stmt);
+    $stmt = $filter->prepare($this->db, 'SELECT issue_id AS id, title, type, priority, scale, status, progress, date_created, date_updated FROM issues');
     $stmt->execute();
     
     $results = [];
