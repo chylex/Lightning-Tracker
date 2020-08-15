@@ -3,6 +3,9 @@ declare(strict_types = 1);
 
 namespace Configuration;
 
+use Database\DB;
+use Exception;
+use Logging\Log;
 use Validation\ValidationException;
 use Validation\Validator;
 
@@ -14,6 +17,8 @@ final class SystemConfig{
   public static function fromForm(array $data): SystemConfig{
     return new SystemConfig(boolval($data['SysEnableRegistration'] ?? false),
                             rtrim($data['BaseUrl'], '/'),
+                            'mysql',
+                            false,
                             $data['DbName'],
                             $data['DbHost'],
                             $data['DbUser'],
@@ -21,23 +26,50 @@ final class SystemConfig{
   }
   
   public static function fromCurrentInstallation(): SystemConfig{
-    return new SystemConfig(SYS_ENABLE_REGISTRATION, BASE_URL, DB_NAME, DB_HOST, DB_USER, DB_PASSWORD);
+    return new SystemConfig(SYS_ENABLE_REGISTRATION, BASE_URL, DB_DRIVER, DB_SUPPORTS_UTF8MB4_0900_AI_CI, DB_NAME, DB_HOST, DB_USER, DB_PASSWORD);
   }
   
   private bool $sys_enable_registration;
   private string $base_url;
+  private string $db_driver;
+  private bool $db_supports_utf8mb4_0900_ai_ci;
   private string $db_name;
   private string $db_host;
   private string $db_user;
   private string $db_password;
   
-  private function __construct(bool $sys_enable_registration, string $base_url, string $db_name, string $db_host, string $db_user, string $db_password){
+  private function __construct(bool $sys_enable_registration,
+                               string $base_url,
+                               string $db_driver,
+                               bool $db_supports_utf8mb4_0900_ai_ci,
+                               string $db_name,
+                               string $db_host,
+                               string $db_user,
+                               string $db_password){
     $this->sys_enable_registration = $sys_enable_registration;
     $this->base_url = $base_url;
+    $this->db_driver = $db_driver;
+    $this->db_supports_utf8mb4_0900_ai_ci = $db_supports_utf8mb4_0900_ai_ci;
     $this->db_name = $db_name;
     $this->db_host = $db_host;
     $this->db_user = $db_user;
     $this->db_password = $db_password;
+  }
+  
+  public function updateDatabaseFeatureSupport(): bool{
+    try{
+      $db = DB::from($this->db_driver, $this->db_name, $this->db_host, $this->db_user, $this->db_password);
+      
+      $stmt = $db->query('SHOW COLLATION WHERE Collation = \'utf8mb4_0900_ai_ci\'');
+      $stmt->execute();
+      $this->db_supports_utf8mb4_0900_ai_ci = $stmt->fetchColumn() !== false;
+      $stmt->closeCursor();
+      
+      return true;
+    }catch(Exception $e){
+      Log::critical($e);
+      return false;
+    }
   }
   
   /**
@@ -61,6 +93,8 @@ final class SystemConfig{
     $migration_version = TRACKER_MIGRATION_VERSION;
     $sys_enable_registration = $this->sys_enable_registration ? 'true' : 'false';
     $base_url = addcslashes($this->base_url, '\'\\');
+    $db_driver = addcslashes($this->db_driver, '\'\\');
+    $db_supports_utf8mb4_0900_ai_ci = $this->db_supports_utf8mb4_0900_ai_ci ? 'true' : 'false';
     $db_name = addcslashes($this->db_name, '\'\\');
     $db_host = addcslashes($this->db_host, '\'\\');
     $db_user = addcslashes($this->db_user, '\'\\');
@@ -76,7 +110,9 @@ define('INSTALLED_MIGRATION_VERSION', $migration_version);
 define('SYS_ENABLE_REGISTRATION', $sys_enable_registration);
 define('BASE_URL', '$base_url');
 
-define('DB_DRIVER', 'mysql');
+define('DB_DRIVER', '$db_driver');
+define('DB_SUPPORTS_UTF8MB4_0900_AI_CI', $db_supports_utf8mb4_0900_ai_ci);
+
 define('DB_NAME', '$db_name');
 define('DB_HOST', '$db_host');
 define('DB_USER', '$db_user');

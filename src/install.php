@@ -140,6 +140,12 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     }
   }
   
+  // Database Feature Check
+  
+  if (!$config->updateDatabaseFeatureSupport()){
+    $errors[] = 'Could not detect database features.';
+  }
+  
   // Previous Installation / Table Conflict Detection
   
   $any_table_existed = false;

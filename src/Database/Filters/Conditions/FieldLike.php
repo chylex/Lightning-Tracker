@@ -20,7 +20,8 @@ final class FieldLike implements IWhereCondition{
   }
   
   public function getSql(): string{
-    return AbstractFilter::field($this->table_name, $this->field)." LIKE CONCAT('%', :$this->field, '%')"; // TODO use utf8mb4_0900_ai_ci if available
+    $collate = DB_SUPPORTS_UTF8MB4_0900_AI_CI ? ' COLLATE utf8mb4_0900_ai_ci' : '';
+    return AbstractFilter::field($this->table_name, $this->field)."$collate LIKE CONCAT('%', :$this->field, '%')";
   }
   
   public function prepareStatement(PDOStatement $stmt): void{

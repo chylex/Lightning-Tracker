@@ -13,7 +13,13 @@ try{
     // add migration
   }
   
-  if (!file_put_contents(CONFIG_FILE, SystemConfig::fromCurrentInstallation()->generate(), LOCK_EX)){
+  $config = SystemConfig::fromCurrentInstallation();
+  
+  if (!$config->updateDatabaseFeatureSupport()){
+    die('Lightning Tracker tried updating to a new version and failed detecting database features.');
+  }
+  
+  if (!file_put_contents(CONFIG_FILE, $config->generate(), LOCK_EX)){
     die('Lightning Tracker tried updating to a new version and failed updating the configuration file.');
   }
 }catch(Exception $e){

@@ -91,6 +91,11 @@ HTML;
   public function updateConfig(array $data): bool{
     $config = SystemConfig::fromForm($data);
     
+    if (!$config->updateDatabaseFeatureSupport()){
+      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Error updating detected database features.'));
+      return false;
+    }
+    
     try{
       $config->validate();
     }catch(ValidationException $e){
