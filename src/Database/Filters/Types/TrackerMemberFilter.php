@@ -53,6 +53,7 @@ final class TrackerMemberFilter extends AbstractTrackerIdFilter{
   
   protected function getDefaultOrderByColumns(): array{
     return [
+        'tr.special' => Sorting::SQL_DESC,
         'role_order' => Sorting::SQL_ASC,
         'user_id'    => Sorting::SQL_DESC
     ];

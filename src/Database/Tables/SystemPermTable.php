@@ -25,12 +25,14 @@ final class SystemPermTable extends AbstractTable{
     return $this->db;
   }
   
-  public function addRole(string $title, array $perms): void{
+  public function addRole(string $title, array $perms, bool $special = false): void{
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare('INSERT INTO system_roles (title) VALUES (?)');
-      $stmt->execute([$title]);
+      $stmt = $this->db->prepare('INSERT INTO system_roles (title, special) VALUES (?, ?)');
+      $stmt->bindValue(1, $title);
+      $stmt->bindValue(2, $special, PDO::PARAM_BOOL);
+      $stmt->execute();
       
       $this->addPermissions('INSERT INTO system_role_perms (role_id, permission) VALUES ()', $perms);
       
@@ -45,7 +47,7 @@ final class SystemPermTable extends AbstractTable{
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->db->prepare('SELECT id, title FROM system_roles ORDER BY id ASC');
+    $stmt = $this->db->prepare('SELECT id, title, special FROM system_roles ORDER BY special DESC, id ASC');
     $stmt->execute();
     return $this->fetchRoles($stmt);
   }
@@ -70,7 +72,7 @@ final class SystemPermTable extends AbstractTable{
   }
   
   public function deleteById(int $id): void{
-    $stmt = $this->db->prepare('DELETE FROM system_roles WHERE id = ?');
+    $stmt = $this->db->prepare('DELETE FROM system_roles WHERE id = ? AND special = FALSE');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->execute();
   }

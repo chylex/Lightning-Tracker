@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 
 use Configuration\SystemConfig;
+use Database\DB;
 use Logging\Log;
 
 try{
@@ -10,7 +11,9 @@ try{
   }
   
   if (INSTALLED_MIGRATION_VERSION === 1){
-    // add migration
+    $db = DB::get();
+    $db->query('ALTER TABLE system_roles ADD special BOOL DEFAULT FALSE NOT NULL');
+    $db->query('ALTER TABLE tracker_roles ADD special BOOL DEFAULT FALSE NOT NULL');
   }
   
   if (!file_put_contents(CONFIG_FILE, SystemConfig::fromCurrentInstallation()->generate(), LOCK_EX)){

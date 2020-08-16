@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS `tracker_roles` (
 	`id`         INT NOT NULL AUTO_INCREMENT,
 	`tracker_id` INT NOT NULL,
 	`title`      VARCHAR(32) NOT NULL,
+	`special`    BOOL NOT NULL DEFAULT FALSE,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY (`tracker_id`, `title`),
 	KEY (`id`, `tracker_id`),

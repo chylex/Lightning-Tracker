@@ -8,6 +8,7 @@ use Database\Objects\RoleInfo;
 use Database\Objects\TrackerInfo;
 use Database\Objects\UserProfile;
 use Database\Tables\Traits\PermTable;
+use Exception;
 use PDO;
 use PDOException;
 
@@ -24,7 +25,7 @@ final class TrackerPermTable extends AbstractTrackerTable{
     return $this->db;
   }
   
-  public function addRole(string $title, array $perms): void{
+  public function addRole(string $title, array $perms, bool $special = false): void{
     $owned_transaction = !$this->db->inTransaction();
     
     if ($owned_transaction){
@@ -32,9 +33,10 @@ final class TrackerPermTable extends AbstractTrackerTable{
     }
     
     try{
-      $stmt = $this->db->prepare('INSERT INTO tracker_roles (tracker_id, title) VALUES (?, ?)');
+      $stmt = $this->db->prepare('INSERT INTO tracker_roles (tracker_id, title, special) VALUES (?, ?, ?)');
       $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
       $stmt->bindValue(2, $title);
+      $stmt->bindValue(3, $special, PDO::PARAM_BOOL);
       $stmt->execute();
       
       $this->addPermissions('INSERT INTO tracker_role_perms (role_id, permission) VALUES ()', $perms);
@@ -55,7 +57,7 @@ final class TrackerPermTable extends AbstractTrackerTable{
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->db->prepare('SELECT id, title FROM tracker_roles WHERE tracker_id = ? ORDER BY id ASC');
+    $stmt = $this->db->prepare('SELECT id, title, special FROM tracker_roles WHERE tracker_id = ? ORDER BY special DESC, id ASC');
     $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     return $this->fetchRoles($stmt);
@@ -85,7 +87,7 @@ SQL
   }
   
   public function deleteById(int $id): void{
-    $stmt = $this->db->prepare('DELETE FROM tracker_roles WHERE id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('DELETE FROM tracker_roles WHERE id = ? AND tracker_id = ? AND special = FALSE');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
