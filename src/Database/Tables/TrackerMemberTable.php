@@ -31,18 +31,14 @@ final class TrackerMemberTable extends AbstractTrackerTable{
   }
   
   public function countMembers(?TrackerMemberFilter $filter = null): ?int{
-    if ($filter === null || $filter->isEmpty()){
-      $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty());
-      
-      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) + 1 FROM tracker_members', AbstractFilter::STMT_COUNT); // +1 for owner
-      $stmt->execute();
-      
-      $count = $this->fetchOneColumn($stmt);
-      return $count === false ? null : (int)$count;
-    }
-    else{
-      return count($this->listMembers($filter)); // TODO fix this mess by introducing a proper un-assignable un-deletable role for the owner
-    }
+    $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'tm');
+    $filter->setRoleTitleColumn('tr', 'title');
+    
+    $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM tracker_members tm LEFT JOIN tracker_roles tr ON tm.role_id = tr.id', AbstractFilter::STMT_COUNT);
+    $stmt->execute();
+    
+    $count = $this->fetchOneColumn($stmt);
+    return $count === false ? null : (int)$count;
   }
   
   /**
@@ -50,35 +46,21 @@ final class TrackerMemberTable extends AbstractTrackerTable{
    * @return TrackerMember[]
    */
   public function listMembers(?TrackerMemberFilter $filter = null): array{
-    $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'sub');
-    $filter->setRoleTitleColumn(null, 'role_title');
+    $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'tm');
+    $filter->setRoleTitleColumn('tr', 'title');
     
     $sql = <<<SQL
-SELECT user_id, u.name AS name, role_title, role_order
-FROM (
-  SELECT tm.user_id                 AS user_id,
-         tr.title                   AS role_title,
-         IFNULL(tm.role_id + 1, ~0) AS role_order,
-         tm.tracker_id              AS tracker_id
-  FROM tracker_members tm
-  LEFT JOIN tracker_roles tr ON tm.role_id = tr.id
-  WHERE tm.tracker_id = :tracker_id_1
-
-  UNION
-
-  SELECT t.owner_id AS user_id,
-         'Owner'    AS role_title,
-         0          AS role_order,
-         t.id       AS tracker_id
-  FROM trackers t
-  WHERE t.id = :tracker_id_2
-) sub
-JOIN users u ON sub.user_id = u.id
+SELECT tm.user_id             AS user_id,
+       u.name                 AS name,
+       tr.title               AS role_title,
+       IFNULL(tm.role_id, ~0) AS role_order,
+       tm.tracker_id          AS tracker_id
+FROM tracker_members tm
+LEFT JOIN tracker_roles tr ON tm.role_id = tr.id
+JOIN      users u ON tm.user_id = u.id
 SQL;
     
     $stmt = $filter->prepare($this->db, $sql);
-    $stmt->bindValue('tracker_id_1', $this->getTrackerId(), PDO::PARAM_INT);
-    $stmt->bindValue('tracker_id_2', $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     
     $results = [];

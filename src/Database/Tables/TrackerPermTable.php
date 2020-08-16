@@ -25,7 +25,14 @@ final class TrackerPermTable extends AbstractTrackerTable{
     return $this->db;
   }
   
-  public function addRole(string $title, array $perms, bool $special = false): void{
+  /**
+   * @param string $title
+   * @param array $perms
+   * @param bool $special
+   * @return int
+   * @throws Exception
+   */
+  public function addRole(string $title, array $perms, bool $special = false): int{
     $owned_transaction = !$this->db->inTransaction();
     
     if ($owned_transaction){
@@ -39,11 +46,23 @@ final class TrackerPermTable extends AbstractTrackerTable{
       $stmt->bindValue(3, $special, PDO::PARAM_BOOL);
       $stmt->execute();
       
+      $id = $this->getLastInsertId();
+      
+      if ($id === null){
+        if ($owned_transaction){
+          $this->db->rollBack();
+        }
+        
+        throw new Exception('Could not retrieve role ID.');
+      }
+      
       $this->addPermissions('INSERT INTO tracker_role_perms (role_id, permission) VALUES ()', $perms);
       
       if ($owned_transaction){
         $this->db->commit();
       }
+      
+      return $id;
     }catch(PDOException $e){
       if ($owned_transaction){
         $this->db->rollBack();

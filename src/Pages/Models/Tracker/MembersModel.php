@@ -123,7 +123,6 @@ class MembersModel extends BasicTrackerPageModel{
     
     $filtering_role = $header->addMultiSelect('role')->label('Role');
     $filtering_role->addOption('', '<span class="missing">(Default)</span>');
-    $filtering_role->addOption('Owner', 'Owner');
     
     foreach((new TrackerPermTable(DB::get(), $tracker))->listRoles() as $role){
       $title = $role->getTitleSafe();

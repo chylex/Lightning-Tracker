@@ -50,6 +50,7 @@ final class TrackerTable extends AbstractTable{
       
       $tracker = new TrackerInfo($id, $name, $url, $owner->getId());
       $perms = new TrackerPermTable($this->db, $tracker);
+      $members = new TrackerMemberTable($this->db, $tracker);
       
       $perms_reporter = [
           IssuesModel::PERM_CREATE
@@ -68,9 +69,12 @@ final class TrackerTable extends AbstractTable{
           SettingsModel::PERM
       ]);
       
+      $owner_role_id = $perms->addRole('Owner', [], true);
       $perms->addRole('Administrator', $perms_admin);
       $perms->addRole('Moderator', $perms_moderator);
       $perms->addRole('Reporter', $perms_reporter);
+      
+      $members->setRole($owner->getId(), $owner_role_id);
       
       $this->db->commit();
     }catch(PDOException $e){
