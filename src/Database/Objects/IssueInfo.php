@@ -45,6 +45,10 @@ class IssueInfo{
     return $this->id;
   }
   
+  public function getTitle(): string{
+    return $this->title;
+  }
+  
   public final function getTitleSafe(): string{
     return protect($this->title);
   }

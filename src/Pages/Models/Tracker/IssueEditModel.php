@@ -162,8 +162,8 @@ HTML
         $milestone = $issue->getMilestoneId();
         $assignee = $issue->getAssignee();
         
-        $this->form->fill(['Title'       => $issue->getTitleSafe(),
-                           'Description' => $issue->getDescription()->getRawTextSafe(),
+        $this->form->fill(['Title'       => $issue->getTitle(),
+                           'Description' => $issue->getDescription()->getRawText(),
                            'Type'        => $issue->getType()->getId(),
                            'Priority'    => $issue->getPriority()->getId(),
                            'Scale'       => $issue->getScale()->getId(),

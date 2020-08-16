@@ -40,7 +40,7 @@ class SettingsModel extends BasicTrackerPageModel{
       $tracker = $this->getTracker();
       $trackers = new TrackerTable(DB::get());
       
-      $this->form->fill(['Name'   => $tracker->getNameSafe(),
+      $this->form->fill(['Name'   => $tracker->getName(),
                          'Hidden' => $trackers->isHidden($tracker->getId())]);
     }
     

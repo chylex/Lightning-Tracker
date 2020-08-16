@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Components\Markdown;
 
 use Pages\IViewable;
-use function Database\protect;
 
 final class MarkdownComponent implements IViewable{
   private string $text;
@@ -21,10 +20,6 @@ final class MarkdownComponent implements IViewable{
   
   public function getRawText(): string{
     return $this->text;
-  }
-  
-  public function getRawTextSafe(): string{
-    return protect($this->text);
   }
   
   public function parse(): MarkdownParseResult{
