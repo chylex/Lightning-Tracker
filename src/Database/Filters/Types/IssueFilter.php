@@ -6,6 +6,7 @@ namespace Database\Filters\Types;
 use Database\Filters\AbstractTrackerIdFilter;
 use Database\Filters\Conditions\FieldLike;
 use Database\Filters\Conditions\FieldOneOf;
+use Database\Filters\Conditions\FieldOneOfNullable;
 use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
@@ -40,11 +41,11 @@ final class IssueFilter extends AbstractTrackerIdFilter{
         return new FieldOneOf($field, $value);
       
       case 'milestone':
-        return new FieldOneOf($field.'_id', $value, 'm');
+        return new FieldOneOfNullable($field.'_id', $value, 'm');
       
       case 'author':
       case 'assignee':
-        return new FieldOneOf($field.'_id', $value);
+        return new FieldOneOfNullable($field.'_id', $value);
       
       default:
         return null;

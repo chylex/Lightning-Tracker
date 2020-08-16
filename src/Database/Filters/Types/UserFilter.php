@@ -5,7 +5,7 @@ namespace Database\Filters\Types;
 
 use Database\Filters\AbstractFilter;
 use Database\Filters\Conditions\FieldLike;
-use Database\Filters\Conditions\FieldOneOf;
+use Database\Filters\Conditions\FieldOneOfNullable;
 use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
@@ -36,7 +36,7 @@ final class UserFilter extends AbstractFilter{
         return new FieldLike($field, $value);
       
       case 'role':
-        return new FieldOneOf('title', array_map(fn($v): ?string => empty($v) ? null : $v, $value), 'sr');
+        return new FieldOneOfNullable('title', $value, 'sr');
       
       default:
         return null;

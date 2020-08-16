@@ -5,7 +5,7 @@ namespace Database\Filters\Types;
 
 use Database\Filters\AbstractTrackerIdFilter;
 use Database\Filters\Conditions\FieldLike;
-use Database\Filters\Conditions\FieldOneOf;
+use Database\Filters\Conditions\FieldOneOfNullable;
 use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
@@ -37,7 +37,7 @@ final class TrackerMemberFilter extends AbstractTrackerIdFilter{
         return new FieldLike($field, $value, 'u');
       
       case 'role':
-        return new FieldOneOf($this->role_title_field_name, array_map(fn($v): ?string => empty($v) ? null : $v, $value), $this->role_title_table_name);
+        return new FieldOneOfNullable($this->role_title_field_name, $value, $this->role_title_table_name);
       
       default:
         return null;
