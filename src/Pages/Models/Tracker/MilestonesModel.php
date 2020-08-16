@@ -14,7 +14,6 @@ use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Table\TableComponent;
-use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
@@ -48,7 +47,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     
     $this->table->addColumn('Title')->sort('title')->width(65)->bold();
     $this->table->addColumn('Active')->tight()->center();
-    $this->table->addColumn('Issues')->tight();
+    $this->table->addColumn('Issues')->tight()->center();
     $this->table->addColumn('Progress')->sort('progress')->width(35);
     $this->table->addColumn('Last Updated')->sort('date_updated')->tight()->right();
     
@@ -95,7 +94,7 @@ class MilestonesModel extends BasicTrackerPageModel{
               $form_toggle_active,
               $milestone->getClosedIssues().' / '.$milestone->getTotalIssues(),
               new ProgressBarComponent($milestone->getPercentageDone()),
-              $update_date === null ? Text::plain('<div class="center-text">-</div>') : new DateTimeComponent($update_date, true)];
+              $update_date === null ? '<div class="center-text">-</div>' : new DateTimeComponent($update_date, true)];
       
       if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
         $form_move = new FormComponent(self::ACTION_MOVE);
@@ -114,7 +113,11 @@ class MilestonesModel extends BasicTrackerPageModel{
         $row[] = '';
       }
       
-      $this->table->addRow($row);
+      $row = $this->table->addRow($row);
+      
+      if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
+        $row->link($this->getReq()->getBasePath()->encoded().'/milestones/'.$milestone_id_str);
+      }
     }
     
     $this->table->setupColumnSorting($sorting);

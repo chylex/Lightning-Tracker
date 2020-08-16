@@ -173,6 +173,24 @@ SQL;
     return $results;
   }
   
+  public function setMilestoneTitle(int $id, string $title): void{
+    $stmt = $this->db->prepare('UPDATE milestones SET title = ? WHERE milestone_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $title);
+    $stmt->bindValue(2, $id, PDO::PARAM_INT);
+    $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+  }
+  
+  public function getMilestoneTitle(int $id): ?string{
+    $stmt = $this->db->prepare('SELECT title FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $title = $this->fetchOneColumn($stmt);
+    return $title === false ? null : $title;
+  }
+  
   public function findGlobalId(int $id): ?int{
     $stmt = $this->db->prepare('SELECT gid FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
