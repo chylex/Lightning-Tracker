@@ -5,6 +5,12 @@ use Configuration\SystemConfig;
 use Database\DB;
 use Logging\Log;
 
+function begin_transaction(PDO $db): void{
+  if (!$db->inTransaction()){
+    $db->beginTransaction();
+  }
+}
+
 try{
   if (!copy(CONFIG_FILE, CONFIG_BACKUP_FILE)){
     die('Lightning Tracker tried updating to a new version and failed creating a backup configuration file.');
@@ -19,7 +25,15 @@ try{
   if (!file_put_contents(CONFIG_FILE, SystemConfig::fromCurrentInstallation()->generate(), LOCK_EX)){
     die('Lightning Tracker tried updating to a new version and failed updating the configuration file.');
   }
+  
+  if (isset($db) && $db->inTransaction()){
+    $db->commit();
+  }
 }catch(Exception $e){
+  if (isset($db) && $db->inTransaction()){
+    $db->rollBack();
+  }
+  
   Log::critical($e);
   die('Lightning Tracker tried updating to a new version and encountered an unexpected error. Please check the server logs.');
 }
