@@ -6,21 +6,24 @@ namespace Pages\Controllers\Handlers;
 use Database\Objects\TrackerInfo;
 use Pages\Controllers\IControlHandler;
 use Pages\IAction;
-use Pages\Models\BasicTrackerPageModel;
+use Pages\Models\BasicMixedPageModel;
 use Pages\Models\ErrorModel;
 use Pages\Views\ErrorPage;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\view;
 
-class LoadIssueId implements IControlHandler{
-  private TrackerInfo $tracker;
-  private ?int $issue_id_ref;
+class LoadNumericId implements IControlHandler{
+  private ?int $id_ref;
+  private string $title;
+  
+  private ?TrackerInfo $tracker;
   private bool $optional = false;
   
-  public function __construct(TrackerInfo $tracker, ?int &$issue_id_ref){
+  public function __construct(?int &$id_ref, string $title, ?TrackerInfo $tracker = null){
+    $this->id_ref = &$id_ref;
+    $this->title = $title;
     $this->tracker = $tracker;
-    $this->issue_id_ref = &$issue_id_ref;
   }
   
   public function allowMissing(): self{
@@ -32,18 +35,18 @@ class LoadIssueId implements IControlHandler{
     $issue_id = $req->getParam('id');
     
     if ($issue_id === null && $this->optional){
-      $this->issue_id_ref = null;
+      $this->id_ref = null;
       return null;
     }
     
     if ($issue_id === null || !is_numeric($issue_id)){
-      $page_model = new BasicTrackerPageModel($req, $this->tracker);
-      $error_model = new ErrorModel($page_model, 'Issue Error', 'Invalid issue ID.');
+      $page_model = new BasicMixedPageModel($req, $this->tracker);
+      $error_model = new ErrorModel($page_model, 'Load Error', 'Invalid '.$this->title.' ID.');
       
       return view(new ErrorPage($error_model->load()));
     }
     
-    $this->issue_id_ref = (int)$issue_id;
+    $this->id_ref = (int)$issue_id;
     return null;
   }
 }

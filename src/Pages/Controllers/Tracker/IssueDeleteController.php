@@ -6,7 +6,7 @@ namespace Pages\Controllers\Tracker;
 use Database\Objects\TrackerInfo;
 use Generator;
 use Pages\Controllers\AbstractTrackerController;
-use Pages\Controllers\Handlers\LoadIssueId;
+use Pages\Controllers\Handlers\LoadNumericId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
@@ -24,7 +24,7 @@ class IssueDeleteController extends AbstractTrackerController{
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireLoginState(true);
     yield new RequireTrackerPermission($tracker, IssuesModel::PERM_DELETE_ALL);
-    yield new LoadIssueId($tracker, $this->issue_id);
+    yield new LoadNumericId($this->issue_id, 'issue', $tracker);
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
