@@ -13,6 +13,14 @@ abstract class AbstractTable{
     $this->db = $db;
   }
   
+  protected final function getLastInsertId(): ?int{
+    $stmt = $this->db->query('SELECT LAST_INSERT_ID()');
+    $stmt->execute();
+    
+    $id = $this->fetchOneColumn($stmt);
+    return $id === false ? null : $id;
+  }
+  
   /**
    * Fetches the next result.
    *

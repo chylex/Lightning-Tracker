@@ -41,10 +41,7 @@ final class TrackerTable extends AbstractTable{
       $stmt->bindValue('owner_id', $owner->getId(), PDO::PARAM_INT);
       $stmt->execute();
       
-      $stmt = $this->db->query('SELECT LAST_INSERT_ID()');
-      $stmt->execute();
-      
-      $id = $this->fetchOneColumn($stmt);
+      $id = $this->getLastInsertId();
       
       if ($id === false){
         $this->db->rollBack();
