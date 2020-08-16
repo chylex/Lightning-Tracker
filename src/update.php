@@ -21,6 +21,13 @@ try{
     $db->query('ALTER TABLE system_roles ADD special BOOL DEFAULT FALSE NOT NULL');
     $db->query('ALTER TABLE tracker_roles ADD special BOOL DEFAULT FALSE NOT NULL');
     
+    /** @noinspection SqlResolve */
+    $db->query('ALTER TABLE milestones CHANGE id gid INT NOT NULL AUTO_INCREMENT');
+    $db->query('ALTER TABLE milestones ADD milestone_id INT NOT NULL DEFAULT 0 AFTER gid');
+    
+    /** @noinspection SqlResolve */
+    $db->query('ALTER TABLE issues CHANGE milestone_id milestone_gid INT NULL');
+    
     begin_transaction($db);
     
     $db->query(<<<SQL
@@ -30,7 +37,7 @@ FROM tracker_roles
 GROUP BY tracker_id
 SQL
     );
-  
+    
     $db->query(<<<SQL
 INSERT INTO tracker_members (tracker_id, user_id, role_id)
 SELECT t.id AS tracker_id, t.owner_id AS user_id, tr.id AS role_id
@@ -38,6 +45,12 @@ FROM trackers t
 JOIN tracker_roles tr ON t.id = tr.tracker_id AND tr.title = 'Owner' AND tr.special = TRUE
 SQL
     );
+    
+    /** @noinspection SqlWithoutWhere */
+    $db->query('UPDATE milestones SET milestone_id = ordering');
+    $db->query('ALTER TABLE milestones MODIFY milestone_id INT NOT NULL AFTER gid');
+    $db->query('ALTER TABLE milestones DROP PRIMARY KEY');
+    $db->query('ALTER TABLE milestones ADD PRIMARY KEY (tracker_id, milestone_id)');
   }
   
   if (!file_put_contents(CONFIG_FILE, SystemConfig::fromCurrentInstallation()->generate(), LOCK_EX)){

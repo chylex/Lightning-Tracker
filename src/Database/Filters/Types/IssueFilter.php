@@ -40,6 +40,8 @@ final class IssueFilter extends AbstractTrackerIdFilter{
         return new FieldOneOf($field, $value);
       
       case 'milestone':
+        return new FieldOneOf($field.'_id', $value, 'm');
+      
       case 'author':
       case 'assignee':
         return new FieldOneOf($field.'_id', $value);

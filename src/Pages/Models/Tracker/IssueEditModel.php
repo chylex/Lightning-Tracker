@@ -116,7 +116,7 @@ HTML
     $select_assignee = $this->form->addSelect('Assignee')->addOption('', '(None)')->dropdown();
     
     foreach((new MilestoneTable(DB::get(), $tracker))->listMilestones() as $milestone){
-      $select_milestone->addOption(strval($milestone->getId()), $milestone->getTitleSafe());
+      $select_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitleSafe());
     }
     
     if ($perms->checkTracker($tracker, MembersModel::PERM_LIST)){
@@ -236,8 +236,21 @@ HTML
         return null;
       }
       
+      if ($milestone === null){
+        $milestone_gid = null;
+      }
+      else{
+        $milestones = new MilestoneTable(DB::get(), $tracker);
+        $milestone_gid = $milestones->findGlobalId($milestone);
+        
+        if ($milestone_gid === null){
+          $this->form->invalidateField('Milestone', 'Invalid milestone.');
+          return null;
+        }
+      }
+      
       if ($this->issue_id === null){
-        $id = $issues->addIssue($new_issue_author, $title, $description, $type, $priority, $scale, $status, $progress, $milestone, $assignee);
+        $id = $issues->addIssue($new_issue_author, $title, $description, $type, $priority, $scale, $status, $progress, $milestone_gid, $assignee);
       }
       else{
         if ($progress === $this->issue->getProgress()){
@@ -268,7 +281,7 @@ HTML
           $assignee = $prev_assignee === null ? null : $prev_assignee->getId();
         }
         
-        $issues->editIssue($this->issue_id, $title, $description, $type, $priority, $scale, $status, $progress, $milestone, $assignee);
+        $issues->editIssue($this->issue_id, $title, $description, $type, $priority, $scale, $status, $progress, $milestone_gid, $assignee);
         $id = $this->issue_id;
       }
       

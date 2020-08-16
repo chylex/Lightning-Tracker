@@ -6,7 +6,7 @@ namespace Database\Objects;
 use function Database\protect;
 
 final class MilestoneInfo{
-  private int $id;
+  private int $milestone_id;
   private string $title;
   
   private int $closed_issues;
@@ -14,8 +14,8 @@ final class MilestoneInfo{
   private ?int $percentage_done;
   private ?string $date_updated;
   
-  public function __construct(int $id, string $title, int $closed_issues, int $total_issues, ?int $percentage_done, ?string $date_updated){
-    $this->id = $id;
+  public function __construct(int $milestone_id, string $title, int $closed_issues, int $total_issues, ?int $percentage_done, ?string $date_updated){
+    $this->milestone_id = $milestone_id;
     $this->title = $title;
     $this->closed_issues = $closed_issues;
     $this->total_issues = $total_issues;
@@ -23,8 +23,8 @@ final class MilestoneInfo{
     $this->date_updated = $date_updated;
   }
   
-  public function getId(): int{
-    return $this->id;
+  public function getMilestoneId(): int{
+    return $this->milestone_id;
   }
   
   public function getTitleSafe(): string{

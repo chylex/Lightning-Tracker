@@ -32,7 +32,7 @@ final class IssueTable extends AbstractTrackerTable{
                            IssueScale $scale,
                            IssueStatus $status,
                            int $progress,
-                           ?int $milestone_id,
+                           ?int $milestone_gid,
                            ?int $assignee_id
   ): int{
     $this->db->beginTransaction();
@@ -49,16 +49,16 @@ final class IssueTable extends AbstractTrackerTable{
       }
       
       $stmt = $this->db->prepare(<<<SQL
-  INSERT INTO issues (tracker_id, issue_id, author_id, assignee_id, milestone_id, title, description, type, priority, scale, status, progress, date_created, date_updated)
-  VALUES (:tracker_id, :issue_id, :author_id, :assignee_id, :milestone_id, :title, :description, :type, :priority, :scale, :status, :progress, NOW(), NOW())
-  SQL
+INSERT INTO issues (tracker_id, issue_id, author_id, assignee_id, milestone_gid, title, description, type, priority, scale, status, progress, date_created, date_updated)
+VALUES (:tracker_id, :issue_id, :author_id, :assignee_id, :milestone_gid, :title, :description, :type, :priority, :scale, :status, :progress, NOW(), NOW())
+SQL
       );
       
       $stmt->bindValue('tracker_id', $this->getTrackerId(), PDO::PARAM_INT);
       $stmt->bindValue('issue_id', $next_id, PDO::PARAM_INT);
       $stmt->bindValue('author_id', $author->getId(), PDO::PARAM_INT);
       $stmt->bindValue('assignee_id', $assignee_id, $assignee_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-      $stmt->bindValue('milestone_id', $milestone_id, $milestone_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+      $stmt->bindValue('milestone_gid', $milestone_gid, $milestone_gid === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
       $stmt->bindValue('title', $title);
       $stmt->bindValue('description', $description);
       $stmt->bindValue('type', $type->getId());
@@ -84,7 +84,7 @@ final class IssueTable extends AbstractTrackerTable{
                             IssueScale $scale,
                             IssueStatus $status,
                             int $progress,
-                            ?int $milestone_id,
+                            ?int $milestone_gid,
                             ?int $assignee_id
   ): void{
     $stmt = $this->db->prepare(<<<SQL
@@ -97,7 +97,7 @@ SET title = :title,
     status = :status,
     progress = :progress,
     assignee_id = :assignee_id,
-    milestone_id = :milestone_id,
+    milestone_gid = :milestone_gid,
     date_updated = NOW()
 WHERE issue_id = :issue_id AND tracker_id = :tracker_id
 SQL
@@ -106,7 +106,7 @@ SQL
     $stmt->bindValue('tracker_id', $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->bindValue('issue_id', $id, PDO::PARAM_INT);
     $stmt->bindValue('assignee_id', $assignee_id, $assignee_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-    $stmt->bindValue('milestone_id', $milestone_id, $milestone_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+    $stmt->bindValue('milestone_gid', $milestone_gid, $milestone_gid === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
     $stmt->bindValue('title', $title);
     $stmt->bindValue('description', $description);
     $stmt->bindValue('type', $type->getId());
@@ -145,9 +145,15 @@ SQL
   }
   
   public function countIssues(?IssueFilter $filter = null): ?int{
-    $filter = $this->prepareFilter($filter ?? IssueFilter::empty());
+    $filter = $this->prepareFilter($filter ?? IssueFilter::empty(), 'i');
     
-    $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues', AbstractFilter::STMT_COUNT);
+    if ($filter->isEmpty()){
+      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues i', AbstractFilter::STMT_COUNT);
+    }
+    else{
+      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues i LEFT JOIN milestones m ON i.milestone_gid = m.gid', AbstractFilter::STMT_COUNT);
+    }
+    
     $stmt->execute();
     
     $count = $this->fetchOneColumn($stmt);
@@ -159,9 +165,23 @@ SQL
    * @return IssueInfo[]
    */
   public function listIssues(?IssueFilter $filter = null): array{
-    $filter = $this->prepareFilter($filter ?? IssueFilter::empty());
+    $filter = $this->prepareFilter($filter ?? IssueFilter::empty(), 'i');
     
-    $stmt = $filter->prepare($this->db, 'SELECT issue_id AS id, title, type, priority, scale, status, progress, date_created, date_updated FROM issues');
+    $stmt = $filter->prepare($this->db, <<<SQL
+SELECT i.issue_id AS id,
+       i.title,
+       i.type,
+       i.priority,
+       i.scale,
+       i.status,
+       i.progress,
+       i.date_created,
+       i.date_updated
+FROM issues i
+LEFT JOIN milestones m ON i.milestone_gid = m.gid
+SQL
+    );
+    
     $stmt->execute();
     
     $results = [];
@@ -183,25 +203,25 @@ SQL
   
   public function getIssueDetail(int $id): ?IssueDetail{
     $stmt = $this->db->prepare(<<<SQL
-SELECT issues.title        AS title,
-       issues.description  AS description,
-       issues.type         AS type,
-       issues.priority     AS priority,
-       issues.scale        AS scale,
-       issues.status       AS status,
-       issues.progress     AS progress,
-       issues.date_created AS date_created,
-       issues.date_updated AS date_updated,
-       issues.author_id    AS author_id,
-       author.name         AS author_name,
-       issues.assignee_id  AS assignee_id,
-       assignee.name       AS assignee_name,
-       milestone.id        AS milestone_id,
-       milestone.title     AS milestone_title
+SELECT issues.title           AS title,
+       issues.description     AS description,
+       issues.type            AS type,
+       issues.priority        AS priority,
+       issues.scale           AS scale,
+       issues.status          AS status,
+       issues.progress        AS progress,
+       issues.date_created    AS date_created,
+       issues.date_updated    AS date_updated,
+       issues.author_id       AS author_id,
+       author.name            AS author_name,
+       issues.assignee_id     AS assignee_id,
+       assignee.name          AS assignee_name,
+       milestone.milestone_id AS milestone_id,
+       milestone.title        AS milestone_title
 FROM issues
 LEFT JOIN users author ON issues.author_id = author.id
 LEFT JOIN users assignee ON issues.assignee_id = assignee.id
-LEFT JOIN milestones milestone ON issues.milestone_id = milestone.id
+LEFT JOIN milestones milestone ON issues.milestone_gid = milestone.gid
 WHERE issues.issue_id = :issue_id AND issues.tracker_id = :tracker_id
 SQL
     );

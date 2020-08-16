@@ -109,7 +109,7 @@ class IssuesModel extends BasicTrackerPageModel{
     $filtering_milestone->addOption('', '<span class="missing">(No Milestone)</span>');
     
     foreach((new MilestoneTable(DB::get(), $tracker))->listMilestones() as $milestone){
-      $filtering_milestone->addOption(strval($milestone->getId()), $milestone->getTitleSafe());
+      $filtering_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitleSafe());
     }
     
     // TODO get rid of IDs and allow filtering by manually typing username (either add a field, or just in the URL & add the options if the user cannot see everyone)

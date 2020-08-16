@@ -21,21 +21,29 @@ final class MilestoneTable extends AbstractTrackerTable{
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare('SELECT IFNULL(MAX(ordering) + 1, 1) FROM milestones WHERE tracker_id = ?');
+      $stmt = $this->db->prepare(<<<SQL
+SELECT IFNULL(MAX(milestone_id) + 1, 1) AS id,
+       IFNULL(MAX(ordering) + 1, 1)     AS ordering
+FROM milestones
+WHERE tracker_id = ?
+SQL
+      );
+      
       $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
       $stmt->execute();
       
-      $order = $this->fetchOneColumn($stmt);
+      $next = $this->fetchOne($stmt);
       
-      if ($order === false){
+      if ($next === false){
         $this->db->rollBack();
-        throw new LogicException('Error calculating milestone order.');
+        throw new LogicException('Error calculating next milestone ID.');
       }
       
-      $stmt = $this->db->prepare('INSERT INTO milestones (tracker_id, ordering, title) VALUES (?, ?, ?)');
-      $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
-      $stmt->bindValue(2, $order, PDO::PARAM_INT);
-      $stmt->bindValue(3, $title);
+      $stmt = $this->db->prepare('INSERT INTO milestones (milestone_id, tracker_id, ordering, title) VALUES (?, ?, ?, ?)');
+      $stmt->bindValue(1, $next['id'], PDO::PARAM_INT);
+      $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt->bindValue(3, $next['ordering'], PDO::PARAM_INT);
+      $stmt->bindValue(4, $title);
       $stmt->execute();
       
       $this->db->commit();
@@ -98,7 +106,7 @@ final class MilestoneTable extends AbstractTrackerTable{
     $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     
-    $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE milestone_id = ? AND tracker_id = ?');
     $stmt->bindValue(1, $other_ordering, PDO::PARAM_INT);
     $stmt->bindValue(2, $id, PDO::PARAM_INT);
     $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
@@ -106,7 +114,7 @@ final class MilestoneTable extends AbstractTrackerTable{
   }
   
   private function getMilestoneOrdering(int $id): ?int{
-    $stmt = $this->db->prepare('SELECT ordering FROM milestones WHERE id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('SELECT ordering FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
@@ -133,17 +141,17 @@ final class MilestoneTable extends AbstractTrackerTable{
     $filter = $this->prepareFilter($filter ?? MilestoneFilter::empty(), 'm');
     
     $sql = <<<SQL
-SELECT m.id                                                             AS id,
+SELECT m.milestone_id                                                   AS milestone_id,
        m.title                                                          AS title,
        COUNT(CASE WHEN i.status IN ('finished', 'rejected') THEN 1 END) AS closed_issues,
        COUNT(i.issue_id)                                                AS total_issues,
        FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS progress,
        MAX(i.date_updated)                                              AS date_updated
 FROM milestones m
-LEFT JOIN issues i ON m.id = i.milestone_id
+LEFT JOIN issues i ON m.gid = i.milestone_gid
 LEFT JOIN issue_weights iw ON i.scale = iw.scale
 # WHERE
-GROUP BY m.id, m.title
+GROUP BY m.gid, m.title
 # ORDER
 # LIMIT
 SQL;
@@ -154,7 +162,7 @@ SQL;
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new MilestoneInfo($res['id'],
+      $results[] = new MilestoneInfo($res['milestone_id'],
                                      $res['title'],
                                      $res['closed_issues'],
                                      $res['total_issues'],
@@ -163,6 +171,16 @@ SQL;
     }
     
     return $results;
+  }
+  
+  public function findGlobalId(int $id): ?int{
+    $stmt = $this->db->prepare('SELECT gid FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $gid = $this->fetchOneColumn($stmt);
+    return $gid === false ? null : (int)$gid;
   }
   
   public function deleteById(int $id): void{
@@ -181,7 +199,7 @@ SQL;
       $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
       $stmt->execute();
       
-      $stmt = $this->db->prepare('DELETE FROM milestones WHERE id = ? AND tracker_id = ?');
+      $stmt = $this->db->prepare('DELETE FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
       $stmt->bindValue(1, $id, PDO::PARAM_INT);
       $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
       $stmt->execute();

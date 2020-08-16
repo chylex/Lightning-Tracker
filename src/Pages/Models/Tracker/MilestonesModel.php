@@ -83,7 +83,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
     
     foreach($milestones->listMilestones($filter) as $milestone){
-      $milestone_id = $milestone->getId();
+      $milestone_id = $milestone->getMilestoneId();
       $milestone_id_str = strval($milestone_id);
       $update_date = $milestone->getLastUpdateDate();
       
@@ -193,8 +193,18 @@ class MilestonesModel extends BasicTrackerPageModel{
       return false;
     }
     
-    $settings = new TrackerUserSettingsTable(DB::get(), $this->getTracker());
-    $settings->toggleActiveMilestone($logon_user, (int)$data['Milestone']);
+    $db = DB::get();
+    $tracker = $this->getTracker();
+    
+    $milestones = new MilestoneTable($db, $tracker);
+    $milestone_gid = $milestones->findGlobalId((int)$data['Milestone']);
+    
+    if ($milestone_gid === null){
+      return false;
+    }
+    
+    $settings = new TrackerUserSettingsTable($db, $tracker);
+    $settings->toggleActiveMilestone($logon_user, $milestone_gid);
     return true;
   }
   

@@ -12,11 +12,11 @@ CREATE TABLE IF NOT EXISTS `tracker_user_settings` (
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
 	FOREIGN KEY (`active_milestone`)
-		REFERENCES `milestones` (`id`)
+		REFERENCES `milestones` (`gid`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
 	FOREIGN KEY (`active_milestone`, `tracker_id`) # Ensures the milestone-tracker pair is always valid.
-		REFERENCES `milestones` (`id`, `tracker_id`)
+		REFERENCES `milestones` (`gid`, `tracker_id`)
 		ON UPDATE NO ACTION
 		ON DELETE NO ACTION
 ) ENGINE = InnoDB
