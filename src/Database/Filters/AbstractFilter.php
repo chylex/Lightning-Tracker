@@ -16,6 +16,7 @@ abstract class AbstractFilter{
   public const STMT_SELECT_INJECT = 1;
   public const STMT_COUNT = 2;
   
+  /** @noinspection PhpUnused */
   public static abstract function empty(): self;
   
   private ?Filtering $filtering = null;
@@ -47,6 +48,7 @@ abstract class AbstractFilter{
    * @param string $field
    * @param mixed $value
    * @return IWhereCondition|null
+   * @noinspection PhpUnusedParameterInspection
    */
   protected function getFilterWhereCondition(string $field, $value): ?IWhereCondition{
     return null;

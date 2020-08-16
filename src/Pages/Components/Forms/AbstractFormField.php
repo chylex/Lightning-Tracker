@@ -14,6 +14,10 @@ abstract class AbstractFormField implements IFormField{
     $this->name = $name;
   }
   
+  public function getName(): string{
+    return $this->name;
+  }
+  
   public function value(string $value): self{
     $this->value = $value;
     return $this;
@@ -24,20 +28,16 @@ abstract class AbstractFormField implements IFormField{
     return $this;
   }
   
-  public function getName(): string{
-    return $this->name;
-  }
-  
-  public function addError(string $message): void{
-    $this->errors[] = $message;
-  }
-  
   public function isDisabled(): bool{
     return $this->disabled;
   }
   
   public function acceptsMissingField(): bool{
     return false;
+  }
+  
+  public function addError(string $message): void{
+    $this->errors[] = $message;
   }
   
   protected final function echoErrors(): void{

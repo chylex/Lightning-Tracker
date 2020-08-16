@@ -8,20 +8,16 @@ use Pages\IViewable;
 use Routing\Request;
 
 final class TablePaginationFooterComponent implements IViewable{
+  private const PAGES_SHOWN = 15;
+  
   private Request $req;
   private Pagination $pagination;
   
-  private int $pages_shown = 15;
   private string $element_name = 'rows';
   
   public function __construct(Request $req, Pagination $pagination){
     $this->req = $req;
     $this->pagination = $pagination;
-  }
-  
-  public function pagesShown(int $pages_shown): self{
-    $this->pages_shown = $pages_shown;
-    return $this;
   }
   
   public function elementName(string $element_name): self{
@@ -50,8 +46,8 @@ HTML;
     
     $this->echoPageIcon(1, 'backward');
     
-    $page_1 = max(1, $current_page - (int)floor($this->pages_shown / 2));
-    $page_2 = min($page_1 + $this->pages_shown - 1, $total_pages);
+    $page_1 = max(1, $current_page - (int)floor(self::PAGES_SHOWN / 2));
+    $page_2 = min($page_1 + self::PAGES_SHOWN - 1, $total_pages);
     
     for($page = $page_1; $page <= $page_2; $page++){
       $this->echoPageNumber($page, strval($page));

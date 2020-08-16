@@ -5,8 +5,9 @@ namespace Pages\Components\Sidemenu\Elements;
 
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
+use Pages\IViewable;
 
-final class SidemenuActionButton{
+final class SidemenuActionButton implements IViewable{
   private Text $title;
   private string $action;
   

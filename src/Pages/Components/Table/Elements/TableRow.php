@@ -6,6 +6,9 @@ namespace Pages\Components\Table\Elements;
 use Pages\IViewable;
 
 final class TableRow implements IViewable{
+  /**
+   * @var TableColumn[]
+   */
   private array $columns_ref;
   private array $values;
   

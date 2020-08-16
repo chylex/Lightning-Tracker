@@ -18,7 +18,7 @@ trait PermTable{
     }
     
     $values = implode(',', array_map(fn($ignore): string => '(LAST_INSERT_ID(), ?)', $perms));
-    $stmt = $this->db->prepare(str_replace('()', $values, $sql_base));
+    $stmt = $this->getDB()->prepare(str_replace('()', $values, $sql_base));
     
     for($i = 0, $count = count($perms); $i < $count; $i++){
       $stmt->bindValue($i + 1, $perms[$i]);

@@ -4,8 +4,9 @@ declare(strict_types = 1);
 namespace Pages\Components\Sidemenu\Elements;
 
 use Pages\Components\Text;
+use Pages\IViewable;
 
-final class SidemenuItem{
+final class SidemenuItem implements IViewable{
   private Text $title;
   private string $url;
   private bool $active = false;
