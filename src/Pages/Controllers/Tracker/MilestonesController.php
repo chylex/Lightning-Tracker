@@ -23,7 +23,6 @@ class MilestonesController extends AbstractTrackerController{
       
       if (($action === $model::ACTION_CREATE && $model->createMilestone($data)) ||
           ($action === $model::ACTION_MOVE && $model->moveMilestone($data)) ||
-          ($action === $model::ACTION_DELETE && $model->deleteMilestone($data)) ||
           ($action === $model::ACTION_TOGGLE_ACTIVE && $model->toggleActiveMilestone($data))
       ){
         return reload();

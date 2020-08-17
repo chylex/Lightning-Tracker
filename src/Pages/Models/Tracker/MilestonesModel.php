@@ -14,6 +14,7 @@ use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
@@ -26,7 +27,6 @@ class MilestonesModel extends BasicTrackerPageModel{
   public const ACTION_CREATE = 'Create';
   public const ACTION_MOVE = 'Move';
   public const ACTION_TOGGLE_ACTIVE = 'ToggleActive';
-  public const ACTION_DELETE = 'Delete';
   
   private const ACTION_MOVE_UP = 'Up';
   private const ACTION_MOVE_DOWN = 'Down';
@@ -81,6 +81,8 @@ class MilestonesModel extends BasicTrackerPageModel{
     $active_milestone = $this->getActiveMilestone();
     $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
     
+    $path_enc = $this->getReq()->getBasePath()->encoded().'/milestones/';
+    
     foreach($milestones->listMilestones($filter) as $milestone){
       $milestone_id = $milestone->getMilestoneId();
       $milestone_id_str = strval($milestone_id);
@@ -102,12 +104,16 @@ class MilestonesModel extends BasicTrackerPageModel{
         $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
         $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
         
-        $form_delete = new FormComponent(self::ACTION_DELETE);
-        $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
-        $form_delete->addHidden('Milestone', $milestone_id_str);
-        $form_delete->addIconButton('submit', 'circle-cross')->color('red')->flushLeft();
+        $btn_delete = Text::plain(<<<HTML
+<form action="$path_enc$milestone_id_str/delete">
+  <button type="submit" class="icon flush-left">
+    <span class="icon icon-circle-cross icon-color-red"></span>
+  </button>
+</form>
+HTML
+        );
         
-        $row[] = new CompositeComponent($form_move, $form_delete);
+        $row[] = new CompositeComponent($form_move, $btn_delete);
       }
       else{
         $row[] = '';
@@ -116,7 +122,7 @@ class MilestonesModel extends BasicTrackerPageModel{
       $row = $this->table->addRow($row);
       
       if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
-        $row->link($this->getReq()->getBasePath()->encoded().'/milestones/'.$milestone_id_str);
+        $row->link($path_enc.$milestone_id_str);
       }
     }
     
@@ -208,19 +214,6 @@ class MilestonesModel extends BasicTrackerPageModel{
     
     $settings = new TrackerUserSettingsTable($db, $tracker);
     $settings->toggleActiveMilestone($logon_user, $milestone_gid);
-    return true;
-  }
-  
-  public function deleteMilestone(array $data): bool{ // TODO make it a dedicated page with additional checks
-    $tracker = $this->getTracker();
-    $this->perms->requireTracker($tracker, self::PERM_EDIT);
-    
-    if (!isset($data['Milestone']) || !is_numeric($data['Milestone'])){
-      return false;
-    }
-    
-    $milestones = new MilestoneTable(DB::get(), $tracker);
-    $milestones->deleteById((int)$data['Milestone']);
     return true;
   }
 }

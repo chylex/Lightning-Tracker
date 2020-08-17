@@ -201,30 +201,40 @@ SQL;
     return $gid === false ? null : (int)$gid;
   }
   
-  public function deleteById(int $id): void{
+  public function deleteById(int $id, ?int $replacement_gid): void{
+    $tracker = $this->getTrackerId();
+    
     $this->db->beginTransaction();
     
     try{
+      $gid = $this->findGlobalId($id);
       $ordering = $this->getMilestoneOrdering($id);
       
-      if ($ordering === null){
+      if ($gid === null || $ordering === null){
         $this->db->rollBack();
         return;
       }
       
       $stmt = $this->db->prepare('UPDATE milestones SET ordering = ordering - 1 WHERE ordering > ? AND tracker_id = ?');
       $stmt->bindValue(1, $ordering, PDO::PARAM_INT);
-      $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt->bindValue(2, $tracker, PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $stmt = $this->db->prepare('UPDATE issues SET milestone_gid = ? WHERE milestone_gid = ? AND tracker_id = ?');
+      $stmt->bindValue(1, $replacement_gid, $replacement_gid === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+      $stmt->bindValue(2, $gid, PDO::PARAM_INT);
+      $stmt->bindValue(3, $tracker, PDO::PARAM_INT);
       $stmt->execute();
       
       $stmt = $this->db->prepare('DELETE FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
       $stmt->bindValue(1, $id, PDO::PARAM_INT);
-      $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt->bindValue(2, $tracker, PDO::PARAM_INT);
       $stmt->execute();
       
       $this->db->commit();
     }catch(PDOException $e){
       $this->db->rollBack();
+      throw $e;
     }
   }
 }
