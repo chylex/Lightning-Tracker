@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Issues;
 
-use Pages\Components\Text;
+use Pages\Components\Html;
 use Pages\IViewable;
 
 final class IssueType implements IIssueTag{
@@ -81,7 +81,7 @@ HTML;
 HTML;
     }
     
-    return Text::plain($html); // TODO perhaps not entirely clear
+    return new Html($html);
   }
 }
 

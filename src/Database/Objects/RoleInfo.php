@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
-use function Database\protect;
-
 final class RoleInfo{
   private int $id;
   private string $title;
@@ -20,8 +18,8 @@ final class RoleInfo{
     return $this->id;
   }
   
-  public function getTitleSafe(): string{
-    return protect($this->title);
+  public function getTitle(): string{
+    return $this->title;
   }
   
   public function isSpecial(): bool{

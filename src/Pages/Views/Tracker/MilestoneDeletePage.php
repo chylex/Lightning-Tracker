@@ -35,7 +35,7 @@ class MilestoneDeletePage extends AbstractTrackerPage{
   /** @noinspection HtmlMissingClosingTag */
   protected function echoPageBody(): void{
     if ($this->model->hasMilestone()){
-      $title = $this->model->getMilestoneTitle();
+      $title = $this->model->getMilestoneTitleSafe();
       $issue_count = $this->model->getMilestoneIssueCount();
       $issue_count_str = $issue_count === 1 ? '1 issue' : $issue_count.' issues';
       

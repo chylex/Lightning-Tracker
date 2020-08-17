@@ -4,16 +4,17 @@ declare(strict_types = 1);
 namespace Pages\Components\Forms\Elements;
 
 use Pages\IViewable;
+use function Database\protect;
 
 final class FormSelectOption implements IViewable{
   private string $value;
-  private string $html;
+  private string $text;
   private ?string $class;
   private bool $selected = false;
   
-  public function __construct(string $value, string $html, ?string $class){
+  public function __construct(string $value, string $text, ?string $class){
     $this->value = $value;
-    $this->html = $html;
+    $this->text = $text;
     $this->class = $class;
   }
   
@@ -22,10 +23,13 @@ final class FormSelectOption implements IViewable{
   }
   
   public function echoBody(): void{
+    $value = protect($this->value);
+    $text = protect($this->text);
+    
     $class_attr = $this->class !== null ? ' class="'.$this->class.'"' : '';
     $selected_attr = $this->selected ? ' selected' : '';
     
-    echo '<option value="'.$this->value.'"'.$class_attr.$selected_attr.'>'.$this->html.'</option>';
+    echo '<option value="'.$value.'"'.$class_attr.$selected_attr.'>'.$text.'</option>';
   }
 }
 

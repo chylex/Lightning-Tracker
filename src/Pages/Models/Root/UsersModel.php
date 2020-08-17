@@ -12,6 +12,7 @@ use Exception;
 use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicRootPageModel;
 use Pages\Models\Mixed\RegisterModel;
@@ -111,7 +112,7 @@ class UsersModel extends BasicRootPageModel{
         $row[] = $user->getEmailSafe();
       }
       
-      $row[] = $user->getRoleTitleSafe() ?? '<span class="missing">none</span>';
+      $row[] = $user->getRoleTitleSafe() ?? Text::missing('none');
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
       if ($this->perms->checkSystem(self::PERM_EDIT)){
@@ -141,11 +142,11 @@ class UsersModel extends BasicRootPageModel{
     }
     
     $filtering_role = $header->addMultiSelect('role')->label('Role');
-    $filtering_role->addOption('', '<span class="missing">(None)</span>');
+    $filtering_role->addOption('', Text::missing('(None)'));
     
     foreach((new SystemPermTable(DB::get()))->listRoles() as $role){
-      $title = $role->getTitleSafe();
-      $filtering_role->addOption($title, $title);
+      $title = $role->getTitle();
+      $filtering_role->addOption($title, Text::plain($title));
     }
     
     return $this;

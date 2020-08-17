@@ -45,8 +45,8 @@ final class FormSelect extends AbstractFormField{
     }
   }
   
-  public function addOption(string $value, string $html, ?string $class = null): self{
-    $this->options[] = new FormSelectOption($value, $html, $class);
+  public function addOption(string $value, string $text, ?string $class = null): self{
+    $this->options[] = new FormSelectOption($value, $text, $class);
     return $this;
   }
   

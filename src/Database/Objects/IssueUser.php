@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
-use function Database\protect;
-
 final class IssueUser{
   private int $id;
   private string $name;
@@ -18,8 +16,8 @@ final class IssueUser{
     return $this->id;
   }
   
-  public function getNameSafe(): string{
-    return protect($this->name);
+  public function getName(): string{
+    return $this->name;
   }
 }
 

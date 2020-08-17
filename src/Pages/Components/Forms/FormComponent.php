@@ -18,6 +18,7 @@ use Pages\Components\Forms\Elements\FormSplitGroupEnd;
 use Pages\Components\Forms\Elements\FormSplitGroupStart;
 use Pages\Components\Forms\Elements\FormTextArea;
 use Pages\Components\Forms\Elements\FormTextField;
+use Pages\Components\Html;
 use Pages\Components\Text;
 use Pages\IViewable;
 use Validation\InvalidField;
@@ -87,11 +88,11 @@ HTML;
   }
   
   public function startTitledSection(string $title): void{
-    $this->elements[] = Text::plain('<h3>'.$title.'</h3><article>');
+    $this->elements[] = new Html('<h3>'.$title.'</h3><article>');
   }
   
   public function endTitledSection(): void{
-    $this->elements[] = Text::plain('</article>');
+    $this->elements[] = new Html('</article>');
   }
   
   public function startSplitGroup(int $percentage_per_element, ?string $wrapper_class = null): void{
@@ -163,7 +164,7 @@ HTML;
   }
   
   public function addHTML(string $html): void{
-    $this->elements[] = Text::plain($html);
+    $this->elements[] = new Html($html);
   }
   
   public function isFilled(): bool{

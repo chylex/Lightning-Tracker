@@ -4,9 +4,9 @@ declare(strict_types = 1);
 namespace Pages\Views\Mixed;
 
 use Pages\Components\Forms\FormComponent;
+use Pages\Components\Html;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\SplitComponent;
-use Pages\Components\Text;
 use Pages\IViewable;
 use Pages\Models\Mixed\AccountModel;
 use Pages\Views\AbstractPage;
@@ -42,7 +42,7 @@ class AccountPage extends AbstractPage{
     $split->collapseAt(800);
     $split->setLeftWidthLimits(250);
     
-    $split->addLeft(Text::plain('<h3>Menu</h3>'));
+    $split->addLeft(new Html('<h3>Menu</h3>'));
     $split->addLeft($this->model->getMenuLinks());
     $split->addLeft($this->model->getMenuActions());
     $split->addRight($this->getAccountPageColumn());

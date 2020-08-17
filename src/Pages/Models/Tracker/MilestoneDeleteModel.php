@@ -18,7 +18,7 @@ class MilestoneDeleteModel extends BasicTrackerPageModel{
   
   private int $milestone_id;
   private bool $has_milestone = false;
-  private string $milestone_title;
+  private string $milestone_title_safe;
   private int $milestone_issue_count;
   
   private FormComponent $form;
@@ -40,7 +40,7 @@ class MilestoneDeleteModel extends BasicTrackerPageModel{
       
       if ($id === $milestone_id){
         $this->has_milestone = true;
-        $this->milestone_title = $milestone->getTitleSafe();
+        $this->milestone_title_safe = $milestone->getTitleSafe();
         
         $issues = new IssueTable(DB::get(), $tracker);
         $filter = new IssueFilter();
@@ -48,7 +48,7 @@ class MilestoneDeleteModel extends BasicTrackerPageModel{
         $this->milestone_issue_count = $issues->countIssues($filter) ?? 0;
       }
       else{
-        $select_milestone->addOption(strval($id), $milestone->getTitleSafe());
+        $select_milestone->addOption(strval($id), $milestone->getTitle());
       }
     }
     
@@ -59,8 +59,8 @@ class MilestoneDeleteModel extends BasicTrackerPageModel{
     return $this->has_milestone;
   }
   
-  public function getMilestoneTitle(): string{
-    return $this->milestone_title;
+  public function getMilestoneTitleSafe(): string{
+    return $this->milestone_title_safe;
   }
   
   public function getMilestoneIssueCount(): int{

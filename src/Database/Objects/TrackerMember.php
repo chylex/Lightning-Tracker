@@ -20,6 +20,10 @@ final class TrackerMember{
     return $this->user_id;
   }
   
+  public function getUserName(): string{
+    return $this->user_name;
+  }
+  
   public function getUserNameSafe(): string{
     return protect($this->user_name);
   }

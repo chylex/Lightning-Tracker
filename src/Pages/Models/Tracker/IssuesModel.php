@@ -11,6 +11,7 @@ use Database\Tables\MilestoneTable;
 use Database\Tables\TrackerMemberTable;
 use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\Elements\FormSelectMultiple;
+use Pages\Components\Html;
 use Pages\Components\Issues\IIssueTag;
 use Pages\Components\Issues\IssuePriority;
 use Pages\Components\Issues\IssueScale;
@@ -37,7 +38,7 @@ class IssuesModel extends BasicTrackerPageModel{
    */
   private static function setupIssueTagOptions(FormSelectMultiple $select, array $items): void{
     foreach($items as $item){
-      $select->addOption($item->getId(), '<span class="'.$item->getTagClass().'"></span> '.$item->getTitle());
+      $select->addOption($item->getId(), new Html('<span class="'.$item->getTagClass().'"></span> '.$item->getTitle()));
     }
   }
   
@@ -106,24 +107,24 @@ class IssuesModel extends BasicTrackerPageModel{
     self::setupIssueTagOptions($header->addMultiSelect('status')->label('Status'), IssueStatus::list());
     
     $filtering_milestone = $header->addMultiSelect('milestone')->label('Milestone');
-    $filtering_milestone->addOption('', '<span class="missing">(No Milestone)</span>');
+    $filtering_milestone->addOption('', Text::missing('(No Milestone)'));
     
     foreach((new MilestoneTable(DB::get(), $tracker))->listMilestones() as $milestone){
-      $filtering_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitleSafe());
+      $filtering_milestone->addOption(strval($milestone->getMilestoneId()), Text::plain($milestone->getTitle()));
     }
     
     // TODO get rid of IDs and allow filtering by manually typing username (either add a field, or just in the URL & add the options if the user cannot see everyone)
     // TODO could also have a way of including former members
     
     $filtering_author = $header->addMultiSelect('author')->label('Author');
-    $filtering_author->addOption('', '<span class="missing">(No Author)</span>');
+    $filtering_author->addOption('', Text::missing('(No Author)'));
     
     $filtering_assignee = $header->addMultiSelect('assignee')->label('Assignee');
-    $filtering_assignee->addOption('', '<span class="missing">(No Assignee)</span>');
+    $filtering_assignee->addOption('', Text::missing('(No Assignee)'));
     
     if ($logon_user !== null){
-      $filtering_author->addOption(strval($logon_user_id), '<span class="missing">(You)</span>');
-      $filtering_assignee->addOption(strval($logon_user_id), '<span class="missing">(You)</span>');
+      $filtering_author->addOption(strval($logon_user_id), Text::missing('(You)'));
+      $filtering_assignee->addOption(strval($logon_user_id), Text::missing('(You)'));
       
       if ($this->perms->checkTracker($tracker, MembersModel::PERM_LIST)){
         foreach((new TrackerMemberTable(DB::get(), $tracker))->listMembers() as $member){
@@ -131,10 +132,10 @@ class IssuesModel extends BasicTrackerPageModel{
           
           if ($user_id !== $logon_user_id){
             $user_id_str = strval($user_id);
-            $user_name = $member->getUserNameSafe();
+            $user_name = $member->getUserName();
             
-            $filtering_author->addOption($user_id_str, $user_name);
-            $filtering_assignee->addOption($user_id_str, $user_name);
+            $filtering_author->addOption($user_id_str, Text::plain($user_name));
+            $filtering_assignee->addOption($user_id_str, Text::plain($user_name));
           }
         }
       }

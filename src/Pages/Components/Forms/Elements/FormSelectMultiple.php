@@ -4,14 +4,12 @@ declare(strict_types = 1);
 namespace Pages\Components\Forms\Elements;
 
 use Pages\Components\Forms\AbstractFormField;
+use Pages\IViewable;
+use function Database\protect;
 
 final class FormSelectMultiple extends AbstractFormField{
   private string $id;
   private ?string $label;
-  
-  /**
-   * @var string[]
-   */
   private array $options = [];
   
   /**
@@ -45,8 +43,8 @@ final class FormSelectMultiple extends AbstractFormField{
     return $this;
   }
   
-  public function addOption(string $value, string $html): self{
-    $this->options[] = [$value, $html];
+  public function addOption(string $value, IViewable $label): self{
+    $this->options[] = [$value, $label];
     return $this;
   }
   
@@ -73,15 +71,22 @@ HTML;
     
     foreach($this->options as $option){
       $value = $option[0];
-      $html = $option[1];
+      $value_safe = protect($value);
+      $option_label = $option[1];
       
-      $id = $this->id.'-'.$value;
+      $id = $this->id.'-'.$value_safe;
       $checked_attr = in_array($value, $this->checked, true) ? ' checked' : '';
       
       echo <<<HTML
       <div class="field-group">
-        <input id="$id" name="$name_as_array" type="checkbox" value="$value"$checked_attr$disabled_attr>
-        <label for="$id"$disabled_class>$html</label>
+        <input id="$id" name="$name_as_array" type="checkbox" value="$value_safe"$checked_attr$disabled_attr>
+        <label for="$id"$disabled_class>
+HTML;
+      
+      $option_label->echoBody();
+      
+      echo <<<HTML
+        </label>
       </div>
 HTML;
     }

@@ -10,6 +10,7 @@ use Database\Tables\TrackerUserSettingsTable;
 use Exception;
 use Logging\Log;
 use Pages\Components\CompositeComponent;
+use Pages\Components\Html;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Text;
@@ -85,9 +86,9 @@ class BasicTrackerPageModel extends AbstractPageModel{
       return null;
     }
     
-    return new CompositeComponent(Text::plain('<h3>Active Milestone</h3><article><h4>'.$milestone->getTitleSafe().'</h4>'),
+    return new CompositeComponent(new Html('<h3>Active Milestone</h3><article><h4>'.$milestone->getTitleSafe().'</h4>'),
                                   new ProgressBarComponent($milestone->getPercentageDone()),
-                                  Text::plain('</article>'));
+                                  new Html('</article>'));
   }
 }
 

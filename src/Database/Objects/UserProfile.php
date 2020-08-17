@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
-use function Database\protect;
-
 final class UserProfile{
   private int $id;
   private string $name;
@@ -26,10 +24,6 @@ final class UserProfile{
   
   public function getName(): string{
     return $this->name;
-  }
-  
-  public function getNameSafe(): string{
-    return protect($this->name);
   }
   
   public function getEmail(): string{

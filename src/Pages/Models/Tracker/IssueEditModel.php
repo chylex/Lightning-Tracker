@@ -116,12 +116,12 @@ HTML
     $select_assignee = $this->form->addSelect('Assignee')->addOption('', '(None)')->dropdown();
     
     foreach((new MilestoneTable(DB::get(), $tracker))->listMilestones() as $milestone){
-      $select_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitleSafe());
+      $select_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitle());
     }
     
     if ($perms->checkTracker($tracker, MembersModel::PERM_LIST)){
       foreach((new TrackerMemberTable(DB::get(), $tracker))->listMembers() as $member){
-        $select_assignee->addOption(strval($member->getUserId()), $member->getUserNameSafe());
+        $select_assignee->addOption(strval($member->getUserId()), $member->getUserName());
       }
     }
     else{
@@ -129,7 +129,7 @@ HTML
       
       if ($this->issue !== null && $this->issue->getAssignee() !== null){
         $assignee = $this->issue->getAssignee();
-        $select_assignee->addOption(strval($assignee->getId()), $assignee->getNameSafe());
+        $select_assignee->addOption(strval($assignee->getId()), $assignee->getName());
       }
     }
     

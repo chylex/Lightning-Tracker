@@ -13,6 +13,7 @@ use Database\Tables\UserTable;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use PDOException;
@@ -63,7 +64,7 @@ class MembersModel extends BasicTrackerPageModel{
                                 ->addOption('', '(Default)');
       
       foreach($roles as $role){
-        $select_role->addOption(strval($role->getId()), $role->getTitleSafe());
+        $select_role->addOption(strval($role->getId()), $role->getTitle());
       }
       
       $this->form->addButton('submit', 'Invite User')
@@ -95,7 +96,7 @@ class MembersModel extends BasicTrackerPageModel{
     
     foreach($members->listMembers($filter) as $member){
       $row = [$member->getUserNameSafe(),
-              $member->getRoleTitleSafe() ?? '<span class="missing">Default</span>'];
+              $member->getRoleTitleSafe() ?? Text::missing('Default')];
       
       if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
         $user_id = $member->getUserId();
@@ -122,11 +123,11 @@ class MembersModel extends BasicTrackerPageModel{
     $header->addTextField('name')->label('Username');
     
     $filtering_role = $header->addMultiSelect('role')->label('Role');
-    $filtering_role->addOption('', '<span class="missing">(Default)</span>');
+    $filtering_role->addOption('', Text::missing('(Default)'));
     
     foreach((new TrackerPermTable(DB::get(), $tracker))->listRoles() as $role){
-      $title = $role->getTitleSafe();
-      $filtering_role->addOption($title, $title);
+      $title = $role->getTitle();
+      $filtering_role->addOption($title, Text::plain($title));
     }
     
     return $this;
