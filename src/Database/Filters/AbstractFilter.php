@@ -34,6 +34,11 @@ abstract class AbstractFilter{
     return $this->filtering;
   }
   
+  public function filterManual(array $values): Filtering{
+    $this->filtering = Filtering::fromArray($values, $this->getFilteringColumns());
+    return $this->filtering;
+  }
+  
   public function sort(Request $req): Sorting{
     $this->sorting = Sorting::fromGlobals($req, $this->getSortingColumns());
     return $this->sorting;

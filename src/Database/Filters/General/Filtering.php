@@ -67,6 +67,10 @@ final class Filtering{
     return new Filtering($fields, $rules);
   }
   
+  public static function fromArray(array $rules, array $fields): Filtering{
+    return new Filtering($fields, $rules);
+  }
+  
   /**
    * @var string[] List of valid fields.
    */
