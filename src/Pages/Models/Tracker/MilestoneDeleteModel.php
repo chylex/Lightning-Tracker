@@ -72,7 +72,7 @@ class MilestoneDeleteModel extends BasicTrackerPageModel{
   }
   
   public function deleteMilestoneSafely(): bool{
-    if ($this->milestone_issue_count > 0){
+    if (!$this->has_milestone || $this->milestone_issue_count > 0){
       return false;
     }
     
