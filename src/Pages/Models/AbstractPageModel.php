@@ -6,6 +6,8 @@ namespace Pages\Models;
 use LogicException;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
+use Pages\Controllers\Handlers\RequireLoginState;
+use Pages\Controllers\Mixed\LoginController;
 use Pages\IModel;
 use Routing\Request;
 use Session\Permissions;
@@ -37,7 +39,7 @@ abstract class AbstractPageModel implements IModel{
       $this->nav->addRight(Text::withIcon($logon_user->getName(), 'user'), '/account');
     }
     else{
-      $this->nav->addRight(Text::withIcon('Login', 'enter'), '/login');
+      $this->nav->addRight(Text::withIcon('Login', 'enter'), '/login'.LoginController::getReturnQuery($this->getReq()));
       
       if (SYS_ENABLE_REGISTRATION){
         $this->nav->addRight(Text::withIcon('Register', 'user'), '/register');
