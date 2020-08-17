@@ -79,20 +79,9 @@
     <inspection_tool class="ConvertLambdaToReference" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ConvertOldAnnotations" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CssConvertColorToHexInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="CssConvertColorToRgbInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="CssConvertColorToRgbInspection" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="CssMissingSemicolon" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CssReplaceWithShorthandUnsafely" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="CssUnknownProperty" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="myCustomPropertiesEnabled" value="true" />
-      <option name="myIgnoreVendorSpecificProperties" value="false" />
-      <option name="myCustomPropertiesList">
-        <value>
-          <list size="1">
-            <item index="0" class="java.lang.String" itemvalue="scrollbar-width" />
-          </list>
-        </value>
-      </option>
-    </inspection_tool>
     <inspection_tool class="CustomClassloader" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CustomSecurityManager" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="CyclicClassDependency" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -110,7 +99,9 @@
     <inspection_tool class="DuplicateBooleanBranch" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DuplicateConditionJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DynamicallyGeneratedCodeJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ES6ConvertIndexedForToForOf" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ES6ConvertLetToConst" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="ES6ConvertToForOf" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ES6ShorthandObjectProperty" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ES6TopLevelAwaitExpression" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="EmptyDirectory" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -148,7 +139,7 @@
     <inspection_tool class="FunctionNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_regex" value="[a-z][A-Za-z]*" />
       <option name="m_minLength" value="0" />
-      <option name="m_maxLength" value="0" />
+      <option name="m_maxLength" value="99" />
     </inspection_tool>
     <inspection_tool class="FunctionWithInconsistentReturnsJS" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="HashCodeUsesNonFinalVariable" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -156,6 +147,7 @@
       <option name="insideTryAllowed" value="false" />
     </inspection_tool>
     <inspection_tool class="HtmlMissingClosingTag" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="HtmlPresentationalElement" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="HtmlRequiredTitleAttribute" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="IOResource" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredTypesString" value="java.io.ByteArrayOutputStream,java.io.ByteArrayInputStream,java.io.StringBufferInputStream,java.io.CharArrayWriter,java.io.CharArrayReader,java.io.StringWriter,java.io.StringReader" />
@@ -191,12 +183,14 @@
     <inspection_tool class="JSArrowFunctionBracesCanBeRemoved" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="JSClassNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_minLength" value="0" />
-      <option name="m_maxLength" value="0" />
+      <option name="m_maxLength" value="99" />
     </inspection_tool>
     <inspection_tool class="JSConstructorReturnsPrimitive" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="JSEqualityComparisonWithCoercion.TS" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="mySeverity" value="Always" />
     </inspection_tool>
+    <inspection_tool class="JSJoinVariableDeclarationAndAssignment" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="JSMissingSwitchBranches" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="JSNonASCIINames" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myAllowOnlyAscii" value="true" />
     </inspection_tool>
@@ -228,7 +222,7 @@
     <inspection_tool class="LocalVariableNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_regex" value="[a-z][A-Za-z]*" />
       <option name="m_minLength" value="0" />
-      <option name="m_maxLength" value="0" />
+      <option name="m_maxLength" value="99" />
     </inspection_tool>
     <inspection_tool class="MalformedSetUpTearDown" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="MapReplaceableByEnumMap" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -308,7 +302,7 @@
     <inspection_tool class="ParameterNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_regex" value="[a-z][A-Za-z]*" />
       <option name="m_minLength" value="0" />
-      <option name="m_maxLength" value="0" />
+      <option name="m_maxLength" value="99" />
     </inspection_tool>
     <inspection_tool class="ParameterizedParametersStaticCollection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpAssignmentInConditionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
@@ -363,6 +357,7 @@
     <inspection_tool class="PhpRedundantClosingTagInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="PhpSeparateElseIfInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpShortOpenTagInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpSingleStatementWithBracesInspection" enabled="false" level="INFORMATION" enabled_by_default="false" />
     <inspection_tool class="PhpStatementHasEmptyBodyInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myCommentsCountAsContent" value="true" />
     </inspection_tool>
