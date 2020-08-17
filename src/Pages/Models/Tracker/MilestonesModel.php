@@ -106,7 +106,7 @@ class MilestonesModel extends BasicTrackerPageModel{
         
         $btn_delete = Text::plain(<<<HTML
 <form action="$path_enc$milestone_id_str/delete">
-  <button type="submit" class="icon flush-left">
+  <button type="submit" class="icon">
     <span class="icon icon-circle-cross icon-color-red"></span>
   </button>
 </form>

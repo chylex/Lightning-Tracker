@@ -9,6 +9,7 @@
 }
 
 option.issue-tag:before {
+  margin-left: -1px;
   margin-right: 5px;
 }
 

@@ -11,7 +11,6 @@ final class FormIconButton implements IViewable{
   private string $icon;
   private ?string $color = null;
   private ?string $value = null;
-  private bool $flush_left = false;
   
   public function __construct(string $type, string $icon){
     $this->type = $type;
@@ -28,18 +27,12 @@ final class FormIconButton implements IViewable{
     return $this;
   }
   
-  public function flushLeft(): self{
-    $this->flush_left = true;
-    return $this;
-  }
-  
   public function echoBody(): void{
     $value = $this->value === null ? '' : ' name="'.FormComponent::SUB_ACTION_KEY.'" value="'.$this->value.'"';
     $color_class = $this->color === null ? '' : ' icon-color-'.$this->color;
-    $flush_left_class = $this->flush_left ? ' flush-left' : '';
     
     echo <<<HTML
-<button type="$this->type" class="icon$flush_left_class"$value>
+<button type="$this->type" class="icon"$value>
   <span class="icon icon-$this->icon$color_class"></span>
 </button>
 HTML;

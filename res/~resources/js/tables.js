@@ -71,31 +71,36 @@ document.addEventListener("DOMContentLoaded", function(){
             continue;
         }
         
-        recalculateTableLayout(table);
+        // noinspection JSUnresolvedVariable
+        const onFontsLoaded = (document.fonts && document.fonts.ready) || Promise.resolve();
         
-        let isMutating = false;
-        
-        const observer = new MutationObserver(function(){
-            if (isMutating || !canUseFixedLayout(table)){
-                return;
-            }
-            
-            // noinspection ReuseOfLocalVariableJS
-            isMutating = true;
-            
-            resetTableLayout(table);
+        onFontsLoaded.then(function(){
             recalculateTableLayout(table);
             
-            setTimeout(function(){
+            let isMutating = false;
+            
+            const observer = new MutationObserver(function(){
+                if (isMutating || !canUseFixedLayout(table)){
+                    return;
+                }
+                
                 // noinspection ReuseOfLocalVariableJS
-                isMutating = false;
-            }, 0);
-        });
-        
-        observer.observe(table, {
-            subtree: true,
-            childList: true,
-            characterData: true,
+                isMutating = true;
+                
+                resetTableLayout(table);
+                recalculateTableLayout(table);
+                
+                setTimeout(function(){
+                    // noinspection ReuseOfLocalVariableJS
+                    isMutating = false;
+                }, 0);
+            });
+            
+            observer.observe(table, {
+                subtree: true,
+                childList: true,
+                characterData: true,
+            });
         });
     }
     

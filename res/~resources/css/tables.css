@@ -136,6 +136,7 @@ td.bold {
 }
 
 td .icon {
+  width: 20px;
   font-size: 20px;
   vertical-align: -5%;
 }
@@ -144,16 +145,13 @@ td .icon.faded {
   color: #444444;
 }
 
-td button.icon + button.icon {
+td button.icon + button.icon,
+td form + form {
   margin-left: 5px;
 }
 
-td button.icon.flush-left {
-  margin-left: 1px;
-}
-
 td form {
-  display: inline;
+  display: inline-block;
 }
 
 details.filtering {
@@ -225,12 +223,19 @@ details.filtering > article label {
   display: block;
 }
 
-details.filtering > article input[type="text"] {
+details.filtering > article input[type="checkbox"] + label {
+  display: inline;
+}
+
+details.filtering > article input[type="text"],
+details.filtering details.multiselect > summary {
+  height: 29px;
+  line-height: 20px;
   padding: 4px 7px;
 }
 
-details.filtering > article input[type="checkbox"] + label {
-  display: inline;
+details.filtering details.multiselect > summary {
+  padding-right: 28px;
 }
 
 details.filtering details.multiselect > article {

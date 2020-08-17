@@ -131,16 +131,21 @@ document.addEventListener("DOMContentLoaded", function(){
             }
         }
         
-        updateCallback();
+        // noinspection JSUnresolvedVariable
+        const onFontsLoaded = (document.fonts && document.fonts.ready) || Promise.resolve();
         
-        if (summary.clientWidth === 0 && "IntersectionObserver" in window){
-            const observer = new IntersectionObserver(function(){
-                updateCallback();
-                observer.disconnect();
-            });
+        onFontsLoaded.then(function(){
+            updateCallback();
             
-            observer.observe(summary);
-        }
+            if (summary.clientWidth === 0 && "IntersectionObserver" in window){
+                const observer = new IntersectionObserver(function(){
+                    updateCallback();
+                    observer.disconnect();
+                });
+                
+                observer.observe(summary);
+            }
+        });
     }
     
     for(/** @type HTMLInputElement */ const range of document.querySelectorAll("input[type='number']")){

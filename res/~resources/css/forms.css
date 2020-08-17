@@ -32,7 +32,7 @@ input[type=email],
 input[type=number],
 textarea,
 select {
-  padding: 7px;
+  padding: 7px 8px;
   width: 100%;
   border: 1px solid #333333;
   border-radius: 5px;
@@ -88,6 +88,10 @@ select[size] {
 }
 
 select:not([size]) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 36px;
+  padding: 0 22px 0 8px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3E%3Cpath d='M3.996,5l3.996,-5l-7.992,0l3.996,5Z'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) 50% / 11px;
 }
 
@@ -98,7 +102,7 @@ select:not([size]):disabled {
 
 @supports (-moz-appearance: none) {
   select:not([size]) {
-    padding: 7px 3px;
+    padding-left: 3px;
   }
 
   option:checked {
@@ -120,7 +124,7 @@ select:not([size]):disabled {
 }
 
 option {
-  padding: 7px;
+  padding: 7px 8px;
   outline: none;
 }
 
@@ -131,6 +135,7 @@ option:not(:disabled) {
 option.icon:before {
   /*noinspection CssNoGenericFontName*/
   font-family: 'icomoon' !important;
+  margin-left: -1px;
   margin-right: 5px;
   line-height: 17px;
   vertical-align: -6%;
@@ -139,7 +144,7 @@ option.icon:before {
 details.multiselect > summary {
   border: 1px solid #333333;
   border-radius: 5px;
-  padding: 4px 28px 4px 7px;
+  padding: 7px 28px 7px 8px;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3E%3Cpath d='M3.996,5l3.996,-5l-7.992,0l3.996,5Z'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) 50% / 11px;
   overflow: hidden;
   font-style: italic;
@@ -185,7 +190,7 @@ details.multiselect > article .issue-tag:before {
 
 label {
   display: inline-block;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   font-weight: bold;
 }
 
