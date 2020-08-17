@@ -5,7 +5,6 @@ namespace Database\Tables;
 
 use Database\AbstractTrackerTable;
 use Database\Filters\AbstractFilter;
-use Database\Filters\AbstractTrackerIdFilter;
 use Database\Filters\Types\TrackerMemberFilter;
 use Database\Objects\TrackerInfo;
 use Database\Objects\TrackerMember;
@@ -14,12 +13,6 @@ use PDO;
 final class TrackerMemberTable extends AbstractTrackerTable{
   public function __construct(PDO $db, TrackerInfo $tracker){
     parent::__construct($db, $tracker);
-  }
-  
-  protected function prepareFilter(AbstractTrackerIdFilter $filter, ?string $table_name = null): TrackerMemberFilter{
-    $filter = parent::prepareFilter($filter, $table_name);
-    /** @var TrackerMemberFilter $filter */
-    return $filter; // TODO ugly workaround
   }
   
   public function setRole(int $user_id, ?int $role_id): void{
@@ -32,7 +25,6 @@ final class TrackerMemberTable extends AbstractTrackerTable{
   
   public function countMembers(?TrackerMemberFilter $filter = null): ?int{
     $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'tm');
-    $filter->setRoleTitleColumn('tr', 'title');
     
     $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM tracker_members tm LEFT JOIN tracker_roles tr ON tm.role_id = tr.id', AbstractFilter::STMT_COUNT);
     $stmt->execute();
@@ -47,14 +39,12 @@ final class TrackerMemberTable extends AbstractTrackerTable{
    */
   public function listMembers(?TrackerMemberFilter $filter = null): array{
     $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'tm');
-    $filter->setRoleTitleColumn('tr', 'title');
     
     $sql = <<<SQL
 SELECT tm.user_id             AS user_id,
        u.name                 AS name,
        tr.title               AS role_title,
-       IFNULL(tm.role_id, ~0) AS role_order,
-       tm.tracker_id          AS tracker_id
+       IFNULL(tm.role_id, ~0) AS role_order
 FROM tracker_members tm
 LEFT JOIN tracker_roles tr ON tm.role_id = tr.id
 JOIN      users u ON tm.user_id = u.id

@@ -90,15 +90,15 @@ final class TrackerFilter extends AbstractFilter{
     }
   }
   
-  protected function getSortingColumns(): array{
+  protected function getSortingFields(): array{
     return [
-        'name'
+        new Field('name')
     ];
   }
   
-  protected function getDefaultOrderByColumns(): array{
+  protected function getDefaultSortingRuleList(): array{
     return [
-        'name' => Sorting::SQL_ASC
+        (new Field('name'))->sortRule(Sorting::SQL_ASC)
     ];
   }
 }

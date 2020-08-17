@@ -23,6 +23,10 @@ final class Field{
   public function getSql(): string{
     return self::sql($this->field_name, $this->table_name);
   }
+  
+  public function sortRule(string $direction): array{
+    return [$this, $direction];
+  }
 }
 
 ?>

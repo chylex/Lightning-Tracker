@@ -6,6 +6,7 @@ namespace Database\Filters\Types;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Conditions\FieldLike;
 use Database\Filters\Conditions\FieldOneOfNullable;
+use Database\Filters\Field;
 use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
@@ -33,7 +34,7 @@ final class UserFilter extends AbstractFilter{
     switch($field){
       case 'name':
       case 'email':
-        return new FieldLike($field, $value);
+        return new FieldLike($field, $value, 'u');
       
       case 'role':
         return new FieldOneOfNullable('title', $value, 'sr');
@@ -43,17 +44,17 @@ final class UserFilter extends AbstractFilter{
     }
   }
   
-  protected function getSortingColumns(): array{
+  protected function getSortingFields(): array{
     return [
-        'name',
-        'role_title',
-        'date_registered'
+        new Field('name', 'u'),
+        new Field('role_title'),
+        new Field('date_registered', 'u')
     ];
   }
   
-  protected function getDefaultOrderByColumns(): array{
+  protected function getDefaultSortingRuleList(): array{
     return [
-        'date_registered' => Sorting::SQL_ASC
+        (new Field('date_registered', 'u'))->sortRule(Sorting::SQL_ASC)
     ];
   }
 }

@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Database\Filters\General;
 
+use Database\Filters\Field;
 use LogicException;
 use Routing\Request;
 
@@ -17,15 +18,21 @@ final class Sorting{
   
   /**
    * @param Request $req
-   * @param string[] $columns
+   * @param Field[] $fields
    * @return Sorting
    */
-  public static function fromGlobals(Request $req, array $columns): Sorting{
+  public static function fromGlobals(Request $req, array $fields): Sorting{
     $rule_str = $_GET[self::GET_SORT] ?? '';
     $rules = [];
     
+    $associative_fields = [];
+    
+    foreach($fields as $field){
+      $associative_fields[$field->getFieldName()] = $field;
+    }
+    
     if (empty($rule_str)){
-      return new Sorting($req, $columns, $rules);
+      return new Sorting($req, $associative_fields, $rules);
     }
     
     foreach(explode(self::RULE_SEPARATOR, $rule_str) as $rule){
@@ -41,42 +48,48 @@ final class Sorting{
         $direction = self::SQL_ASC;
       }
       
-      if (in_array($rule, $columns)){
+      if (array_key_exists($rule, $associative_fields)){
         $rules[$rule] = $direction;
       }
     }
     
-    return new Sorting($req, $columns, $rules);
+    return new Sorting($req, $associative_fields, $rules);
   }
   
   private Request $req;
   
   /**
-   * @var string[] List of valid columns.
+   * @var Field[] Mapping of valid column names to field objects.
    */
-  private array $columns;
+  private array $fields;
   
   /**
-   * @var string[] Mapping of a subset of valid columns to SQL order directions (ASC/DESC).
+   * @var string[] Mapping of a subset of valid column names to SQL order directions (ASC/DESC).
    */
   private array $rules;
   
-  private function __construct(Request $req, array $columns, array $rules){
+  private function __construct(Request $req, array $fields, array $rules){
     $this->req = $req;
-    $this->columns = $columns;
+    $this->fields = $fields;
     $this->rules = $rules;
   }
   
   public function isSortable(string $column): bool{
-    return in_array($column, $this->columns, true);
+    return array_key_exists($column, $this->fields);
   }
   
   public function getSortDirection(string $column): ?string{
     return $this->rules[$column] ?? null;
   }
   
-  public function getRules(): array{
-    return $this->rules;
+  public function getRuleList(): array{
+    $list = [];
+    
+    foreach($this->rules as $column => $direction){
+      $list[] = $this->fields[$column]->sortRule($direction);
+    }
+    
+    return $list;
   }
   
   public function isEmpty(): bool{

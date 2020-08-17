@@ -40,7 +40,7 @@ abstract class AbstractFilter{
   }
   
   public function sort(Request $req): Sorting{
-    $this->sorting = Sorting::fromGlobals($req, $this->getSortingColumns());
+    $this->sorting = Sorting::fromGlobals($req, $this->getSortingFields());
     return $this->sorting;
   }
   
@@ -63,11 +63,14 @@ abstract class AbstractFilter{
     return [];
   }
   
-  protected function getSortingColumns(): array{
+  /**
+   * @return Field[]
+   */
+  protected function getSortingFields(): array{
     return [];
   }
   
-  protected abstract function getDefaultOrderByColumns(): array;
+  protected abstract function getDefaultSortingRuleList(): array;
   
   public final function prepare(PDO $db, string $sql, int $type = self::STMT_SELECT_APPEND): PDOStatement{
     $conditions = $this->generateWhereConditions();
@@ -141,9 +144,13 @@ abstract class AbstractFilter{
   
   private function generateOrderByClause(): string{
     $cols = [];
-    $rules = $this->sorting === null || $this->sorting->isEmpty() ? $this->getDefaultOrderByColumns() : $this->sorting->getRules();
+    $rules = $this->sorting === null || $this->sorting->isEmpty() ? $this->getDefaultSortingRuleList() : $this->sorting->getRuleList();
     
-    foreach($rules as $field => $direction){
+    foreach($rules as $item){
+      /** @var Field $field */
+      $field = $item[0];
+      $direction = $item[1];
+      
       if (!$direction){
         continue;
       }
@@ -151,10 +158,7 @@ abstract class AbstractFilter{
       switch($direction){
         case Sorting::SQL_ASC:
         case Sorting::SQL_DESC:
-          $field_period = strpos($field, '.');
-          $table_name = $field_period === false ? null : substr($field, 0, $field_period);
-          $field_name = $field_period === false ? $field : substr($field, $field_period + 1);
-          $cols[] = Field::sql($table_name, $field_name).' '.$direction;
+          $cols[] = $field->getSql().' '.$direction;
           break;
         
         default:

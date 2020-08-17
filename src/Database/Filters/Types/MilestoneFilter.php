@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Filters\Types;
 
 use Database\Filters\AbstractTrackerIdFilter;
+use Database\Filters\Field;
 use Database\Filters\General\Sorting;
 
 final class MilestoneFilter extends AbstractTrackerIdFilter{
@@ -11,17 +12,17 @@ final class MilestoneFilter extends AbstractTrackerIdFilter{
     return new self();
   }
   
-  protected function getSortingColumns(): array{
+  protected function getSortingFields(): array{
     return [
-        'title',
-        'progress',
-        'date_updated'
+        new Field('title', 'm'),
+        new Field('progress'),
+        new Field('date_updated')
     ];
   }
   
-  protected function getDefaultOrderByColumns(): array{
+  protected function getDefaultSortingRuleList(): array{
     return [
-        'm.ordering' => Sorting::SQL_ASC
+        (new Field('ordering', 'm'))->sortRule(Sorting::SQL_ASC)
     ];
   }
 }

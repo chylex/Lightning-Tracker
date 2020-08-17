@@ -7,6 +7,7 @@ use Database\Filters\AbstractTrackerIdFilter;
 use Database\Filters\Conditions\FieldLike;
 use Database\Filters\Conditions\FieldOneOf;
 use Database\Filters\Conditions\FieldOneOfNullable;
+use Database\Filters\Field;
 use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
@@ -32,40 +33,40 @@ final class IssueFilter extends AbstractTrackerIdFilter{
   protected function getFilterWhereCondition(string $field, $value): ?IWhereCondition{
     switch($field){
       case 'title':
-        return new FieldLike($field, $value);
+        return new FieldLike($field, $value, 'i');
       
       case 'type':
       case 'priority':
       case 'scale':
       case 'status':
-        return new FieldOneOf($field, $value);
+        return new FieldOneOf($field, $value, 'i');
       
       case 'milestone':
         return new FieldOneOfNullable($field.'_id', $value, 'm');
       
       case 'author':
       case 'assignee':
-        return new FieldOneOfNullable($field.'_id', $value);
+        return new FieldOneOfNullable($field.'_id', $value, 'i');
       
       default:
         return null;
     }
   }
   
-  protected function getSortingColumns(): array{
+  protected function getSortingFields(): array{
     return [
-        'id',
-        'title',
-        'priority',
-        'scale',
-        'progress',
-        'date_updated'
+        new Field('id'),
+        new Field('title', 'i'),
+        new Field('priority', 'i'),
+        new Field('scale', 'i'),
+        new Field('progress', 'i'),
+        new Field('date_updated', 'i')
     ];
   }
   
-  protected function getDefaultOrderByColumns(): array{
+  protected function getDefaultSortingRuleList(): array{
     return [
-        'id' => Sorting::SQL_DESC
+        (new Field('id'))->sortRule(Sorting::SQL_DESC)
     ];
   }
 }
