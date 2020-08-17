@@ -30,7 +30,7 @@ abstract class AbstractTrackerIdFilter extends AbstractFilter{
       }
       
       public function getSql(): string{
-        return AbstractTrackerIdFilter::field($this->tracker_id_prefix, 'tracker_id').' = :tracker_id';
+        return Field::sql('tracker_id', $this->tracker_id_prefix).' = :tracker_id';
       }
       
       public function prepareStatement(PDOStatement $stmt): void{

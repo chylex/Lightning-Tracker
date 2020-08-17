@@ -4,13 +4,13 @@ declare(strict_types = 1);
 namespace Database\Filters\Conditions;
 
 use Database\Filters\AbstractFilter;
+use Database\Filters\Field;
 use Database\Filters\IWhereCondition;
 use PDOStatement;
 use function Database\bind;
 
 final class FieldOneOf implements IWhereCondition{
-  private ?string $table_name;
-  private string $field;
+  private Field $field;
   
   /**
    * @var string[]
@@ -18,26 +18,29 @@ final class FieldOneOf implements IWhereCondition{
   private array $values;
   
   public function __construct(string $field, array $values, ?string $table_name = null){
-    $this->field = $field;
+    $this->field = new Field($field, $table_name);
     $this->values = $values;
-    $this->table_name = $table_name;
   }
   
-  public function getFieldName(): string{
-    return AbstractFilter::field($this->table_name, $this->field);
+  public function getFieldSql(): string{
+    return $this->field->getSql();
   }
   
   public function getSql(): string{
+    $field_name = $this->field->getFieldName();
+    
     $indices = empty($this->values) ? [] : range(1, count($this->values));
-    $param_list = array_map(fn($index): string => ':'.$this->field.'_'.$index, $indices);
+    $param_list = array_map(fn($index): string => ':'.$field_name.'_'.$index, $indices);
     $param_str = implode(', ', $param_list);
     
-    return $this->getFieldName().' IN ('.$param_str.')';
+    return $this->getFieldSql().' IN ('.$param_str.')';
   }
   
   public function prepareStatement(PDOStatement $stmt): void{
+    $field_name = $this->field->getFieldName();
+    
     for($i = 0, $count = count($this->values); $i < $count; $i++){
-      bind($stmt, $this->field.'_'.($i + 1), $this->values[$i]);
+      bind($stmt, $field_name.'_'.($i + 1), $this->values[$i]);
     }
   }
 }

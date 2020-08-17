@@ -5,6 +5,7 @@ namespace Database\Filters\Types;
 
 use Database\Filters\AbstractFilter;
 use Database\Filters\Conditions\FieldLike;
+use Database\Filters\Field;
 use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
@@ -17,8 +18,8 @@ final class TrackerFilter extends AbstractFilter{
   public static function getUserVisibilityClause(?string $table_name = null): string{
     // TODO have roles which ban the user instead?
     return
-        ' OR '.self::field($table_name, 'owner_id').' = :user_id_1'.
-        ' OR EXISTS(SELECT 1 FROM tracker_members tm WHERE tm.tracker_id = '.self::field($table_name, 'id').' AND tm.user_id = :user_id_2)';
+        ' OR '.Field::sql('owner_id', $table_name).' = :user_id_1'.
+        ' OR EXISTS(SELECT 1 FROM tracker_members tm WHERE tm.tracker_id = '.Field::sql('id', $table_name).' AND tm.user_id = :user_id_2)';
   }
   
   public static function bindUserVisibility(PDOStatement $stmt, UserProfile $user): void{

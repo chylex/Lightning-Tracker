@@ -26,14 +26,14 @@ final class FieldOneOfNullable implements IWhereCondition{
   }
   
   public function getSql(): string{
-    $field_name = $this->delegate->getFieldName();
+    $field = $this->delegate->getFieldSql();
     
     if ($this->can_be_null){
       if ($this->has_no_values){
-        return $field_name.' IS NULL';
+        return $field.' IS NULL';
       }
       else{
-        return '('.$field_name.' IS NULL OR '.$this->delegate->getSql().')';
+        return '('.$field.' IS NULL OR '.$this->delegate->getSql().')';
       }
     }
     else{

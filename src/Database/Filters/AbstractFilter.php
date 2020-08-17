@@ -154,7 +154,7 @@ abstract class AbstractFilter{
           $field_period = strpos($field, '.');
           $table_name = $field_period === false ? null : substr($field, 0, $field_period);
           $field_name = $field_period === false ? $field : substr($field, $field_period + 1);
-          $cols[] = self::field($table_name, $field_name).' '.$direction;
+          $cols[] = Field::sql($table_name, $field_name).' '.$direction;
           break;
         
         default:
@@ -174,10 +174,6 @@ abstract class AbstractFilter{
     $limit_count = $this->pagination->getElementsPerPage();
     
     return (int)$limit_offset.', '.(int)$limit_count;
-  }
-  
-  public static final function field(?string $table_name, string $field_name): string{
-    return $table_name === null ? "`$field_name`" : "`$table_name`.`$field_name`";
   }
 }
 
