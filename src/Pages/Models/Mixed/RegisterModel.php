@@ -97,32 +97,44 @@ class RegisterModel extends BasicMixedPageModel{
     return false;
   }
   
-  public static function validateUserFields(string $name, string $email, string $password): Validator{
+  public static function validateUserFields(string $name, string $email, ?string $password): Validator{
     $validator = new Validator();
     $validator->str('Name', $name)->notEmpty()->maxLength(32);
     $validator->str('Email', $email)->notEmpty()->maxLength(191)->contains('@', 'Email is not valid.');
-    $validator->str('Password', $password)->minLength(7)->maxLength(72);
+    
+    if ($password !== null){
+      $validator->str('Password', $password)->minLength(7)->maxLength(72);
+    }
+    
     return $validator;
   }
   
-  public static function checkDuplicateUser(FormComponent $form, string $name, string $email): bool{
+  public static function checkDuplicateUser(FormComponent $form, string $name, string $email, ?int $exclude_id = null): bool{
     try{
       $users = new UserTable(DB::get());
+      $has_duplicate = false;
       
-      if ($users->checkEmailExists($email)){
-        $form->invalidateField('Email', 'User with this email already exists.');
-        return false;
-      }
-      elseif ($users->checkNameExists($name)){
+      $name_match = $users->findIdByName($name);
+      $email_match = $users->findIdByEmail($email);
+      
+      if ($name_match !== null && ($exclude_id === null || $exclude_id !== $name_match)){
         $form->invalidateField('Name', 'User with this name already exists.');
-        return false;
+        $has_duplicate = true;
       }
       
-      return true;
+      if ($email_match !== null && ($exclude_id === null || $exclude_id !== $email_match)){
+        $form->invalidateField('Email', 'User with this email already exists.');
+        $has_duplicate = true;
+      }
+      
+      if ($has_duplicate){
+        return true;
+      }
     }catch(Exception $e){
       $form->onGeneralError($e);
-      return false;
     }
+    
+    return false;
   }
 }
 

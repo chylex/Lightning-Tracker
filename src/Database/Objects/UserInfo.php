@@ -9,12 +9,14 @@ final class UserInfo{
   private int $id;
   private string $name;
   private string $email;
+  private ?int $role_id;
   private ?string $role_title;
   private string $date_registered;
   
-  public function __construct(int $id, string $name, string $email, ?string $role_title, string $date_registered){
+  public function __construct(int $id, string $name, string $email, ?int $role_id, ?string $role_title, string $date_registered){
     $this->id = $id;
     $this->name = $name;
+    $this->role_id = $role_id;
     $this->email = $email;
     $this->role_title = $role_title;
     $this->date_registered = $date_registered;
@@ -24,12 +26,24 @@ final class UserInfo{
     return $this->id;
   }
   
+  public function getName(): string{
+    return $this->name;
+  }
+  
   public function getNameSafe(): string{
     return protect($this->name);
   }
   
+  public function getEmail(): string{
+    return $this->email;
+  }
+  
   public function getEmailSafe(): string{
     return protect($this->email);
+  }
+  
+  public function getRoleId(): ?int{
+    return $this->role_id;
   }
   
   public function getRoleTitleSafe(): ?string{

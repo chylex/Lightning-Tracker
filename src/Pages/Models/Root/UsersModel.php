@@ -128,7 +128,11 @@ class UsersModel extends BasicRootPageModel{
         }
       }
       
-      $this->table->addRow($row);
+      $row = $this->table->addRow($row);
+      
+      if ($this->perms->checkSystem(self::PERM_EDIT)){
+        $row->link($this->getReq()->getBasePath()->encoded().'/users/'.$user_id);
+      }
     }
     
     $this->table->setupColumnSorting($sorting);
