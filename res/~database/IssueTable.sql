@@ -1,18 +1,18 @@
 CREATE TABLE IF NOT EXISTS `issues` (
-	`tracker_id`    INT NOT NULL,
-	`issue_id`      INT NOT NULL,
-	`author_id`     INT NULL,
-	`assignee_id`   INT NULL,
-	`milestone_gid` INT DEFAULT NULL,
-	`title`         VARCHAR(128) NOT NULL,
-	`description`   TEXT NOT NULL,
-	`type`          ENUM ('feature', 'enhancement', 'bug', 'crash', 'task') NOT NULL,
-	`priority`      ENUM ('low', 'medium', 'high') NOT NULL,
-	`scale`         ENUM ('tiny', 'small', 'medium', 'large', 'massive') NOT NULL,
-	`status`        ENUM ('open', 'in-progress', 'ready-to-test', 'blocked', 'finished', 'rejected') DEFAULT 'open' NOT NULL,
-	`progress`      TINYINT DEFAULT 0 NOT NULL,
-	`date_created`  DATETIME NOT NULL,
-	`date_updated`  DATETIME NOT NULL,
+	`tracker_id`   INT NOT NULL,
+	`issue_id`     INT NOT NULL,
+	`author_id`    INT NULL,
+	`assignee_id`  INT NULL,
+	`milestone_id` INT DEFAULT NULL,
+	`title`        VARCHAR(128) NOT NULL,
+	`description`  TEXT NOT NULL,
+	`type`         ENUM ('feature', 'enhancement', 'bug', 'crash', 'task') NOT NULL,
+	`priority`     ENUM ('low', 'medium', 'high') NOT NULL,
+	`scale`        ENUM ('tiny', 'small', 'medium', 'large', 'massive') NOT NULL,
+	`status`       ENUM ('open', 'in-progress', 'ready-to-test', 'blocked', 'finished', 'rejected') DEFAULT 'open' NOT NULL,
+	`progress`     TINYINT DEFAULT 0 NOT NULL,
+	`date_created` DATETIME NOT NULL,
+	`date_updated` DATETIME NOT NULL,
 	PRIMARY KEY (`tracker_id`, `issue_id`),
 	FOREIGN KEY (`tracker_id`)
 		REFERENCES `trackers` (`id`)
@@ -27,14 +27,10 @@ CREATE TABLE IF NOT EXISTS `issues` (
 		REFERENCES `users` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	FOREIGN KEY (`milestone_gid`)
-		REFERENCES `milestones` (`gid`)
-		ON UPDATE CASCADE
-		ON DELETE SET NULL,
-	FOREIGN KEY (`milestone_gid`, `tracker_id`)
+	FOREIGN KEY (`milestone_id`, `tracker_id`)
 		# Ensures the milestone-tracker pair is always valid.
-		REFERENCES `milestones` (`gid`, `tracker_id`)
-		ON UPDATE RESTRICT
+		REFERENCES `milestones` (`milestone_id`, `tracker_id`)
+		ON UPDATE CASCADE
 		ON DELETE RESTRICT,
 	FOREIGN KEY (`scale`)
 		REFERENCES `issue_weights` (`scale`)

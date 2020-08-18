@@ -107,20 +107,7 @@ class MilestoneDeleteModel extends BasicTrackerPageModel{
     
     try{
       $milestones = new MilestoneTable(DB::get(), $this->getTracker());
-      
-      if ($replacement === null){
-        $replacement_gid = null;
-      }
-      else{
-        $replacement_gid = $milestones->findGlobalId($replacement);
-        
-        if ($replacement_gid === null){
-          $this->form->invalidateField('Replacement', 'Invalid milestone.');
-          return false;
-        }
-      }
-      
-      $milestones->deleteById($this->milestone_id, $replacement_gid);
+      $milestones->deleteById($this->milestone_id, $replacement);
       return true;
     }catch(Exception $e){
       $this->form->onGeneralError($e);

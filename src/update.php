@@ -18,15 +18,53 @@ try{
   
   if (INSTALLED_MIGRATION_VERSION === 1){
     $db = DB::get();
+    
     $db->query('ALTER TABLE system_roles ADD special BOOL DEFAULT FALSE NOT NULL');
     $db->query('ALTER TABLE tracker_roles ADD special BOOL DEFAULT FALSE NOT NULL');
     
-    /** @noinspection SqlResolve */
-    $db->query('ALTER TABLE milestones CHANGE id gid INT NOT NULL AUTO_INCREMENT');
-    $db->query('ALTER TABLE milestones ADD milestone_id INT NOT NULL DEFAULT 0 AFTER gid');
+    $stmt = $db->prepare(<<<SQL
+SELECT DISTINCT TABLE_NAME AS tbl, CONSTRAINT_NAME AS constr
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE TABLE_SCHEMA = :db_name AND REFERENCED_TABLE_SCHEMA = TABLE_SCHEMA
+  AND (
+    (TABLE_NAME = 'issues' AND COLUMN_NAME = 'milestone_id') OR
+    (TABLE_NAME = 'tracker_user_settings' AND COLUMN_NAME = 'active_milestone') OR
+    (TABLE_NAME = 'tracker_user_settings' AND COLUMN_NAME = 'tracker_id')
+  )
+SQL
+    );
+    
+    $stmt->bindValue('db_name', DB_NAME);
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+    
+    foreach($rows as $row){
+      /** @noinspection SqlResolve */
+      $db->query('ALTER TABLE `'.$row['tbl'].'` DROP FOREIGN KEY `'.$row['constr'].'`');
+    }
     
     /** @noinspection SqlResolve */
-    $db->query('ALTER TABLE issues CHANGE milestone_id milestone_gid INT NULL');
+    $db->query('ALTER TABLE milestones CHANGE id milestone_id INT NOT NULL AFTER tracker_id');
+    $db->query('ALTER TABLE milestones DROP PRIMARY KEY');
+    $db->query('ALTER TABLE milestones ADD PRIMARY KEY (tracker_id, milestone_id)');
+    
+    $db->query(<<<SQL
+ALTER TABLE issues
+  ADD FOREIGN KEY (`milestone_id`, `tracker_id`)
+    REFERENCES `milestones` (`milestone_id`, `tracker_id`)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT
+SQL
+    );
+    
+    $db->query(<<<SQL
+ALTER TABLE tracker_user_settings
+  ADD FOREIGN KEY (`active_milestone`, `tracker_id`)
+    REFERENCES `milestones` (`milestone_id`, `tracker_id`)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+SQL
+    );
     
     begin_transaction($db);
     
@@ -48,9 +86,6 @@ SQL
     
     /** @noinspection SqlWithoutWhere */
     $db->query('UPDATE milestones SET milestone_id = ordering');
-    $db->query('ALTER TABLE milestones MODIFY milestone_id INT NOT NULL AFTER gid');
-    $db->query('ALTER TABLE milestones DROP PRIMARY KEY');
-    $db->query('ALTER TABLE milestones ADD PRIMARY KEY (tracker_id, milestone_id)');
   }
   
   if (!file_put_contents(CONFIG_FILE, SystemConfig::fromCurrentInstallation()->generate(), LOCK_EX)){

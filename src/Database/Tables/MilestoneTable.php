@@ -148,10 +148,10 @@ SELECT m.milestone_id                                                   AS miles
        FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS progress,
        MAX(i.date_updated)                                              AS date_updated
 FROM milestones m
-LEFT JOIN issues i ON m.gid = i.milestone_gid
+LEFT JOIN issues i ON m.tracker_id = i.tracker_id AND m.milestone_id = i.milestone_id
 LEFT JOIN issue_weights iw ON i.scale = iw.scale
 # WHERE
-GROUP BY m.gid, m.title
+GROUP BY m.milestone_id, m.title
 # ORDER
 # LIMIT
 SQL;
@@ -191,26 +191,15 @@ SQL;
     return $title === false ? null : $title;
   }
   
-  public function findGlobalId(int $id): ?int{
-    $stmt = $this->db->prepare('SELECT gid FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
-    $stmt->execute();
-    
-    $gid = $this->fetchOneColumn($stmt);
-    return $gid === false ? null : (int)$gid;
-  }
-  
-  public function deleteById(int $id, ?int $replacement_gid): void{
+  public function deleteById(int $id, ?int $replacement_id): void{
     $tracker = $this->getTrackerId();
     
     $this->db->beginTransaction();
     
     try{
-      $gid = $this->findGlobalId($id);
       $ordering = $this->getMilestoneOrdering($id);
       
-      if ($gid === null || $ordering === null){
+      if ($ordering === null){
         $this->db->rollBack();
         return;
       }
@@ -220,11 +209,14 @@ SQL;
       $stmt->bindValue(2, $tracker, PDO::PARAM_INT);
       $stmt->execute();
       
-      $stmt = $this->db->prepare('UPDATE issues SET milestone_gid = ? WHERE milestone_gid = ? AND tracker_id = ?');
-      $stmt->bindValue(1, $replacement_gid, $replacement_gid === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-      $stmt->bindValue(2, $gid, PDO::PARAM_INT);
-      $stmt->bindValue(3, $tracker, PDO::PARAM_INT);
-      $stmt->execute();
+      foreach(['UPDATE issues SET milestone_id = ? WHERE milestone_id = ? AND tracker_id = ?',
+               'UPDATE tracker_user_settings SET active_milestone = ? WHERE active_milestone = ? AND tracker_id = ?'] as $sql){
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(1, $replacement_id, $replacement_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+        $stmt->bindValue(2, $id, PDO::PARAM_INT);
+        $stmt->bindValue(3, $tracker, PDO::PARAM_INT);
+        $stmt->execute();
+      }
       
       $stmt = $this->db->prepare('DELETE FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
       $stmt->bindValue(1, $id, PDO::PARAM_INT);

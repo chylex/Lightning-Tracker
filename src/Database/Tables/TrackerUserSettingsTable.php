@@ -14,7 +14,7 @@ final class TrackerUserSettingsTable extends AbstractTrackerTable{
     parent::__construct($db, $tracker);
   }
   
-  public function toggleActiveMilestone(UserProfile $user, int $milestone_gid): void{
+  public function toggleActiveMilestone(UserProfile $user, int $milestone_id): void{
     $stmt = $this->db->prepare(<<<SQL
 INSERT INTO tracker_user_settings (tracker_id, user_id, active_milestone)
 VALUES (?, ?, ?)
@@ -24,7 +24,7 @@ SQL
     
     $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->bindValue(2, $user->getId(), PDO::PARAM_INT);
-    $stmt->bindValue(3, $milestone_gid, PDO::PARAM_INT);
+    $stmt->bindValue(3, $milestone_id, PDO::PARAM_INT);
     $stmt->execute();
   }
   
@@ -34,11 +34,11 @@ SELECT m.milestone_id                                                  AS id,
        m.title                                                         AS title,
        FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution)) AS percentage_done
 FROM tracker_user_settings tus
-JOIN      milestones m ON m.gid = tus.active_milestone
-LEFT JOIN issues i ON m.gid = i.milestone_gid
+JOIN      milestones m ON tus.tracker_id = m.tracker_id AND tus.active_milestone = m.milestone_id
+LEFT JOIN issues i ON m.milestone_id = i.milestone_id
 LEFT JOIN issue_weights iw ON i.scale = iw.scale
 WHERE tus.user_id = ? AND tus.tracker_id = ?
-GROUP BY m.gid
+GROUP BY m.milestone_id
 SQL
     );
     

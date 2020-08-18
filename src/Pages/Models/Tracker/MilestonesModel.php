@@ -202,18 +202,8 @@ HTML
       return false;
     }
     
-    $db = DB::get();
-    $tracker = $this->getTracker();
-    
-    $milestones = new MilestoneTable($db, $tracker);
-    $milestone_gid = $milestones->findGlobalId((int)$data['Milestone']);
-    
-    if ($milestone_gid === null){
-      return false;
-    }
-    
-    $settings = new TrackerUserSettingsTable($db, $tracker);
-    $settings->toggleActiveMilestone($logon_user, $milestone_gid);
+    $settings = new TrackerUserSettingsTable(DB::get(), $this->getTracker());
+    $settings->toggleActiveMilestone($logon_user, (int)$data['Milestone']);
     return true;
   }
 }
