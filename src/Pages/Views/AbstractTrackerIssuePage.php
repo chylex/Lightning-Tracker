@@ -19,11 +19,7 @@ abstract class AbstractTrackerIssuePage extends AbstractTrackerPage{
   }
   
   protected function getHeading(): string{
-    $back_url = $this->getHeadingBackUrl();
-    
-    return <<<HTML
-<a href="$back_url">Back</a> <span class="breadcrumb-arrows">&raquo;</span>
-HTML;
+    return self::breadcrumb($this->model->getReq(), $this->getHeadingBackUrl());
   }
   
   protected abstract function getHeadingBackUrl(): string;

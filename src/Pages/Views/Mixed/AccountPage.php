@@ -19,8 +19,8 @@ class AccountPage extends AbstractPage{
     $this->model = $model;
   }
   
-  protected function getTitle(): string{
-    return 'Lightning Tracker - My Account';
+  protected function getSubtitle(): string{
+    return 'My Account';
   }
   
   protected function getHeading(): string{

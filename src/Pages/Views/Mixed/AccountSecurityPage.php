@@ -14,8 +14,8 @@ class AccountSecurityPage extends AccountPage{
     $this->model = $model;
   }
   
-  protected function getTitle(): string{
-    return parent::getTitle().' - Security';
+  protected function getSubtitle(): string{
+    return parent::getSubtitle().' - Security';
   }
   
   protected function getAccountPageColumn(): IViewable{

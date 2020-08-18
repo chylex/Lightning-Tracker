@@ -14,20 +14,19 @@ class IssueDeletePage extends AbstractTrackerIssuePage{
     $this->model = $model;
   }
   
-  protected function getTitle(): string{
-    return $this->model->getTracker()->getNameSafe().' - Issue #'.$this->model->getIssueId().' - Lightning Tracker';
+  protected function getSubtitle(): string{
+    return 'Issue #'.$this->model->getIssueId();
   }
   
   protected function getHeading(): string{
-    $issue_id = $this->model->getIssueId();
     $issue = $this->model->getIssue();
-    
     $title = $issue === null ? '' : ' - '.$issue->getTitleSafe();
-    return parent::getHeading().' Issue #'.$issue_id.$title;
+    
+    return parent::getHeading().' '.$this->getSubtitle().$title;
   }
   
   protected function getHeadingBackUrl(): string{
-    return $this->model->getReq()->getBasePath()->encoded().'/issues/'.$this->model->getIssueId();
+    return '/issues/'.$this->model->getIssueId();
   }
   
   protected function getLayout(): string{

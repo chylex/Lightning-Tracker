@@ -14,8 +14,8 @@ class AccountAppearancePage extends AccountPage{
     $this->model = $model;
   }
   
-  protected function getTitle(): string{
-    return parent::getTitle().' - Appearance';
+  protected function getSubtitle(): string{
+    return parent::getSubtitle().' - Appearance';
   }
   
   protected function getAccountPageColumn(): IViewable{

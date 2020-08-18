@@ -11,8 +11,8 @@ class AboutPage extends AbstractPage{
     parent::__construct($model);
   }
   
-  protected function getTitle(): string{
-    return 'Lightning Tracker - About';
+  protected function getSubtitle(): string{
+    return 'About';
   }
   
   protected function getHeading(): string{

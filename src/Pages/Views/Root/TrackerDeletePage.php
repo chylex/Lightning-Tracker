@@ -15,8 +15,8 @@ class TrackerDeletePage extends AbstractPage{
     $this->model = $model;
   }
   
-  protected function getTitle(): string{
-    return 'Lightning Tracker - Delete Tracker';
+  protected function getSubtitle(): string{
+    return 'Trackers';
   }
   
   protected function getHeading(): string{

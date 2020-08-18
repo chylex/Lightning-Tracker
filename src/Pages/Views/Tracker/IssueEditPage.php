@@ -14,39 +14,28 @@ class IssueEditPage extends AbstractTrackerIssuePage{
     $this->model = $model;
   }
   
-  protected function getTitle(): string{
+  protected function getSubtitle(): string{
     if ($this->model->isNewIssue()){
-      return $this->model->getTracker()->getNameSafe().' - New Issue - Lightning Tracker';
+      return 'New Issue';
     }
     else{
-      return $this->model->getTracker()->getNameSafe().' - Issue #'.$this->model->getIssueId().' - Lightning Tracker';
+      return 'Issue #'.$this->model->getIssueId();
     }
   }
   
   protected function getHeading(): string{
-    $issue_id = $this->model->getIssueId();
-    $issue = $this->model->getIssue();
+    $issue = $this->model->isNewIssue() ? null : $this->model->getIssue();
+    $title = $issue === null ? '' : ' - '.$issue->getTitleSafe();
     
-    if ($this->model->isNewIssue()){
-      return parent::getHeading().' New Issue';
-    }
-    elseif ($issue === null){
-      return parent::getHeading().' Issue #'.$issue_id;
-    }
-    else{
-      return parent::getHeading().' Issue #'.$issue_id.' - '.$issue->getTitleSafe();
-    }
+    return parent::getHeading().' '.$this->getSubtitle().$title;
   }
   
   protected function getHeadingBackUrl(): string{
-    $issue_id = $this->model->getIssueId();
-    $base_path = $this->model->getReq()->getBasePath()->encoded();
-    
-    if ($issue_id === null){
-      return $base_path.'/issues';
+    if ($this->model->isNewIssue()){
+      return '/issues';
     }
     else{
-      return $base_path.'/issues/'.$issue_id;
+      return '/issues/'.$this->model->getIssueId();
     }
   }
   

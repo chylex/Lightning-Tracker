@@ -15,13 +15,12 @@ class MilestoneEditPage extends AbstractTrackerPage{
     $this->model = $model;
   }
   
-  protected function getTitle(): string{
-    return $this->model->getTracker()->getNameSafe().' - Milestones - Lightning Tracker';
+  protected function getSubtitle(): string{
+    return 'Milestones';
   }
   
   protected function getHeading(): string{
-    $base_url = $this->model->getReq()->getBasePath()->encoded();
-    return '<a href="'.$base_url.'/milestones">Back</a> <span class="breadcrumb-arrows">&raquo;</span> Edit Milestone';
+    return self::breadcrumb($this->model->getReq(), '/milestones').'Edit Milestone';
   }
   
   protected function getLayout(): string{

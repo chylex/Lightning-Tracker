@@ -13,8 +13,8 @@ abstract class AbstractTrackerPage extends AbstractPage{
     $this->model = $model;
   }
   
-  protected function getTitle(): string{
-    return $this->model->getTracker()->getNameSafe().' - '.$this->getHeading().' - Lightning Tracker';
+  protected final function getTitle(): string{
+    return $this->model->getTracker()->getNameSafe().' - '.$this->getSubtitle().' - Lightning Tracker';
   }
 }
 

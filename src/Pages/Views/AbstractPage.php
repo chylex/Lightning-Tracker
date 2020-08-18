@@ -6,11 +6,16 @@ namespace Pages\Views;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\IModel;
 use Pages\IViewable;
+use Routing\Request;
 
 abstract class AbstractPage implements IViewable{
   protected const LAYOUT_FULL = 'full';
   protected const LAYOUT_CONDENSED = 'condensed';
   protected const LAYOUT_COMPACT = 'compact';
+  
+  protected static final function breadcrumb(Request $req, string $link, string $title = 'Back'): string{
+    return '<a href="'.$req->getBasePath()->encoded().$link.'">'.$title.'</a> <span class="breadcrumb-arrows">&raquo;</span> ';
+  }
   
   private IModel $model;
   
@@ -20,7 +25,11 @@ abstract class AbstractPage implements IViewable{
   }
   
   protected function getTitle(): string{
-    return 'Lightning Tracker - '.$this->getHeading();
+    return 'Lightning Tracker - '.$this->getSubtitle();
+  }
+  
+  protected function getSubtitle(): string{
+    return $this->getHeading();
   }
   
   protected abstract function getHeading(): string;
