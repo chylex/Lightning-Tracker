@@ -54,7 +54,7 @@ class AccountAppearanceModel extends AccountModel{
       $path = BASE_PATH_ENC;
       $cookie = Pagination::COOKIE_ELEMENTS;
       $age = 0x7FFFFFFF;
-      header("Set-Cookie: $cookie=$table_pagination_elements; Max-Age=$age; Path=$path; SameSite=Lax");
+      header("Set-Cookie: $cookie=$table_pagination_elements; Max-Age=$age; Path=$path/; SameSite=Lax");
       
       $this->appearance_form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Settings were changed.'));
       return true;

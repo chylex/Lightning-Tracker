@@ -48,7 +48,7 @@ if ($base_url_split === false){
   die('Base URL is invalid.');
 }
 
-$base_url_path = parse_url(BASE_URL, PHP_URL_PATH) ?? '/';
+$base_url_path = rtrim(parse_url(BASE_URL, PHP_URL_PATH), '/') ?? '';
 $base_url_protocol = mb_substr(BASE_URL, 0, $base_url_split + 3);
 $base_url_domain_path = mb_substr(BASE_URL, $base_url_split + 3);
 
