@@ -6,6 +6,7 @@ namespace Pages\Views\Root;
 use Pages\Components\Forms\FormComponent;
 use Pages\Models\Root\TrackerDeleteModel;
 use Pages\Views\AbstractPage;
+use Routing\Request;
 
 class TrackerDeletePage extends AbstractPage{
   private TrackerDeleteModel $model;
@@ -20,7 +21,7 @@ class TrackerDeletePage extends AbstractPage{
   }
   
   protected function getHeading(): string{
-    return 'Delete Tracker - '.$this->model->getTracker()->getNameSafe();
+    return self::breadcrumb(Request::empty(), '/').'Delete Tracker - '.$this->model->getTracker()->getNameSafe();
   }
   
   protected function getLayout(): string{

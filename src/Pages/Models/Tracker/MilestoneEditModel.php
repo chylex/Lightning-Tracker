@@ -13,10 +13,12 @@ use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
 use Validation\ValidationException;
 use Validation\Validator;
+use function Database\protect;
 
 class MilestoneEditModel extends BasicTrackerPageModel{
   private int $milestone_id;
-  private bool $has_milestone;
+  private bool $has_milestone = false;
+  private string $milestone_title_safe;
   
   private FormComponent $form;
   
@@ -43,6 +45,7 @@ class MilestoneEditModel extends BasicTrackerPageModel{
       }
       else{
         $this->has_milestone = true;
+        $this->milestone_title_safe = protect($title);
         $this->form->fill(['Title' => $title]);
       }
     }
@@ -52,6 +55,10 @@ class MilestoneEditModel extends BasicTrackerPageModel{
   
   public function hasMilestone(): bool{
     return $this->has_milestone;
+  }
+  
+  public function getMilestoneTitleSafe(): string{
+    return $this->milestone_title_safe;
   }
   
   public function getEditForm(): FormComponent{

@@ -20,7 +20,8 @@ class MilestoneEditPage extends AbstractTrackerPage{
   }
   
   protected function getHeading(): string{
-    return self::breadcrumb($this->model->getReq(), '/milestones').'Edit Milestone';
+    $name = $this->model->hasMilestone() ? ' - '.$this->model->getMilestoneTitleSafe() : '';
+    return self::breadcrumb($this->model->getReq(), '/milestones').'Edit Milestone'.$name;
   }
   
   protected function getLayout(): string{
@@ -33,7 +34,9 @@ class MilestoneEditPage extends AbstractTrackerPage{
   
   protected function echoPageBody(): void{
     if ($this->model->hasMilestone()){
+      echo '<div class="max-width-400">';
       $this->model->getEditForm()->echoBody();
+      echo '</div>';
     }
     else{
       echo '<p>Milestone not found.</p>';
