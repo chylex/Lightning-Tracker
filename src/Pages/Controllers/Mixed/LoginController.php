@@ -22,10 +22,11 @@ class LoginController extends AbstractHandlerController{
   }
   
   public static function getReturnQuery(Request $req): string{
-    $base_path = ltrim($req->getBasePath()->raw(), '/');
+    $base_path_components = [BASE_PATH, $req->getBasePath()->raw()];
+    $base_path = implode('/', array_filter(array_map(fn($v): string => ltrim($v, '/'), $base_path_components), fn($v): bool => !empty($v)));
     $base_path_len = strlen($base_path);
-    $request_uri = ltrim($_SERVER['REQUEST_URI'], '/');
     
+    $request_uri = ltrim($_SERVER['REQUEST_URI'], '/');
     $current_path = '/'.parse_url($request_uri, PHP_URL_PATH);
     
     if (self::strEndsWith($current_path, '/register')){

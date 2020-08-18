@@ -37,7 +37,7 @@ final class TableRow implements IViewable{
       $column->echoCellStart();
       
       if ($link !== null){
-        echo '<a href="'.$link.'">';
+        echo '<a href="'.BASE_URL_ENC.'/'.ltrim($link, '/').'">';
       }
       
       if ($value instanceof IViewable){
