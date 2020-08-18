@@ -15,10 +15,11 @@ CREATE TABLE IF NOT EXISTS `tracker_members` (
 		REFERENCES `tracker_roles` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	FOREIGN KEY (`role_id`, `tracker_id`) # Ensures the role-tracker pair is always valid.
+	FOREIGN KEY (`role_id`, `tracker_id`)
+		# Ensures the role-tracker pair is always valid.
 		REFERENCES `tracker_roles` (`id`, `tracker_id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE utf8mb4_general_ci

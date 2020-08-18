@@ -6,7 +6,6 @@ namespace Pages\Models;
 use LogicException;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
-use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Mixed\LoginController;
 use Pages\IModel;
 use Routing\Request;

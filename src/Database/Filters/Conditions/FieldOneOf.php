@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace Database\Filters\Conditions;
 
-use Database\Filters\AbstractFilter;
 use Database\Filters\Field;
 use Database\Filters\IWhereCondition;
 use PDOStatement;

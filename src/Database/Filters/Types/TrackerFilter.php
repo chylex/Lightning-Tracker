@@ -16,7 +16,6 @@ use function Database\bind;
 
 final class TrackerFilter extends AbstractFilter{
   public static function getUserVisibilityClause(?string $table_name = null): string{
-    // TODO have roles which ban the user instead?
     return
         ' OR '.Field::sql('owner_id', $table_name).' = :user_id_1'.
         ' OR EXISTS(SELECT 1 FROM tracker_members tm WHERE tm.tracker_id = '.Field::sql('id', $table_name).' AND tm.user_id = :user_id_2)';

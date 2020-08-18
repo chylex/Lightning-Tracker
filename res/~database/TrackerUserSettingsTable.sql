@@ -15,10 +15,11 @@ CREATE TABLE IF NOT EXISTS `tracker_user_settings` (
 		REFERENCES `milestones` (`gid`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	FOREIGN KEY (`active_milestone`, `tracker_id`) # Ensures the milestone-tracker pair is always valid.
+	FOREIGN KEY (`active_milestone`, `tracker_id`)
+		# Ensures the milestone-tracker pair is always valid.
 		REFERENCES `milestones` (`gid`, `tracker_id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE utf8mb4_general_ci

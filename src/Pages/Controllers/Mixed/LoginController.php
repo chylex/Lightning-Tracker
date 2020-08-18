@@ -31,7 +31,7 @@ class LoginController extends AbstractHandlerController{
     if (self::strEndsWith($current_path, '/register')){
       $return = '';
     }
-    elseif(self::strEndsWith($current_path, '/login')){
+    elseif (self::strEndsWith($current_path, '/login')){
       $return = $_GET['return'] ?? '';
     }
     else{

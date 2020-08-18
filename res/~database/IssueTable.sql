@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS `issues` (
 	FOREIGN KEY (`milestone_gid`, `tracker_id`)
 		# Ensures the milestone-tracker pair is always valid.
 		REFERENCES `milestones` (`gid`, `tracker_id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION,
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT,
 	FOREIGN KEY (`scale`)
 		REFERENCES `issue_weights` (`scale`)
 		ON UPDATE RESTRICT
