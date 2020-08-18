@@ -181,7 +181,12 @@ span.missing {
 }
 
 #page-content.compact {
-  max-width: 500px;
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+#page-content.minimal {
+  max-width: 425px;
   margin: 0 auto;
 }
 

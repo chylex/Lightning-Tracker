@@ -24,7 +24,7 @@ class MilestoneDeletePage extends AbstractTrackerPage{
   }
   
   protected function getLayout(): string{
-    return self::LAYOUT_CONDENSED;
+    return self::LAYOUT_COMPACT;
   }
   
   protected function echoPageHead(): void{

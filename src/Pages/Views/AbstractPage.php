@@ -12,6 +12,7 @@ abstract class AbstractPage implements IViewable{
   protected const LAYOUT_FULL = 'full';
   protected const LAYOUT_CONDENSED = 'condensed';
   protected const LAYOUT_COMPACT = 'compact';
+  protected const LAYOUT_MINIMAL = 'minimal';
   
   protected static final function breadcrumb(Request $req, string $link, string $title = 'Back'): string{
     return '<a href="'.$req->getBasePath()->encoded().$link.'">'.$title.'</a> <span class="breadcrumb-arrows">&raquo;</span> ';

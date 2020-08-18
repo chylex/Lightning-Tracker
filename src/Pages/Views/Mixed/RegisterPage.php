@@ -20,7 +20,7 @@ class RegisterPage extends AbstractPage{
   }
   
   protected function getLayout(): string{
-    return self::LAYOUT_COMPACT;
+    return self::LAYOUT_MINIMAL;
   }
   
   protected function echoPageHead(): void{
