@@ -6,6 +6,10 @@ namespace Routing;
 use Pages\Components\Forms\FormComponent;
 
 final class Request{
+  public static function empty(): self{
+    return new Request('', '', []);
+  }
+  
   public static function prepareSession(array $data): void{
     session_start();
     

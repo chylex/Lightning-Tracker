@@ -114,7 +114,7 @@ $router->add('&/favicon.ico', 'Root/FaviconController');
 
 function handle_error(int $code, string $title, string $message, ?Request $req = null): void{
   http_response_code($code);
-  $page_model = new BasicRootPageModel($req ?? new Request('', '', []));
+  $page_model = new BasicRootPageModel($req ?? Request::empty());
   $error_model = new ErrorModel($page_model, $title, $message);
   view(new ErrorPage($error_model->load()))->execute();
 }
