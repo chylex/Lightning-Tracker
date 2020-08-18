@@ -42,6 +42,11 @@ HTML;
     $item = new NavigationItem($title, $this->base_url.$url);
     
     $url_trim = trim($url, '/');
+    $query_start = mb_strpos($url_trim, '?');
+    
+    if ($query_start !== false){
+      $url_trim = mb_substr($url_trim, 0, $query_start);
+    }
     
     if ((empty($url_trim) && empty($this->active_path_normalized)) || (!empty($url_trim) && mb_strpos($this->active_path_normalized, $url_trim) === 0)){
       $item = $item->active();
