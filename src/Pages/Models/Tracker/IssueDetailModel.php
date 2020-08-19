@@ -34,7 +34,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
     $this->perms = $perms;
     $this->issue_id = $issue_id;
     
-    $this->menu_actions = new SidemenuComponent(BASE_URL_ENC, $req);
+    $this->menu_actions = new SidemenuComponent($req);
     $this->menu_actions->setTitle(Text::plain('Actions'));
   }
   

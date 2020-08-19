@@ -17,6 +17,7 @@ use Pages\Components\ProgressBarComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
+use Routing\Link;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
@@ -69,6 +70,7 @@ class MilestonesModel extends BasicTrackerPageModel{
   public function load(): IModel{
     parent::load();
     
+    $req = $this->getReq();
     $tracker = $this->getTracker();
     
     $filter = new MilestoneFilter();
@@ -80,8 +82,6 @@ class MilestonesModel extends BasicTrackerPageModel{
     
     $active_milestone = $this->getActiveMilestone();
     $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
-    
-    $path_enc = $this->getReq()->getBasePath()->encoded().'/milestones/';
     
     foreach($milestones->listMilestones($filter) as $milestone){
       $milestone_id = $milestone->getMilestoneId();
@@ -104,8 +104,9 @@ class MilestonesModel extends BasicTrackerPageModel{
         $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
         $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
         
+        $link_delete = Link::fromBase($req, 'milestones', $milestone_id_str, 'delete');
         $btn_delete = new Html(<<<HTML
-<form action="$path_enc$milestone_id_str/delete">
+<form action="$link_delete">
   <button type="submit" class="icon">
     <span class="icon icon-circle-cross icon-color-red"></span>
   </button>
@@ -122,7 +123,7 @@ HTML
       $row = $this->table->addRow($row);
       
       if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
-        $row->link($path_enc.$milestone_id_str);
+        $row->link(Link::fromBase($req, 'milestones', $milestone_id_str));
       }
     }
     

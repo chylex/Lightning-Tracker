@@ -13,6 +13,7 @@ use Pages\IAction;
 use Pages\Models\Tracker\MilestoneDeleteModel;
 use Pages\Models\Tracker\MilestonesModel;
 use Pages\Views\Tracker\MilestoneDeletePage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -34,7 +35,7 @@ class MilestoneDeleteController extends AbstractTrackerController{
     if (($action === null && $model->deleteMilestoneSafely()) ||
         ($action === $model::ACTION_CONFIRM && $model->deleteMilestone($req->getData()))
     ){
-      return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'milestones']);
+      return redirect(Link::fromBase($req, 'milestones'));
     }
     
     return view(new MilestoneDeletePage($model->load()));

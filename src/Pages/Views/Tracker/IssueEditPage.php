@@ -32,10 +32,10 @@ class IssueEditPage extends AbstractTrackerIssuePage{
   
   protected function getHeadingBackUrl(): string{
     if ($this->model->isNewIssue()){
-      return '/issues';
+      return 'issues';
     }
     else{
-      return '/issues/'.$this->model->getIssueId();
+      return 'issues/'.$this->model->getIssueId();
     }
   }
   

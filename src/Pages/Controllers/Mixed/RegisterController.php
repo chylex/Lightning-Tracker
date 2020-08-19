@@ -13,6 +13,7 @@ use Pages\Models\ErrorModel;
 use Pages\Models\Mixed\RegisterModel;
 use Pages\Views\ErrorPage;
 use Pages\Views\Mixed\RegisterPage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -39,14 +40,14 @@ class RegisterController extends AbstractHandlerController{
     }
     
     if ($sess->isLoggedOn()){
-      return redirect([BASE_URL_ENC, $req->getBasePath()->encoded()]);
+      return redirect(Link::fromBase($req));
     }
     
     $model = new RegisterModel($req, $this->tracker);
     $data = $req->getData();
     
     if (!empty($data) && $model->registerUser($data, $sess)){
-      return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'register?success']);
+      return redirect(Link::fromBase($req, 'register?success'));
     }
     
     return view(new RegisterPage($model->load()));

@@ -21,7 +21,7 @@ class MilestoneEditPage extends AbstractTrackerPage{
   
   protected function getHeading(): string{
     $name = $this->model->hasMilestone() ? ' - '.$this->model->getMilestoneTitleSafe() : '';
-    return self::breadcrumb($this->model->getReq(), '/milestones').'Edit Milestone'.$name;
+    return self::breadcrumb($this->model->getReq(), 'milestones').'Edit Milestone'.$name;
   }
   
   protected function getLayout(): string{

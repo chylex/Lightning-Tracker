@@ -12,6 +12,7 @@ use Pages\IAction;
 use Pages\Models\Root\TrackerDeleteModel;
 use Pages\Models\Root\TrackersModel;
 use Pages\Views\Root\TrackerDeletePage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -27,7 +28,7 @@ class TrackerDeleteController extends AbstractTrackerController{
     $model = new TrackerDeleteModel($req, $tracker);
     
     if ($req->getAction() === $model::ACTION_CONFIRM && $model->deleteTracker($req->getData())){
-      return redirect([BASE_URL_ENC]);
+      return redirect(Link::fromRoot());
     }
     
     return view(new TrackerDeletePage($model->load()));

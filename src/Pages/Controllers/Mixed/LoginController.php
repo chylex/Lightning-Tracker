@@ -11,6 +11,7 @@ use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\IAction;
 use Pages\Models\Mixed\LoginModel;
 use Pages\Views\Mixed\LoginPage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -56,7 +57,7 @@ class LoginController extends AbstractHandlerController{
     if (!empty($data) && $model->loginUser($data, $sess)){
       $return = $_GET['return'] ?? '';
       $return = strpos($return, '://') === false ? ltrim($return, '/') : '';
-      return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), $return]);
+      return redirect(Link::fromBase($req, $return));
     }
     
     return view(new LoginPage($model->load()));

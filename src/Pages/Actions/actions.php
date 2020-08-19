@@ -9,8 +9,8 @@ function view(AbstractPage $view): ViewAction{
   return new ViewAction($view);
 }
 
-function redirect(array $components): RedirectAction{
-  return new RedirectAction(implode('/', array_filter($components, fn($component): bool => !empty($component))));
+function redirect(string $url): RedirectAction{
+  return new RedirectAction($url);
 }
 
 function reload(): RedirectAction{

@@ -12,6 +12,7 @@ use Pages\IAction;
 use Pages\Models\Root\UserEditModel;
 use Pages\Models\Root\UsersModel;
 use Pages\Views\Root\UserEditPage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -31,7 +32,7 @@ class UserEditController extends AbstractHandlerController{
     $data = $req->getData();
     
     if (!empty($data) && $model->editUser($data)){
-      return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'users']);
+      return redirect(Link::fromBase($req, 'users'));
     }
     
     return view(new UserEditPage($model->load()));

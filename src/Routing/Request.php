@@ -61,30 +61,6 @@ final class Request{
   public function getAction(): ?string{
     return $this->data[FormComponent::ACTION_KEY] ?? null;
   }
-  
-  /**
-   * @param string $key
-   * @param mixed $new_value
-   * @return string
-   */
-  public function pathWithGet(string $key, $new_value): string{
-    $data = $_GET;
-    
-    if ($new_value === null){
-      unset($data[$key]);
-    }
-    else{
-      $data[$key] = $new_value;
-    }
-    
-    $query = http_build_query($data);
-    
-    if (!empty($query)){
-      $query = '/?'.$query;
-    }
-    
-    return $this->getFullPath()->encoded().$query;
-  }
 }
 
 ?>

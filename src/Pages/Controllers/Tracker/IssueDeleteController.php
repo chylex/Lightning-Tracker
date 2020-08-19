@@ -13,6 +13,7 @@ use Pages\IAction;
 use Pages\Models\Tracker\IssueDeleteModel;
 use Pages\Models\Tracker\IssuesModel;
 use Pages\Views\Tracker\IssueDeletePage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -31,7 +32,7 @@ class IssueDeleteController extends AbstractTrackerController{
     $model = new IssueDeleteModel($req, $tracker, $this->issue_id);
     
     if ($req->getAction() === $model::ACTION_CONFIRM && $model->deleteIssue($req->getData())){
-      return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'issues']);
+      return redirect(Link::fromBase($req, 'issues'));
     }
     
     return view(new IssueDeletePage($model->load()));

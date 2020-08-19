@@ -11,6 +11,7 @@ use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\IAction;
 use Pages\Models\Tracker\IssueEditModel;
 use Pages\Views\Tracker\IssueEditPage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -32,7 +33,7 @@ class IssueEditController extends AbstractTrackerController{
       $new_issue_id = $model->createOrEditIssue($data, $sess->getLogonUser());
       
       if ($new_issue_id !== null){
-        return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'issues/'.$new_issue_id]);
+        return redirect(Link::fromBase($req, 'issues', $new_issue_id));
       }
     }
     

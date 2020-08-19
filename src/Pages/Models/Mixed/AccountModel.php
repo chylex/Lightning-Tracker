@@ -21,8 +21,8 @@ class AccountModel extends BasicMixedPageModel{
   public function __construct(Request $req, UserProfile $logon_user, ?TrackerInfo $tracker){
     parent::__construct($req, $tracker);
     $this->logon_user = $logon_user;
-    $this->menu_links = new SidemenuComponent(BASE_URL_ENC, $req);
-    $this->menu_actions = new SidemenuComponent(BASE_URL_ENC, $req);
+    $this->menu_links = new SidemenuComponent($req);
+    $this->menu_actions = new SidemenuComponent($req);
   }
   
   public function load(): IModel{

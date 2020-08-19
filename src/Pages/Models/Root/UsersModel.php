@@ -17,6 +17,7 @@ use Pages\IModel;
 use Pages\Models\BasicRootPageModel;
 use Pages\Models\Mixed\RegisterModel;
 use PDOException;
+use Routing\Link;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
@@ -131,7 +132,7 @@ class UsersModel extends BasicRootPageModel{
       $row = $this->table->addRow($row);
       
       if ($this->perms->checkSystem(self::PERM_EDIT)){
-        $row->link($this->getReq()->getBasePath()->encoded().'/users/'.$user_id);
+        $row->link(Link::fromBase($this->getReq(), 'users', $user_id));
       }
     }
     

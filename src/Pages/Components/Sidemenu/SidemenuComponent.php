@@ -7,6 +7,7 @@ use Pages\Components\Sidemenu\Elements\SidemenuActionButton;
 use Pages\Components\Sidemenu\Elements\SidemenuItem;
 use Pages\Components\Text;
 use Pages\IViewable;
+use Routing\Link;
 use Routing\Request;
 
 final class SidemenuComponent implements IViewable{
@@ -22,8 +23,8 @@ HTML;
   private string $active_url_normalized;
   private ?Text $title = null;
   
-  public function __construct(string $home_url, Request $req){
-    $this->base_url = rtrim($home_url.'/'.$req->getBasePath()->encoded(), '/');
+  public function __construct(Request $req){
+    $this->base_url = Link::fromBase($req);
     $this->active_url_normalized = trim($req->getRelativePath()->raw(), '/');
   }
   

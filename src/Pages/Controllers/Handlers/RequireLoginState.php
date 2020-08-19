@@ -6,6 +6,7 @@ namespace Pages\Controllers\Handlers;
 use Pages\Controllers\IControlHandler;
 use Pages\Controllers\Mixed\LoginController;
 use Pages\IAction;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -20,10 +21,10 @@ class RequireLoginState implements IControlHandler{
   public function run(Request $req, Session $sess): ?IAction{
     if ($this->should_be_logged_in !== $sess->isLoggedOn()){
       if ($this->should_be_logged_in){
-        return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'login'.LoginController::getReturnQuery($req)]);
+        return redirect(Link::fromBase($req, 'login'.LoginController::getReturnQuery($req)));
       }
       else{
-        return redirect([BASE_URL_ENC, $req->getBasePath()->encoded()]);
+        return redirect(Link::fromBase($req));
       }
     }
     

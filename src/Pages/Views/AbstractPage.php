@@ -6,6 +6,7 @@ namespace Pages\Views;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\IModel;
 use Pages\IViewable;
+use Routing\Link;
 use Routing\Request;
 
 abstract class AbstractPage implements IViewable{
@@ -15,7 +16,7 @@ abstract class AbstractPage implements IViewable{
   protected const LAYOUT_MINIMAL = 'minimal';
   
   protected static final function breadcrumb(Request $req, string $link, string $title = 'Back'): string{
-    return '<a href="'.$req->getBasePath()->encoded().$link.'">'.$title.'</a> <span class="breadcrumb-arrows">&raquo;</span> ';
+    return '<a href="'.Link::fromBase($req, $link).'">'.$title.'</a> <span class="breadcrumb-arrows">&raquo;</span> ';
   }
   
   private IModel $model;

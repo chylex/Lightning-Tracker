@@ -13,6 +13,7 @@ use Pages\IAction;
 use Pages\Models\Tracker\MilestoneEditModel;
 use Pages\Models\Tracker\MilestonesModel;
 use Pages\Views\Tracker\MilestoneEditPage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -32,7 +33,7 @@ class MilestoneEditController extends AbstractTrackerController{
     $data = $req->getData();
     
     if (!empty($data) && $model->editMilestone($data)){
-      return redirect([BASE_URL_ENC, $req->getBasePath()->encoded(), 'milestones']);
+      return redirect(Link::fromBase($req, 'milestones'));
     }
     
     return view(new MilestoneEditPage($model->load()));

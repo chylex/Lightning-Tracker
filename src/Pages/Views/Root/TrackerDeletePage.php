@@ -21,7 +21,7 @@ class TrackerDeletePage extends AbstractPage{
   }
   
   protected function getHeading(): string{
-    return self::breadcrumb(Request::empty(), '/').'Delete Tracker - '.$this->model->getTracker()->getNameSafe();
+    return self::breadcrumb(Request::empty(), '').'Delete Tracker - '.$this->model->getTracker()->getNameSafe();
   }
   
   protected function getLayout(): string{

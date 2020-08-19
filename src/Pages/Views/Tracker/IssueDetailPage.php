@@ -28,7 +28,7 @@ class IssueDetailPage extends AbstractTrackerIssuePage{
   }
   
   protected function getHeadingBackUrl(): string{
-    return '/issues';
+    return 'issues';
   }
   
   protected function echoPageBody(): void{

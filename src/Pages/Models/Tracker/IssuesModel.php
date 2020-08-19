@@ -23,6 +23,7 @@ use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
+use Routing\Link;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
@@ -63,7 +64,7 @@ class IssuesModel extends BasicTrackerPageModel{
     $this->table->addColumn('Progress')->sort('progress')->width(30);
     $this->table->addColumn('Last Update')->sort('date_updated')->tight();
     
-    $this->menu_actions = new SidemenuComponent(BASE_URL_ENC, $req);
+    $this->menu_actions = new SidemenuComponent($req);
     $this->menu_actions->setTitle(Text::plain('Actions'));
   }
   
@@ -84,8 +85,10 @@ class IssuesModel extends BasicTrackerPageModel{
     $sorting = $filter->sort($this->getReq());
     
     foreach($issues->listIssues($filter) as $issue){
+      $issue_id = $issue->getId();
+      
       $row = $this->table->addRow([$issue->getType()->getViewable(true),
-                                   '<span class="issue-id">#'.$issue->getId().'</span>',
+                                   '<span class="issue-id">#'.$issue_id.'</span>',
                                    $issue->getTitleSafe(),
                                    $issue->getPriority(),
                                    $issue->getScale(),
@@ -93,7 +96,7 @@ class IssuesModel extends BasicTrackerPageModel{
                                    new ProgressBarComponent($issue->getProgress()),
                                    new DateTimeComponent($issue->getLastUpdateDate())]);
       
-      $row->link($this->getReq()->getBasePath()->encoded().'/issues/'.$issue->getId());
+      $row->link(Link::fromBase($this->getReq(), 'issues', $issue_id));
     }
     
     $this->table->setupColumnSorting($sorting);

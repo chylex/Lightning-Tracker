@@ -21,7 +21,7 @@ class MilestoneDeletePage extends AbstractTrackerPage{
   
   protected function getHeading(): string{
     $name = $this->model->hasMilestone() ? ' - '.$this->model->getMilestoneTitleSafe() : '';
-    return self::breadcrumb($this->model->getReq(), '/milestones').'Delete Milestone'.$name;
+    return self::breadcrumb($this->model->getReq(), 'milestones').'Delete Milestone'.$name;
   }
   
   protected function getLayout(): string{

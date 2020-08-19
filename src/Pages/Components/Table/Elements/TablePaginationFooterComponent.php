@@ -5,6 +5,7 @@ namespace Pages\Components\Table\Elements;
 
 use Database\Filters\General\Pagination;
 use Pages\IViewable;
+use Routing\Link;
 use Routing\Request;
 
 final class TablePaginationFooterComponent implements IViewable{
@@ -66,7 +67,7 @@ HTML;
   
   private function echoPageNumber(int $page, string $text): void{
     $active = $this->pagination->getCurrentPage() === $page ? ' class="active"' : '';
-    $link = BASE_URL_ENC.'/'.$this->req->pathWithGet(Pagination::GET_PAGE, $page);
+    $link = Link::withGet($this->req, Pagination::GET_PAGE, $page);
     
     echo <<<HTML
 <li$active>
@@ -76,7 +77,7 @@ HTML;
   }
   
   private function echoPageIcon(int $page, string $icon): void{
-    $link = BASE_URL_ENC.'/'.$this->req->pathWithGet(Pagination::GET_PAGE, $page);
+    $link = Link::withGet($this->req, Pagination::GET_PAGE, $page);
     
     echo <<<HTML
 <li>

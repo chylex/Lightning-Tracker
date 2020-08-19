@@ -5,6 +5,7 @@ namespace Database\Filters\General;
 
 use Database\Filters\Field;
 use LogicException;
+use Routing\Link;
 use Routing\Request;
 
 final class Sorting{
@@ -120,7 +121,7 @@ final class Sorting{
       $new_rules_str[] = ($direction === self::SQL_DESC ? self::REVERSE_DIRECTION_CHAR : '').$column;
     }
     
-    return $this->req->pathWithGet(self::GET_SORT, empty($new_rules_str) ? null : implode(self::RULE_SEPARATOR, $new_rules_str));
+    return Link::withGet($this->req, self::GET_SORT, empty($new_rules_str) ? null : implode(self::RULE_SEPARATOR, $new_rules_str));
   }
 }
 

@@ -12,6 +12,7 @@ use Pages\Controllers\IControlHandler;
 use Pages\IAction;
 use Pages\Models\Mixed\AccountModel;
 use Pages\Views\Mixed\AccountPage;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
 use function Pages\Actions\redirect;
@@ -28,7 +29,7 @@ class AccountController extends AbstractHandlerController{
       public function run(Request $req, Session $sess): ?IAction{
         if ($req->getAction() === AccountModel::ACTION_LOGOUT){
           $sess->destroyCurrentLogin();
-          return redirect([BASE_URL_ENC, $req->getBasePath()->encoded()]);
+          return redirect(Link::fromBase($req));
         }
         
         return null;

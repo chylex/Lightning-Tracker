@@ -15,6 +15,7 @@ use Pages\Components\Table\TableComponent;
 use Pages\IModel;
 use Pages\Models\BasicRootPageModel;
 use PDOException;
+use Routing\Link;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
@@ -83,13 +84,13 @@ class TrackersModel extends BasicRootPageModel{
       $sorting = $filter->sort($this->getReq());
       
       foreach($trackers->listTrackers($filter) as $tracker){
-        $url = BASE_URL_ENC.'/tracker/'.rawurlencode($tracker->getUrl());
-        $link = '<a href="'.$url.'" class="plain">'.$tracker->getUrlSafe().' <span class="icon icon-out"></span></a>';
+        $url_enc = rawurlencode($tracker->getUrl());
+        $link = '<a href="'.Link::fromRoot('tracker', $url_enc).'" class="plain">'.$tracker->getUrlSafe().' <span class="icon icon-out"></span></a>';
         
         $row = [$tracker->getNameSafe(), $link];
         
         if ($this->perms->checkSystem(self::PERM_EDIT)){
-          $row[] = '<a href="'.$url.'/delete" class="icon"><span class="icon icon-circle-cross icon-color-red"></span></a>';
+          $row[] = '<a href="'.Link::fromRoot('tracker', $url_enc, 'delete').'" class="icon"><span class="icon icon-circle-cross icon-color-red"></span></a>';
         }
         
         $this->table->addRow($row);

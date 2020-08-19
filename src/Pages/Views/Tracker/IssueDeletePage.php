@@ -26,7 +26,7 @@ class IssueDeletePage extends AbstractTrackerIssuePage{
   }
   
   protected function getHeadingBackUrl(): string{
-    return '/issues/'.$this->model->getIssueId();
+    return 'issues/'.$this->model->getIssueId();
   }
   
   protected function getLayout(): string{

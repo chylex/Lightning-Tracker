@@ -24,7 +24,7 @@ class UserEditPage extends AbstractPage{
     $user = $this->model->getUser();
     $name = $user === null ? '' : ' - '.$user->getNameSafe();
     
-    return self::breadcrumb($this->model->getReq(), '/users').'Edit User'.$name;
+    return self::breadcrumb($this->model->getReq(), 'users').'Edit User'.$name;
   }
   
   protected function getLayout(): string{

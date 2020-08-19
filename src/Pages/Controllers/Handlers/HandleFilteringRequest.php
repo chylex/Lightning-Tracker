@@ -4,13 +4,14 @@ declare(strict_types = 1);
 namespace Pages\Controllers\Handlers;
 
 use Database\Filters\General\Filtering;
-use Pages\Actions\RedirectAction;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\Elements\TableFilteringHeaderComponent;
 use Pages\Controllers\IControlHandler;
 use Pages\IAction;
+use Routing\Link;
 use Routing\Request;
 use Session\Session;
+use function Pages\Actions\redirect;
 
 class HandleFilteringRequest implements IControlHandler{
   public function run(Request $req, Session $sess): ?IAction{
@@ -41,13 +42,13 @@ class HandleFilteringRequest implements IControlHandler{
       }
       
       $filter_str = implode(Filtering::RULE_SEPARATOR, $rules);
-      $patched_url = $req->pathWithGet(Filtering::GET_FILTER, empty($filter_str) ? null : $filter_str);
+      $patched_url = Link::withGet($req, Filtering::GET_FILTER, empty($filter_str) ? null : $filter_str);
     }
     else{
-      $patched_url = $req->pathWithGet(Filtering::GET_FILTER, null);
+      $patched_url = Link::withGet($req, Filtering::GET_FILTER, null);
     }
     
-    return new RedirectAction(BASE_URL_ENC.'/'.$patched_url);
+    return redirect($patched_url);
   }
 }
 
