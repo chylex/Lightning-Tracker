@@ -7,6 +7,7 @@ use Database\DB;
 use Database\Objects\TrackerInfo;
 use Database\SQL;
 use Database\Tables\UserTable;
+use Database\Validation\UserFields;
 use Exception;
 use LogicException;
 use Pages\Components\Forms\FormComponent;
@@ -14,8 +15,8 @@ use Pages\Models\BasicMixedPageModel;
 use PDOException;
 use Routing\Request;
 use Session\Session;
+use Validation\FormValidator;
 use Validation\ValidationException;
-use Validation\Validator;
 
 class RegisterModel extends BasicMixedPageModel{
   public const ACTION_REGISTER = 'Register';
@@ -65,13 +66,11 @@ class RegisterModel extends BasicMixedPageModel{
       return false;
     }
     
-    $name = $data['Name'];
-    $email = $data['Email'];
-    $password = $data['Password'];
-    $password_repeated = $data['PasswordRepeated'];
-    
-    $validator = self::validateUserFields($name, $email, $password);
-    $validator->str('PasswordRepeated', $password_repeated)->isTrue(fn($v): bool => $v === $password, 'Passwords do not match.');
+    $validator = new FormValidator($data);
+    $name = UserFields::name($validator);
+    $email = UserFields::email($validator);
+    $password = UserFields::password($validator);
+    $validator->str('PasswordRepeated')->isTrue(fn($v): bool => $v === $password, 'Passwords do not match.')->val();
     
     try{
       $validator->validate();
@@ -97,18 +96,6 @@ class RegisterModel extends BasicMixedPageModel{
     }
     
     return false;
-  }
-  
-  public static function validateUserFields(string $name, string $email, ?string $password): Validator{
-    $validator = new Validator();
-    $validator->str('Name', $name)->notEmpty()->maxLength(32);
-    $validator->str('Email', $email)->notEmpty()->maxLength(191)->contains('@', 'Email is not valid.');
-    
-    if ($password !== null){
-      $validator->str('Password', $password)->minLength(7)->maxLength(72);
-    }
-    
-    return $validator;
   }
   
   public static function checkDuplicateUser(FormComponent $form, string $name, string $email, ?int $exclude_id = null): bool{

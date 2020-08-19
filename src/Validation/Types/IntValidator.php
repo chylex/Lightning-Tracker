@@ -13,7 +13,7 @@ class IntValidator extends AbstractFieldValidator{
     $this->value = $value;
   }
   
-  protected function getValue(): int{
+  public function val(): int{
     return $this->value;
   }
   

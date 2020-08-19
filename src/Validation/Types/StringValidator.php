@@ -13,7 +13,7 @@ class StringValidator extends AbstractFieldValidator{
     $this->value = $value;
   }
   
-  protected function getValue(): string{
+  public function val(): string{
     return $this->value;
   }
   

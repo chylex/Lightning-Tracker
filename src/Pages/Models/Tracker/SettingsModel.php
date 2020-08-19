@@ -6,14 +6,15 @@ namespace Pages\Models\Tracker;
 use Database\DB;
 use Database\Objects\TrackerInfo;
 use Database\Tables\TrackerTable;
+use Database\Validation\TrackerFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
+use Validation\FormValidator;
 use Validation\ValidationException;
-use Validation\Validator;
 
 class SettingsModel extends BasicTrackerPageModel{
   public const ACTION_UPDATE = 'Update';
@@ -57,11 +58,9 @@ class SettingsModel extends BasicTrackerPageModel{
       return false;
     }
     
-    $name = $data['Name'];
-    $hidden = (bool)($data['Hidden'] ?? false);
-    
-    $validator = new Validator();
-    $validator->str('Name', $name)->notEmpty()->maxLength(32);
+    $validator = new FormValidator($data);
+    $name = TrackerFields::name($validator);
+    $hidden = TrackerFields::hidden($validator);
     
     try{
       $validator->validate();

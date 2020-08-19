@@ -9,8 +9,8 @@ use Database\Objects\UserProfile;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Routing\Request;
+use Validation\FormValidator;
 use Validation\ValidationException;
-use Validation\Validator;
 
 class AccountAppearanceModel extends AccountModel{
   public const ACTION_CHANGE_APPEARANCE = 'ChangeAppearance';
@@ -45,10 +45,8 @@ class AccountAppearanceModel extends AccountModel{
       return false;
     }
     
-    $table_pagination_elements = (int)$data['TablePaginationElements'];
-    
-    $validator = new Validator();
-    $validator->int('TablePaginationElements', $table_pagination_elements, 'Elements per page')->min(5)->max(50);
+    $validator = new FormValidator($data);
+    $table_pagination_elements = $validator->int('TablePaginationElements', 'Elements per page')->min(5)->max(50)->val();
     
     try{
       $validator->validate();

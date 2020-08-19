@@ -10,6 +10,7 @@ use Database\Objects\UserProfile;
 use Database\Tables\IssueTable;
 use Database\Tables\MilestoneTable;
 use Database\Tables\TrackerMemberTable;
+use Database\Validation\IssueFields;
 use Exception;
 use Pages\Components\Forms\Elements\FormSelect;
 use Pages\Components\Forms\FormComponent;
@@ -22,8 +23,8 @@ use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
 use Session\Permissions;
+use Validation\FormValidator;
 use Validation\ValidationException;
-use Validation\Validator;
 
 class IssueEditModel extends BasicTrackerPageModel{
   public const ACTION_CONFIRM = 'Confirm';
@@ -202,29 +203,22 @@ HTML
     
     $tracker = $this->getTracker();
     
-    $title = $data['Title'];
-    $description = $data['Description'];
-    $type = $data['Type'] ?? '';
-    $priority = $data['Priority'] ?? '';
-    $scale = $data['Scale'] ?? '';
-    $status = $data['Status'] ?? '';
-    $progress = (int)$data['Progress'];
+    $data['Type'] ??= '';
+    $data['Priority'] ??= '';
+    $data['Scale'] ??= '';
+    $data['Status'] ??= '';
+    
+    $validator = new FormValidator($data);
+    $title = IssueFields::title($validator);
+    $description = IssueFields::description($validator);
+    $type = IssueFields::type($validator);
+    $priority = IssueFields::priority($validator);
+    $scale = IssueFields::scale($validator);
+    $status = IssueFields::status($validator);
+    $progress = IssueFields::progress($validator);
+    
     $milestone = empty($data['Milestone']) ? null : (int)$data['Milestone'];
     $assignee = empty($data['Assignee']) ? null : (int)$data['Assignee'];
-    
-    $validator = new Validator();
-    $validator->str('Title', $title)->notEmpty()->maxLength(128);
-    $validator->str('Description', $description)->maxLength(65000);
-    $validator->str('Type', $type)->isTrue(fn($v): bool => IssueType::exists($v), 'Type is invalid.');
-    $validator->str('Priority', $priority)->isTrue(fn($v): bool => IssuePriority::exists($v), 'Priority is invalid.');
-    $validator->str('Scale', $scale)->isTrue(fn($v): bool => IssueScale::exists($v), 'Scale is invalid.');
-    $validator->str('Status', $status)->isTrue(fn($v): bool => IssueStatus::exists($v), 'Status is invalid.');
-    $validator->int('Progress', $progress)->min(0)->max(100);
-    
-    $type = IssueType::get($type);
-    $priority = IssuePriority::get($priority);
-    $scale = IssueScale::get($scale);
-    $status = IssueStatus::get($status);
     
     try{
       $validator->validate();

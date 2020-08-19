@@ -7,12 +7,13 @@ use Database\DB;
 use Database\Objects\TrackerInfo;
 use Database\Objects\UserProfile;
 use Database\Tables\UserTable;
+use Database\Validation\UserFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Routing\Request;
+use Validation\FormValidator;
 use Validation\ValidationException;
-use Validation\Validator;
 
 class AccountSecurityModel extends AccountModel{
   public const ACTION_CHANGE_PASSWORD = 'ChangePassword';
@@ -61,13 +62,9 @@ class AccountSecurityModel extends AccountModel{
       return false;
     }
     
-    $old_password = $data['OldPassword'];
-    $new_password = $data['NewPassword'];
-    $new_password_repeated = $data['NewPasswordRepeated'];
-    
-    $validator = new Validator();
-    $validator->str('NewPassword', $new_password, 'Password')->minLength(7)->maxLength(72);
-    $validator->str('NewPasswordRepeated', $new_password_repeated)->isTrue(fn($v): bool => $v === $new_password, 'Passwords do not match.');
+    $validator = new FormValidator($data);
+    $new_password = UserFields::password($validator, 'NewPassword');
+    $validator->str('NewPasswordRepeated')->isTrue(fn($v): bool => $v === $new_password, 'Passwords do not match.');
     
     $user = $this->getLogonUser();
     
@@ -80,7 +77,7 @@ class AccountSecurityModel extends AccountModel{
         return false;
       }
       
-      $validator->str('OldPassword', $old_password)->isTrue(fn($v): bool => $login_info->checkPassword($v), 'Password does not match.');
+      $validator->str('OldPassword')->isTrue(fn($v): bool => $login_info->checkPassword($v), 'Password does not match.');
       $validator->validate();
       
       $users->changePassword($user->getId(), $new_password);

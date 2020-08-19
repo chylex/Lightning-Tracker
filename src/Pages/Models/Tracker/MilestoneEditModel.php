@@ -6,13 +6,14 @@ namespace Pages\Models\Tracker;
 use Database\DB;
 use Database\Objects\TrackerInfo;
 use Database\Tables\MilestoneTable;
+use Database\Validation\MilestoneFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
+use Validation\FormValidator;
 use Validation\ValidationException;
-use Validation\Validator;
 use function Database\protect;
 
 class MilestoneEditModel extends BasicTrackerPageModel{
@@ -72,10 +73,8 @@ class MilestoneEditModel extends BasicTrackerPageModel{
       return false;
     }
     
-    $title = $data['Title'];
-    
-    $validator = new Validator();
-    $validator->str('Title', $title)->notEmpty()->maxLength(64);
+    $validator = new FormValidator($data);
+    $title = MilestoneFields::title($validator);
     
     try{
       $validator->validate();

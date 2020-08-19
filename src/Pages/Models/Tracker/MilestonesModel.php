@@ -8,6 +8,7 @@ use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\TrackerInfo;
 use Database\Tables\MilestoneTable;
 use Database\Tables\TrackerUserSettingsTable;
+use Database\Validation\MilestoneFields;
 use Exception;
 use Pages\Components\CompositeComponent;
 use Pages\Components\DateTimeComponent;
@@ -21,8 +22,8 @@ use Routing\Link;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
+use Validation\FormValidator;
 use Validation\ValidationException;
-use Validation\Validator;
 
 class MilestonesModel extends BasicTrackerPageModel{
   public const ACTION_CREATE = 'Create';
@@ -146,10 +147,8 @@ HTML
       return false;
     }
     
-    $title = $data['Title'];
-    
-    $validator = new Validator();
-    $validator->str('Title', $title)->notEmpty()->maxLength(64);
+    $validator = new FormValidator($data);
+    $title = MilestoneFields::title($validator);
     
     try{
       $validator->validate();

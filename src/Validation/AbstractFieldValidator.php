@@ -17,10 +17,10 @@ abstract class AbstractFieldValidator{
   /**
    * @return mixed
    */
-  protected abstract function getValue();
+  public abstract function val();
   
   public function isTrue(callable $test, string $message): self{
-    if ($this->noError() && !$test($this->getValue())){
+    if ($this->noError() && !$test($this->val())){
       $this->fail($message);
     }
     

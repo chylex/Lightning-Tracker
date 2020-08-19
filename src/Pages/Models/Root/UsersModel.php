@@ -8,6 +8,7 @@ use Database\Filters\Types\UserFilter;
 use Database\SQL;
 use Database\Tables\SystemPermTable;
 use Database\Tables\UserTable;
+use Database\Validation\UserFields;
 use Exception;
 use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
@@ -21,6 +22,7 @@ use Routing\Link;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
+use Validation\FormValidator;
 use Validation\ValidationException;
 
 class UsersModel extends BasicRootPageModel{
@@ -168,11 +170,10 @@ class UsersModel extends BasicRootPageModel{
       return false;
     }
     
-    $name = $data['Name'];
-    $email = $data['Email'];
-    $password = $data['Password'];
-    
-    $validator = RegisterModel::validateUserFields($name, $email, $password);
+    $validator = new FormValidator($data);
+    $name = UserFields::name($validator);
+    $email = UserFields::email($validator);
+    $password = UserFields::password($validator);
     
     try{
       $validator->validate();

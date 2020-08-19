@@ -8,6 +8,7 @@ use Database\Objects\UserInfo;
 use Database\SQL;
 use Database\Tables\SystemPermTable;
 use Database\Tables\UserTable;
+use Database\Validation\UserFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\IModel;
@@ -15,6 +16,7 @@ use Pages\Models\BasicRootPageModel;
 use Pages\Models\Mixed\RegisterModel;
 use PDOException;
 use Routing\Request;
+use Validation\FormValidator;
 use Validation\ValidationException;
 
 class UserEditModel extends BasicRootPageModel{
@@ -95,12 +97,11 @@ class UserEditModel extends BasicRootPageModel{
       return false;
     }
     
-    $name = $data['Name'];
-    $email = $data['Email'];
-    $password = empty($data['Password']) ? null : $data['Password'];
+    $validator = new FormValidator($data);
+    $name = UserFields::name($validator);
+    $email = UserFields::email($validator);
+    $password = empty($data['Password']) ? null : UserFields::password($validator);
     $role = empty($data['Role']) ? null : (int)$data['Role'];
-    
-    $validator = RegisterModel::validateUserFields($name, $email, $password);
     
     try{
       $validator->validate();

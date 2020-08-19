@@ -9,6 +9,7 @@ use Database\Filters\Types\TrackerFilter;
 use Database\Objects\UserProfile;
 use Database\SQL;
 use Database\Tables\TrackerTable;
+use Database\Validation\TrackerFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
@@ -19,8 +20,8 @@ use Routing\Link;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
+use Validation\FormValidator;
 use Validation\ValidationException;
-use Validation\Validator;
 
 class TrackersModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
@@ -123,13 +124,10 @@ class TrackersModel extends BasicRootPageModel{
       return false;
     }
     
-    $name = $data['Name'];
-    $url = $data['Url'];
-    $hidden = (bool)($data['Hidden'] ?? false);
-    
-    $validator = new Validator();
-    $validator->str('Name', $name)->notEmpty()->maxLength(32);
-    $validator->str('Url', $url)->notEmpty()->maxLength(32)->notContains('/')->notContains('\\');
+    $validator = new FormValidator($data);
+    $name = TrackerFields::name($validator);
+    $url = TrackerFields::url($validator);
+    $hidden = TrackerFields::hidden($validator);
     
     try{
       $validator->validate();
