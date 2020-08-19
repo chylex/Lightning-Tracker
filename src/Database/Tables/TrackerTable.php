@@ -74,7 +74,7 @@ final class TrackerTable extends AbstractTable{
       $perms->addRole('Moderator', $perms_moderator);
       $perms->addRole('Reporter', $perms_reporter);
       
-      $members->setRole($owner->getId(), $owner_role_id);
+      $members->addMember($owner->getId(), $owner_role_id);
       
       $this->db->commit();
     }catch(PDOException $e){

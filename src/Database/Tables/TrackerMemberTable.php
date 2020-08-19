@@ -15,7 +15,7 @@ final class TrackerMemberTable extends AbstractTrackerTable{
     parent::__construct($db, $tracker);
   }
   
-  public function setRole(int $user_id, ?int $role_id): void{
+  public function addMember(int $user_id, ?int $role_id): void{
     $stmt = $this->db->prepare('INSERT INTO tracker_members (tracker_id, user_id, role_id) VALUES (?, ?, ?)');
     $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->bindValue(2, $user_id, PDO::PARAM_INT);

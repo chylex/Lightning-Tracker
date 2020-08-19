@@ -48,8 +48,6 @@ class MembersModel extends BasicTrackerPageModel{
     if ($perms->checkTracker($tracker, self::PERM_MANAGE)){
       $this->table->addColumn('Actions')->right()->tight();
       
-      $roles = (new TrackerPermTable(DB::get(), $tracker))->listRoles();
-      
       $this->form = new FormComponent(self::ACTION_INVITE);
       $this->form->startTitledSection('Invite User');
       $this->form->setMessagePlacementHere();
@@ -63,8 +61,10 @@ class MembersModel extends BasicTrackerPageModel{
                                 ->dropdown()
                                 ->addOption('', '(Default)');
       
-      foreach($roles as $role){
-        $select_role->addOption(strval($role->getId()), $role->getTitle());
+      foreach((new TrackerPermTable(DB::get(), $tracker))->listRoles() as $role){
+        if (!$role->isSpecial()){
+          $select_role->addOption(strval($role->getId()), $role->getTitle());
+        }
       }
       
       $this->form->addButton('submit', 'Invite User')
@@ -179,8 +179,13 @@ class MembersModel extends BasicTrackerPageModel{
         return false;
       }
       
+      if ((new TrackerPermTable($db, $tracker))->isRoleSpecial($role_id)){
+        $this->form->invalidateField('Role', 'Invalid role.');
+        return false;
+      }
+      
       $members = new TrackerMemberTable($db, $tracker);
-      $members->setRole($user_id, $role_id); // TODO add a proper invitation system
+      $members->addMember($user_id, $role_id); // TODO add a proper invitation system
       return true;
     }catch(PDOException $e){
       if ($e->getCode() === SQL::CONSTRAINT_VIOLATION){

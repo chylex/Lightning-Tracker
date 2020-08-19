@@ -72,6 +72,14 @@ final class TrackerPermTable extends AbstractTrackerTable{
     }
   }
   
+  public function isRoleSpecial(int $id): ?bool{
+    $stmt = $this->db->prepare('SELECT special FROM tracker_roles WHERE id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    return (bool)$this->fetchOneColumn($stmt);
+  }
+  
   /**
    * @return RoleInfo[]
    */
