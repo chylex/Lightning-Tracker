@@ -17,6 +17,7 @@ use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use PDOException;
+use Routing\Link;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
@@ -31,7 +32,6 @@ class MembersModel extends BasicTrackerPageModel{
   private Permissions $perms;
   private TableComponent $table;
   private ?FormComponent $form;
-  // TODO add a way to edit an existing member
   
   public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms){
     parent::__construct($req, $tracker);
@@ -95,13 +95,16 @@ class MembersModel extends BasicTrackerPageModel{
     $sorting = $filter->sort($this->getReq());
     
     foreach($members->listMembers($filter) as $member){
-      $row = [$member->getUserNameSafe(),
+      $name_safe = $member->getUserNameSafe();
+      
+      $row = [$name_safe,
               $member->getRoleTitleSafe() ?? Text::missing('Default')];
       
+      $user_id = $member->getUserId();
+      $is_self_or_owner = $user_id === $logon_user_id || $user_id === $owner_id;
+      
       if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
-        $user_id = $member->getUserId();
-        
-        if ($user_id === $logon_user_id || $user_id === $owner_id){
+        if ($is_self_or_owner){
           $row[] = '';
         }
         else{
@@ -113,7 +116,11 @@ class MembersModel extends BasicTrackerPageModel{
         }
       }
       
-      $this->table->addRow($row);
+      $row = $this->table->addRow($row);
+      
+      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE) && !$is_self_or_owner){
+        $row->link(Link::fromBase($this->getReq(), 'members', $name_safe));
+      }
     }
     
     $this->table->setupColumnSorting($sorting);

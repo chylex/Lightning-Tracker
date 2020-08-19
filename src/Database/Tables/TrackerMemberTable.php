@@ -62,6 +62,24 @@ SQL;
     return $results;
   }
   
+  public function setRole(int $user_id, ?int $role_id){
+    $stmt = $this->db->prepare('UPDATE tracker_members SET role_id = ? WHERE user_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $role_id, $role_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+    $stmt->bindValue(2, $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+  }
+  
+  public function getRoleIdStr(int $user_id): ?string{
+    $stmt = $this->db->prepare('SELECT role_id FROM tracker_members WHERE user_id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $res = $this->fetchOneColumn($stmt);
+    return $res === false ? null : ($res === null ? '' : strval((int)$res));
+  }
+  
   public function checkMembershipExists(int $user_id): bool{
     $stmt = $this->db->prepare('SELECT 1 FROM tracker_members WHERE user_id = ? AND tracker_id = ?');
     $stmt->bindValue(1, $user_id, PDO::PARAM_INT);

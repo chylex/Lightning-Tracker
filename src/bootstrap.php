@@ -100,6 +100,7 @@ $router->add('tracker/:tracker/&/milestones', 'Tracker/MilestonesController');
 $router->add('tracker/:tracker/&/milestones/:id', 'Tracker/MilestoneEditController');
 $router->add('tracker/:tracker/&/milestones/:id/delete', 'Tracker/MilestoneDeleteController');
 $router->add('tracker/:tracker/&/members', 'Tracker/MembersController');
+$router->add('tracker/:tracker/&/members/:id', 'Tracker/MemberEditController');
 $router->add('tracker/:tracker/&/settings', 'Tracker/SettingsController');
 $router->add('tracker/:tracker/&/delete', 'Root/TrackerDeleteController');
 
