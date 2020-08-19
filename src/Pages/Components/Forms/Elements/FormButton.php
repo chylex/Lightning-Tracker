@@ -28,7 +28,7 @@ final class FormButton implements IViewable{
   }
   
   public function echoBody(): void{
-    $value = $this->value === null ? '' : ' name="'.FormComponent::SUB_ACTION_KEY.'" value="'.$this->value.'"';
+    $value = $this->value === null ? '' : ' name="'.FormComponent::BUTTON_KEY.'" value="'.$this->value.'"';
     $icon = $this->icon === null ? '' : '<span class="icon icon-'.$this->icon.'"></span> ';
     
     echo <<<HTML

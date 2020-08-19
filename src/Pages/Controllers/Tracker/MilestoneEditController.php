@@ -30,9 +30,8 @@ class MilestoneEditController extends AbstractTrackerController{
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $model = new MilestoneEditModel($req, $tracker, $this->milestone_id);
-    $data = $req->getData();
     
-    if (!empty($data) && $model->editMilestone($data)){
+    if ($req->getAction() === $model::ACTION_EDIT && $model->editMilestone($req->getData())){
       return redirect(Link::fromBase($req, 'milestones'));
     }
     

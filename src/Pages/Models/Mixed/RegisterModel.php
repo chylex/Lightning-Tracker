@@ -18,13 +18,15 @@ use Validation\ValidationException;
 use Validation\Validator;
 
 class RegisterModel extends BasicMixedPageModel{
+  public const ACTION_REGISTER = 'Register';
+  
   private FormComponent $form;
   private bool $successful_login;
   
   public function __construct(Request $req, ?TrackerInfo $tracker, bool $successful_login = false){
     parent::__construct($req, $tracker);
     
-    $this->form = new FormComponent();
+    $this->form = new FormComponent(self::ACTION_REGISTER);
     
     $this->form->addTextField('Name')
                ->label('Username')

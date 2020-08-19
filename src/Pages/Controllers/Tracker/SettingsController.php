@@ -23,10 +23,9 @@ class SettingsController extends AbstractTrackerController{
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $model = new SettingsModel($req, $tracker);
-    $data = $req->getData();
     
-    if (!empty($data) && $model->updateSettings($data)){
-      return $model->getForm()->reload($data);
+    if ($req->getAction() === $model::ACTION_UPDATE && $model->updateSettings($req->getData())){
+      return $model->getForm()->reload($req);
     }
     
     return view(new SettingsPage($model->load()));

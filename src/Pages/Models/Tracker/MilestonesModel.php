@@ -142,9 +142,6 @@ HTML
   }
   
   public function createMilestone(array $data): bool{
-    $tracker = $this->getTracker();
-    $this->perms->requireTracker($tracker, self::PERM_EDIT);
-    
     if (!$this->form->accept($data)){
       return false;
     }
@@ -156,7 +153,7 @@ HTML
     
     try{
       $validator->validate();
-      $milestones = new MilestoneTable(DB::get(), $tracker);
+      $milestones = new MilestoneTable(DB::get(), $this->getTracker());
       $milestones->addMilestone($title);
       return true;
     }catch(ValidationException $e){
@@ -169,22 +166,19 @@ HTML
   }
   
   public function moveMilestone(array $data): bool{
-    $tracker = $this->getTracker();
-    $this->perms->requireTracker($tracker, self::PERM_EDIT);
+    $button = $data[FormComponent::BUTTON_KEY] ?? null;
     
-    $type = $data[FormComponent::SUB_ACTION_KEY] ?? null;
-    
-    if (($type !== self::ACTION_MOVE_UP && $type !== self::ACTION_MOVE_DOWN) || !isset($data['Milestone']) || !is_numeric($data['Milestone'])){
+    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || !isset($data['Milestone']) || !is_numeric($data['Milestone'])){
       return false;
     }
     
     $milestones = new MilestoneTable(DB::get(), $this->getTracker());
     
-    if ($type === self::ACTION_MOVE_UP){
+    if ($button === self::ACTION_MOVE_UP){
       $milestones->moveMilestoneUp((int)$data['Milestone']);
       return true;
     }
-    elseif ($type === self::ACTION_MOVE_DOWN){
+    elseif ($button === self::ACTION_MOVE_DOWN){
       $milestones->moveMilestoneDown((int)$data['Milestone']);
       return true;
     }

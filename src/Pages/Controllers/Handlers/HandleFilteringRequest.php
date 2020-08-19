@@ -22,14 +22,14 @@ class HandleFilteringRequest implements IControlHandler{
       return null;
     }
     
-    $button = $data[FormComponent::SUB_ACTION_KEY] ?? TableFilteringHeaderComponent::ACTION_UPDATE;
+    $button = $data[FormComponent::BUTTON_KEY] ?? TableFilteringHeaderComponent::BUTTON_SET;
     
     unset($data[FormComponent::ACTION_KEY]);
-    unset($data[FormComponent::SUB_ACTION_KEY]);
+    unset($data[FormComponent::BUTTON_KEY]);
     
     $rules = [];
     
-    if ($button === TableFilteringHeaderComponent::ACTION_UPDATE){
+    if ($button === TableFilteringHeaderComponent::BUTTON_SET){
       foreach($data as $key => $value){
         $pre = Filtering::encode($key).Filtering::KEY_VALUE_SEPARATOR;
         

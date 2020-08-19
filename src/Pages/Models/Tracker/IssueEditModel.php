@@ -26,6 +26,8 @@ use Validation\ValidationException;
 use Validation\Validator;
 
 class IssueEditModel extends BasicTrackerPageModel{
+  public const ACTION_CONFIRM = 'Confirm';
+  
   public const TASK_REGEX = '/^\[([ xX]?)]/mu';
   public const TASK_CHECKED_CHARS = ['x', 'X'];
   
@@ -80,7 +82,7 @@ class IssueEditModel extends BasicTrackerPageModel{
       $this->issue = null;
     }
     
-    $this->form = new FormComponent();
+    $this->form = new FormComponent(self::ACTION_CONFIRM);
     $this->form->addHTML(<<<HTML
 <div class="split-wrapper split-collapse-640">
   <div class="split-75">

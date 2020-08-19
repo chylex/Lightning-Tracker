@@ -29,8 +29,8 @@ class MilestoneDeleteController extends AbstractTrackerController{
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    $model = new MilestoneDeleteModel($req, $tracker, $this->issue_id);
     $action = $req->getAction();
+    $model = new MilestoneDeleteModel($req, $tracker, $this->issue_id);
     
     if (($action === null && $model->deleteMilestoneSafely()) ||
         ($action === $model::ACTION_CONFIRM && $model->deleteMilestone($req->getData()))

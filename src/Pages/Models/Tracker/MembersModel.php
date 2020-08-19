@@ -142,14 +142,12 @@ class MembersModel extends BasicTrackerPageModel{
   }
   
   public function inviteUser(array $data): bool{
-    $tracker = $this->getTracker();
-    $this->perms->requireTracker($tracker, self::PERM_MANAGE);
-    
     if (!$this->form->accept($data)){
       return false;
     }
     
     $db = DB::get();
+    $tracker = $this->getTracker();
     
     $name = $data['Name'];
     $role = $data['Role'];
@@ -211,14 +209,11 @@ class MembersModel extends BasicTrackerPageModel{
   }
   
   public function removeMember(array $data): bool{ // TODO make it a dedicated page with additional checks
-    $tracker = $this->getTracker();
-    $this->perms->requireTracker($tracker, self::PERM_MANAGE);
-    
     if (!isset($data['User']) || !is_numeric($data['User'])){
       return false;
     }
     
-    $members = new TrackerMemberTable(DB::get(), $tracker);
+    $members = new TrackerMemberTable(DB::get(), $this->getTracker());
     $members->removeUserId((int)$data['User']);
     return true;
   }

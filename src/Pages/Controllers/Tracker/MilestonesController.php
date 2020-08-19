@@ -15,14 +15,15 @@ use function Pages\Actions\view;
 
 class MilestonesController extends AbstractTrackerController{
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    $model = new MilestonesModel($req, $tracker, $sess->getPermissions());
     $action = $req->getAction();
+    $perms = $sess->getPermissions();
+    $model = new MilestonesModel($req, $tracker, $perms);
     
     if ($action !== null){
       $data = $req->getData();
       
-      if (($action === $model::ACTION_CREATE && $model->createMilestone($data)) ||
-          ($action === $model::ACTION_MOVE && $model->moveMilestone($data)) ||
+      if (($action === $model::ACTION_CREATE && $perms->requireTracker($tracker, $model::PERM_EDIT) && $model->createMilestone($data)) ||
+          ($action === $model::ACTION_MOVE && $perms->requireTracker($tracker, $model::PERM_EDIT) && $model->moveMilestone($data)) ||
           ($action === $model::ACTION_TOGGLE_ACTIVE && $model->toggleActiveMilestone($data))
       ){
         return reload();

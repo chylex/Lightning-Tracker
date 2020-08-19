@@ -23,17 +23,14 @@ class MembersController extends AbstractTrackerController{
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    $model = new MembersModel($req, $tracker, $sess->getPermissions());
     $action = $req->getAction();
+    $perms = $sess->getPermissions();
+    $model = new MembersModel($req, $tracker, $perms);
     
-    if ($action !== null){
-      $data = $req->getData();
-      
-      if (($action === $model::ACTION_INVITE && $model->inviteUser($data)) ||
-          ($action === $model::ACTION_REMOVE && $model->removeMember($data))
-      ){
-        return reload();
-      }
+    if (($action === $model::ACTION_INVITE && $perms->requireTracker($tracker, $model::PERM_MANAGE) && $model->inviteUser($req->getData())) ||
+        ($action === $model::ACTION_REMOVE && $perms->requireTracker($tracker, $model::PERM_MANAGE) && $model->removeMember($req->getData()))
+    ){
+      return reload();
     }
     
     return view(new MembersPage($model->load()));

@@ -52,9 +52,8 @@ class LoginController extends AbstractHandlerController{
   
   protected function finally(Request $req, Session $sess): IAction{
     $model = new LoginModel($req, $this->tracker);
-    $data = $req->getData();
     
-    if (!empty($data) && $model->loginUser($data, $sess)){
+    if ($req->getAction() === $model::ACTION_LOGIN && $model->loginUser($req->getData(), $sess)){
       $return = $_GET['return'] ?? '';
       $return = strpos($return, '://') === false ? ltrim($return, '/') : '';
       return redirect(Link::fromBase($req, $return));

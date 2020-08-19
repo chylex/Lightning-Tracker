@@ -18,6 +18,8 @@ use Routing\Request;
 use Validation\ValidationException;
 
 class UserEditModel extends BasicRootPageModel{
+  public const ACTION_CONFIRM = 'Edit';
+  
   private int $user_id;
   private ?UserInfo $user;
   
@@ -27,7 +29,7 @@ class UserEditModel extends BasicRootPageModel{
     parent::__construct($req);
     $this->user_id = $user_id;
     
-    $this->form = new FormComponent();
+    $this->form = new FormComponent(self::ACTION_CONFIRM);
     
     $this->form->startSplitGroup(50);
     

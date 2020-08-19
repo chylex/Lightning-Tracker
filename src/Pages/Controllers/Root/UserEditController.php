@@ -29,9 +29,8 @@ class UserEditController extends AbstractHandlerController{
   
   protected function finally(Request $req, Session $sess): IAction{
     $model = new UserEditModel($req, $this->user_id);
-    $data = $req->getData();
     
-    if (!empty($data) && $model->editUser($data)){
+    if ($req->getAction() === $model::ACTION_CONFIRM && $model->editUser($req->getData())){
       return redirect(Link::fromBase($req, 'users'));
     }
     

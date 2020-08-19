@@ -44,9 +44,8 @@ class RegisterController extends AbstractHandlerController{
     }
     
     $model = new RegisterModel($req, $this->tracker);
-    $data = $req->getData();
     
-    if (!empty($data) && $model->registerUser($data, $sess)){
+    if ($req->getAction() === $model::ACTION_REGISTER && $model->registerUser($req->getData(), $sess)){
       return redirect(Link::fromBase($req, 'register?success'));
     }
     

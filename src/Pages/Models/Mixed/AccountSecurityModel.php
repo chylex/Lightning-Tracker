@@ -15,12 +15,14 @@ use Validation\ValidationException;
 use Validation\Validator;
 
 class AccountSecurityModel extends AccountModel{
+  public const ACTION_CHANGE_PASSWORD = 'ChangePassword';
+  
   private FormComponent $change_password_form;
   
   public function __construct(Request $req, UserProfile $logon_user, ?TrackerInfo $tracker){
     parent::__construct($req, $logon_user, $tracker);
     
-    $form = new FormComponent('ChangePassword');
+    $form = new FormComponent(self::ACTION_CHANGE_PASSWORD);
     $form->startTitledSection('Change Password');
     $form->setMessagePlacementHere();
     

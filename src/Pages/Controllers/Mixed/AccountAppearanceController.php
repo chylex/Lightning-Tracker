@@ -13,10 +13,9 @@ use function Pages\Actions\view;
 class AccountAppearanceController extends AccountController{
   protected function finally(Request $req, Session $sess): IAction{
     $model = new AccountAppearanceModel($req, $sess->getLogonUser(), $this->tracker);
-    $data = $req->getData();
     
-    if (!empty($data) && $model->updateAppearanceSettings($data)){
-      return $model->getAppearanceSettingsForm()->reload($data);
+    if ($req->getAction() === $model::ACTION_CHANGE_APPEARANCE && $model->updateAppearanceSettings($req->getData())){
+      return $model->getAppearanceSettingsForm()->reload($req);
     }
     
     return view(new AccountAppearancePage($model->load()));

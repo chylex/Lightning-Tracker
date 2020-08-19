@@ -11,8 +11,9 @@ use Routing\Request;
 use Validation\ValidationException;
 
 class SettingsModel extends BasicRootPageModel{
-  public const ACTION_UPDATE_SETTINGS = 'UpdateSettings';
-  public const ACTION_REMOVE_BACKUP = 'RemoveBackup';
+  public const ACTION_SUBMIT = 'Submit';
+  public const BUTTON_UPDATE_SETTINGS = 'UpdateSettings';
+  public const BUTTON_REMOVE_BACKUP = 'RemoveBackup';
   
   public const PERM = 'settings';
   
@@ -22,7 +23,7 @@ class SettingsModel extends BasicRootPageModel{
   public function __construct(Request $req){
     parent::__construct($req);
     
-    $this->form = new FormComponent();
+    $this->form = new FormComponent(self::ACTION_SUBMIT);
     $this->form->addHTML(<<<HTML
 <div class="split-wrapper split-collapse-640">
   <div class="split-50">
@@ -62,10 +63,10 @@ HTML
     );
     
     $this->form->setMessagePlacementHere();
-    $this->form->addButton('submit', 'Update Settings')->value(self::ACTION_UPDATE_SETTINGS)->icon('pencil');
+    $this->form->addButton('submit', 'Update Settings')->value(self::BUTTON_UPDATE_SETTINGS)->icon('pencil');
     
     if (file_exists(CONFIG_BACKUP_FILE)){
-      $this->form->addButton('submit', 'Remove Backup File')->value(self::ACTION_REMOVE_BACKUP)->icon('trash');
+      $this->form->addButton('submit', 'Remove Backup File')->value(self::BUTTON_REMOVE_BACKUP)->icon('trash');
     }
     
     echo <<<HTML
@@ -77,7 +78,11 @@ HTML;
     return $this->form;
   }
   
-  public function removeBackupFile(): bool{
+  public function removeBackupFile(array $data): bool{
+    if (!$this->form->accept($data)){
+      return false;
+    }
+    
     if (@unlink(CONFIG_BACKUP_FILE)){
       $this->form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Backup file removed.'));
       return true;
@@ -89,6 +94,10 @@ HTML;
   }
   
   public function updateConfig(array $data): bool{
+    if (!$this->form->accept($data)){
+      return false;
+    }
+    
     $config = SystemConfig::fromForm($data);
     
     try{

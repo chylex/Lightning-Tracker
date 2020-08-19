@@ -53,7 +53,7 @@ class AccountPage extends AbstractPage{
   protected function getAccountPageColumn(): IViewable{
     $logon_user = $this->model->getLogonUser();
     
-    $form = new FormComponent();
+    $form = new FormComponent('');
     $form->startTitledSection('General');
     $form->setMessagePlacementHere();
     $form->startSplitGroup(50);

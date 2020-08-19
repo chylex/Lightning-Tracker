@@ -16,6 +16,8 @@ use Validation\Validator;
 use function Database\protect;
 
 class MilestoneEditModel extends BasicTrackerPageModel{
+  public const ACTION_EDIT = 'Edit';
+  
   private int $milestone_id;
   private bool $has_milestone = false;
   private string $milestone_title_safe;
@@ -26,7 +28,7 @@ class MilestoneEditModel extends BasicTrackerPageModel{
     parent::__construct($req, $tracker);
     $this->milestone_id = $milestone_id;
     
-    $this->form = new FormComponent();
+    $this->form = new FormComponent(self::ACTION_EDIT);
     $this->form->addTextField('Title')->type('text');
     $this->form->addButton('submit', 'Edit Milestone')->icon('pencil');
   }

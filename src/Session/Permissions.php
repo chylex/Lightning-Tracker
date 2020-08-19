@@ -60,14 +60,20 @@ final class Permissions{
     return in_array($permission, $this->tracker[$id]);
   }
   
-  public function requireSystem(string $permission): void{
-    if (!$this->checkSystem($permission)){
+  public function requireSystem(string $permission): bool{
+    if ($this->checkSystem($permission)){
+      return true;
+    }
+    else{
       throw new PermissionException('system:'.$permission);
     }
   }
   
-  public function requireTracker(TrackerInfo $tracker, string $permission): void{
-    if (!$this->checkTracker($tracker, $permission)){
+  public function requireTracker(TrackerInfo $tracker, string $permission): bool{
+    if ($this->checkTracker($tracker, $permission)){
+      return true;
+    }
+    else{
       throw new PermissionException('tracker:'.$permission);
     }
   }

@@ -12,7 +12,8 @@ use Pages\IViewable;
 
 final class TableFilteringHeaderComponent implements IViewable{
   public const ACTION_UPDATE = 'UpdateTableFilter';
-  public const ACTION_CLEAR = 'ClearTableFilter';
+  public const BUTTON_SET = 'Set';
+  public const BUTTON_CLEAR = 'Clear';
   
   private Filtering $filtering;
   private string $id;
@@ -67,9 +68,9 @@ final class TableFilteringHeaderComponent implements IViewable{
     $action_key = FormComponent::ACTION_KEY;
     $action_value = self::ACTION_UPDATE;
     
-    $sub_action_key = FormComponent::SUB_ACTION_KEY;
-    $button_update = self::ACTION_UPDATE;
-    $button_clear = self::ACTION_CLEAR;
+    $button_key = FormComponent::BUTTON_KEY;
+    $button_set = self::BUTTON_SET;
+    $button_clear = self::BUTTON_CLEAR;
     
     $active_str = $this->active_filters === 0 ? '' : ' ('.$this->active_filters.' active)';
     
@@ -92,8 +93,8 @@ HTML;
     
     echo <<<HTML
       <div class="buttons">
-        <button class="styled" type="submit" name="$sub_action_key" value="$button_update"><span class="icon icon-checkmark"></span></button>
-        <button class="styled" type="submit" name="$sub_action_key" value="$button_clear" data-clear-form><span class="icon icon-blocked"></span></button>
+        <button class="styled" type="submit" name="$button_key" value="$button_set"><span class="icon icon-checkmark"></span></button>
+        <button class="styled" type="submit" name="$button_key" value="$button_clear" data-clear-form><span class="icon icon-blocked"></span></button>
       </div>
     </article>
   </details>

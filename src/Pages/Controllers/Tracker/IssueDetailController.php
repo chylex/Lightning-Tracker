@@ -4,12 +4,11 @@ declare(strict_types = 1);
 namespace Pages\Controllers\Tracker;
 
 use Database\Objects\TrackerInfo;
+use Generator;
 use Pages\Controllers\AbstractTrackerController;
+use Pages\Controllers\Handlers\LoadNumericId;
 use Pages\IAction;
-use Pages\Models\BasicTrackerPageModel;
-use Pages\Models\ErrorModel;
 use Pages\Models\Tracker\IssueDetailModel;
-use Pages\Views\ErrorPage;
 use Pages\Views\Tracker\IssueDetailPage;
 use Routing\Request;
 use Session\Session;
@@ -17,17 +16,14 @@ use function Pages\Actions\reload;
 use function Pages\Actions\view;
 
 class IssueDetailController extends AbstractTrackerController{
+  private ?int $issue_id;
+  
+  protected function trackerHandlers(TrackerInfo $tracker): Generator{
+    yield new LoadNumericId($this->issue_id, 'issue', $tracker);
+  }
+  
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    $issue_id = $req->getParam('id');
-    
-    if ($issue_id === null || !is_numeric($issue_id)){
-      $page_model = new BasicTrackerPageModel($req, $tracker);
-      $error_model = new ErrorModel($page_model, 'Issue Error', 'Invalid issue ID.');
-      
-      return view(new ErrorPage($error_model->load()));
-    }
-    
-    $model = new IssueDetailModel($req, $tracker, $sess->getPermissions(), (int)$issue_id);
+    $model = new IssueDetailModel($req, $tracker, $sess->getPermissions(), $this->issue_id);
     
     if ($req->getAction() === $model::ACTION_UPDATE_TASKS){
       $model->updateCheckboxes($req->getData());

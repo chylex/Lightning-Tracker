@@ -20,9 +20,10 @@ class TrackersController extends AbstractHandlerController{
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new TrackersModel($req, $sess->getPermissions());
+    $perms = $sess->getPermissions();
+    $model = new TrackersModel($req, $perms);
     
-    if ($req->getAction() === $model::ACTION_CREATE && $model->createTracker($req->getData(), $sess->getLogonUser())){
+    if ($req->getAction() === $model::ACTION_CREATE && $perms->requireSystem($model::PERM_ADD) && $model->createTracker($req->getData(), $sess->getLogonUser())){
       return reload();
     }
     

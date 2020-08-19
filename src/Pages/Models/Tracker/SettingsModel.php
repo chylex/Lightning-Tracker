@@ -16,6 +16,7 @@ use Validation\ValidationException;
 use Validation\Validator;
 
 class SettingsModel extends BasicTrackerPageModel{
+  public const ACTION_UPDATE = 'Update';
   public const PERM = 'settings';
   
   private FormComponent $form;
@@ -23,7 +24,7 @@ class SettingsModel extends BasicTrackerPageModel{
   public function __construct(Request $req, TrackerInfo $tracker){
     parent::__construct($req, $tracker);
     
-    $this->form = new FormComponent();
+    $this->form = new FormComponent(self::ACTION_UPDATE);
     $this->form->startTitledSection('Tracker');
     $this->form->setMessagePlacementHere();
     $this->form->addTextField('Name');

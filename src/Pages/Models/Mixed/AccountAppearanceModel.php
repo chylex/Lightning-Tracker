@@ -13,12 +13,14 @@ use Validation\ValidationException;
 use Validation\Validator;
 
 class AccountAppearanceModel extends AccountModel{
+  public const ACTION_CHANGE_APPEARANCE = 'ChangeAppearance';
+  
   private FormComponent $appearance_form;
   
   public function __construct(Request $req, UserProfile $logon_user, ?TrackerInfo $tracker){
     parent::__construct($req, $logon_user, $tracker);
     
-    $form = new FormComponent('Appearance');
+    $form = new FormComponent(self::ACTION_CHANGE_APPEARANCE);
     $form->startTitledSection('Appearance');
     $form->addHTML('<p>These settings are saved in this browser, they will not be synchronized across all of your devices.</p>');
     $form->setMessagePlacementHere();

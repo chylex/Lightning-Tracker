@@ -27,10 +27,9 @@ class IssueEditController extends AbstractTrackerController{
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $model = new IssueEditModel($req, $tracker, $sess->getPermissions(), $this->issue_id);
-    $data = $req->getData();
     
-    if (!empty($data)){
-      $new_issue_id = $model->createOrEditIssue($data, $sess->getLogonUser());
+    if ($req->getAction() === $model::ACTION_CONFIRM){
+      $new_issue_id = $model->createOrEditIssue($req->getData(), $sess->getLogonUser());
       
       if ($new_issue_id !== null){
         return redirect(Link::fromBase($req, 'issues', $new_issue_id));

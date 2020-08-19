@@ -40,11 +40,9 @@ class UsersModel extends BasicRootPageModel{
     parent::__construct($req);
     
     $this->perms = $perms;
-    $this->perms->requireSystem(self::PERM_LIST);
     
     $this->table = new TableComponent();
     $this->table->ifEmpty('No users found.');
-    
     
     if ($perms->checkSystem(self::PERM_LIST_EMAIL)){
       $this->table->addColumn('Username')->sort('name')->width(40)->bold();
@@ -166,8 +164,6 @@ class UsersModel extends BasicRootPageModel{
   }
   
   public function createUser(array $data): bool{
-    $this->perms->requireSystem(self::PERM_ADD);
-    
     if (!$this->form->accept($data)){
       return false;
     }
@@ -199,8 +195,6 @@ class UsersModel extends BasicRootPageModel{
   }
   
   public function deleteUser(array $data): bool{ // TODO make it a dedicated page with additional checks
-    $this->perms->requireSystem(self::PERM_EDIT);
-    
     if (!isset($data['User']) || !is_numeric($data['User'])){
       return false;
     }

@@ -119,8 +119,6 @@ class TrackersModel extends BasicRootPageModel{
   }
   
   public function createTracker(array $data, ?UserProfile $owner): bool{
-    $this->perms->requireSystem(self::PERM_ADD);
-    
     if (!$this->form->accept($data) || $owner === null){
       return false;
     }

@@ -24,14 +24,15 @@ class UsersController extends AbstractHandlerController{
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new UsersModel($req, $sess->getPermissions());
     $action = $req->getAction();
+    $perms = $sess->getPermissions();
+    $model = new UsersModel($req, $perms);
     
     if ($action !== null){
       $data = $req->getData();
       
-      if (($action === $model::ACTION_CREATE && $model->createUser($data)) ||
-          ($action === $model::ACTION_DELETE && $model->deleteUser($data))
+      if (($action === $model::ACTION_CREATE && $perms->requireSystem($model::PERM_ADD) && $model->createUser($data)) ||
+          ($action === $model::ACTION_DELETE && $perms->requireSystem($model::PERM_EDIT) && $model->deleteUser($data))
       ){
         return reload();
       }

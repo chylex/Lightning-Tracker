@@ -14,12 +14,14 @@ use Routing\Request;
 use Session\Session;
 
 class LoginModel extends BasicMixedPageModel{
+  public const ACTION_LOGIN = 'Login';
+  
   private FormComponent $form;
   
   public function __construct(Request $req, ?TrackerInfo $tracker){
     parent::__construct($req, $tracker);
     
-    $this->form = new FormComponent();
+    $this->form = new FormComponent(self::ACTION_LOGIN);
     
     $this->form->addTextField('Name')
                ->label('Username')

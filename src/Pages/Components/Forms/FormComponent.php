@@ -21,12 +21,13 @@ use Pages\Components\Forms\Elements\FormTextField;
 use Pages\Components\Html;
 use Pages\Components\Text;
 use Pages\IViewable;
+use Routing\Request;
 use Validation\InvalidField;
 use function Database\protect;
 
 final class FormComponent implements IViewable{
   public const ACTION_KEY = '_Action';
-  public const SUB_ACTION_KEY = '_SubAction';
+  public const BUTTON_KEY = '_Button';
   private const MESSAGES_KEY = '_Messages';
   private const RELOADED_KEY = '_Reloaded';
   
@@ -61,9 +62,9 @@ HTML;
    */
   private array $fields = [];
   
-  public function __construct(string $id = 'Form'){
-    $this->id = $id.'-'.(++self::$global_counter);
-    $this->action = $id;
+  public function __construct(string $action){
+    $this->id = $action.'-'.(++self::$global_counter);
+    $this->action = $action;
     
     $this->message_list = new FormMessageList();
     $this->elements = [$this->message_list];
@@ -190,9 +191,9 @@ HTML;
    * Refills form fields using the provided data, given that the form ID matches.
    *
    * @param array $data
-   * @return string|bool Truthy if all fields were present, indicating that the form is ready for validation. The truthy value is the submit button value if present, or true if no button had a set value.
+   * @return bool True if all fields were present, indicating that the form is ready for validation.
    */
-  public function accept(array $data){
+  public function accept(array $data): bool{
     if (!isset($data[self::ACTION_KEY]) || $data[self::ACTION_KEY] !== $this->action){
       return false;
     }
@@ -224,16 +225,17 @@ HTML;
       return false; // TODO prevents infinite reloading, but ugly
     }
     
-    return $data[self::SUB_ACTION_KEY] ?? true;
+    return true;
   }
   
   /**
    * Reloads the form, saving data and form messages in a session.
    *
-   * @param array $data
+   * @param Request $req
    * @return ReloadFormAction
    */
-  public function reload(array $data): ReloadFormAction{
+  public function reload(Request $req): ReloadFormAction{
+    $data = $req->getData();
     $data[self::MESSAGES_KEY] = $this->message_list->getMessages();
     $data[self::RELOADED_KEY] = true;
     return new ReloadFormAction($data);
