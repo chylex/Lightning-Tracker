@@ -23,6 +23,7 @@ class UserEditController extends AbstractHandlerController{
   
   protected function prerequisites(): Generator{
     yield new RequireLoginState(true);
+    yield new RequireSystemPermission(UsersModel::PERM_LIST);
     yield new RequireSystemPermission(UsersModel::PERM_EDIT);
     yield new LoadNumericId($this->user_id, 'user');
   }

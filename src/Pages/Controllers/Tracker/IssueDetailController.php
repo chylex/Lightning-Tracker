@@ -9,6 +9,7 @@ use Pages\Controllers\AbstractTrackerController;
 use Pages\Controllers\Handlers\LoadNumericId;
 use Pages\IAction;
 use Pages\Models\Tracker\IssueDetailModel;
+use Pages\Models\Tracker\IssuesModel;
 use Pages\Views\Tracker\IssueDetailPage;
 use Routing\Request;
 use Session\Session;
@@ -23,9 +24,17 @@ class IssueDetailController extends AbstractTrackerController{
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    $model = new IssueDetailModel($req, $tracker, $sess->getPermissions(), $this->issue_id);
+    $perms = $sess->getPermissions();
+    $model = new IssueDetailModel($req, $tracker, $perms, $this->issue_id);
     
     if ($req->getAction() === $model::ACTION_UPDATE_TASKS){
+      $issue = $model->getIssue();
+      $logon_user = $sess->getLogonUser();
+      
+      if ($issue === null || $logon_user === null || !$issue->isAuthorOrAssignee($logon_user)){
+        $perms->requireTracker($tracker, IssuesModel::PERM_EDIT_ALL);
+      }
+      
       $model->updateCheckboxes($req->getData());
       return reload();
     }

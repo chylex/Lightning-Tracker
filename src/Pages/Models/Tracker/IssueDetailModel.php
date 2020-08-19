@@ -43,9 +43,6 @@ class IssueDetailModel extends BasicTrackerPageModel{
     
     $tracker = $this->getTracker();
     
-    $logon_user = Session::get()->getLogonUser();
-    $logon_user_id = $logon_user === null ? -1 : $logon_user->getId();
-    
     $issues = new IssueTable(DB::get(), $tracker);
     $issue = $issues->getIssueDetail($this->issue_id);
     
@@ -53,16 +50,10 @@ class IssueDetailModel extends BasicTrackerPageModel{
       $this->can_edit = false;
     }
     else{
-      $author = $issue->getAuthor();
-      $assignee = $issue->getAssignee();
+      $logon_user = Session::get()->getLogonUser();
       
       $this->issue = $issue;
-      
-      $this->can_edit = (
-          ($author !== null && $logon_user_id === $author->getId()) ||
-          ($assignee !== null && $logon_user_id === $assignee->getId()) ||
-          $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL)
-      );
+      $this->can_edit = $logon_user !== null && ($issue->isAuthorOrAssignee($logon_user) || $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL));
       
       if ($this->can_edit){
         $this->menu_actions->addLink(Text::withIcon('Edit Issue', 'pencil'), '/issues/'.$this->issue_id.'/edit');

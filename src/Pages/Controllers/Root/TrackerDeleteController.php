@@ -21,6 +21,7 @@ use function Pages\Actions\view;
 class TrackerDeleteController extends AbstractTrackerController{
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireLoginState(true);
+    yield new RequireSystemPermission(TrackersModel::PERM_LIST);
     yield new RequireSystemPermission(TrackersModel::PERM_EDIT);
   }
   

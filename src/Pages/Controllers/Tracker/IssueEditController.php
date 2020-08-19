@@ -10,6 +10,7 @@ use Pages\Controllers\Handlers\LoadNumericId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\IAction;
 use Pages\Models\Tracker\IssueEditModel;
+use Pages\Models\Tracker\IssuesModel;
 use Pages\Views\Tracker\IssueEditPage;
 use Routing\Link;
 use Routing\Request;
@@ -26,10 +27,21 @@ class IssueEditController extends AbstractTrackerController{
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    $model = new IssueEditModel($req, $tracker, $sess->getPermissions(), $this->issue_id);
+    $perms = $sess->getPermissions();
+    $model = new IssueEditModel($req, $tracker, $perms, $this->issue_id);
+    
+    $logon_user = $sess->getLogonUser();
+    
+    if (!$model->isNewIssue()){
+      $issue = $model->getIssue();
+      
+      if ($issue === null || !$issue->isAuthorOrAssignee($logon_user)){
+        $perms->requireTracker($tracker, IssuesModel::PERM_EDIT_ALL);
+      }
+    }
     
     if ($req->getAction() === $model::ACTION_CONFIRM){
-      $new_issue_id = $model->createOrEditIssue($req->getData(), $sess->getLogonUser());
+      $new_issue_id = $model->createOrEditIssue($req->getData(), $logon_user);
       
       if ($new_issue_id !== null){
         return redirect(Link::fromBase($req, 'issues', $new_issue_id));

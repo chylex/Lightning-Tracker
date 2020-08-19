@@ -58,6 +58,14 @@ final class IssueDetail extends IssueInfo{
   public function getAssignee(): ?IssueUser{
     return $this->assignee;
   }
+  
+  public function isAuthorOrAssignee(UserProfile $user): bool{
+    $user_id = $user->getId();
+    $author = $this->author;
+    $assignee = $this->assignee;
+    
+    return ($author !== null && $user_id === $author->getId()) || ($assignee !== null && $user_id === $assignee->getId());
+  }
 }
 
 ?>
