@@ -122,7 +122,7 @@ SQL
       $condition = 'status = \''.IssueStatus::OPEN.'\' OR status = \''.IssueStatus::IN_PROGRESS.'\'';
       $auto_status = 'ready-to-test';
     }
-    else{
+    elseif ($progress > 0){
       $condition = 'status = \''.IssueStatus::OPEN.'\'';
       $auto_status = 'in-progress';
     }

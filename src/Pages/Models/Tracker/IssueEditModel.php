@@ -252,7 +252,7 @@ HTML
                   $status = IssueStatus::get(IssueStatus::READY_TO_TEST);
                 }
               }
-              elseif ($prev_status === IssueStatus::OPEN){
+              elseif ($progress > 0 && $prev_status === IssueStatus::OPEN){
                 $status = IssueStatus::get(IssueStatus::IN_PROGRESS);
               }
             }
