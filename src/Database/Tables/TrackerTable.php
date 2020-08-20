@@ -120,6 +120,20 @@ final class TrackerTable extends AbstractTable{
     return $results;
   }
   
+  public function listTrackersOwnedBy(int $user_id): array{
+    $stmt = $this->db->prepare('SELECT id, name, url FROM trackers WHERE owner_id = ?');
+    $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $results = [];
+    
+    while(($res = $this->fetchNext($stmt)) !== false){
+      $results[] = new TrackerInfo($res['id'], $res['name'], $res['url'], $user_id);
+    }
+    
+    return $results;
+  }
+  
   public function getInfoFromUrl(string $url, ?UserProfile $profile): ?TrackerVisibilityInfo{
     $user_visibility_clause = $profile === null ? '' : TrackerFilter::getUserVisibilityClause();
     $stmt = $this->db->prepare('SELECT id, name, owner_id, (hidden = FALSE'.$user_visibility_clause.') AS visible FROM trackers WHERE url = :url');

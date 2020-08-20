@@ -12,6 +12,7 @@ use Database\Validation\UserFields;
 use Exception;
 use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
+use Pages\Components\Html;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Pages\IModel;
@@ -27,7 +28,6 @@ use Validation\ValidationException;
 
 class UsersModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
-  public const ACTION_DELETE = 'Delete';
   
   public const PERM_LIST = 'users.list';
   public const PERM_LIST_EMAIL = 'users.list.email';
@@ -92,6 +92,8 @@ class UsersModel extends BasicRootPageModel{
   public function load(): IModel{
     parent::load();
     
+    $req = $this->getReq();
+    
     $logon_user_id = Session::get()->getLogonUserId();
     $can_see_email = $this->perms->checkSystem(self::PERM_LIST_EMAIL);
     
@@ -115,15 +117,21 @@ class UsersModel extends BasicRootPageModel{
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
       if ($this->perms->checkSystem(self::PERM_EDIT)){
-        if ($user_id === $logon_user_id){
+        if ($user_id === $logon_user_id || $user->isAdmin()){
           $row[] = '';
         }
         else{
-          $form = new FormComponent(self::ACTION_DELETE);
-          $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
-          $form->addHidden('User', strval($user_id));
-          $form->addIconButton('submit', 'circle-cross')->color('red');
-          $row[] = $form;
+          $link_delete = Link::fromBase($req, 'users', strval($user_id), 'delete');
+          $btn_delete = new Html(<<<HTML
+<form action="$link_delete">
+  <button type="submit" class="icon">
+    <span class="icon icon-circle-cross icon-color-red"></span>
+  </button>
+</form>
+HTML
+          );
+          
+          $row[] = $btn_delete;
         }
       }
       
@@ -191,24 +199,6 @@ class UsersModel extends BasicRootPageModel{
     }
     
     return false;
-  }
-  
-  public function deleteUser(array $data): bool{ // TODO make it a dedicated page with additional checks
-    if (!isset($data['User']) || !is_numeric($data['User'])){
-      return false;
-    }
-    
-    try{
-      $users = new UserTable(DB::get());
-      $users->deleteById((int)$data['User']);
-      return true;
-    }catch(PDOException $e){
-      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION){
-        // TODO show message with reason which foreign key checks failed, i.e. cannot delete tracker owner
-      }
-      
-      throw $e;
-    }
   }
 }
 

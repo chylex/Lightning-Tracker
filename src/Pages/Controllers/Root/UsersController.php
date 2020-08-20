@@ -24,18 +24,11 @@ class UsersController extends AbstractHandlerController{
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $action = $req->getAction();
     $perms = $sess->getPermissions();
     $model = new UsersModel($req, $perms);
     
-    if ($action !== null){
-      $data = $req->getData();
-      
-      if (($action === $model::ACTION_CREATE && $perms->requireSystem($model::PERM_ADD) && $model->createUser($data)) ||
-          ($action === $model::ACTION_DELETE && $perms->requireSystem($model::PERM_EDIT) && $model->deleteUser($data))
-      ){
-        return reload();
-      }
+    if ($req->getAction() === $model::ACTION_CREATE && $perms->requireSystem($model::PERM_ADD) && $model->createUser($req->getData())){
+      return reload();
     }
     
     return view(new UsersPage($model->load()));

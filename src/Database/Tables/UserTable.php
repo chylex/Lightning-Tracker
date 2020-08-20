@@ -8,6 +8,7 @@ use Database\Filters\AbstractFilter;
 use Database\Filters\Types\UserFilter;
 use Database\Objects\UserInfo;
 use Database\Objects\UserLoginInfo;
+use Database\Objects\UserStatistics;
 use Exception;
 use PDO;
 
@@ -90,7 +91,7 @@ SQL
     $filter ??= UserFilter::empty();
     
     $sql = <<<SQL
-SELECT u.id, u.name, u.email, sr.id AS role_id, sr.title AS role_title, u.date_registered
+SELECT u.id, u.name, u.email, sr.id AS role_id, sr.title AS role_title, u.admin, u.date_registered
 FROM users u
 LEFT JOIN system_roles sr ON u.role_id = sr.id
 SQL;
@@ -101,7 +102,7 @@ SQL;
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new UserInfo($res['id'], $res['name'], $res['email'], $res['role_id'], $res['role_title'], $res['date_registered']);
+      $results[] = new UserInfo($res['id'], $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
     }
     
     return $results;
@@ -109,7 +110,7 @@ SQL;
   
   public function getUserInfo(int $id): ?UserInfo{
     $sql = <<<SQL
-SELECT u.id, u.name, u.email, sr.id AS role_id, sr.title AS role_title, u.date_registered
+SELECT u.id, u.name, u.email, sr.id AS role_id, sr.title AS role_title, u.admin, u.date_registered
 FROM users u
 LEFT JOIN system_roles sr ON u.role_id = sr.id
 WHERE u.id = ?
@@ -120,7 +121,7 @@ SQL;
     $stmt->execute();
     
     $res = $this->fetchOne($stmt);
-    return $res === false ? null : new UserInfo($res['id'], $res['name'], $res['email'], $res['role_id'], $res['role_title'], $res['date_registered']);
+    return $res === false ? null : new UserInfo($res['id'], $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
   }
   
   public function getLoginInfo(string $name): ?UserLoginInfo{
@@ -129,6 +130,23 @@ SQL;
     
     $res = $this->fetchOne($stmt);
     return $res === false ? null : new UserLoginInfo($res['id'], $res['password']);
+  }
+  
+  public function getUserStatistics(int $id): UserStatistics{
+    $numbers = [];
+    
+    foreach(['SELECT COUNT(*) FROM tracker_members WHERE user_id = ?',
+             'SELECT COUNT(*) FROM issues WHERE author_id = ?',
+             'SELECT COUNT(*) FROM issues WHERE assignee_id = ?'] as $sql){
+      $stmt = $this->db->prepare($sql);
+      $stmt->bindValue(1, $id, PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $res = $this->fetchOneColumn($stmt);
+      $numbers[] = $res === false ? 0 : (int)$res;
+    }
+    
+    return new UserStatistics($numbers[0], $numbers[1], $numbers[2]);
   }
   
   public function findIdByName(string $name): ?int{
@@ -148,7 +166,7 @@ SQL;
   }
   
   public function deleteById(int $id): void{
-    $stmt = $this->db->prepare('DELETE FROM users WHERE id = ?');
+    $stmt = $this->db->prepare('DELETE FROM users WHERE id = ? AND admin = FALSE');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->execute();
   }

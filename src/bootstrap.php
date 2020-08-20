@@ -88,6 +88,7 @@ $router->add('&/', 'Root/TrackersController');
 $router->add('&/about', 'Root/AboutController');
 $router->add('&/users', 'Root/UsersController');
 $router->add('&/users/:id', 'Root/UserEditController');
+$router->add('&/users/:id/delete', 'Root/UserDeleteController');
 $router->add('&/settings', 'Root/SettingsController');
 
 $router->add('tracker/:tracker/&', 'Tracker/DashboardController');
