@@ -33,6 +33,11 @@ class MembersModel extends BasicTrackerPageModel{
   private TableComponent $table;
   private ?FormComponent $form;
   
+  /**
+   * @var string[]
+   */
+  private array $editable_roles = [];
+  
   public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms){
     parent::__construct($req, $tracker);
     
@@ -43,7 +48,7 @@ class MembersModel extends BasicTrackerPageModel{
     $this->table->ifEmpty('No members found.');
     
     $this->table->addColumn('Username')->sort('name')->width(60)->bold();
-    $this->table->addColumn('Role')->sort('role_title')->width(40);
+    $this->table->addColumn('Role')->sort('role_order')->width(40);
     
     if ($perms->checkTracker($tracker, self::PERM_MANAGE)){
       $this->table->addColumn('Actions')->right()->tight();
@@ -61,9 +66,16 @@ class MembersModel extends BasicTrackerPageModel{
                                 ->dropdown()
                                 ->addOption('', '(Default)');
       
-      foreach((new TrackerPermTable(DB::get(), $tracker))->listRoles() as $role){
-        if (!$role->isSpecial()){
-          $select_role->addOption(strval($role->getId()), $role->getTitle());
+      $logon_user = Session::get()->getLogonUser();
+      $logon_user_id = $logon_user === null ? null : $logon_user->getId();
+      
+      if ($logon_user_id !== null){
+        $this->editable_roles[] = '';
+        
+        foreach((new TrackerPermTable(DB::get(), $tracker))->listRolesAssignableBy($logon_user_id) as $role){
+          $role_id_str = strval($role->getId());
+          $select_role->addOption($role_id_str, $role->getTitle());
+          $this->editable_roles[] = $role_id_str;
         }
       }
       
@@ -101,24 +113,24 @@ class MembersModel extends BasicTrackerPageModel{
               $member->getRoleTitleSafe() ?? Text::missing('Default')];
       
       $user_id = $member->getUserId();
-      $is_self_or_owner = $user_id === $logon_user_id || $user_id === $owner_id;
+      $can_edit = $user_id !== $logon_user_id && $user_id !== $owner_id && in_array(strval($member->getRoleId() ?? ''), $this->editable_roles, true);
       
       if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
-        if ($is_self_or_owner){
-          $row[] = '';
-        }
-        else{
+        if ($can_edit){
           $form = new FormComponent(self::ACTION_REMOVE);
           $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
           $form->addHidden('User', strval($user_id));
           $form->addIconButton('submit', 'circle-cross')->color('red');
           $row[] = $form;
         }
+        else{
+          $row[] = '';
+        }
       }
       
       $row = $this->table->addRow($row);
       
-      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE) && !$is_self_or_owner){
+      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE) && $can_edit){
         $row->link(Link::fromBase($this->getReq(), 'members', $name_safe));
       }
     }
@@ -184,7 +196,7 @@ class MembersModel extends BasicTrackerPageModel{
         return false;
       }
       
-      if ((new TrackerPermTable($db, $tracker))->isRoleSpecial($role_id)){
+      if ($role_id !== null && !(new TrackerPermTable($db, $tracker))->isRoleAssignableBy($role_id, Session::get()->getLogonUser()->getId())){
         $this->form->invalidateField('Role', 'Invalid role.');
         return false;
       }
@@ -220,8 +232,20 @@ class MembersModel extends BasicTrackerPageModel{
       return false;
     }
     
-    $members = new TrackerMemberTable(DB::get(), $this->getTracker());
-    $members->removeUserId((int)$data['User']);
+    $db = DB::get();
+    $tracker = $this->getTracker();
+    
+    $user_id = (int)$data['User'];
+    $logon_user_id = Session::get()->getLogonUser()->getId();
+    
+    $members = new TrackerMemberTable($db, $tracker);
+    $role = $members->getRoleIdStr($user_id);
+    
+    if (!MemberEditModel::canEditMember($logon_user_id, $user_id, empty($role) ? null : intval($role), $tracker)){
+      return false;
+    }
+    
+    $members->removeUserId($user_id);
     return true;
   }
 }

@@ -99,6 +99,21 @@ SQL
     
     upgrade_config($db, 2);
   }
+  
+  if (INSTALLED_MIGRATION_VERSION === 2){
+    $db = DB::get();
+    
+    $db->query('ALTER TABLE tracker_roles ADD ordering MEDIUMINT NOT NULL AFTER title');
+    
+    begin_transaction($db);
+    
+    $db->query('UPDATE tracker_roles SET ordering = 0 WHERE title = \'Owner\'');
+    $db->query('UPDATE tracker_roles SET ordering = 1 WHERE title = \'Administrator\'');
+    $db->query('UPDATE tracker_roles SET ordering = 2 WHERE title = \'Moderator\'');
+    $db->query('UPDATE tracker_roles SET ordering = 3 WHERE title = \'Reporter\'');
+    
+    upgrade_config($db, 3);
+  }
 }catch(Exception $e){
   if (isset($db) && $db->inTransaction()){
     $db->rollBack();

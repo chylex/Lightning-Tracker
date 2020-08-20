@@ -39,7 +39,7 @@ final class TrackerMemberFilter extends AbstractTrackerIdFilter{
   protected function getSortingFields(): array{
     return [
         new Field('name', 'u'),
-        new Field('role_title')
+        new Field('role_order')
     ];
   }
   

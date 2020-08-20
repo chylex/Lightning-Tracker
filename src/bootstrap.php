@@ -13,7 +13,7 @@ use function Pages\Actions\view;
 
 define('TRACKER_PUBLIC_VERSION', '0.1');
 define('TRACKER_RESOURCE_VERSION', 1);
-define('TRACKER_MIGRATION_VERSION', 2);
+define('TRACKER_MIGRATION_VERSION', 3);
 
 define('CONFIG_FILE', __DIR__.'/config.php');
 define('CONFIG_BACKUP_FILE', __DIR__.'/config.old.php');

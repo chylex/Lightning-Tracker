@@ -47,7 +47,7 @@ final class SystemPermTable extends AbstractTable{
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->db->prepare('SELECT id, title, special FROM system_roles ORDER BY special DESC, id ASC');
+    $stmt = $this->db->prepare('SELECT id, title FROM system_roles ORDER BY special DESC, id ASC');
     $stmt->execute();
     return $this->fetchRoles($stmt);
   }

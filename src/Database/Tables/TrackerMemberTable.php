@@ -41,10 +41,11 @@ final class TrackerMemberTable extends AbstractTrackerTable{
     $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'tm');
     
     $sql = <<<SQL
-SELECT tm.user_id             AS user_id,
-       u.name                 AS name,
-       tr.title               AS role_title,
-       IFNULL(tm.role_id, ~0) AS role_order
+SELECT tm.user_id              AS user_id,
+       u.name                  AS name,
+       tr.id                   AS role_id,
+       tr.title                AS role_title,
+       IFNULL(tr.ordering, ~0) AS role_order
 FROM tracker_members tm
 LEFT JOIN tracker_roles tr ON tm.role_id = tr.id
 JOIN      users u ON tm.user_id = u.id
@@ -56,7 +57,7 @@ SQL;
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new TrackerMember($res['user_id'], $res['name'], $res['role_title']);
+      $results[] = new TrackerMember($res['user_id'], $res['name'], $res['role_id'], $res['role_title']);
     }
     
     return $results;

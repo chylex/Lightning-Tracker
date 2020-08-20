@@ -10,7 +10,6 @@ use Pages\Controllers\Handlers\LoadStringId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
-use Pages\Models\BasicRootPageModel;
 use Pages\Models\BasicTrackerPageModel;
 use Pages\Models\ErrorModel;
 use Pages\Models\Tracker\MemberEditModel;
@@ -34,7 +33,7 @@ class MemberEditController extends AbstractTrackerController{
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    $model = new MemberEditModel($req, $tracker, $this->member_name);
+    $model = new MemberEditModel($req, $tracker, $this->member_name, $sess->getLogonUser()->getId());
     
     if (!$model->canEdit()){
       $page_model = new BasicTrackerPageModel($req, $tracker);
