@@ -72,9 +72,7 @@ class IssuesModel extends BasicTrackerPageModel{
     parent::load();
     
     $tracker = $this->getTracker();
-    
-    $logon_user = Session::get()->getLogonUser();
-    $logon_user_id = $logon_user === null ? -1 : $logon_user->getId();
+    $logon_user_id = Session::get()->getLogonUserId();
     
     $filter = new IssueFilter();
     $issues = new IssueTable(DB::get(), $tracker);
@@ -125,7 +123,7 @@ class IssuesModel extends BasicTrackerPageModel{
     $filtering_assignee = $header->addMultiSelect('assignee')->label('Assignee');
     $filtering_assignee->addOption('', Text::missing('(No Assignee)'));
     
-    if ($logon_user !== null){
+    if ($logon_user_id !== null){
       $filtering_author->addOption(strval($logon_user_id), Text::missing('(You)'));
       $filtering_assignee->addOption(strval($logon_user_id), Text::missing('(You)'));
       

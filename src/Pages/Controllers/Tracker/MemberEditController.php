@@ -33,7 +33,7 @@ class MemberEditController extends AbstractTrackerController{
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    $model = new MemberEditModel($req, $tracker, $this->member_name, $sess->getLogonUser()->getId());
+    $model = new MemberEditModel($req, $tracker, $this->member_name, $sess->getLogonUserIdOrThrow());
     
     if (!$model->canEdit()){
       $page_model = new BasicTrackerPageModel($req, $tracker);

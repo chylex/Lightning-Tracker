@@ -39,7 +39,7 @@ class RegisterController extends AbstractHandlerController{
       return view(new ErrorPage($error_model->load()));
     }
     
-    if ($sess->isLoggedOn()){
+    if ($sess->getLogonUser() !== null){
       return redirect(Link::fromBase($req));
     }
     

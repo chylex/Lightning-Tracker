@@ -9,6 +9,7 @@ use Database\Tables\UserLoginTable;
 use Database\Tables\UserTable;
 use Exception;
 use Logging\Log;
+use LogicException;
 
 final class Session{
   private const COOKIE_NAME = 'logon';
@@ -83,8 +84,19 @@ final class Session{
     return $this->getLogin()->getLogonUser();
   }
   
-  public function isLoggedOn(): bool{
-    return $this->getLogonUser() !== null;
+  public function getLogonUserId(): ?int{
+    $logon_user = $this->getLogonUser();
+    return $logon_user === null ? null : $logon_user->getId();
+  }
+  
+  public function getLogonUserIdOrThrow(): int{
+    $logon_user = $this->getLogonUser();
+    
+    if ($logon_user === null){
+      throw new LogicException('Expected a logged in user.');
+    }
+    
+    return $logon_user->getId();
   }
   
   public function getPermissions(): Permissions{

@@ -66,8 +66,7 @@ class MembersModel extends BasicTrackerPageModel{
                                 ->dropdown()
                                 ->addOption('', '(Default)');
       
-      $logon_user = Session::get()->getLogonUser();
-      $logon_user_id = $logon_user === null ? null : $logon_user->getId();
+      $logon_user_id = Session::get()->getLogonUserId();
       
       if ($logon_user_id !== null){
         $this->editable_roles[] = '';
@@ -92,11 +91,9 @@ class MembersModel extends BasicTrackerPageModel{
   public function load(): IModel{
     parent::load();
     
-    $logon_user = Session::get()->getLogonUser();
-    $logon_user_id = $logon_user === null ? -1 : $logon_user->getId();
-    
     $tracker = $this->getTracker();
     $owner_id = $tracker->getOwnerId();
+    $logon_user_id = Session::get()->getLogonUserId();
     
     $filter = new TrackerMemberFilter();
     $members = new TrackerMemberTable(DB::get(), $tracker);
@@ -196,7 +193,7 @@ class MembersModel extends BasicTrackerPageModel{
         return false;
       }
       
-      if ($role_id !== null && !(new TrackerPermTable($db, $tracker))->isRoleAssignableBy($role_id, Session::get()->getLogonUser()->getId())){
+      if ($role_id !== null && !(new TrackerPermTable($db, $tracker))->isRoleAssignableBy($role_id, Session::get()->getLogonUserIdOrThrow())){
         $this->form->invalidateField('Role', 'Invalid role.');
         return false;
       }
@@ -236,12 +233,11 @@ class MembersModel extends BasicTrackerPageModel{
     $tracker = $this->getTracker();
     
     $user_id = (int)$data['User'];
-    $logon_user_id = Session::get()->getLogonUser()->getId();
     
     $members = new TrackerMemberTable($db, $tracker);
     $role = $members->getRoleIdStr($user_id);
     
-    if (!MemberEditModel::canEditMember($logon_user_id, $user_id, empty($role) ? null : intval($role), $tracker)){
+    if (!MemberEditModel::canEditMember(Session::get()->getLogonUserIdOrThrow(), $user_id, empty($role) ? null : intval($role), $tracker)){
       return false;
     }
     

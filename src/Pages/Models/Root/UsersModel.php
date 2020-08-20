@@ -92,9 +92,7 @@ class UsersModel extends BasicRootPageModel{
   public function load(): IModel{
     parent::load();
     
-    $logon_user = Session::get()->getLogonUser();
-    $logon_user_id = $logon_user === null ? -1 : $logon_user->getId();
-    
+    $logon_user_id = Session::get()->getLogonUserId();
     $can_see_email = $this->perms->checkSystem(self::PERM_LIST_EMAIL);
     
     $filter = new UserFilter($can_see_email);
