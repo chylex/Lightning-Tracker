@@ -57,8 +57,7 @@ final class SystemConfig{
     $validator->validate();
   }
   
-  public function generate(): string{
-    $migration_version = TRACKER_MIGRATION_VERSION;
+  public function generate(int $migration_version = TRACKER_MIGRATION_VERSION): string{
     $sys_enable_registration = $this->sys_enable_registration ? 'true' : 'false';
     $base_url = addcslashes($this->base_url, '\'\\');
     $db_name = addcslashes($this->db_name, '\'\\');

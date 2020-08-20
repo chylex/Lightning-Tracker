@@ -11,6 +11,16 @@ function begin_transaction(PDO $db): void{
   }
 }
 
+function upgrade_config(PDO $db, int $version): void{
+  if (!file_put_contents(CONFIG_FILE, SystemConfig::fromCurrentInstallation()->generate($version), LOCK_EX)){
+    die('Lightning Tracker tried updating to a new version and failed updating the configuration file.');
+  }
+  
+  if (isset($db) && $db->inTransaction()){
+    $db->commit();
+  }
+}
+
 try{
   if (!copy(CONFIG_FILE, CONFIG_BACKUP_FILE)){
     die('Lightning Tracker tried updating to a new version and failed creating a backup configuration file.');
@@ -86,14 +96,8 @@ SQL
     
     /** @noinspection SqlWithoutWhere */
     $db->query('UPDATE milestones SET milestone_id = ordering');
-  }
-  
-  if (!file_put_contents(CONFIG_FILE, SystemConfig::fromCurrentInstallation()->generate(), LOCK_EX)){
-    die('Lightning Tracker tried updating to a new version and failed updating the configuration file.');
-  }
-  
-  if (isset($db) && $db->inTransaction()){
-    $db->commit();
+    
+    upgrade_config($db, 2);
   }
 }catch(Exception $e){
   if (isset($db) && $db->inTransaction()){
