@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS `tracker_roles` (
-	`id`         INT NOT NULL AUTO_INCREMENT,
 	`tracker_id` INT NOT NULL,
+	`role_id`    INT NOT NULL,
 	`title`      VARCHAR(32) NOT NULL,
 	`ordering`   MEDIUMINT NOT NULL,
 	`special`    BOOL NOT NULL DEFAULT FALSE,
-	PRIMARY KEY (`id`),
+	PRIMARY KEY (`tracker_id`, `role_id`),
 	UNIQUE KEY (`tracker_id`, `title`),
-	KEY (`id`, `tracker_id`),
+	KEY (`role_id`, `tracker_id`),
 	# Needed for role-tracker pair checks.
 	FOREIGN KEY (`tracker_id`)
 		REFERENCES `trackers` (`id`)

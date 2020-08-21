@@ -26,7 +26,13 @@ final class TrackerMemberTable extends AbstractTrackerTable{
   public function countMembers(?TrackerMemberFilter $filter = null): ?int{
     $filter = $this->prepareFilter($filter ?? TrackerMemberFilter::empty(), 'tm');
     
-    $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM tracker_members tm LEFT JOIN tracker_roles tr ON tm.role_id = tr.id', AbstractFilter::STMT_COUNT);
+    $sql = <<<SQL
+SELECT COUNT(*)
+FROM tracker_members tm
+LEFT JOIN tracker_roles tr ON tm.tracker_id = tr.tracker_id AND tm.role_id = tr.role_id
+SQL;
+    
+    $stmt = $filter->prepare($this->db, $sql, AbstractFilter::STMT_COUNT);
     $stmt->execute();
     
     $count = $this->fetchOneColumn($stmt);
@@ -43,11 +49,11 @@ final class TrackerMemberTable extends AbstractTrackerTable{
     $sql = <<<SQL
 SELECT tm.user_id              AS user_id,
        u.name                  AS name,
-       tr.id                   AS role_id,
+       tr.role_id              AS role_id,
        tr.title                AS role_title,
        IFNULL(tr.ordering, ~0) AS role_order
 FROM tracker_members tm
-LEFT JOIN tracker_roles tr ON tm.role_id = tr.id
+LEFT JOIN tracker_roles tr ON tm.tracker_id = tr.tracker_id AND tm.role_id = tr.role_id
 JOIN      users u ON tm.user_id = u.id
 SQL;
     

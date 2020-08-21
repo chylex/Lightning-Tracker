@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS `tracker_role_perms` (
+	`tracker_id` INT NOT NULL,
 	`role_id`    INT NOT NULL,
 	`permission` ENUM (
 		'settings',
@@ -8,9 +9,9 @@ CREATE TABLE IF NOT EXISTS `tracker_role_perms` (
 		'issues.create',
 		'issues.edit.all',
 		'issues.delete.all') NOT NULL,
-	PRIMARY KEY (`role_id`, `permission`),
-	FOREIGN KEY (`role_id`)
-		REFERENCES `tracker_roles` (`id`)
+	PRIMARY KEY (`tracker_id`, `role_id`, `permission`),
+	FOREIGN KEY (`role_id`, `tracker_id`)
+		REFERENCES `tracker_roles` (`role_id`, `tracker_id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
 ) ENGINE = InnoDB

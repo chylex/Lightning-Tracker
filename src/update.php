@@ -21,6 +21,22 @@ function upgrade_config(PDO $db, int $version): void{
   }
 }
 
+/**
+ * @param string $path
+ * @return string
+ * @throws Exception
+ */
+function read_sql_file(string $path): string{
+  $file = __DIR__.'/~database/'.$path;
+  $contents = file_get_contents($file);
+  
+  if ($contents === false){
+    throw new Exception('Error reading file \''.$path.'\'.');
+  }
+  
+  return $contents;
+}
+
 try{
   if (!copy(CONFIG_FILE, CONFIG_BACKUP_FILE)){
     die('Lightning Tracker tried updating to a new version and failed creating a backup configuration file.');
@@ -87,6 +103,7 @@ GROUP BY tracker_id
 SQL
     );
     
+    /** @noinspection SqlResolve */
     $db->query(<<<SQL
 INSERT INTO tracker_members (tracker_id, user_id, role_id)
 SELECT t.id AS tracker_id, t.owner_id AS user_id, tr.id AS role_id
@@ -104,24 +121,60 @@ SQL
   if (INSTALLED_MIGRATION_VERSION === 2){
     $db = DB::get();
     
-    $db->query('ALTER TABLE tracker_roles ADD ordering MEDIUMINT NOT NULL AFTER title');
+    $stmt = $db->prepare(<<<SQL
+SELECT DISTINCT TABLE_NAME AS tbl, CONSTRAINT_NAME AS constr
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE TABLE_SCHEMA = :db_name
+  AND REFERENCED_TABLE_SCHEMA = TABLE_SCHEMA
+  AND (TABLE_NAME = 'tracker_members' AND REFERENCED_TABLE_NAME = 'tracker_roles')
+SQL
+    );
+    
+    $stmt->bindValue('db_name', DB_NAME);
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+    
+    foreach($rows as $row){
+      /** @noinspection SqlResolve */
+      $db->query('ALTER TABLE `'.$row['tbl'].'` DROP FOREIGN KEY `'.$row['constr'].'`');
+    }
+    
+    $db->query('DROP TABLE tracker_role_perms');
+    $db->query('DROP TABLE tracker_roles');
+    
+    $db->query(read_sql_file('TrackerRoleTable.sql'));
+    $db->query(read_sql_file('TrackerRolePermTable.sql'));
+    
+    /** @noinspection SqlWithoutWhere */
+    $db->query('UPDATE tracker_members SET role_id = NULL');
+    
+    $db->query(<<<SQL
+ALTER TABLE tracker_members
+  ADD FOREIGN KEY (`role_id`, `tracker_id`)
+    REFERENCES `tracker_roles` (`role_id`, `tracker_id`)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT
+SQL
+    );
     
     begin_transaction($db);
     
     $db->query(<<<SQL
-INSERT INTO tracker_roles (tracker_id, title, ordering)
-SELECT tracker_id, 'Developer' AS title, 3
-FROM tracker_roles
-GROUP BY tracker_id
+INSERT INTO tracker_roles (tracker_id, role_id, title, ordering, special)
+SELECT t.id, 1 AS role_id, 'Owner' AS title, 0 AS ordering, TRUE AS special
+FROM trackers t
+GROUP BY t.id
 SQL
     );
     
-    // TODO reset permissions
-    
-    $db->query('UPDATE tracker_roles SET ordering = 0 WHERE title = \'Owner\'');
-    $db->query('UPDATE tracker_roles SET ordering = 1 WHERE title = \'Administrator\'');
-    $db->query('UPDATE tracker_roles SET ordering = 2 WHERE title = \'Moderator\'');
-    $db->query('UPDATE tracker_roles SET ordering = 4 WHERE title = \'Reporter\'');
+    $db->query(<<<SQL
+INSERT INTO tracker_members (tracker_id, user_id, role_id)
+SELECT t.id AS tracker_id, t.owner_id AS user_id, tr.role_id AS role_id
+FROM trackers t
+JOIN tracker_roles tr ON t.id = tr.tracker_id AND tr.title = 'Owner' AND tr.special = TRUE
+ON DUPLICATE KEY UPDATE role_id = tr.role_id
+SQL
+    );
     
     upgrade_config($db, 3);
   }
