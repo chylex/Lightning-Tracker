@@ -107,10 +107,20 @@ SQL
     
     begin_transaction($db);
     
+    $db->query(<<<SQL
+INSERT INTO tracker_roles (tracker_id, title, ordering)
+SELECT tracker_id, 'Developer' AS title, 3
+FROM tracker_roles
+GROUP BY tracker_id
+SQL
+    );
+    
+    // TODO reset permissions
+    
     $db->query('UPDATE tracker_roles SET ordering = 0 WHERE title = \'Owner\'');
     $db->query('UPDATE tracker_roles SET ordering = 1 WHERE title = \'Administrator\'');
     $db->query('UPDATE tracker_roles SET ordering = 2 WHERE title = \'Moderator\'');
-    $db->query('UPDATE tracker_roles SET ordering = 3 WHERE title = \'Reporter\'');
+    $db->query('UPDATE tracker_roles SET ordering = 4 WHERE title = \'Reporter\'');
     
     upgrade_config($db, 3);
   }

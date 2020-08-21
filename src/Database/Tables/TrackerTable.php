@@ -56,22 +56,25 @@ final class TrackerTable extends AbstractTable{
           IssuesModel::PERM_CREATE
       ];
       
-      $perms_moderator = array_merge($perms_reporter, [
+      $perms_developer = array_merge($perms_reporter, [
           IssuesModel::PERM_EDIT_ALL,
+          MilestonesModel::PERM_EDIT,
+          MembersModel::PERM_LIST
+      ]);
+      
+      $perms_moderator = array_merge($perms_developer, [
           IssuesModel::PERM_DELETE_ALL,
-          MembersModel::PERM_LIST,
-          // TODO banning users
+          MembersModel::PERM_MANAGE
       ]);
       
       $perms_admin = array_merge($perms_moderator, [
-          MilestonesModel::PERM_EDIT,
-          MembersModel::PERM_MANAGE,
           SettingsModel::PERM
       ]);
       
       $owner_role_id = $perms->addRole('Owner', [], true);
       $perms->addRole('Administrator', $perms_admin);
       $perms->addRole('Moderator', $perms_moderator);
+      $perms->addRole('Developer', $perms_developer);
       $perms->addRole('Reporter', $perms_reporter);
       
       $members->addMember($owner->getId(), $owner_role_id);

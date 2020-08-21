@@ -16,8 +16,6 @@ use PDOException;
 final class TrackerPermTable extends AbstractTrackerTable{
   use PermTable;
   
-  public const GUEST_PERMS = []; // TODO
-  
   public function __construct(PDO $db, TrackerInfo $tracker){
     parent::__construct($db, $tracker);
   }
@@ -155,7 +153,7 @@ SQL
    */
   public function listPerms(?UserProfile $user): array{
     if ($user === null){
-      return self::GUEST_PERMS;
+      return [];
     }
     
     $stmt = $this->db->prepare(<<<SQL
@@ -169,7 +167,7 @@ SQL
     $stmt->bindValue(1, $user->getId(), PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
-    return array_merge(self::GUEST_PERMS, $this->fetchPerms($stmt));
+    return $this->fetchPerms($stmt);
   }
   
   public function deleteById(int $id): void{
