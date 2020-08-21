@@ -11,14 +11,12 @@ use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Pages\IModel;
-use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
-class SettingsModel extends BasicTrackerPageModel{
+class SettingsGeneralModel extends AbstractSettingsModel{
   public const ACTION_UPDATE = 'Update';
-  public const PERM = 'settings';
   
   private FormComponent $form;
   
@@ -28,10 +26,15 @@ class SettingsModel extends BasicTrackerPageModel{
     $this->form = new FormComponent(self::ACTION_UPDATE);
     $this->form->startTitledSection('Tracker');
     $this->form->setMessagePlacementHere();
+    
+    $this->form->startSplitGroup(50);
     $this->form->addTextField('Name');
     $this->form->addTextField('Url')->value($tracker->getUrl())->disable();
+    $this->form->endSplitGroup();
+    
     $this->form->addCheckBox('Hidden')->label('Hidden From Non-Members');
     $this->form->addButton('submit', 'Update Settings')->icon('pencil');
+    
     $this->form->endTitledSection();
   }
   

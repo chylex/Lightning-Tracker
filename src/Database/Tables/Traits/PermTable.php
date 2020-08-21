@@ -35,7 +35,7 @@ trait PermTable{
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new RoleInfo($res['id'], $res['title']);
+      $results[] = new RoleInfo($res['id'], $res['title'], (bool)$res['special']);
     }
     
     return $results;

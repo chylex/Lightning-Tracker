@@ -10,10 +10,10 @@ use Database\Objects\TrackerInfo;
 use Database\Objects\TrackerVisibilityInfo;
 use Database\Objects\UserProfile;
 use Exception;
+use Pages\Models\Tracker\AbstractSettingsModel;
 use Pages\Models\Tracker\IssuesModel;
 use Pages\Models\Tracker\MembersModel;
 use Pages\Models\Tracker\MilestonesModel;
-use Pages\Models\Tracker\SettingsModel;
 use PDO;
 use PDOException;
 
@@ -68,7 +68,7 @@ final class TrackerTable extends AbstractTable{
       ]);
       
       $perms_admin = array_merge($perms_moderator, [
-          SettingsModel::PERM
+          AbstractSettingsModel::PERM
       ]);
       
       $owner_role_id = $perms->addRole('Owner', [], true);

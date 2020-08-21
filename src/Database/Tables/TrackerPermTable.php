@@ -83,9 +83,80 @@ final class TrackerPermTable extends AbstractTrackerTable{
     }
   }
   
-  public function isRoleSpecial(int $id): ?bool{
-    $stmt = $this->db->prepare('SELECT special FROM tracker_roles WHERE id = ? AND tracker_id = ?');
+  public function moveRoleUp(int $id): void{
+    $this->db->beginTransaction();
+    
+    try{
+      $ordering = $this->getRoleOrderingIfNotSpecial($id);
+      
+      if ($ordering === null || $ordering <= 1 || $this->isRoleSpecialByOrdering($ordering - 1)){
+        $this->db->rollBack();
+        return;
+      }
+      
+      $this->swapRolesInternal($id, $ordering, $ordering - 1);
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+    }
+  }
+  
+  public function moveRoleDown(int $id): void{
+    $this->db->beginTransaction();
+    
+    try{
+      $stmt = $this->db->prepare('SELECT MAX(ordering) FROM tracker_roles WHERE tracker_id = ?');
+      $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $limit = $this->fetchOneColumn($stmt);
+      
+      if ($limit === false){
+        $this->db->rollBack();
+        return;
+      }
+      
+      $ordering = $this->getRoleOrderingIfNotSpecial($id);
+      
+      if ($ordering === null || $ordering >= $limit || $this->isRoleSpecialByOrdering($ordering + 1)){
+        $this->db->rollBack();
+        return;
+      }
+      
+      $this->swapRolesInternal($id, $ordering, $ordering + 1);
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+    }
+  }
+  
+  private function swapRolesInternal(int $id, int $current_ordering, int $other_ordering): void{
+    $stmt = $this->db->prepare('UPDATE tracker_roles SET ordering = ? WHERE ordering = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $current_ordering, PDO::PARAM_INT);
+    $stmt->bindValue(2, $other_ordering, PDO::PARAM_INT);
+    $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $stmt = $this->db->prepare('UPDATE tracker_roles SET ordering = ? WHERE id = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $other_ordering, PDO::PARAM_INT);
+    $stmt->bindValue(2, $id, PDO::PARAM_INT);
+    $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+  }
+  
+  private function getRoleOrderingIfNotSpecial(int $id): ?int{
+    $stmt = $this->db->prepare('SELECT ordering FROM tracker_roles WHERE id = ? AND tracker_id = ? AND special = FALSE');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $res = $this->fetchOneColumn($stmt);
+    return $res === false ? null : $res;
+  }
+  
+  private function isRoleSpecialByOrdering(int $ordering): bool{
+    $stmt = $this->db->prepare('SELECT special FROM tracker_roles WHERE ordering = ? AND tracker_id = ?');
+    $stmt->bindValue(1, $ordering, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     return (bool)$this->fetchOneColumn($stmt);
@@ -116,7 +187,7 @@ SQL
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->db->prepare('SELECT id, title FROM tracker_roles WHERE tracker_id = ? ORDER BY special DESC, ordering ASC');
+    $stmt = $this->db->prepare('SELECT id, title, special FROM tracker_roles WHERE tracker_id = ? ORDER BY special DESC, ordering ASC');
     $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     return $this->fetchRoles($stmt);
@@ -128,7 +199,7 @@ SQL
    */
   public function listRolesAssignableBy(int $user_id): array{
     $stmt = $this->db->prepare(<<<SQL
-SELECT id, title
+SELECT id, title, special
 FROM tracker_roles
 WHERE tracker_id = ?
   AND special = FALSE

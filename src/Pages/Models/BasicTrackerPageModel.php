@@ -15,8 +15,8 @@ use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Text;
 use Pages\IViewable;
+use Pages\Models\Tracker\AbstractSettingsModel;
 use Pages\Models\Tracker\MembersModel;
-use Pages\Models\Tracker\SettingsModel;
 use Routing\Request;
 use Session\Permissions;
 use Session\Session;
@@ -45,7 +45,7 @@ class BasicTrackerPageModel extends AbstractPageModel{
       $nav->addLeft(Text::withIcon('Members', 'users'), '/members');
     }
     
-    if ($perms->checkTracker($this->tracker, SettingsModel::PERM)){
+    if ($perms->checkTracker($this->tracker, AbstractSettingsModel::PERM)){
       $nav->addLeft(Text::withIcon('Settings', 'wrench'), '/settings');
     }
   }
