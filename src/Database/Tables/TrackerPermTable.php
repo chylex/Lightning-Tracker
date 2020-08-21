@@ -39,15 +39,20 @@ final class TrackerPermTable extends AbstractTrackerTable{
     }
     
     try{
-      $stmt = $this->db->prepare('SELECT IFNULL(MAX(ordering) + 1, 1) AS ordering FROM tracker_roles WHERE tracker_id = ?');
-      $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
-      $stmt->execute();
-      
-      $ordering = $this->fetchOneColumn($stmt);
-      
-      if ($ordering === false){
-        $this->db->rollBack();
-        throw new LogicException('Error calculating role order.');
+      if ($special){
+        $ordering = 0;
+      }
+      else{
+        $stmt = $this->db->prepare('SELECT IFNULL(MAX(ordering) + 1, 1) AS ordering FROM tracker_roles WHERE tracker_id = ?');
+        $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
+        $stmt->execute();
+        
+        $ordering = $this->fetchOneColumn($stmt);
+        
+        if ($ordering === false){
+          $this->db->rollBack();
+          throw new LogicException('Error calculating role order.');
+        }
       }
       
       $stmt = $this->db->prepare('INSERT INTO tracker_roles (tracker_id, title, ordering, special) VALUES (?, ?, ?, ?)');
@@ -242,10 +247,33 @@ SQL
   }
   
   public function deleteById(int $id): void{
-    $stmt = $this->db->prepare('DELETE FROM tracker_roles WHERE id = ? AND tracker_id = ? AND special = FALSE');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $tracker = $this->getTrackerId();
+    
+    $this->db->beginTransaction();
+    
+    try{
+      $ordering = $this->getRoleOrderingIfNotSpecial($id);
+      
+      if ($ordering === null){
+        $this->db->rollBack();
+        return;
+      }
+      
+      $stmt = $this->db->prepare('UPDATE tracker_roles SET ordering = ordering - 1 WHERE ordering > ? AND tracker_id = ?');
+      $stmt->bindValue(1, $ordering, PDO::PARAM_INT);
+      $stmt->bindValue(2, $tracker, PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $stmt = $this->db->prepare('DELETE FROM tracker_roles WHERE id = ? AND tracker_id = ? AND special = FALSE');
+      $stmt->bindValue(1, $id, PDO::PARAM_INT);
+      $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+      throw $e;
+    }
   }
 }
 
