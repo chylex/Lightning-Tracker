@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Components;
 
 use Pages\IViewable;
-use function Database\protect;
 
 final class Text implements IViewable{
   public static function plain(string $text): self{

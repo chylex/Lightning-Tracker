@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
-use function Database\protect;
-
 final class TrackerMember{
   private int $user_id;
   private string $user_name;

@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
-use function Database\protect;
-
 final class RoleInfo{
   private int $id;
   private string $title;

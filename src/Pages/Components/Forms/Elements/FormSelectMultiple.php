@@ -5,7 +5,6 @@ namespace Pages\Components\Forms\Elements;
 
 use Pages\Components\Forms\AbstractFormField;
 use Pages\IViewable;
-use function Database\protect;
 
 final class FormSelectMultiple extends AbstractFormField{
   private string $id;

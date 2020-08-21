@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Components\Markdown;
 
 use Pages\Models\Tracker\IssueEditModel;
-use function Database\protect;
 
 final class MarkdownParser{
   private const SPACE = 32;

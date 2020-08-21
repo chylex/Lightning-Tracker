@@ -6,7 +6,6 @@ namespace Database\Filters\Conditions;
 use Database\Filters\Field;
 use Database\Filters\IWhereCondition;
 use PDOStatement;
-use function Database\bind;
 
 final class FieldOneOf implements IWhereCondition{
   private Field $field;

@@ -48,7 +48,9 @@ HTML;
       $url_trim = mb_substr($url_trim, 0, $query_start);
     }
     
-    if ((empty($url_trim) && empty($this->active_path_normalized)) || (!empty($url_trim) && mb_strpos($this->active_path_normalized, $url_trim) === 0)){
+    if ((empty($url_trim) && empty($this->active_path_normalized)) ||
+        (!empty($url_trim) && ($this->active_path_normalized === $url_trim || mb_str_starts_with($this->active_path_normalized, $url_trim.'/')))
+    ){
       $item = $item->active();
     }
     

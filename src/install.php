@@ -6,7 +6,6 @@ use Database\DB;
 use Database\Objects\UserLoginInfo;
 use Routing\UrlString;
 use Validation\ValidationException;
-use function Database\protect;
 
 // Constants
 

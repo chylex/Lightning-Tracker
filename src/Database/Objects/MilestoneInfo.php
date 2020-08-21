@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
-use function Database\protect;
-
 final class MilestoneInfo{
   private int $milestone_id;
   private string $title;

@@ -5,7 +5,6 @@ namespace Database\Filters;
 
 use PDO;
 use PDOStatement;
-use function Database\bind;
 
 abstract class AbstractTrackerIdFilter extends AbstractFilter{
   private int $tracker_id;

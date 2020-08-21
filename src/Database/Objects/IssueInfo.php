@@ -7,7 +7,6 @@ use Pages\Components\Issues\IssuePriority;
 use Pages\Components\Issues\IssueScale;
 use Pages\Components\Issues\IssueStatus;
 use Pages\Components\Issues\IssueType;
-use function Database\protect;
 
 class IssueInfo{
   private int $id;

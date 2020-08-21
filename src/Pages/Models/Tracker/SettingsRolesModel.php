@@ -119,19 +119,20 @@ class SettingsRolesModel extends AbstractSettingsModel{
   
   public function moveRole(array $data): bool{
     $button = $data[FormComponent::BUTTON_KEY] ?? null;
+    $role = get_int($data, 'Role');
     
-    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || !isset($data['Role']) || !is_numeric($data['Role'])){
+    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $role === null){
       return false;
     }
     
     $perms = new TrackerPermTable(DB::get(), $this->getTracker());
     
     if ($button === self::ACTION_MOVE_UP){
-      $perms->moveRoleUp((int)$data['Role']);
+      $perms->moveRoleUp($role);
       return true;
     }
     elseif ($button === self::ACTION_MOVE_DOWN){
-      $perms->moveRoleDown((int)$data['Role']);
+      $perms->moveRoleDown($role);
       return true;
     }
     
@@ -139,7 +140,9 @@ class SettingsRolesModel extends AbstractSettingsModel{
   }
   
   public function deleteRole(array $data): bool{ // TODO make it a dedicated page with additional checks
-    if (!isset($data['Role']) || !is_numeric($data['Role'])){
+    $role = get_int($data, 'Role');
+    
+    if ($role === null){
       return false;
     }
     

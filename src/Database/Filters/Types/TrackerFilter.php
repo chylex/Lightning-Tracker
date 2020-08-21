@@ -12,7 +12,6 @@ use Database\Filters\IWhereCondition;
 use Database\Objects\UserProfile;
 use PDO;
 use PDOStatement;
-use function Database\bind;
 
 final class TrackerFilter extends AbstractFilter{
   public static function getUserVisibilityClause(?string $table_name = null): string{

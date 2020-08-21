@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Models;
 
 use Pages\IModel;
-use function Database\protect;
 
 class ErrorModel extends AbstractWrapperModel{
   private string $title;

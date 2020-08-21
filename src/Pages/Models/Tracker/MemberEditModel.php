@@ -14,7 +14,6 @@ use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
 use Validation\FormValidator;
 use Validation\ValidationException;
-use function Database\protect;
 
 class MemberEditModel extends BasicTrackerPageModel{
   public const ACTION_EDIT = 'Edit';

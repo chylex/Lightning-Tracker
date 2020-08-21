@@ -179,19 +179,20 @@ HTML
   
   public function moveMilestone(array $data): bool{
     $button = $data[FormComponent::BUTTON_KEY] ?? null;
+    $milestone = get_int($data, 'Milestone');
     
-    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || !isset($data['Milestone']) || !is_numeric($data['Milestone'])){
+    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $milestone === null){
       return false;
     }
     
     $milestones = new MilestoneTable(DB::get(), $this->getTracker());
     
     if ($button === self::ACTION_MOVE_UP){
-      $milestones->moveMilestoneUp((int)$data['Milestone']);
+      $milestones->moveMilestoneUp($milestone);
       return true;
     }
     elseif ($button === self::ACTION_MOVE_DOWN){
-      $milestones->moveMilestoneDown((int)$data['Milestone']);
+      $milestones->moveMilestoneDown($milestone);
       return true;
     }
     
@@ -199,7 +200,9 @@ HTML
   }
   
   public function toggleActiveMilestone(array $data): bool{
-    if (!isset($data['Milestone']) || !is_numeric($data['Milestone'])){
+    $milestone = get_int($data, 'Milestone');
+    
+    if ($milestone === null){
       return false;
     }
     

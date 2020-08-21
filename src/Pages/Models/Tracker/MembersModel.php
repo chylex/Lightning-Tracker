@@ -225,23 +225,23 @@ class MembersModel extends BasicTrackerPageModel{
   }
   
   public function removeMember(array $data): bool{ // TODO make it a dedicated page with additional checks
-    if (!isset($data['User']) || !is_numeric($data['User'])){
+    $user = get_int($data, 'User');
+    
+    if ($user === null){
       return false;
     }
     
     $db = DB::get();
     $tracker = $this->getTracker();
     
-    $user_id = (int)$data['User'];
-    
     $members = new TrackerMemberTable($db, $tracker);
-    $role = $members->getRoleIdStr($user_id);
+    $role = $members->getRoleIdStr($user);
     
-    if (!MemberEditModel::canEditMember(Session::get()->getLogonUserIdOrThrow(), $user_id, empty($role) ? null : intval($role), $tracker)){
+    if (!MemberEditModel::canEditMember(Session::get()->getLogonUserIdOrThrow(), $user, empty($role) ? null : intval($role), $tracker)){
       return false;
     }
     
-    $members->removeUserId($user_id);
+    $members->removeUserId($user);
     return true;
   }
 }

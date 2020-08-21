@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Components\Forms\Elements;
 
 use Pages\IViewable;
-use function Database\protect;
 
 final class FormSelectOption implements IViewable{
   private string $value;

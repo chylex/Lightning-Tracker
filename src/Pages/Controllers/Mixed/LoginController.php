@@ -18,26 +18,22 @@ use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
 class LoginController extends AbstractHandlerController{
-  private static function strEndsWith(string $haystack, string $needle): bool{
-    return substr($haystack, -strlen($needle)) === $needle;
-  }
-  
   public static function getReturnQuery(Request $req): string{
     $base_path_components = [BASE_PATH, $req->getBasePath()->raw()];
     $base_path = implode('/', array_filter(array_map(fn($v): string => ltrim($v, '/'), $base_path_components), fn($v): bool => !empty($v)));
-    $base_path_len = strlen($base_path);
+    $base_path_len = mb_strlen($base_path);
     
     $request_uri = ltrim($_SERVER['REQUEST_URI'], '/');
     $current_path = '/'.parse_url($request_uri, PHP_URL_PATH);
     
-    if (self::strEndsWith($current_path, '/register')){
+    if (mb_str_ends_with($current_path, '/register')){
       $return = '';
     }
-    elseif (self::strEndsWith($current_path, '/login')){
+    elseif (mb_str_ends_with($current_path, '/login')){
       $return = $_GET['return'] ?? '';
     }
     else{
-      $return = substr($request_uri, 0, $base_path_len) === $base_path ? rawurlencode(ltrim(substr($request_uri, $base_path_len), '/')) : '';
+      $return = mb_substr($request_uri, 0, $base_path_len) === $base_path ? rawurlencode(ltrim(mb_substr($request_uri, $base_path_len), '/')) : '';
     }
     
     return empty($return) ? '' : '?return='.$return;

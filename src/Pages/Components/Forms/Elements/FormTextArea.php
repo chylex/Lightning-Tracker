@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Pages\Components\Forms\Elements;
 
 use Pages\Components\Forms\AbstractFormField;
-use function Database\protect;
 
 final class FormTextArea extends AbstractFormField{
   private string $id;

@@ -32,7 +32,7 @@ spl_autoload_register(function($class){
   require __DIR__.'/'.str_replace('\\', '/', $class).'.php';
 });
 
-require_once 'Database/utils.php';
+require_once 'utils.php';
 
 if (!file_exists('config.php')){
   require_once 'install.php';

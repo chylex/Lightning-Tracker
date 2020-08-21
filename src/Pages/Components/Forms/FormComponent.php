@@ -23,7 +23,6 @@ use Pages\Components\Text;
 use Pages\IViewable;
 use Routing\Request;
 use Validation\InvalidField;
-use function Database\protect;
 
 final class FormComponent implements IViewable{
   public const ACTION_KEY = '_Action';
