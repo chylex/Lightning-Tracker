@@ -46,7 +46,10 @@ class SettingsRolesModel extends AbstractSettingsModel{
   public function load(): IModel{
     parent::load();
     
-    foreach((new TrackerPermTable(DB::get(), $this->getTracker()))->listRoles() as $role){
+    $perms = new TrackerPermTable(DB::get(), $this->getTracker());
+    $ordering_limit = $perms->findMaxOrdering();
+    
+    foreach($perms->listRoles() as $role){
       $role_id_str = strval($role->getId());
       $row = [$role->getTitleSafe()];
       
@@ -56,8 +59,19 @@ class SettingsRolesModel extends AbstractSettingsModel{
       else{
         $form_move = new FormComponent(self::ACTION_MOVE);
         $form_move->addHidden('Role', $role_id_str);
-        $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
-        $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
+        
+        $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
+        $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
+        
+        $ordering = $role->getOrdering();
+        
+        if ($ordering === 0 || $ordering === 1){
+          $btn_move_up->disabled();
+        }
+        
+        if ($ordering === 0 || $ordering === $ordering_limit){
+          $btn_move_down->disabled();
+        }
         
         $form_delete = new FormComponent(self::ACTION_DELETE);
         $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');

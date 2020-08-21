@@ -8,11 +8,13 @@ use function Database\protect;
 final class RoleInfo{
   private int $id;
   private string $title;
+  private int $ordering;
   private bool $special;
   
-  public function __construct(int $id, string $title, bool $special){
+  public function __construct(int $id, string $title, int $ordering, bool $special){
     $this->id = $id;
     $this->title = $title;
+    $this->ordering = $ordering;
     $this->special = $special;
   }
   
@@ -26,6 +28,10 @@ final class RoleInfo{
   
   public function getTitleSafe(): string{
     return protect($this->title);
+  }
+  
+  public function getOrdering(): int{
+    return $this->ordering;
   }
   
   public function isSpecial(): bool{

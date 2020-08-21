@@ -110,11 +110,7 @@ final class TrackerPermTable extends AbstractTrackerTable{
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare('SELECT MAX(ordering) FROM tracker_roles WHERE tracker_id = ?');
-      $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
-      $stmt->execute();
-      
-      $limit = $this->fetchOneColumn($stmt);
+      $limit = $this->findMaxOrdering();
       
       if ($limit === false){
         $this->db->rollBack();
@@ -133,6 +129,15 @@ final class TrackerPermTable extends AbstractTrackerTable{
     }catch(PDOException $e){
       $this->db->rollBack();
     }
+  }
+  
+  public function findMaxOrdering(): ?int{
+    $stmt = $this->db->prepare('SELECT MAX(ordering) FROM tracker_roles WHERE tracker_id = ?');
+    $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $limit = $this->fetchOneColumn($stmt);
+    return $limit === false ? null : (int)$limit;
   }
   
   private function swapRolesInternal(int $id, int $current_ordering, int $other_ordering): void{
@@ -192,7 +197,7 @@ SQL
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->db->prepare('SELECT id, title, special FROM tracker_roles WHERE tracker_id = ? ORDER BY special DESC, ordering ASC');
+    $stmt = $this->db->prepare('SELECT id, title, ordering, special FROM tracker_roles WHERE tracker_id = ? ORDER BY special DESC, ordering ASC');
     $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     return $this->fetchRoles($stmt);
@@ -204,7 +209,7 @@ SQL
    */
   public function listRolesAssignableBy(int $user_id): array{
     $stmt = $this->db->prepare(<<<SQL
-SELECT id, title, special
+SELECT id, title, ordering, special
 FROM tracker_roles
 WHERE tracker_id = ?
   AND special = FALSE
