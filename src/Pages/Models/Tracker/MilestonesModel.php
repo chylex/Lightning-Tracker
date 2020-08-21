@@ -84,6 +84,8 @@ class MilestonesModel extends BasicTrackerPageModel{
     $active_milestone = $this->getActiveMilestone();
     $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
     
+    $ordering_limit = $milestones->findMaxOrdering();
+    
     foreach($milestones->listMilestones($filter) as $milestone){
       $milestone_id = $milestone->getMilestoneId();
       $milestone_id_str = strval($milestone_id);
@@ -102,8 +104,19 @@ class MilestonesModel extends BasicTrackerPageModel{
       if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
         $form_move = new FormComponent(self::ACTION_MOVE);
         $form_move->addHidden('Milestone', $milestone_id_str);
-        $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
-        $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
+        
+        $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
+        $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
+        
+        $ordering = $milestone->getOrdering();
+        
+        if ($ordering === 1){
+          $btn_move_up->disabled();
+        }
+        
+        if ($ordering === $ordering_limit){
+          $btn_move_down->disabled();
+        }
         
         $link_delete = Link::fromBase($req, 'milestones', $milestone_id_str, 'delete');
         $btn_delete = new Html(<<<HTML

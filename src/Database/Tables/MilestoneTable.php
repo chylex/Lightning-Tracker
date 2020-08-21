@@ -74,11 +74,7 @@ SQL
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare('SELECT MAX(ordering) FROM milestones WHERE tracker_id = ?');
-      $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
-      $stmt->execute();
-      
-      $limit = $this->fetchOneColumn($stmt);
+      $limit = $this->findMaxOrdering();
       
       if ($limit === false){
         $this->db->rollBack();
@@ -97,6 +93,15 @@ SQL
     }catch(PDOException $e){
       $this->db->rollBack();
     }
+  }
+  
+  public function findMaxOrdering(): ?int{
+    $stmt = $this->db->prepare('SELECT MAX(ordering) FROM milestones WHERE tracker_id = ?');
+    $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $limit = $this->fetchOneColumn($stmt);
+    return $limit === false ? null : (int)$limit;
   }
   
   private function swapMilestonesInternal(int $id, int $current_ordering, int $other_ordering): void{
@@ -143,6 +148,7 @@ SQL
     $sql = <<<SQL
 SELECT m.milestone_id                                                   AS milestone_id,
        m.title                                                          AS title,
+       m.ordering                                                       AS ordering,
        COUNT(CASE WHEN i.status IN ('finished', 'rejected') THEN 1 END) AS closed_issues,
        COUNT(i.issue_id)                                                AS total_issues,
        FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS progress,
@@ -164,6 +170,7 @@ SQL;
     while(($res = $this->fetchNext($stmt)) !== false){
       $results[] = new MilestoneInfo($res['milestone_id'],
                                      $res['title'],
+                                     $res['ordering'],
                                      $res['closed_issues'],
                                      $res['total_issues'],
                                      $res['progress'] === null ? null : (int)$res['progress'],
