@@ -11,6 +11,7 @@ final class FormIconButton implements IViewable{
   private string $icon;
   private ?string $color = null;
   private ?string $value = null;
+  private bool $disabled = false;
   
   public function __construct(string $type, string $icon){
     $this->type = $type;
@@ -27,12 +28,18 @@ final class FormIconButton implements IViewable{
     return $this;
   }
   
+  public function disabled(): self{
+    $this->disabled = true;
+    return $this;
+  }
+  
   public function echoBody(): void{
     $value = $this->value === null ? '' : ' name="'.FormComponent::BUTTON_KEY.'" value="'.$this->value.'"';
     $color_class = $this->color === null ? '' : ' icon-color-'.$this->color;
+    $disabled_attr = $this->disabled ? ' disabled' : '';
     
     echo <<<HTML
-<button type="$this->type" class="icon"$value>
+<button type="$this->type" class="icon"$value$disabled_attr>
   <span class="icon icon-$this->icon$color_class"></span>
 </button>
 HTML;

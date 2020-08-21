@@ -155,15 +155,23 @@ button.icon {
   opacity: 0.75;
   background: none;
   border: none;
-  cursor: pointer;
   text-align: left;
   text-decoration: none;
   font-size: 20px;
 }
 
+a.icon,
+button.icon:not([disabled]) {
+  cursor: pointer;
+}
+
 a.icon:hover,
-button.icon:hover {
+button.icon:not([disabled]):hover {
   opacity: 1;
+}
+
+button.icon[disabled] > span.icon {
+  color: #2f2f2f !important;
 }
 
 span.missing {
