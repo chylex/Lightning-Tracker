@@ -78,6 +78,7 @@ SQL
     
     begin_transaction($db);
     
+    /** @noinspection SqlInsertValues */
     $db->query(<<<SQL
 INSERT INTO tracker_roles (tracker_id, title, special)
 SELECT tracker_id, 'Owner' AS title, TRUE AS special

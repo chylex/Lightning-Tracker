@@ -33,7 +33,7 @@ class TrackerDeleteModel extends BasicRootPageModel{
     
     $this->form = new FormComponent(self::ACTION_CONFIRM);
     $this->form->addTextField('Name')->label('Tracker Name');
-    $this->form->addButton('submit', 'Delete')->icon('trash');
+    $this->form->addButton('submit', 'Delete Tracker')->icon('trash');
   }
   
   protected function createNavigation(): NavigationComponent{

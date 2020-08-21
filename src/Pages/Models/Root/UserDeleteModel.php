@@ -79,9 +79,9 @@ class UserDeleteModel extends BasicRootPageModel{
     if (!$this->form->accept($data)){
       return false;
     }
-  
+    
     $confirmation = $data['Name'] ?? null;
-  
+    
     if ($confirmation !== $this->user->getName()){
       $this->form->invalidateField('Name', 'Incorrect username.');
       return false;

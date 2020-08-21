@@ -33,9 +33,7 @@ class MilestoneDeleteModel extends BasicTrackerPageModel{
                                    ->addOption('', '(No Milestone)')
                                    ->dropdown();
     
-    $milestones = new MilestoneTable(DB::get(), $tracker);
-    
-    foreach($milestones->listMilestones() as $milestone){
+    foreach((new MilestoneTable(DB::get(), $tracker))->listMilestones() as $milestone){
       $id = $milestone->getMilestoneId();
       
       if ($id === $milestone_id){

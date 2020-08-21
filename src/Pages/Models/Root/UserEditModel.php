@@ -20,7 +20,7 @@ use Validation\FormValidator;
 use Validation\ValidationException;
 
 class UserEditModel extends BasicRootPageModel{
-  public const ACTION_CONFIRM = 'Edit';
+  public const ACTION_CONFIRM = 'Confirm';
   
   private int $user_id;
   private ?UserInfo $user;

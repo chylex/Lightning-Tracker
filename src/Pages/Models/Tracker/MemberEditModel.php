@@ -48,7 +48,6 @@ class MemberEditModel extends BasicTrackerPageModel{
     $users = new UserTable($db);
     $this->user_id = $users->findIdByName($member_name);
     
-    $perms = new TrackerPermTable($db, $tracker);
     $members = new TrackerMemberTable($db, $tracker);
     $member_role = $members->getRoleIdStr($this->user_id);
     
@@ -62,7 +61,7 @@ class MemberEditModel extends BasicTrackerPageModel{
                                 ->dropdown()
                                 ->addOption('', '(Default)');
       
-      foreach($perms->listRolesAssignableBy($logon_user_id) as $role){
+      foreach((new TrackerPermTable($db, $tracker))->listRolesAssignableBy($logon_user_id) as $role){
         $select_role->addOption(strval($role->getId()), $role->getTitle());
       }
       

@@ -29,12 +29,12 @@ class SettingsRolesModel extends AbstractSettingsModel{
   
   public function __construct(Request $req, TrackerInfo $tracker){
     parent::__construct($req, $tracker);
-  
+    
     $this->table = new TableComponent();
     $this->table->ifEmpty('No roles found.');
     $this->table->addColumn('Title')->width(100)->bold();
     $this->table->addColumn('Actions')->tight()->right();
-  
+    
     $this->form = new FormComponent(self::ACTION_CREATE);
     $this->form->startTitledSection('Create Role');
     $this->form->setMessagePlacementHere();
@@ -46,9 +46,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
   public function load(): IModel{
     parent::load();
     
-    $perms = new TrackerPermTable(DB::get(), $this->getTracker());
-    
-    foreach($perms->listRoles() as $role){
+    foreach((new TrackerPermTable(DB::get(), $this->getTracker()))->listRoles() as $role){
       $role_id_str = strval($role->getId());
       $row = [$role->getTitleSafe()];
       
@@ -60,18 +58,18 @@ class SettingsRolesModel extends AbstractSettingsModel{
         $form_move->addHidden('Role', $role_id_str);
         $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
         $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
-  
+        
         $form_delete = new FormComponent(self::ACTION_DELETE);
         $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
         $form_delete->addHidden('Role', $role_id_str);
         $form_delete->addIconButton('submit', 'circle-cross')->color('red');
-  
+        
         $row[] = new CompositeComponent($form_move, $form_delete);
       }
-  
+      
       $row = $this->table->addRow($row);
     }
-  
+    
     return $this;
   }
   
@@ -122,7 +120,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       $perms->moveRoleDown((int)$data['Role']);
       return true;
     }
-  
+    
     return false;
   }
   

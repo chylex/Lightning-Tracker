@@ -38,15 +38,10 @@ class MilestoneEditModel extends BasicTrackerPageModel{
     parent::load();
     
     if (!$this->form->isFilled()){
-      $tracker = $this->getTracker();
-      $milestones = new MilestoneTable(DB::get(), $tracker);
-      
+      $milestones = new MilestoneTable(DB::get(), $this->getTracker());
       $title = $milestones->getMilestoneTitle($this->milestone_id);
       
-      if ($title === null){
-        $this->has_milestone = false;
-      }
-      else{
+      if ($title !== null){
         $this->has_milestone = true;
         $this->milestone_title_safe = protect($title);
         $this->form->fill(['Title' => $title]);

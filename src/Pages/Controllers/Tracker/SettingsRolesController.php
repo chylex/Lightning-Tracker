@@ -28,14 +28,14 @@ class SettingsRolesController extends AbstractTrackerController{
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $action = $req->getAction();
     $model = new SettingsRolesModel($req, $tracker);
-  
+    
     if (($action === $model::ACTION_CREATE && $model->createRole($req->getData())) ||
         ($action === $model::ACTION_MOVE && $model->moveRole($req->getData())) ||
         ($action === $model::ACTION_DELETE && $model->deleteRole($req->getData()))
     ){
       return reload();
     }
-  
+    
     return view(new SettingsRolesPage($model->load()));
   }
 }

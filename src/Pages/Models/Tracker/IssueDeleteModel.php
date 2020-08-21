@@ -26,7 +26,7 @@ class IssueDeleteModel extends BasicTrackerPageModel{
     
     $this->form = new FormComponent(self::ACTION_CONFIRM);
     $this->form->addTextField('Id')->label('Issue ID');
-    $this->form->addButton('submit', 'Delete')->icon('trash');
+    $this->form->addButton('submit', 'Delete Issue')->icon('trash');
   }
   
   public function load(): IModel{

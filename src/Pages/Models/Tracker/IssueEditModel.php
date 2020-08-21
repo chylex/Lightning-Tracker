@@ -224,7 +224,7 @@ HTML
       $validator->validate();
       $issues = new IssueTable(DB::get(), $tracker);
       
-      if ($assignee !== null && !($assignee === $tracker->getOwnerId() || (new TrackerMemberTable(DB::get(), $tracker))->checkMembershipExists($assignee))){
+      if ($assignee !== null && !(new TrackerMemberTable(DB::get(), $tracker))->checkMembershipExists($assignee)){
         $real_assignee = $this->issue === null ? null : $this->issue->getAssignee();
         
         $this->form->invalidateField('Assignee', 'Assignee must be a member of the tracker.');
