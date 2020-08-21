@@ -49,6 +49,7 @@ SQL
       $this->db->commit();
     }catch(PDOException $e){
       $this->db->rollBack();
+      throw $e;
     }
   }
   
@@ -67,6 +68,7 @@ SQL
       $this->db->commit();
     }catch(PDOException $e){
       $this->db->rollBack();
+      throw $e;
     }
   }
   
@@ -92,6 +94,7 @@ SQL
       $this->db->commit();
     }catch(PDOException $e){
       $this->db->rollBack();
+      throw $e;
     }
   }
   
