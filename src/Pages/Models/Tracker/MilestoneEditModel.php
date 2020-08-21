@@ -19,8 +19,7 @@ class MilestoneEditModel extends BasicTrackerPageModel{
   public const ACTION_EDIT = 'Edit';
   
   private int $milestone_id;
-  private bool $has_milestone = false;
-  private string $milestone_title_safe;
+  private ?string $milestone_title;
   
   private FormComponent $form;
   
@@ -36,26 +35,21 @@ class MilestoneEditModel extends BasicTrackerPageModel{
   public function load(): IModel{
     parent::load();
     
-    if (!$this->form->isFilled()){
-      $milestones = new MilestoneTable(DB::get(), $this->getTracker());
-      $title = $milestones->getMilestoneTitle($this->milestone_id);
-      
-      if ($title !== null){
-        $this->has_milestone = true;
-        $this->milestone_title_safe = protect($title);
-        $this->form->fill(['Title' => $title]);
-      }
+    $this->milestone_title = (new MilestoneTable(DB::get(), $this->getTracker()))->getMilestoneTitle($this->milestone_id);
+    
+    if ($this->milestone_title !== null && !$this->form->isFilled()){
+      $this->form->fill(['Title' => $this->milestone_title]);
     }
     
     return $this;
   }
   
   public function hasMilestone(): bool{
-    return $this->has_milestone;
+    return $this->milestone_title !== null;
   }
   
   public function getMilestoneTitleSafe(): string{
-    return $this->milestone_title_safe;
+    return protect($this->milestone_title);
   }
   
   public function getEditForm(): FormComponent{
