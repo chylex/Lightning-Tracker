@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `tracker_role_perms` (
 		'settings',
 		'members.list',
 		'members.manage',
-		'milestones.edit',
+		'milestones.manage',
 		'issues.create',
 		'issues.edit.all',
 		'issues.delete.all') NOT NULL,

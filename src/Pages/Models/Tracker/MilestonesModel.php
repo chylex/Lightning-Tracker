@@ -33,7 +33,7 @@ class MilestonesModel extends BasicTrackerPageModel{
   private const ACTION_MOVE_UP = 'Up';
   private const ACTION_MOVE_DOWN = 'Down';
   
-  public const PERM_EDIT = 'milestones.edit';
+  public const PERM_MANAGE = 'milestones.manage';
   
   private Permissions $perms;
   private TableComponent $table;
@@ -53,7 +53,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $this->table->addColumn('Progress')->sort('progress')->width(35);
     $this->table->addColumn('Last Updated')->sort('date_updated')->tight()->right();
     
-    if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
+    if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
       $this->table->addColumn('Actions')->tight()->right();
       
       $this->form = new FormComponent(self::ACTION_CREATE);
@@ -101,7 +101,7 @@ class MilestonesModel extends BasicTrackerPageModel{
               new ProgressBarComponent($milestone->getPercentageDone()),
               $update_date === null ? '<div class="center-text">-</div>' : new DateTimeComponent($update_date, true)];
       
-      if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
+      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
         $form_move = new FormComponent(self::ACTION_MOVE);
         $form_move->addHidden('Milestone', $milestone_id_str);
         
@@ -136,7 +136,7 @@ HTML
       
       $row = $this->table->addRow($row);
       
-      if ($this->perms->checkTracker($tracker, self::PERM_EDIT)){
+      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
         $row->link(Link::fromBase($req, 'milestones', $milestone_id_str));
       }
     }

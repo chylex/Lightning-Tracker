@@ -24,7 +24,7 @@ class MilestoneEditController extends AbstractTrackerController{
   
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireLoginState(true);
-    yield new RequireTrackerPermission($tracker, MilestonesModel::PERM_EDIT);
+    yield new RequireTrackerPermission($tracker, MilestonesModel::PERM_MANAGE);
     yield new LoadNumericId($this->milestone_id, 'milestone', $tracker);
   }
   
