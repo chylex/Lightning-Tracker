@@ -42,7 +42,9 @@ try{
     die('Lightning Tracker tried updating to a new version and failed creating a backup configuration file.');
   }
   
-  if (INSTALLED_MIGRATION_VERSION === 1){
+  $migration_version = INSTALLED_MIGRATION_VERSION;
+  
+  if ($migration_version === 1){
     $db = DB::get();
     
     $db->query('ALTER TABLE system_roles ADD special BOOL DEFAULT FALSE NOT NULL');
@@ -115,10 +117,10 @@ SQL
     /** @noinspection SqlWithoutWhere */
     $db->query('UPDATE milestones SET milestone_id = ordering');
     
-    upgrade_config($db, 2);
+    upgrade_config($db, $migration_version = 2);
   }
   
-  if (INSTALLED_MIGRATION_VERSION === 2){
+  if ($migration_version === 2){
     $db = DB::get();
     
     $stmt = $db->prepare(<<<SQL
@@ -176,7 +178,7 @@ ON DUPLICATE KEY UPDATE role_id = tr.role_id
 SQL
     );
     
-    upgrade_config($db, 3);
+    upgrade_config($db, $migration_version = 3);
   }
 }catch(Exception $e){
   if (isset($db) && $db->inTransaction()){
