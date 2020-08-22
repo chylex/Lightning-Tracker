@@ -120,11 +120,15 @@ SQL
   public function updateIssueTasks(int $id, string $description, int $progress): void{
     if ($progress === 100){
       $condition = 'status = \''.IssueStatus::OPEN.'\' OR status = \''.IssueStatus::IN_PROGRESS.'\'';
-      $auto_status = 'ready-to-test';
+      $auto_status = IssueStatus::READY_TO_TEST;
     }
     elseif ($progress > 0){
       $condition = 'status = \''.IssueStatus::OPEN.'\'';
-      $auto_status = 'in-progress';
+      $auto_status = IssueStatus::IN_PROGRESS;
+    }
+    else{
+      $condition = 'FALSE';
+      $auto_status = IssueStatus::OPEN;
     }
     
     $stmt = $this->db->prepare(<<<SQL

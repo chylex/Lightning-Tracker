@@ -27,7 +27,7 @@ final class FormValidator extends AbstractValidator{
   }
   
   public function bool(string $field, ?string $label = null): DummyValidator{
-    $validator = new DummyValidator($field, (bool)$this->data[$field] ?? false, $label);
+    $validator = new DummyValidator($field, (bool)($this->data[$field] ?? false), $label);
     $this->validators[] = $validator;
     return $validator;
   }
