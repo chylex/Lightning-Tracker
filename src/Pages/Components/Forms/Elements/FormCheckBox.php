@@ -5,8 +5,8 @@ namespace Pages\Components\Forms\Elements;
 
 use Pages\Components\Forms\AbstractFormField;
 
-final class FormCheckBox extends AbstractFormField{
-  private const CHECKED_VALUE = 'on';
+class FormCheckBox extends AbstractFormField{
+  protected const CHECKED_VALUE = 'on';
   
   private string $id;
   private ?string $label;
@@ -16,7 +16,7 @@ final class FormCheckBox extends AbstractFormField{
     $this->id = $id;
   }
   
-  public function label(string $label): self{
+  public final function label(string $label): self{
     $this->label = $label;
     return $this;
   }
@@ -25,7 +25,7 @@ final class FormCheckBox extends AbstractFormField{
    * @param ?string|bool $value
    * @return $this
    */
-  public function value($value): self{
+  public final function value($value): self{
     if ($value === null){
       $this->value = '';
     }
@@ -39,7 +39,11 @@ final class FormCheckBox extends AbstractFormField{
     return $this;
   }
   
-  public function acceptsMissingField(): bool{
+  protected final function getLabel(): ?string{
+    return $this->label;
+  }
+  
+  public final function acceptsMissingField(): bool{
     return true;
   }
   

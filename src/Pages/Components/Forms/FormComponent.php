@@ -8,6 +8,7 @@ use Logging\Log;
 use Pages\Actions\ReloadFormAction;
 use Pages\Components\Forms\Elements\FormButton;
 use Pages\Components\Forms\Elements\FormCheckBox;
+use Pages\Components\Forms\Elements\FormCheckBoxHierarchyItem;
 use Pages\Components\Forms\Elements\FormHiddenValue;
 use Pages\Components\Forms\Elements\FormIconButton;
 use Pages\Components\Forms\Elements\FormMessageList;
@@ -101,6 +102,21 @@ HTML;
   
   public function endSplitGroup(): void{
     $this->elements[] = new FormSplitGroupEnd();
+  }
+  
+  public function startCheckBoxHierarchy(string $title): void{
+    $this->elements[] = new Html('<label>'.$title.'</label><div class="field-group">');
+  }
+  
+  public function addCheckBoxHierarchyItem(string $name): FormCheckBoxHierarchyItem{
+    $field = new FormCheckBoxHierarchyItem($this->id.'-'.$name, $name);
+    $this->elements[] = $field;
+    $this->fields[$name] = $field;
+    return $field;
+  }
+  
+  public function endCheckBoxHierarchy(): void{
+    $this->elements[] = new Html('</div>');
   }
   
   public function addTextField(string $name): FormTextField{

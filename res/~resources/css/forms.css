@@ -199,11 +199,60 @@ label:not(.disabled) {
   cursor: pointer;
 }
 
-input[type=checkbox] + label {
+input[type=checkbox] + label,
+div.checkbox-multiline-label > label {
   font-size: 15px;
   font-weight: normal;
   vertical-align: 5%;
   /* extends clickable label area to cover space between it and the checkbox */
   margin-left: -7px;
   padding-left: 7px;
+}
+
+div.checkbox-multiline {
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  margin: 3px 0 16px;
+}
+
+div.checkbox-multiline.parent:before,
+div.checkbox-multiline.sibling:before {
+  display: block;
+  content: "";
+  position: absolute;
+  bottom: -26px;
+  width: 12px;
+  border-left: 1px dotted #000000;
+  border-bottom: 1px dotted #000000;
+}
+
+div.checkbox-multiline.parent:before {
+  top: 17px;
+  left: 10px;
+}
+
+div.checkbox-multiline.sibling:before {
+  top: 11px;
+  left: -10px;
+}
+
+div.checkbox-multiline.indented {
+  margin-left: 20px;
+}
+
+div.checkbox-multiline-label {
+  padding-left: 4px;
+}
+
+div.checkbox-multiline-label > label {
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+div.checkbox-multiline-label > p {
+  color: #444444;
+  font-size: 15px;
+  line-height: 18px;
+  margin: 0;
 }
