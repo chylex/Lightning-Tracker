@@ -71,7 +71,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       $role_id_str = strval($role_id);
       
       $perm_list = implode(', ', array_map(fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
-      $perm_list_str = $role->isSpecial() ? '<div class="center-text">-</div>' : (empty($perm_list) ? Text::missing('(None)') : $perm_list);
+      $perm_list_str = $role->isSpecial() ? '<div class="center-text">-</div>' : (empty($perm_list) ? Text::missing('None') : $perm_list);
       
       $row = [$role->getTitleSafe(), $perm_list_str];
       

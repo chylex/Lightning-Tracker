@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `milestones` (
 	`milestone_id` INT NOT NULL,
 	`tracker_id`   INT NOT NULL,
-	`ordering`     INT NOT NULL,
+	`ordering`     MEDIUMINT NOT NULL,
 	`title`        VARCHAR(64) NOT NULL,
 	PRIMARY KEY (`tracker_id`, `milestone_id`),
 	KEY (`milestone_id`, `tracker_id`), # Needed for milestone-tracker pair checks.

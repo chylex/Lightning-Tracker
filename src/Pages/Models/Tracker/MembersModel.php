@@ -47,7 +47,7 @@ class MembersModel extends BasicTrackerPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No members found.');
     
-    $this->table->addColumn('Username')->sort('name')->width(60)->bold();
+    $this->table->addColumn('Username')->sort('name')->width(60)->wrap()->bold();
     $this->table->addColumn('Role')->sort('role_order')->width(40);
     
     if ($perms->checkTracker($tracker, self::PERM_MANAGE)){
@@ -139,7 +139,7 @@ class MembersModel extends BasicTrackerPageModel{
     $header->addTextField('name')->label('Username');
     
     $filtering_role = $header->addMultiSelect('role')->label('Role');
-    $filtering_role->addOption('', Text::missing('(Default)'));
+    $filtering_role->addOption('', Text::missing('Default'));
     
     foreach((new TrackerPermTable(DB::get(), $tracker))->listRoles() as $role){
       $title = $role->getTitle();

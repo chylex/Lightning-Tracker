@@ -1,59 +1,77 @@
 document.addEventListener("DOMContentLoaded", function(){
-    document.body.addEventListener("click", function(e){
-        /** @var HTMLElement */
-        const target = e.target;
-        
-        let ignoreMultiselect = target.closest("details.multiselect");
-        
-        if (ignoreMultiselect === null && target.tagName === "LABEL"){
-            ignoreMultiselect = target.nextElementSibling;
-        }
-        
-        for(/** @type HTMLDetailsElement */ const multiselect of document.querySelectorAll("details.multiselect")){
-            if (multiselect !== ignoreMultiselect){
-                multiselect.open = false;
+    const multiselects = document.querySelectorAll("details.multiselect");
+    
+    if (multiselects.length > 0){
+        document.body.addEventListener("click", function(e){
+            /** @var HTMLElement */
+            const target = e.target;
+            
+            let ignoreMultiselect = target.closest("details.multiselect");
+            
+            if (ignoreMultiselect === null && target.tagName === "LABEL"){
+                ignoreMultiselect = target.nextElementSibling;
             }
-        }
-    });
-    
-    // global multiselect text widths used for overflow slicing
-    const emptyPair = ["", 0];
-    const memoizedPairs = new Map();
-    
-    for(/** @type HTMLDetailsElement */ const multiselect of document.querySelectorAll("details.multiselect")){
-        const label = multiselect.previousElementSibling;
-        
-        label.addEventListener("click", function(){
-            multiselect.open = !multiselect.open;
+            
+            for(/** @type HTMLDetailsElement */ const multiselect of multiselects){
+                if (multiselect !== ignoreMultiselect){
+                    multiselect.open = false;
+                }
+            }
         });
         
-        /**
-         * @param {HTMLElement | Element} ele
-         */
-        function getText(ele){
-            return ele.innerText || ele.textContent; // fallback for buggy browsers
-        }
+        // global multiselect text widths used for overflow slicing
+        const emptyPair = ["", 0];
+        const memoizedPairs = new Map();
         
-        const summary = multiselect.querySelector("summary");
-        const summaryInitialText = getText(summary);
-        
-        const checkboxes = multiselect.getElementsByTagName("input");
-        
-        const updateCallback = function(){
-            const checked = [];
+        for(/** @type HTMLDetailsElement */ const multiselect of multiselects){
+            const label = multiselect.previousElementSibling;
             
-            for(/** @type HTMLInputElement */ const cb of checkboxes){
-                if (cb.checked){
-                    // noinspection JSUnresolvedVariable
-                    checked.push(getText(cb.nextElementSibling).trim());
+            label.addEventListener("click", function(){
+                multiselect.open = !multiselect.open;
+            });
+            
+            /**
+             * @param {HTMLElement | Element} ele
+             */
+            function getText(ele){
+                return ele.innerText || ele.textContent; // fallback for buggy browsers
+            }
+            
+            function getSpanClass(ele){
+                const child = ele.childElementCount === 1 ? ele.children[0] : null;
+                
+                if (child && child.tagName === "SPAN" && child.classList.contains("missing")){
+                    return "missing";
+                }
+                else{
+                    return null;
                 }
             }
             
-            if (checked.length === 0){
-                summary.innerText = summaryInitialText;
-                summary.style.fontStyle = "italic";
-            }
-            else{
+            const summary = multiselect.querySelector("summary");
+            const summaryInitialText = getText(summary);
+            
+            const checkboxes = multiselect.getElementsByTagName("input");
+            
+            const updateCallback = function(){
+                const checked = [];
+                const styles = [];
+                
+                for(/** @type HTMLInputElement */ const cb of checkboxes){
+                    if (cb.checked){
+                        const labelEle = cb.nextElementSibling;
+                        
+                        checked.push(getText(labelEle).trim());
+                        styles.push(getSpanClass(labelEle));
+                    }
+                }
+                
+                if (checked.length === 0){
+                    summary.innerText = summaryInitialText;
+                    summary.style.fontStyle = "italic";
+                    return;
+                }
+                
                 if (summary.clientWidth > 0){
                     const wasClosed = !multiselect.open;
                     
@@ -112,40 +130,40 @@ document.addEventListener("DOMContentLoaded", function(){
                     }
                 }
                 
-                summary.innerText = checked.join(", ");
+                summary.innerHTML = checked.map((text, index) => styles[index] === null ? text : "<span class=\"" + styles[index] + "\">" + text + "</span>").join(", ");
                 summary.style.fontStyle = "normal";
-            }
-        };
-        
-        const updateDelayed = function(){
-            setTimeout(updateCallback, 0);
-        };
-        
-        for(/** @type HTMLInputElement */ const checkbox of checkboxes){
-            checkbox.addEventListener("change", updateCallback);
+            };
             
-            const form = checkbox.form;
+            const updateDelayed = function(){
+                setTimeout(updateCallback, 0);
+            };
             
-            if (form !== null){
-                form.addEventListener("reset", updateDelayed);
-            }
-        }
-        
-        // noinspection JSUnresolvedVariable
-        const onFontsLoaded = (document.fonts && document.fonts.ready) || Promise.resolve();
-        
-        onFontsLoaded.then(function(){
-            updateCallback();
-            
-            if (summary.clientWidth === 0 && "IntersectionObserver" in window){
-                const observer = new IntersectionObserver(function(){
-                    updateCallback();
-                    observer.disconnect();
-                });
+            for(/** @type HTMLInputElement */ const checkbox of checkboxes){
+                checkbox.addEventListener("change", updateCallback);
                 
-                observer.observe(summary);
+                const form = checkbox.form;
+                
+                if (form !== null){
+                    form.addEventListener("reset", updateDelayed);
+                }
             }
-        });
+            
+            // noinspection JSUnresolvedVariable
+            const onFontsLoaded = (document.fonts && document.fonts.ready) || Promise.resolve();
+            
+            onFontsLoaded.then(function(){
+                updateCallback();
+                
+                if (summary.clientWidth === 0 && "IntersectionObserver" in window){
+                    const observer = new IntersectionObserver(function(){
+                        updateCallback();
+                        observer.disconnect();
+                    });
+                    
+                    observer.observe(summary);
+                }
+            });
+        }
     }
     
     for(/** @type HTMLInputElement */ const range of document.querySelectorAll("input[type='number']")){

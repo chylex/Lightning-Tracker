@@ -57,12 +57,12 @@ class IssuesModel extends BasicTrackerPageModel{
     
     $this->table->addColumn('')->tight()->collapsed();
     $this->table->addColumn('ID')->sort('id')->tight()->collapsed()->right()->bold();
-    $this->table->addColumn('Title')->sort('title')->width(70)->collapsed()->bold();
+    $this->table->addColumn('Title')->sort('title')->width(70)->collapsed()->wrap()->bold();
     $this->table->addColumn('Priority')->sort('priority')->tight();
     $this->table->addColumn('Scale')->sort('scale')->tight();
     $this->table->addColumn('Status')->tight();
     $this->table->addColumn('Progress')->sort('progress')->width(30);
-    $this->table->addColumn('Last Update')->sort('date_updated')->tight();
+    $this->table->addColumn('Last Update')->sort('date_updated')->tight()->right();
     
     $this->menu_actions = new SidemenuComponent($req);
     $this->menu_actions->setTitle(Text::plain('Actions'));
@@ -108,7 +108,7 @@ class IssuesModel extends BasicTrackerPageModel{
     self::setupIssueTagOptions($header->addMultiSelect('status')->label('Status'), IssueStatus::list());
     
     $filtering_milestone = $header->addMultiSelect('milestone')->label('Milestone');
-    $filtering_milestone->addOption('', Text::missing('(No Milestone)'));
+    $filtering_milestone->addOption('', Text::missing('None'));
     
     foreach((new MilestoneTable(DB::get(), $tracker))->listMilestones() as $milestone){
       $filtering_milestone->addOption(strval($milestone->getMilestoneId()), Text::plain($milestone->getTitle()));
@@ -118,14 +118,14 @@ class IssuesModel extends BasicTrackerPageModel{
     // TODO could also have a way of including former members
     
     $filtering_author = $header->addMultiSelect('author')->label('Author');
-    $filtering_author->addOption('', Text::missing('(No Author)'));
+    $filtering_author->addOption('', Text::missing('Nobody'));
     
     $filtering_assignee = $header->addMultiSelect('assignee')->label('Assignee');
-    $filtering_assignee->addOption('', Text::missing('(No Assignee)'));
+    $filtering_assignee->addOption('', Text::missing('Nobody'));
     
     if ($logon_user_id !== null){
-      $filtering_author->addOption(strval($logon_user_id), Text::missing('(You)'));
-      $filtering_assignee->addOption(strval($logon_user_id), Text::missing('(You)'));
+      $filtering_author->addOption(strval($logon_user_id), Text::missing('You'));
+      $filtering_assignee->addOption(strval($logon_user_id), Text::missing('You'));
       
       if ($this->perms->checkTracker($tracker, MembersModel::PERM_LIST)){
         foreach((new TrackerMemberTable(DB::get(), $tracker))->listMembers() as $member){

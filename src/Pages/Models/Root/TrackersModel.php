@@ -43,7 +43,7 @@ class TrackersModel extends BasicRootPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No trackers found. Some trackers may not be visible to your account.');
     
-    $this->table->addColumn('Name')->sort('name')->width(50)->bold();
+    $this->table->addColumn('Name')->sort('name')->width(50)->wrap()->bold();
     $this->table->addColumn('Link')->width(50);
     
     if ($perms->checkSystem(self::PERM_EDIT)){

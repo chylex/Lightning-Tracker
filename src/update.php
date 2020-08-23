@@ -123,6 +123,8 @@ SQL
   if ($migration_version === 2){
     $db = DB::get();
     
+    $db->query('ALTER TABLE milestones MODIFY ordering MEDIUMINT NOT NULL');
+    
     $stmt = $db->prepare(<<<SQL
 SELECT DISTINCT TABLE_NAME AS tbl, CONSTRAINT_NAME AS constr
 FROM information_schema.KEY_COLUMN_USAGE

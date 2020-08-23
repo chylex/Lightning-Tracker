@@ -38,9 +38,9 @@ HTML;
         'Scale'     => $issue->getScale(),
         'Status'    => $issue->getStatus(),
         'Progress'  => (new ProgressBarComponent($issue->getProgress()))->compact(),
-        'Milestone' => $milestone === null ? Text::missing('none') : Text::plain($milestone),
-        'Author'    => $author === null ? Text::missing('nobody') : Text::plain($author->getName()),
-        'Assignee'  => $assignee === null ? Text::missing('nobody') : Text::plain($assignee->getName()),
+        'Milestone' => $milestone === null ? Text::missing('None') : Text::plain($milestone),
+        'Author'    => $author === null ? Text::missing('Nobody') : Text::plain($author->getName()),
+        'Assignee'  => $assignee === null ? Text::missing('Nobody') : Text::plain($assignee->getName()),
         'Created'   => new DateTimeComponent($issue->getCreationDate()),
         'Updated'   => new DateTimeComponent($issue->getLastUpdateDate())
     ];

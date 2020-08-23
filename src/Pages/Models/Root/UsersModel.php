@@ -47,11 +47,11 @@ class UsersModel extends BasicRootPageModel{
     $this->table->ifEmpty('No users found.');
     
     if ($perms->checkSystem(self::PERM_LIST_EMAIL)){
-      $this->table->addColumn('Username')->sort('name')->width(40)->bold();
-      $this->table->addColumn('Email')->width(40);
+      $this->table->addColumn('Username')->sort('name')->width(40)->wrap()->bold();
+      $this->table->addColumn('Email')->width(40)->wrap();
     }
     else{
-      $this->table->addColumn('Username')->sort('name')->width(80)->bold();
+      $this->table->addColumn('Username')->sort('name')->width(80)->wrap()->bold();
     }
     
     $this->table->addColumn('Role')->sort('role_title')->width(20);
@@ -113,7 +113,7 @@ class UsersModel extends BasicRootPageModel{
         $row[] = $user->getEmailSafe();
       }
       
-      $row[] = $user->getRoleTitleSafe() ?? Text::missing('none');
+      $row[] = $user->getRoleTitleSafe() ?? Text::missing('Default');
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
       if ($this->perms->checkSystem(self::PERM_EDIT)){
@@ -153,7 +153,7 @@ HTML
     }
     
     $filtering_role = $header->addMultiSelect('role')->label('Role');
-    $filtering_role->addOption('', Text::missing('(None)'));
+    $filtering_role->addOption('', Text::missing('Default'));
     
     foreach((new SystemPermTable(DB::get()))->listRoles() as $role){
       $title = $role->getTitle();

@@ -47,7 +47,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No milestones found.');
     
-    $this->table->addColumn('Title')->sort('title')->width(65)->bold();
+    $this->table->addColumn('Title')->sort('title')->width(65)->wrap()->bold();
     $this->table->addColumn('Active')->tight()->center();
     $this->table->addColumn('Issues')->tight()->center();
     $this->table->addColumn('Progress')->sort('progress')->width(35);
