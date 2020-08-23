@@ -3,4 +3,6 @@
 /.idea/dictionaries
 /.idea/php.xml
 /.idea/runConfigurations/Server.xml
+/build/node_modules/
+/res/~generated/
 /server/

@@ -1,0 +1,12 @@
+{
+  "name": "lightning-tracker",
+  "description": "",
+  "private": true,
+  "repository": {
+    "url": "https://github.com/chylex/Lightning-Tracker"
+  },
+  "devDependencies": {
+    "gulp": "4.0.2",
+    "gulp-concat": "2.6.1"
+  }
+}
