@@ -50,7 +50,7 @@ final class Permissions{
     if (!isset($this->tracker[$id])){
       try{
         $perms = new TrackerPermTable(DB::get(), $tracker);
-        $this->tracker[$id] = $perms->listPerms($this->user);
+        $this->tracker[$id] = $perms->listUserPerms($this->user);
       }catch(Exception $e){
         Log::critical($e);
         $this->tracker[$id] = [];

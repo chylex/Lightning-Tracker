@@ -11,7 +11,9 @@ use Exception;
 use Pages\Components\CompositeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\Text;
 use Pages\IModel;
+use Routing\Link;
 use Routing\Request;
 use Validation\FormValidator;
 use Validation\ValidationException;
@@ -24,6 +26,20 @@ class SettingsRolesModel extends AbstractSettingsModel{
   private const ACTION_MOVE_UP = 'Up';
   private const ACTION_MOVE_DOWN = 'Down';
   
+  public const PERM_NAMES = [
+      AbstractSettingsModel::PERM  => 'Manage Settings',
+      MembersModel::PERM_LIST      => 'View Members',
+      MembersModel::PERM_MANAGE    => 'Manage Members',
+      MilestonesModel::PERM_MANAGE => 'Manage Milestones',
+      IssuesModel::PERM_CREATE     => 'Create Issues',
+      IssuesModel::PERM_EDIT_ALL   => 'Edit All Issues',
+      IssuesModel::PERM_DELETE_ALL => 'Delete All Issues'
+  ];
+  
+  public const PERM_DEPENDENCIES = [
+      MembersModel::PERM_MANAGE => MembersModel::PERM_LIST
+  ];
+  
   private TableComponent $table;
   private FormComponent $form;
   
@@ -32,7 +48,8 @@ class SettingsRolesModel extends AbstractSettingsModel{
     
     $this->table = new TableComponent();
     $this->table->ifEmpty('No roles found.');
-    $this->table->addColumn('Title')->width(100)->bold();
+    $this->table->addColumn('Title')->width(20)->bold();
+    $this->table->addColumn('Permissions')->width(80)->wrap();
     $this->table->addColumn('Actions')->tight()->right();
     
     $this->form = new FormComponent(self::ACTION_CREATE);
@@ -50,8 +67,13 @@ class SettingsRolesModel extends AbstractSettingsModel{
     $ordering_limit = $perms->findMaxOrdering();
     
     foreach($perms->listRoles() as $role){
-      $role_id_str = strval($role->getId());
-      $row = [$role->getTitleSafe()];
+      $role_id = $role->getId();
+      $role_id_str = strval($role_id);
+      
+      $perm_list = implode(', ', array_map(fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
+      $perm_list_str = $role->isSpecial() ? '<div class="center-text">-</div>' : (empty($perm_list) ? Text::missing('(None)') : $perm_list);
+      
+      $row = [$role->getTitleSafe(), $perm_list_str];
       
       if ($role->isSpecial()){
         $row[] = '';
@@ -82,6 +104,10 @@ class SettingsRolesModel extends AbstractSettingsModel{
       }
       
       $row = $this->table->addRow($row);
+      
+      if (!$role->isSpecial()){
+        $row->link(Link::fromBase($this->getReq(), 'settings', 'roles', $role_id_str));
+      }
     }
     
     return $this;

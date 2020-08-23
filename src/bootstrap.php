@@ -104,6 +104,7 @@ $router->add('tracker/:tracker/&/members', 'Tracker/MembersController');
 $router->add('tracker/:tracker/&/members/:id', 'Tracker/MemberEditController');
 $router->add('tracker/:tracker/&/settings', 'Tracker/SettingsGeneralController');
 $router->add('tracker/:tracker/&/settings/roles', 'Tracker/SettingsRolesController');
+$router->add('tracker/:tracker/&/settings/roles/:id', 'Tracker/SettingsRoleEditController');
 $router->add('tracker/:tracker/&/delete', 'Root/TrackerDeleteController');
 
 foreach(['&/', 'tracker/:tracker/&/'] as $base){

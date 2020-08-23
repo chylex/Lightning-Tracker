@@ -61,20 +61,7 @@ SQL
       $stmt->bindValue(5, $special, PDO::PARAM_BOOL);
       $stmt->execute();
       
-      if (!empty($perms)){
-        $sql = 'INSERT INTO tracker_role_perms (tracker_id, role_id, permission) VALUES ()';
-        $values = implode(',', array_map(fn($ignore): string => '(?, ?, ?)', $perms));
-        
-        $stmt = $this->db->prepare(str_replace('()', $values, $sql));
-        
-        for($i = 0, $count = count($perms); $i < $count; $i++){
-          $stmt->bindValue(($i * 3) + 1, $tracker, PDO::PARAM_INT);
-          $stmt->bindValue(($i * 3) + 2, $role_id, PDO::PARAM_INT);
-          $stmt->bindValue(($i * 3) + 3, $perms[$i]);
-        }
-        
-        $stmt->execute();
-      }
+      $this->addRolePermissions($role_id, $perms);
       
       if ($owned_transaction){
         $this->db->commit();
@@ -88,6 +75,57 @@ SQL
       
       throw $e;
     }
+  }
+  
+  public function editRole(int $id, string $title, array $perms): void{
+    $tracker = $this->getTrackerId();
+    
+    $this->db->beginTransaction();
+    
+    try{
+      $stmt = $this->db->prepare('UPDATE tracker_roles SET title = ? WHERE role_id = ? AND tracker_id = ?');
+      $stmt->bindValue(1, $title);
+      $stmt->bindValue(2, $id, PDO::PARAM_INT);
+      $stmt->bindValue(3, $tracker, PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $stmt = $this->db->prepare('DELETE FROM tracker_role_perms WHERE role_id = ? AND tracker_id = ?');
+      $stmt->bindValue(1, $id, PDO::PARAM_INT);
+      $stmt->bindValue(2, $tracker, PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $this->addRolePermissions($id, $perms);
+      
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+      throw $e;
+    }
+  }
+  
+  /**
+   * @param int $id
+   * @param array $perms
+   */
+  private function addRolePermissions(int $id, array $perms): void{
+    if (empty($perms)){
+      return;
+    }
+    
+    $tracker = $this->getTrackerId();
+    
+    $sql = 'INSERT INTO tracker_role_perms (tracker_id, role_id, permission) VALUES ()';
+    $values = implode(',', array_map(fn($ignore): string => '(?, ?, ?)', $perms));
+    
+    $stmt = $this->db->prepare(str_replace('()', $values, $sql));
+    
+    for($i = 0, $count = count($perms); $i < $count; $i++){
+      $stmt->bindValue(($i * 3) + 1, $tracker, PDO::PARAM_INT);
+      $stmt->bindValue(($i * 3) + 2, $id, PDO::PARAM_INT);
+      $stmt->bindValue(($i * 3) + 3, $perms[$i]);
+    }
+    
+    $stmt->execute();
   }
   
   public function moveRoleUp(int $id): void{
@@ -247,10 +285,23 @@ SQL
   }
   
   /**
+   * @param int $id
+   * @return string[]
+   */
+  public function listRolePerms(int $id): array{
+    $stmt = $this->db->prepare('SELECT permission FROM tracker_role_perms WHERE role_id = ?');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    return $perms === false ? [] : $perms;
+  }
+  
+  /**
    * @param ?UserProfile $user
    * @return string[]
    */
-  public function listPerms(?UserProfile $user): array{
+  public function listUserPerms(?UserProfile $user): array{
     if ($user === null){
       return [];
     }
@@ -269,6 +320,16 @@ SQL
     
     $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
     return $perms === false ? [] : $perms;
+  }
+  
+  public function getRoleTitleIfNotSpecial(int $id): ?string{
+    $stmt = $this->db->prepare('SELECT title FROM tracker_roles WHERE role_id = ? AND tracker_id = ? AND special = FALSE');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $title = $this->fetchOneColumn($stmt);
+    return $title === false ? null : $title;
   }
   
   public function deleteById(int $id): void{
