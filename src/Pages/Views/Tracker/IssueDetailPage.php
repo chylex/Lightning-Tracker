@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Tracker;
 
+use Pages\Components\Html;
 use Pages\Components\Issues\IssueDetailComponent;
 use Pages\Components\SplitComponent;
 use Pages\Models\Tracker\IssueDetailModel;
@@ -44,7 +45,17 @@ class IssueDetailPage extends AbstractTrackerIssuePage{
     $split->setRightWidthLimits(250, 400);
     
     $split->addLeft(new IssueDetailComponent($this->model));
-    $split->addRightIfNotNull($this->model->getMenuActions());
+    
+    $menus = array_filter([$this->model->getMenuActions(), $this->model->getMenuShortcuts()], fn($v): bool => $v !== null);
+    
+    if (!empty($menus)){
+      $split->addRight(new Html('<h3>Actions</h3>'));
+      
+      foreach($menus as $menu){
+        $split->addRight($menu);
+      }
+    }
+    
     $split->addRightIfNotNull($this->model->getActiveMilestoneComponent());
     
     $split->echoBody();

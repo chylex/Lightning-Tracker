@@ -117,6 +117,23 @@ SQL
     $stmt->execute();
   }
   
+  public function updateIssueStatus(int $id, IssueStatus $status, ?int $progress = null): void{
+    $stmt = $this->db->prepare(<<<SQL
+UPDATE issues
+SET status = ?,
+    progress = IFNULL(?, progress),
+    date_updated = NOW()
+WHERE issue_id = ? AND tracker_id = ?
+SQL
+    );
+    
+    $stmt->bindValue(1, $status->getId());
+    $stmt->bindValue(2, $progress, $progress === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+    $stmt->bindValue(3, $id, PDO::PARAM_INT);
+    $stmt->bindValue(4, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->execute();
+  }
+  
   public function updateIssueTasks(int $id, string $description, int $progress): void{
     if ($progress === 100){
       $condition = 'status = \''.IssueStatus::OPEN.'\' OR status = \''.IssueStatus::IN_PROGRESS.'\'';

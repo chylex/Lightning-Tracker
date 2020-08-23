@@ -24,10 +24,11 @@ class IssueDetailController extends AbstractTrackerController{
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
+    $action = $req->getAction();
     $perms = $sess->getPermissions();
     $model = new IssueDetailModel($req, $tracker, $perms, $this->issue_id);
     
-    if ($req->getAction() === $model::ACTION_UPDATE_TASKS){
+    if ($action !== null){
       $issue = $model->getIssue();
       $logon_user = $sess->getLogonUser();
       
@@ -35,8 +36,13 @@ class IssueDetailController extends AbstractTrackerController{
         $perms->requireTracker($tracker, IssuesModel::PERM_EDIT_ALL);
       }
       
-      $model->updateCheckboxes($req->getData());
-      return reload();
+      if ($action === $model::ACTION_UPDATE_TASKS){
+        $model->updateCheckboxes($req->getData());
+        return reload();
+      }
+      elseif ($model->tryUseShortcut($action)){
+        return reload();
+      }
     }
     
     return view(new IssueDetailPage($model->load()));

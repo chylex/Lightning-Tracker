@@ -7,6 +7,7 @@ use Database\DB;
 use Database\Objects\IssueDetail;
 use Database\Objects\TrackerInfo;
 use Database\Tables\IssueTable;
+use Pages\Components\Issues\IssueStatus;
 use Pages\Components\Markdown\MarkdownParseResult;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Text;
@@ -20,6 +21,10 @@ class IssueDetailModel extends BasicTrackerPageModel{
   public const ACTION_UPDATE_TASKS = 'Update';
   public const CHECKBOX_NAME = 'Tasks';
   
+  public const ACTION_MARK_READY_TO_TEST = 'MarkReadyToTest';
+  public const ACTION_MARK_FINISHED = 'MarkFinished';
+  public const ACTION_MARK_REJECTED = 'MarkRejected';
+  
   private ?IssueDetail $issue = null;
   private int $issue_id;
   private bool $can_edit;
@@ -27,6 +32,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
   private Permissions $perms;
   private MarkdownParseResult $description;
   private SidemenuComponent $menu_actions;
+  private SidemenuComponent $menu_shortcuts;
   
   public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms, int $issue_id){
     parent::__construct($req, $tracker);
@@ -35,7 +41,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
     $this->issue_id = $issue_id;
     
     $this->menu_actions = new SidemenuComponent($req);
-    $this->menu_actions->setTitle(Text::plain('Actions'));
+    $this->menu_shortcuts = new SidemenuComponent($req);
   }
   
   public function load(): IModel{
@@ -57,6 +63,10 @@ class IssueDetailModel extends BasicTrackerPageModel{
       
       if ($this->can_edit){
         $this->menu_actions->addLink(Text::withIcon('Edit Issue', 'pencil'), '/issues/'.$this->issue_id.'/edit');
+        
+        $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Ready to Test', IssueStatus::get(IssueStatus::READY_TO_TEST)), self::ACTION_MARK_READY_TO_TEST);
+        $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Finished', IssueStatus::get(IssueStatus::FINISHED)), self::ACTION_MARK_FINISHED);
+        $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Rejected', IssueStatus::get(IssueStatus::REJECTED)), self::ACTION_MARK_REJECTED);
       }
       
       if ($this->perms->checkTracker($tracker, IssuesModel::PERM_DELETE_ALL)){
@@ -93,6 +103,33 @@ class IssueDetailModel extends BasicTrackerPageModel{
   
   public function getMenuActions(): ?SidemenuComponent{
     return $this->menu_actions->getIfNotEmpty();
+  }
+  
+  public function getMenuShortcuts(): ?SidemenuComponent{
+    return $this->menu_shortcuts->getIfNotEmpty();
+  }
+  
+  public function tryUseShortcut(string $action): bool{
+    switch($action){
+      case self::ACTION_MARK_READY_TO_TEST:
+        $status = IssueStatus::READY_TO_TEST;
+        break;
+      
+      case self::ACTION_MARK_FINISHED:
+        $status = IssueStatus::FINISHED;
+        break;
+      
+      case self::ACTION_MARK_REJECTED:
+        $status = IssueStatus::REJECTED;
+        break;
+      
+      default:
+        return false;
+    }
+    
+    $issues = new IssueTable(DB::get(), $this->getTracker());
+    $issues->updateIssueStatus($this->issue_id, IssueStatus::get($status), 100);
+    return true;
   }
   
   public function updateCheckboxes(array $data): void{
