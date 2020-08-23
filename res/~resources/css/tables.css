@@ -123,6 +123,10 @@ tr.link > td:last-child > a {
   padding-right: 16px;
 }
 
+td.wrap {
+  white-space: normal;
+}
+
 td.center {
   text-align: center;
 }

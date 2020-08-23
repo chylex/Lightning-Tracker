@@ -12,6 +12,7 @@ final class TableColumn implements IViewable{
   private ?string $sort_key = null;
   private ?int $width_percentage = null;
   private ?string $align = null;
+  private bool $wrap = false;
   private bool $collapsed = false;
   private bool $bold = false;
   
@@ -29,6 +30,11 @@ final class TableColumn implements IViewable{
     return $this;
   }
   
+  public function tight(): self{
+    $this->width_percentage = 0;
+    return $this;
+  }
+  
   public function center(): self{
     $this->align = 'center';
     return $this;
@@ -39,8 +45,8 @@ final class TableColumn implements IViewable{
     return $this;
   }
   
-  public function tight(): self{
-    $this->width_percentage = 0;
+  public function wrap(): self{
+    $this->wrap = true;
     return $this;
   }
   
@@ -65,6 +71,10 @@ final class TableColumn implements IViewable{
     
     if ($this->align !== null){
       $classes[] = $this->align;
+    }
+    
+    if ($this->wrap){
+      $classes[] = 'wrap';
     }
     
     if ($this->collapsed){
