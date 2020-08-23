@@ -292,7 +292,7 @@ echo <<<HTML
     
     <base href="$base_url_encoded/">
     <link rel="icon" type="image/png" href="~resources/img/favicon.png?v=$v">
-    <link rel="stylesheet" type="text/css" href="~generated/style.min.css?v=$v">
+    <link rel="stylesheet" type="text/css" href="~resources/style.min.css?v=$v">
   </head>
   <body>
     <main id="page-content" class="condensed">

@@ -5,7 +5,11 @@
   "repository": {
     "url": "https://github.com/chylex/Lightning-Tracker"
   },
+  "scripts": {
+    "gulp": "gulp"
+  },
   "devDependencies": {
+    "del": "5.1.0",
     "gulp": "4.0.2",
     "gulp-clean-css": "4.3.0",
     "gulp-concat": "2.6.1"

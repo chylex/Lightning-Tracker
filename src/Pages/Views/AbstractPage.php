@@ -76,7 +76,7 @@ HTML;
       echo '<link rel="stylesheet" type="text/css" href="~resources/css/icons.css?v='.$v.'">';
     }
     else{
-      echo '<link rel="stylesheet" type="text/css" href="~generated/style.min.css?v='.$v.'">';
+      echo '<link rel="stylesheet" type="text/css" href="~resources/style.min.css?v='.$v.'">';
     }
     
     NavigationComponent::echoHead();
