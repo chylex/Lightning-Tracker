@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Components;
 
+use Pages\Components\Issues\IIssueTag;
 use Pages\IViewable;
 
 final class Text implements IViewable{
@@ -16,6 +17,10 @@ final class Text implements IViewable{
   
   public static function withIcon(string $text, string $icon): self{
     return new self('<span class="icon icon-'.$icon.'"></span> '.protect($text));
+  }
+  
+  public static function withIssueTag(string $text, IIssueTag $tag): self{
+    return new self('<span class="'.$tag->getTagClass().'"> '.protect($text).'</span>');
   }
   
   public static function checkmark(string $text): self{
