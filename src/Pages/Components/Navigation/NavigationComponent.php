@@ -9,11 +9,9 @@ use Routing\UrlString;
 
 final class NavigationComponent implements IViewable{
   public static function echoHead(): void{
-    $v = TRACKER_RESOURCE_VERSION;
-    
-    echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/navigation.css?v=$v">
-HTML;
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/navigation.css?v='.TRACKER_RESOURCE_VERSION.'">';
+    }
   }
   
   private string $title;

@@ -37,12 +37,11 @@ final class FormComponent implements IViewable{
   private static $global_counter = 0;
   
   public static function echoHead(): void{
-    $v = TRACKER_RESOURCE_VERSION;
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/forms.css?v='.TRACKER_RESOURCE_VERSION.'">';
+    }
     
-    echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/forms.css?v=$v">
-<script type="text/javascript" src="~resources/js/forms.js?v=$v"></script>
-HTML;
+    echo '<script type="text/javascript" src="~resources/js/forms.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
   }
   
   private string $id;

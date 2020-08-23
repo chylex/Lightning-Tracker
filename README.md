@@ -30,5 +30,5 @@ You should be able to install Lightning Tracker on other server software, such a
 
 * Base URL must be identical to the URL leading to the main page, including the protocol (`http://` or `https://`). The field is pre-filled with the URL you used to access it, and the default value should work.
 * If the installation page appears without any styles, you may need to edit your Apache settings (or `.htaccess` if you do not have access to the server configuration) to include a path to the tracker installation folder. For example, if you place the tracker into a folder called `tracker`, you may need to change:
-   * This line: `RewriteCond %{REQUEST_URI} !^/~resources/`
-   * To this: `RewriteCond %{REQUEST_URI} !^/tracker/~resources/`
+   * This line: `RewriteCond %{REQUEST_URI} !^/~(generated|resources)/`
+   * To this: `RewriteCond %{REQUEST_URI} !^/tracker/~(generated|resources)/`

@@ -12,11 +12,9 @@ use Routing\Request;
 
 final class SidemenuComponent implements IViewable{
   public static function echoHead(): void{
-    $v = TRACKER_RESOURCE_VERSION;
-    
-    echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/sidemenu.css?v=$v">
-HTML;
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/sidemenu.css?v='.TRACKER_RESOURCE_VERSION.'">';
+    }
   }
   
   private string $base_url;

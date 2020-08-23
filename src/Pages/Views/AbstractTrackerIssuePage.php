@@ -35,12 +35,10 @@ abstract class AbstractTrackerIssuePage extends AbstractTrackerPage{
     ProgressBarComponent::echoHead();
     DateTimeComponent::echoHead();
     
-    $v = TRACKER_RESOURCE_VERSION;
-    
-    echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/issues.css?v=$v">
-<link rel="stylesheet" type="text/css" href="~resources/css/issuedetail.css?v=$v">
-HTML;
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/issues.css?v='.TRACKER_RESOURCE_VERSION.'">';
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/issuedetail.css?v='.TRACKER_RESOURCE_VERSION.'">';
+    }
   }
   
   protected final function echoIssueMissing(): void{

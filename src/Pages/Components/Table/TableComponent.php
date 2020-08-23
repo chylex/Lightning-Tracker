@@ -15,12 +15,11 @@ use Routing\Request;
 
 final class TableComponent implements IViewable{
   public static function echoHead(): void{
-    $v = TRACKER_RESOURCE_VERSION;
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/tables.css?v='.TRACKER_RESOURCE_VERSION.'">';
+    }
     
-    echo <<<HTML
-<link rel="stylesheet" type="text/css" href="~resources/css/tables.css?v=$v">
-<script type="text/javascript" src="~resources/js/tables.js?v=$v"></script>
-HTML;
+    echo '<script type="text/javascript" src="~resources/js/tables.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
   }
   
   /**

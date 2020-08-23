@@ -69,9 +69,15 @@ abstract class AbstractPage implements IViewable{
     
     <base href="$base_url/">
     <link rel="icon" type="image/png" href="~resources/img/favicon.png?v=$v">
-    <link rel="stylesheet" type="text/css" href="~resources/css/main.css?v=$v">
-    <link rel="stylesheet" type="text/css" href="~resources/css/icons.css?v=$v">
 HTML;
+    
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/main.css?v='.$v.'">';
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/icons.css?v='.$v.'">';
+    }
+    else{
+      echo '<link rel="stylesheet" type="text/css" href="~generated/style.min.css?v='.$v.'">';
+    }
     
     NavigationComponent::echoHead();
     $this->echoPageHead();

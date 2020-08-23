@@ -42,6 +42,12 @@ if (!file_exists('config.php')){
 /** @noinspection PhpIncludeInspection */
 require_once 'config.php';
 
+if (!defined('DEBUG')){
+  define('DEBUG', false);
+}
+
+// Base URL
+
 $base_url_split = mb_strpos(BASE_URL, '://');
 
 if ($base_url_split === false){
