@@ -250,7 +250,7 @@ div.checkbox-multiline-label > label {
   margin-bottom: 1px;
 }
 
-div.checkbox-multiline-label > p {
+div.checkbox-multiline-label p {
   color: #444444;
   font-size: 15px;
   line-height: 18px;

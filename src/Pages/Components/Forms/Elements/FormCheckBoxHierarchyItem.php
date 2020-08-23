@@ -47,13 +47,14 @@ final class FormCheckBoxHierarchyItem extends FormCheckBox{
 <div class="checkbox-multiline$layout_class">
   <input id="$name" name="$name" type="checkbox" value="$checked_value"$checked_attr$disabled_attr>
   <div class="checkbox-multiline-label">
-    <label for="$name"$disabled_class>$label</label>$description
+    <label for="$name"$disabled_class>$label</label><div>$description
   </div>
 HTML;
     
     $this->echoErrors();
     
     echo <<<HTML
+  </div>
 </div>
 HTML;
   }
