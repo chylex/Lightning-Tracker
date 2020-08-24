@@ -72,6 +72,7 @@ textarea {
   min-height: 75px;
   height: 140px;
   resize: vertical;
+  font-size: 16px;
 }
 
 select {

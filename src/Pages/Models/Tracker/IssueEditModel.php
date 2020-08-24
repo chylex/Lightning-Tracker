@@ -99,7 +99,7 @@ HTML
     self::setupIssueTagOptions($this->form->addSelect('Scale')->optional(), IssueScale::list());
     $this->form->endSplitGroup();
     
-    $this->form->addTextArea('Description');
+    $this->form->addTextArea('Description')->markdownEditor();
     
     $this->form->endTitledSection();
     

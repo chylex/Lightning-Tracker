@@ -39,6 +39,11 @@ class IssueEditPage extends AbstractTrackerIssuePage{
     }
   }
   
+  protected function echoPageHead(): void{
+    parent::echoPageHead();
+    echo '<script type="text/javascript" src="~resources/js/editor.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
+  }
+  
   protected function echoPageBody(): void{
     if (!$this->model->isNewIssue() && $this->model->getIssue() === null){
       $this->echoIssueMissing();
