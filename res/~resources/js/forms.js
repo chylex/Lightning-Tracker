@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function(){
         });
         
         // global multiselect text widths used for overflow slicing
-        const emptyPair = ["", 0];
+        const emptyPair = [ "", 0 ];
         const memoizedPairs = new Map();
         
         for(/** @type HTMLDetailsElement */ const multiselect of multiselects){
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function(){
                             let pair = memoizedPairs.get(sliced);
                             
                             if (!pair){
-                                memoizedPairs.set(sliced, pair = [sliced, getTextWidth(sliced)]);
+                                memoizedPairs.set(sliced, pair = [ sliced, getTextWidth(sliced) ]);
                             }
                             
                             return pair;

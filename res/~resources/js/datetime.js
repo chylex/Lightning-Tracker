@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function(){
-    const months = ["Jan", "Feb", "Mar",
-                    "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep",
-                    "Oct", "Nov", "Dec"];
+    const months = [ "Jan", "Feb", "Mar",
+                     "Apr", "May", "Jun",
+                     "Jul", "Aug", "Sep",
+                     "Oct", "Nov", "Dec" ];
     
     function pad(n){
         return n.toString().padStart(2, "0");
