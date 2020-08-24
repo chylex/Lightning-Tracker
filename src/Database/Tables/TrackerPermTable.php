@@ -217,14 +217,14 @@ SQL
   public function isRoleAssignableBy(int $role_id, int $user_id): bool{
     $stmt = $this->db->prepare(<<<SQL
 SELECT 1
-FROM tracker_roles
+FROM tracker_roles tr
 WHERE role_id = ? AND tracker_id = ?
   AND special = FALSE
   AND ordering > IFNULL((SELECT ordering
                          FROM tracker_roles tr2
                          JOIN tracker_members tm ON tr2.tracker_id = tm.tracker_id AND
                                                     tr2.role_id = tm.role_id
-                         WHERE tm.user_id = ?), ~0)
+                         WHERE tm.user_id = ? AND tm.tracker_id = tr.tracker_id), ~0)
 SQL
     );
     
@@ -259,20 +259,21 @@ SQL
   public function listRolesAssignableBy(int $user_id): array{
     $stmt = $this->db->prepare(<<<SQL
 SELECT role_id, title, ordering, special
-FROM tracker_roles
+FROM tracker_roles tr
 WHERE tracker_id = ?
   AND special = FALSE
   AND ordering > IFNULL((SELECT ordering
                          FROM tracker_roles tr2
                          JOIN tracker_members tm ON tr2.tracker_id = tm.tracker_id AND
                                                     tr2.role_id = tm.role_id
-                         WHERE tm.user_id = ?), ~0)
+                         WHERE tm.user_id = ? AND tm.tracker_id = tr.tracker_id), ~0)
 ORDER BY ordering ASC
 SQL
     );
     
     $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->bindValue(2, $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     
     $results = [];
@@ -289,8 +290,9 @@ SQL
    * @return string[]
    */
   public function listRolePerms(int $id): array{
-    $stmt = $this->db->prepare('SELECT permission FROM tracker_role_perms WHERE role_id = ?');
+    $stmt = $this->db->prepare('SELECT permission FROM tracker_role_perms WHERE role_id = ? AND tracker_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
     $stmt->execute();
     
     $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
