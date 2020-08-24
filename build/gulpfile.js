@@ -1,7 +1,13 @@
 const { src, dest, series } = require("gulp");
 const concat = require("gulp-concat");
+const replace = require("gulp-replace");
 const css = require("gulp-clean-css");
 const del = require("del");
+const glob = require("glob");
+const merge = require("merge-stream");
+
+const crypto = require("crypto");
+const fs = require("fs");
 
 const php = "../src";
 const res = "../res";
@@ -11,25 +17,29 @@ function taskClean(){
     return del(out + "/**", { force: true });
 }
 
-async function taskCopy(){
+function taskCopy(){
     // noinspection JSUnusedGlobalSymbols
     const basePhp = { base: php, dot: true };
     const baseRes = { base: res };
     
-    await src(php + "/**/*", basePhp)
-        .pipe(dest(out));
+    const tasks = [
+        src(php + "/**/*", basePhp)
+            .pipe(dest(out)),
+        
+        src(res + "/~database/**/*", baseRes)
+            .pipe(dest(out)),
+        
+        src(res + "/~resources/fonts/**/*", baseRes)
+            .pipe(dest(out)),
+        
+        src(res + "/~resources/img/**/*", baseRes)
+            .pipe(dest(out)),
+        
+        src(res + "/~resources/js/**/*", baseRes)
+            .pipe(dest(out))
+    ];
     
-    await src(res + "/~database/**/*", baseRes)
-        .pipe(dest(out));
-    
-    await src(res + "/~resources/fonts/**/*", baseRes)
-        .pipe(dest(out));
-    
-    await src(res + "/~resources/img/**/*", baseRes)
-        .pipe(dest(out));
-    
-    await src(res + "/~resources/js/**/*", baseRes)
-        .pipe(dest(out));
+    return merge.apply(this, tasks);
 }
 
 function taskCSS(){
@@ -55,4 +65,20 @@ function taskCSS(){
         .pipe(dest(out + "/~resources"));
 }
 
-exports.default = series(taskClean, taskCopy, taskCSS);
+function taskHash(){
+    const hasher = crypto.createHash("sha1");
+    
+    for(const file of glob.sync(out + "/~resources/**/*")){
+        if (fs.lstatSync(file).isFile()){
+            hasher.update(fs.readFileSync(file));
+        }
+    }
+    
+    const hash = hasher.digest("base64").replace(/[^a-zA-Z0-9]/g, "0").substr(0, 8);
+    
+    return src(out + "/bootstrap.php")
+        .pipe(replace("define('TRACKER_RESOURCE_VERSION', '');", "define('TRACKER_RESOURCE_VERSION', '" + hash + "');"))
+        .pipe(dest(out));
+}
+
+exports.default = series(taskClean, taskCopy, taskCSS, taskHash);
