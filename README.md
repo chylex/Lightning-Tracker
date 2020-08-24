@@ -10,6 +10,7 @@ Lightning Tracker is a work-in-progress issue tracker built for PHP 7.4+ and MyS
   * **pdo**
   * **pdo_mysql**
   * **mbstring**
+  * **json**
   * **intl**
 * **MySQL 5.6+**
   * **InnoDB**

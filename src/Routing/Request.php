@@ -61,6 +61,10 @@ final class Request{
   public function getAction(): ?string{
     return $this->data[FormComponent::ACTION_KEY] ?? null;
   }
+  
+  public function isAjax(): bool{
+    return $_SERVER['HTTP_ACCEPT'] === 'application/json';
+  }
 }
 
 ?>

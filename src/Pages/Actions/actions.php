@@ -17,4 +17,8 @@ function reload(): RedirectAction{
   return new RedirectAction($_SERVER['REQUEST_URI']);
 }
 
+function json(array $data): JsonAction{
+  return new JsonAction($data);
+}
+
 ?>
