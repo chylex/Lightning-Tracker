@@ -41,6 +41,11 @@ class IssueEditPage extends AbstractTrackerIssuePage{
   
   protected function echoPageHead(): void{
     parent::echoPageHead();
+    
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/editor.css?v='.TRACKER_RESOURCE_VERSION.'">';
+    }
+    
     echo '<script type="text/javascript" src="~resources/js/editor.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
   }
   
