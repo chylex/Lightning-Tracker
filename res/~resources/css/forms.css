@@ -3,11 +3,12 @@ form .field-group {
 }
 
 form .message {
-  font-size: 15px;
+  font-size: 16px;
   margin: 0 0 20px;
 }
 
 form .message .icon {
+  font-size: 15px;
   margin-right: 3px;
 }
 

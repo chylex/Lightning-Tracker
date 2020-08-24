@@ -50,7 +50,7 @@ class LoginModel extends BasicMixedPageModel{
       $login_info = $users->getLoginInfo($data['Name']);
       
       if ($login_info === null || !$login_info->checkPassword($data['Password'])){
-        $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Invalid username or password.'));
+        $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid username or password.'));
         return false;
       }
       

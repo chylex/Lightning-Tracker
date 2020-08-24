@@ -271,7 +271,7 @@ final class FormComponent implements IViewable{
   
   public function onGeneralError(Exception $e): void{
     Log::critical($e);
-    $this->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('An error occurred while processing your request.'));
+    $this->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('An error occurred while processing your request.'));
   }
   
   public function echoBody(): void{

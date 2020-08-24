@@ -27,8 +27,8 @@ final class Text implements IViewable{
     return self::withIcon($text, 'checkmark');
   }
   
-  public static function warning(string $text): self{
-    return self::withIcon($text, 'warning');
+  public static function blocked(string $text): self{
+    return self::withIcon($text, 'blocked');
   }
   
   private string $html;

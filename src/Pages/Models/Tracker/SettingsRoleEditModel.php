@@ -127,7 +127,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
       $perms = new TrackerPermTable(DB::get(), $this->getTracker());
       
       if ($perms->getRoleTitleIfNotSpecial($this->role_id) === null){
-        $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Invalid role.'));
+        $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid role.'));
         return false;
       }
       

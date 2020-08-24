@@ -45,6 +45,9 @@ span.icon {
 .icon-pencil:before {
   content: "\e905";
 }
+.icon-image:before {
+  content: "\e90d";
+}
 .icon-book:before {
   content: "\e91f";
 }
@@ -53,12 +56,6 @@ span.icon {
 }
 .icon-calendar:before {
   content: "\e953";
-}
-.icon-undo:before {
-  content: "\e965";
-}
-.icon-redo:before {
-  content: "\e966";
 }
 .icon-user:before {
   content: "\e971";
@@ -105,14 +102,11 @@ span.icon {
 .icon-list-bulleted:before {
   content: "\e9bb";
 }
+.icon-link:before {
+  content: "\e9cb";
+}
 .icon-eye:before {
   content: "\e9ce";
-}
-.icon-warning:before {
-  content: "\ea07";
-}
-.icon-notification:before {
-  content: "\ea08";
 }
 .icon-info:before {
   content: "\ea0c";
@@ -122,9 +116,6 @@ span.icon {
 }
 .icon-blocked:before {
   content: "\ea0e";
-}
-.icon-cross:before {
-  content: "\ea0f";
 }
 .icon-checkmark:before {
   content: "\ea10";
@@ -176,7 +167,4 @@ span.icon {
 }
 .icon-code:before {
   content: "\ea80";
-}
-.icon-github:before {
-  content: "\eab0";
 }

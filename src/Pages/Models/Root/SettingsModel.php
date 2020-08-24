@@ -88,7 +88,7 @@ HTML;
       return true;
     }
     else{
-      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Backup file could not be removed.'));
+      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Backup file could not be removed.'));
       return false;
     }
   }
@@ -108,12 +108,12 @@ HTML;
     }
     
     if (!copy(CONFIG_FILE, CONFIG_BACKUP_FILE)){
-      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Error creating backup of \'config.php\'.'));
+      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Error creating backup of \'config.php\'.'));
       return false;
     }
     
     if (!file_put_contents(CONFIG_FILE, $config->generate(), LOCK_EX)){
-      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::warning('Error updating \'config.php\'.'));
+      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Error updating \'config.php\'.'));
       return false;
     }
     
