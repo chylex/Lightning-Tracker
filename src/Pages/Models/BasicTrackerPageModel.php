@@ -86,7 +86,7 @@ class BasicTrackerPageModel extends AbstractPageModel{
       return null;
     }
     
-    return new CompositeComponent(new Html('<h3>Active Milestone</h3><article><h4>'.$milestone->getTitleSafe().'</h4>'),
+    return new CompositeComponent(new Html('<h3>Active Milestone</h3><article id="active-milestone"><h4>'.$milestone->getTitleSafe().'</h4>'),
                                   new ProgressBarComponent($milestone->getPercentageDone()),
                                   new Html('</article>'));
   }

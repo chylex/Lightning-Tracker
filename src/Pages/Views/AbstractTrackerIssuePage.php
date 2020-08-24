@@ -28,7 +28,7 @@ abstract class AbstractTrackerIssuePage extends AbstractTrackerPage{
     return self::LAYOUT_FULL;
   }
   
-  protected final function echoPageHead(): void{
+  protected function echoPageHead(): void{
     SplitComponent::echoHead();
     FormComponent::echoHead();
     SidemenuComponent::echoHead();

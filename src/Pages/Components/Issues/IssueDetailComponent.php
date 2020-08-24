@@ -75,7 +75,6 @@ HTML;
 HTML;
     
     if ($this->model->canEditCheckboxes() && $description->hasCheckboxes()){
-      // TODO hide in JS
       echo <<<HTML
   <h3 data-task-submit>Tasks</h3>
   <article data-task-submit>

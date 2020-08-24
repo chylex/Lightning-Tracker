@@ -32,6 +32,11 @@ class IssueDetailPage extends AbstractTrackerIssuePage{
     return 'issues';
   }
   
+  protected function echoPageHead(): void{
+    parent::echoPageHead();
+    echo '<script type="text/javascript" src="~resources/js/issuedetail.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
+  }
+  
   protected function echoPageBody(): void{
     $issue = $this->model->getIssue();
     

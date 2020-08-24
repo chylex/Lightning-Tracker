@@ -13,6 +13,7 @@ use Pages\Models\Tracker\IssuesModel;
 use Pages\Views\Tracker\IssueDetailPage;
 use Routing\Request;
 use Session\Session;
+use function Pages\Actions\json;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
 
@@ -38,7 +39,13 @@ class IssueDetailController extends AbstractTrackerController{
       
       if ($action === $model::ACTION_UPDATE_TASKS){
         $model->updateCheckboxes($req->getData());
-        return reload();
+        
+        if ($req->isAjax()){
+          return json($model->getProgressUpdate());
+        }
+        else{
+          return reload();
+        }
       }
       elseif ($model->tryUseShortcut($action)){
         return reload();

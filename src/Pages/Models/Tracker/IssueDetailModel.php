@@ -147,6 +147,21 @@ class IssueDetailModel extends BasicTrackerPageModel{
       $issues->updateIssueTasks($this->issue_id, $description, (int)floor(100.0 * count($checked_indices) / $index));
     }
   }
+  
+  public function getProgressUpdate(): array{
+    $issues = new IssueTable(DB::get(), $this->getTracker());
+    $issue = $issues->getIssueDetail($this->issue_id);
+    $status = $issue->getStatus();
+    
+    $active_milestone = $this->getActiveMilestone();
+    $active_milestone_progress = $active_milestone === null ? null : $active_milestone->getPercentageDone();
+    
+    return [
+        'issue_status'     => '<span class="'.$status->getTagClass().'"> '.$status->getTitle().'</span>',
+        'issue_progress'   => $issue->getProgress(),
+        'active_milestone' => $active_milestone_progress
+    ];
+  }
 }
 
 ?>
