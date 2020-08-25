@@ -311,7 +311,7 @@ SQL
     $stmt = $this->db->prepare(<<<SQL
 SELECT trp.permission
 FROM tracker_role_perms trp
-JOIN tracker_members tm ON trp.role_id = tm.role_id
+JOIN tracker_members tm ON trp.tracker_id = tm.tracker_id AND trp.role_id = tm.role_id
 WHERE tm.user_id = ? AND tm.tracker_id = ?
 SQL
     );

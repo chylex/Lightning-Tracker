@@ -40,6 +40,9 @@ class IssueDetailModel extends BasicTrackerPageModel{
     $this->perms = $perms;
     $this->issue_id = $issue_id;
     
+    $issues = new IssueTable(DB::get(), $tracker);
+    $this->issue = $issues->getIssueDetail($issue_id);
+    
     $this->menu_actions = new SidemenuComponent($req);
     $this->menu_shortcuts = new SidemenuComponent($req);
   }
@@ -49,17 +52,12 @@ class IssueDetailModel extends BasicTrackerPageModel{
     
     $tracker = $this->getTracker();
     
-    $issues = new IssueTable(DB::get(), $tracker);
-    $issue = $issues->getIssueDetail($this->issue_id);
-    
-    if ($issue === null){
+    if ($this->issue === null){
       $this->can_edit = false;
     }
     else{
       $logon_user = Session::get()->getLogonUser();
-      
-      $this->issue = $issue;
-      $this->can_edit = $logon_user !== null && ($issue->isAuthorOrAssignee($logon_user) || $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL));
+      $this->can_edit = $logon_user !== null && ($this->issue->isAuthorOrAssignee($logon_user) || $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL));
       
       if ($this->can_edit){
         $this->menu_actions->addLink(Text::withIcon('Edit Issue', 'pencil'), '/issues/'.$this->issue_id.'/edit');
@@ -73,7 +71,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
         $this->menu_actions->addLink(Text::withIcon('Delete Issue', 'trash'), '/issues/'.$this->issue_id.'/delete');
       }
       
-      $desc = $issue->getDescription();
+      $desc = $this->issue->getDescription();
       
       if ($this->can_edit){
         $desc->setCheckboxNameForEditing(self::CHECKBOX_NAME);

@@ -32,7 +32,10 @@ class IssueEditController extends AbstractTrackerController{
     
     $logon_user = $sess->getLogonUser();
     
-    if (!$model->isNewIssue()){
+    if ($model->isNewIssue()){
+      $perms->requireTracker($tracker, IssuesModel::PERM_CREATE);
+    }
+    else{
       $issue = $model->getIssue();
       
       if ($issue === null || !$issue->isAuthorOrAssignee($logon_user)){
