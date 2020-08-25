@@ -5,12 +5,9 @@ namespace Pages\Controllers\Handlers;
 
 use Pages\Controllers\IControlHandler;
 use Pages\IAction;
-use Pages\Models\BasicRootPageModel;
-use Pages\Models\ErrorModel;
-use Pages\Views\ErrorPage;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\view;
+use function Pages\Actions\error;
 
 class RequireSystemPermission implements IControlHandler{
   private string $permission;
@@ -23,10 +20,7 @@ class RequireSystemPermission implements IControlHandler{
   
   public function run(Request $req, Session $sess): ?IAction{
     if (!$sess->getPermissions()->checkSystem($this->permission)){
-      $page_model = new BasicRootPageModel($req);
-      $error_model = new ErrorModel($page_model, 'Permission Error', $this->message);
-      
-      return view(new ErrorPage($error_model->load()));
+      return error($req, 'Permission Error', $this->message);
     }
     
     return null;

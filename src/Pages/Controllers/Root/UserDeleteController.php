@@ -9,15 +9,13 @@ use Pages\Controllers\Handlers\LoadNumericId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireSystemPermission;
 use Pages\IAction;
-use Pages\Models\BasicRootPageModel;
-use Pages\Models\ErrorModel;
 use Pages\Models\Root\UserDeleteModel;
 use Pages\Models\Root\UsersModel;
-use Pages\Views\ErrorPage;
 use Pages\Views\Root\UserDeletePage;
 use Routing\Link;
 use Routing\Request;
 use Session\Session;
+use function Pages\Actions\error;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
@@ -35,10 +33,7 @@ class UserDeleteController extends AbstractHandlerController{
     $model = new UserDeleteModel($req, $this->user_id);
     
     if (!$model->canDelete()){
-      $page_model = new BasicRootPageModel($req);
-      $error_model = new ErrorModel($page_model, 'Permission Error', 'You are not allowed to delete this user.');
-      
-      return view(new ErrorPage($error_model->load()));
+      return error($req, 'Permission Error', 'You are not allowed to delete this user.');
     }
     
     if ($req->getAction() === $model::ACTION_CONFIRM && $model->deleteUser($req->getData())){

@@ -6,12 +6,9 @@ namespace Pages\Controllers\Handlers;
 use Database\Objects\TrackerInfo;
 use Pages\Controllers\IControlHandler;
 use Pages\IAction;
-use Pages\Models\BasicMixedPageModel;
-use Pages\Models\ErrorModel;
-use Pages\Views\ErrorPage;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\view;
+use function Pages\Actions\error;
 
 class LoadStringId implements IControlHandler{
   private ?string $id_ref;
@@ -40,10 +37,7 @@ class LoadStringId implements IControlHandler{
     }
     
     if ($issue_id === null){
-      $page_model = new BasicMixedPageModel($req, $this->tracker);
-      $error_model = new ErrorModel($page_model, 'Load Error', 'Invalid '.$this->title.'.');
-      
-      return view(new ErrorPage($error_model->load()));
+      return error($req, 'Load Error', 'Invalid '.$this->title.'.', $this->tracker);
     }
     
     $this->id_ref = $issue_id;

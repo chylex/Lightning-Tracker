@@ -2,14 +2,11 @@
 declare(strict_types = 1);
 
 use Logging\Log;
-use Pages\Models\BasicRootPageModel;
-use Pages\Models\ErrorModel;
-use Pages\Views\ErrorPage;
 use Routing\Request;
 use Routing\Router;
 use Routing\RouterException;
 use Routing\UrlString;
-use function Pages\Actions\view;
+use function Pages\Actions\error;
 
 define('TRACKER_PUBLIC_VERSION', '0.1');
 define('TRACKER_MIGRATION_VERSION', 4);
@@ -125,9 +122,7 @@ $router->add('&/favicon.ico', 'Root/FaviconController');
 
 function handle_error(int $code, string $title, string $message, ?Request $req = null): void{
   http_response_code($code);
-  $page_model = new BasicRootPageModel($req ?? Request::empty());
-  $error_model = new ErrorModel($page_model, $title, $message);
-  view(new ErrorPage($error_model->load()))->execute();
+  error($req ?? Request::empty(), $title, $message)->execute();
 }
 
 try{

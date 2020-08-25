@@ -10,15 +10,13 @@ use Pages\Controllers\Handlers\LoadStringId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
-use Pages\Models\BasicTrackerPageModel;
-use Pages\Models\ErrorModel;
 use Pages\Models\Tracker\MemberEditModel;
 use Pages\Models\Tracker\MembersModel;
-use Pages\Views\ErrorPage;
 use Pages\Views\Tracker\MemberEditPage;
 use Routing\Link;
 use Routing\Request;
 use Session\Session;
+use function Pages\Actions\error;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
@@ -36,10 +34,7 @@ class MemberEditController extends AbstractTrackerController{
     $model = new MemberEditModel($req, $tracker, $this->member_name, $sess->getLogonUserIdOrThrow());
     
     if (!$model->canEdit()){
-      $page_model = new BasicTrackerPageModel($req, $tracker);
-      $error_model = new ErrorModel($page_model, 'Permission Error', 'You are not allowed to edit this member.');
-      
-      return view(new ErrorPage($error_model->load()));
+      return error($req, 'Permission Error', 'You are not allowed to edit this member.', $tracker);
     }
     
     if ($req->getAction() === $model::ACTION_EDIT && $model->editMember($req->getData())){

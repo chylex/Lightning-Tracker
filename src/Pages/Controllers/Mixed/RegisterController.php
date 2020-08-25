@@ -8,14 +8,12 @@ use Generator;
 use Pages\Controllers\AbstractHandlerController;
 use Pages\Controllers\Handlers\LoadTracker;
 use Pages\IAction;
-use Pages\Models\BasicMixedPageModel;
-use Pages\Models\ErrorModel;
 use Pages\Models\Mixed\RegisterModel;
-use Pages\Views\ErrorPage;
 use Pages\Views\Mixed\RegisterPage;
 use Routing\Link;
 use Routing\Request;
 use Session\Session;
+use function Pages\Actions\error;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
@@ -33,10 +31,7 @@ class RegisterController extends AbstractHandlerController{
     }
     
     if (!SYS_ENABLE_REGISTRATION){
-      $page_model = new BasicMixedPageModel($req, $this->tracker);
-      $error_model = new ErrorModel($page_model, 'Registration Error', 'User registrations are disabled by the administrator.');
-      
-      return view(new ErrorPage($error_model->load()));
+      return error($req, 'Registration Error', 'User registrations are disabled by the administrator.', $this->tracker);
     }
     
     if ($sess->getLogonUser() !== null){
