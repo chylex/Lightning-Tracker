@@ -30,6 +30,7 @@ use Session\Session;
 
 class IssuesModel extends BasicTrackerPageModel{
   public const PERM_CREATE = 'issues.create';
+  public const PERM_FIELDS_ALL = 'issues.fields.all';
   public const PERM_EDIT_ALL = 'issues.edit.all';
   public const PERM_DELETE_ALL = 'issues.delete.all';
   

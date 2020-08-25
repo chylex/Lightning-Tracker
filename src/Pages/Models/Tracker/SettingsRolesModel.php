@@ -32,6 +32,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       MembersModel::PERM_MANAGE    => 'Manage Members',
       MilestonesModel::PERM_MANAGE => 'Manage Milestones',
       IssuesModel::PERM_CREATE     => 'Create Issues',
+      IssuesModel::PERM_FIELDS_ALL => 'Modify All Issue Fields',
       IssuesModel::PERM_EDIT_ALL   => 'Edit All Issues',
       IssuesModel::PERM_DELETE_ALL => 'Delete All Issues'
   ];

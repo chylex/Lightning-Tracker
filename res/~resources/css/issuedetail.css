@@ -20,20 +20,6 @@
   margin-right: 2px;
 }
 
-@media (max-width: 850px) {
-  .split-wrapper.issue-edit-triple-select {
-    flex-wrap: wrap;
-  }
-
-  .split-wrapper.issue-edit-triple-select > div {
-    flex: 1 1 100%;
-    margin-left: 0;
-    margin-right: 0;
-    padding-left: 0;
-    padding-right: 0;
-  }
-}
-
 .issue-description h4 {
   margin: 20px 0;
   font-size: 30px;

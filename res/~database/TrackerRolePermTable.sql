@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `tracker_role_perms` (
 		'members.manage',
 		'milestones.manage',
 		'issues.create',
+		'issues.fields.all',
 		'issues.edit.all',
 		'issues.delete.all') NOT NULL,
 	PRIMARY KEY (`tracker_id`, `role_id`, `permission`),

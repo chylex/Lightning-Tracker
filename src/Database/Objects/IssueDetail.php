@@ -66,6 +66,10 @@ final class IssueDetail extends IssueInfo{
     
     return ($author !== null && $user_id === $author->getId()) || ($assignee !== null && $user_id === $assignee->getId());
   }
+  
+  public function isAssignee(UserProfile $user): bool{
+    return $this->assignee !== null && $user->getId() === $this->assignee->getId();
+  }
 }
 
 ?>

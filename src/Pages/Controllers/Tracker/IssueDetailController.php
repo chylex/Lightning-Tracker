@@ -31,24 +31,31 @@ class IssueDetailController extends AbstractTrackerController{
     
     if ($action !== null){
       $issue = $model->getIssue();
-      $logon_user = $sess->getLogonUser();
       
-      if ($issue === null || $logon_user === null || !$issue->isAuthorOrAssignee($logon_user)){
-        $perms->requireTracker($tracker, IssuesModel::PERM_EDIT_ALL);
-      }
-      
-      if ($action === $model::ACTION_UPDATE_TASKS){
-        $model->updateCheckboxes($req->getData());
+      if ($issue !== null){
+        $logon_user = $sess->getLogonUser();
         
-        if ($req->isAjax()){
-          return json($model->getProgressUpdate());
+        if ($logon_user === null || !$issue->isAuthorOrAssignee($logon_user)){
+          $perms->requireTracker($tracker, IssuesModel::PERM_EDIT_ALL);
         }
-        else{
+        
+        if ($logon_user === null || !$issue->isAssignee($logon_user)){
+          $perms->requireTracker($tracker, IssuesModel::PERM_FIELDS_ALL);
+        }
+        
+        if ($action === $model::ACTION_UPDATE_TASKS){
+          $model->updateCheckboxes($req->getData());
+          
+          if ($req->isAjax()){
+            return json($model->getProgressUpdate());
+          }
+          else{
+            return reload();
+          }
+        }
+        elseif ($model->tryUseShortcut($action)){
           return reload();
         }
-      }
-      elseif ($model->tryUseShortcut($action)){
-        return reload();
       }
     }
     

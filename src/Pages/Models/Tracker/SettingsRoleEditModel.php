@@ -58,6 +58,9 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
     $this->addPermissionBox(IssuesModel::PERM_CREATE)
          ->description('Create new issues.');
     
+    $this->addPermissionBox(IssuesModel::PERM_FIELDS_ALL)
+         ->description('Note: Without this permission, a member can only edit the issue type, title, and description on issues they created, and all fields on issues they are assigned to.');
+    
     $this->addPermissionBox(IssuesModel::PERM_EDIT_ALL)
          ->description('Note: Without this permission, a member can only edit issues they created or are assigned to.');
     

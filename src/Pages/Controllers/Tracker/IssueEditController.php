@@ -28,9 +28,8 @@ class IssueEditController extends AbstractTrackerController{
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $perms = $sess->getPermissions();
-    $model = new IssueEditModel($req, $tracker, $perms, $this->issue_id);
-    
     $logon_user = $sess->getLogonUser();
+    $model = new IssueEditModel($req, $tracker, $perms, $logon_user, $this->issue_id);
     
     if ($model->isNewIssue()){
       $perms->requireTracker($tracker, IssuesModel::PERM_CREATE);
@@ -44,10 +43,10 @@ class IssueEditController extends AbstractTrackerController{
     }
     
     if ($req->getAction() === $model::ACTION_CONFIRM){
-      $new_issue_id = $model->createOrEditIssue($req->getData(), $logon_user);
+      $redirect_issue_id = $model->createOrEditIssue($req->getData());
       
-      if ($new_issue_id !== null){
-        return redirect(Link::fromBase($req, 'issues', $new_issue_id));
+      if ($redirect_issue_id !== null){
+        return redirect(Link::fromBase($req, 'issues', $redirect_issue_id));
       }
     }
     

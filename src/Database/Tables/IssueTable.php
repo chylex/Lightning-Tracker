@@ -117,6 +117,25 @@ SQL
     $stmt->execute();
   }
   
+  public function editIssueLimited(int $id, string $title, string $description, IssueType $type): void{
+    $stmt = $this->db->prepare(<<<SQL
+UPDATE issues
+SET title = :title,
+    description = :description,
+    type = :type,
+    date_updated = NOW()
+WHERE issue_id = :issue_id AND tracker_id = :tracker_id
+SQL
+    );
+    
+    $stmt->bindValue('tracker_id', $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue('issue_id', $id, PDO::PARAM_INT);
+    $stmt->bindValue('title', $title);
+    $stmt->bindValue('description', $description);
+    $stmt->bindValue('type', $type->getId());
+    $stmt->execute();
+  }
+  
   public function updateIssueStatus(int $id, IssueStatus $status, ?int $progress = null): void{
     $stmt = $this->db->prepare(<<<SQL
 UPDATE issues

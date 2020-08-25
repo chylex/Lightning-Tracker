@@ -57,6 +57,7 @@ final class TrackerTable extends AbstractTable{
       ];
       
       $perms_developer = array_merge($perms_reporter, [
+          IssuesModel::PERM_FIELDS_ALL,
           IssuesModel::PERM_EDIT_ALL,
           MilestonesModel::PERM_MANAGE,
           MembersModel::PERM_LIST

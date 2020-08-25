@@ -19,19 +19,19 @@ final class IssueFields{
   }
   
   public static function type(FormValidator $validator): IssueType{
-    return IssueType::get($validator->str('Type')->isTrue(fn($v): bool => IssueType::exists($v), 'Type is invalid.')->val());
+    return IssueType::get($validator->str('Type')->isTrue(fn($v): bool => IssueType::exists($v), 'Please select a type.')->val());
   }
   
   public static function priority(FormValidator $validator): IssuePriority{
-    return IssuePriority::get($validator->str('Priority')->isTrue(fn($v): bool => IssuePriority::exists($v), 'Priority is invalid.')->val());
+    return IssuePriority::get($validator->str('Priority')->isTrue(fn($v): bool => IssuePriority::exists($v), 'Invalid priority.')->val());
   }
   
   public static function scale(FormValidator $validator): IssueScale{
-    return IssueScale::get($validator->str('Scale')->isTrue(fn($v): bool => IssueScale::exists($v), 'Scale is invalid.')->val());
+    return IssueScale::get($validator->str('Scale')->isTrue(fn($v): bool => IssueScale::exists($v), 'Invalid scale.')->val());
   }
   
   public static function status(FormValidator $validator): IssueStatus{
-    return IssueStatus::get($validator->str('Status')->isTrue(fn($v): bool => IssueStatus::exists($v), 'Status is invalid.')->val());
+    return IssueStatus::get($validator->str('Status')->isTrue(fn($v): bool => IssueStatus::exists($v), 'Invalid status.')->val());
   }
   
   public static function progress(FormValidator $validator): int{

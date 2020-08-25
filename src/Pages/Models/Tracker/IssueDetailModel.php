@@ -25,9 +25,9 @@ class IssueDetailModel extends BasicTrackerPageModel{
   public const ACTION_MARK_FINISHED = 'MarkFinished';
   public const ACTION_MARK_REJECTED = 'MarkRejected';
   
-  private ?IssueDetail $issue = null;
+  private ?IssueDetail $issue;
   private int $issue_id;
-  private bool $can_edit;
+  private bool $can_edit_progress;
   
   private Permissions $perms;
   private MarkdownParseResult $description;
@@ -53,15 +53,25 @@ class IssueDetailModel extends BasicTrackerPageModel{
     $tracker = $this->getTracker();
     
     if ($this->issue === null){
-      $this->can_edit = false;
+      $this->can_edit_progress = false;
     }
     else{
       $logon_user = Session::get()->getLogonUser();
-      $this->can_edit = $logon_user !== null && ($this->issue->isAuthorOrAssignee($logon_user) || $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL));
       
-      if ($this->can_edit){
+      if ($logon_user === null){
+        $can_edit = $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL);
+        $this->can_edit_progress = $can_edit && $this->perms->checkTracker($tracker, IssuesModel::PERM_FIELDS_ALL);
+      }
+      else{
+        $can_edit = $this->issue->isAuthorOrAssignee($logon_user) || $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL);
+        $this->can_edit_progress = $can_edit && ($this->issue->isAssignee($logon_user) || $this->perms->checkTracker($tracker, IssuesModel::PERM_FIELDS_ALL));
+      }
+      
+      if ($can_edit){
         $this->menu_actions->addLink(Text::withIcon('Edit Issue', 'pencil'), '/issues/'.$this->issue_id.'/edit');
-        
+      }
+      
+      if ($this->can_edit_progress){
         $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Ready to Test', IssueStatus::get(IssueStatus::READY_TO_TEST)), self::ACTION_MARK_READY_TO_TEST);
         $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Finished', IssueStatus::get(IssueStatus::FINISHED)), self::ACTION_MARK_FINISHED);
         $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Rejected', IssueStatus::get(IssueStatus::REJECTED)), self::ACTION_MARK_REJECTED);
@@ -73,7 +83,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
       
       $desc = $this->issue->getDescription();
       
-      if ($this->can_edit){
+      if ($this->can_edit_progress){
         $desc->setCheckboxNameForEditing(self::CHECKBOX_NAME);
       }
       
@@ -84,7 +94,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
   }
   
   public function canEditCheckboxes(): bool{
-    return $this->can_edit;
+    return $this->can_edit_progress;
   }
   
   public function getIssue(): ?IssueDetail{

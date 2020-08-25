@@ -182,6 +182,24 @@ SQL
     
     upgrade_config($db, $migration_version = 3);
   }
+  
+  if ($migration_version === 3){
+    $db = DB::get();
+    
+    $db->query('ALTER TABLE tracker_role_perms MODIFY permission ENUM (\'settings\', \'members.list\', \'members.manage\', \'milestones.manage\', \'issues.create\', \'issues.fields.all\', \'issues.edit.all\', \'issues.delete.all\') NOT NULL');
+    
+    begin_transaction($db);
+    
+    $db->query(<<<SQL
+INSERT IGNORE INTO tracker_role_perms (tracker_id, role_id, permission)
+SELECT tr.tracker_id AS tracker_id, tr.role_id AS role_id, 'issues.fields.all' AS permission
+FROM tracker_roles tr
+WHERE tr.title = 'Developer'
+SQL
+    );
+    
+    upgrade_config($db, $migration_version = 4);
+  }
 }catch(Exception $e){
   if (isset($db) && $db->inTransaction()){
     $db->rollBack();

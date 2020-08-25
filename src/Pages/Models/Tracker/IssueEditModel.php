@@ -63,86 +63,87 @@ class IssueEditModel extends BasicTrackerPageModel{
   }
   
   private Permissions $perms;
+  private UserProfile $editor;
   private FormComponent $form;
   
   private ?int $issue_id;
   private ?IssueDetail $issue;
+  private bool $can_edit_all_fields;
   
-  /** @noinspection HtmlMissingClosingTag */
-  public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms, ?int $issue_id){
+  public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms, UserProfile $editor, ?int $issue_id){
     parent::__construct($req, $tracker);
     
     $this->perms = $perms;
+    $this->editor = $editor;
     $this->issue_id = $issue_id;
     
     if ($issue_id !== null){
       $issues = new IssueTable(DB::get(), $this->getTracker());
       $this->issue = $issues->getIssueDetail($this->issue_id);
+      $this->can_edit_all_fields = $this->issue->isAssignee($editor) || $perms->checkTracker($tracker, IssuesModel::PERM_FIELDS_ALL);
     }
     else{
       $this->issue = null;
+      $this->can_edit_all_fields = $perms->checkTracker($tracker, IssuesModel::PERM_FIELDS_ALL);
     }
     
     $this->form = new FormComponent(self::ACTION_CONFIRM);
-    $this->form->addHTML(<<<HTML
-<div class="split-wrapper split-collapse-640">
-  <div class="split-75">
-HTML
-    );
+    $this->form->addHTML('<div class="split-wrapper split-collapse-1024 split-collapse-reversed">');
+    
+    if ($this->can_edit_all_fields){
+      $this->form->addHTML('<div class="split-25 min-width-200 max-width-250">');
+      $this->form->startTitledSection('Status');
+      
+      self::setupIssueTagOptions($this->form->addSelect('Status')->optional(), IssueStatus::list());
+      
+      $this->form->addNumberField('Progress', 0, 100)->step(5)->value('0');
+      
+      $select_milestone = $this->form->addSelect('Milestone')->addOption('', '(None)')->dropdown();
+      $select_assignee = $this->form->addSelect('Assignee')->addOption('', '(None)')->dropdown();
+      
+      foreach((new MilestoneTable(DB::get(), $tracker))->listMilestones() as $milestone){
+        $select_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitle());
+      }
+      
+      if ($perms->checkTracker($tracker, MembersModel::PERM_LIST)){
+        foreach((new TrackerMemberTable(DB::get(), $tracker))->listMembers() as $member){
+          $select_assignee->addOption(strval($member->getUserId()), $member->getUserName());
+        }
+      }
+      else{
+        $select_assignee->disable();
+        
+        $assignee = $this->issue === null ? null : $this->issue->getAssignee();
+        
+        if ($assignee !== null){
+          $select_assignee->addOption(strval($assignee->getId()), $assignee->getName());
+        }
+      }
+      
+      $this->form->endTitledSection();
+      $this->form->addHTML('</div><div class="split-50">');
+    }
+    else{
+      $this->form->addHTML('<div class="split-75">');
+    }
     
     $this->form->startTitledSection('Details');
     $this->form->addTextField('Title');
-    
-    $this->form->startSplitGroup(33, 'issue-edit-triple-select');
-    self::setupIssueTagOptions($this->form->addSelect('Type')->optional(), IssueType::list());
-    self::setupIssueTagOptions($this->form->addSelect('Priority')->optional(), IssuePriority::list());
-    self::setupIssueTagOptions($this->form->addSelect('Scale')->optional(), IssueScale::list());
-    $this->form->endSplitGroup();
-    
     $this->form->addTextArea('Description')->markdownEditor();
-    
     $this->form->endTitledSection();
     
-    $this->form->addHTML(<<<HTML
-  </div>
-  <div class="split-25 min-width-200 max-width-400">
-HTML
-    );
+    $this->form->addHTML('</div><div class="split-25 min-width-200 max-width-250">');
+    $this->form->startTitledSection('General');
     
-    $this->form->startTitledSection('Status');
+    self::setupIssueTagOptions($this->form->addSelect('Type')->optional(), IssueType::list());
     
-    self::setupIssueTagOptions($this->form->addSelect('Status')->optional(), IssueStatus::list());
-    
-    $this->form->addNumberField('Progress', 0, 100)->step(5)->value('0');
-    
-    $select_milestone = $this->form->addSelect('Milestone')->addOption('', '(None)')->dropdown();
-    $select_assignee = $this->form->addSelect('Assignee')->addOption('', '(None)')->dropdown();
-    
-    foreach((new MilestoneTable(DB::get(), $tracker))->listMilestones() as $milestone){
-      $select_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitle());
-    }
-    
-    if ($perms->checkTracker($tracker, MembersModel::PERM_LIST)){
-      foreach((new TrackerMemberTable(DB::get(), $tracker))->listMembers() as $member){
-        $select_assignee->addOption(strval($member->getUserId()), $member->getUserName());
-      }
-    }
-    else{
-      $select_assignee->disable();
-      
-      if ($this->issue !== null && $this->issue->getAssignee() !== null){
-        $assignee = $this->issue->getAssignee();
-        $select_assignee->addOption(strval($assignee->getId()), $assignee->getName());
-      }
+    if ($this->can_edit_all_fields){
+      self::setupIssueTagOptions($this->form->addSelect('Priority')->optional(), IssuePriority::list());
+      self::setupIssueTagOptions($this->form->addSelect('Scale')->optional(), IssueScale::list());
     }
     
     $this->form->endTitledSection();
-    
-    $this->form->addHTML(<<<HTML
-  </div>
-</div>
-HTML
-    );
+    $this->form->addHTML("</div></div>");
     
     $this->form->startTitledSection('Confirm');
     $this->form->setMessagePlacementHere();
@@ -155,8 +156,7 @@ HTML
     
     if (!$this->form->isFilled()){
       if ($this->issue_id === null){
-        $this->form->fill(['Type'     => IssueType::FEATURE,
-                           'Priority' => IssuePriority::MEDIUM,
+        $this->form->fill(['Priority' => IssuePriority::MEDIUM,
                            'Scale'    => IssueScale::MEDIUM,
                            'Status'   => IssueStatus::OPEN]);
       }
@@ -196,11 +196,20 @@ HTML
     return $this->form;
   }
   
-  public function createOrEditIssue(array $data, UserProfile $new_issue_author): ?int{
+  public function createOrEditIssue(array $data): ?int{
     if (!$this->form->accept($data)){
       return null;
     }
     
+    if ($this->can_edit_all_fields){
+      return $this->createOrEditIssueFull($data);
+    }
+    else{
+      return $this->createOrEditIssueLimited($data);
+    }
+  }
+  
+  private function createOrEditIssueFull(array $data): ?int{
     $tracker = $this->getTracker();
     
     $data['Type'] ??= '';
@@ -233,7 +242,7 @@ HTML
       }
       
       if ($this->issue_id === null){
-        $id = $issues->addIssue($new_issue_author, $title, $description, $type, $priority, $scale, $status, $progress, $milestone, $assignee);
+        $id = $issues->addIssue($this->editor, $title, $description, $type, $priority, $scale, $status, $progress, $milestone, $assignee);
       }
       else{
         if ($progress === $this->issue->getProgress()){
@@ -265,6 +274,41 @@ HTML
         }
         
         $issues->editIssue($this->issue_id, $title, $description, $type, $priority, $scale, $status, $progress, $milestone, $assignee);
+        $id = $this->issue_id;
+      }
+      
+      return $id;
+    }catch(ValidationException $e){
+      $this->form->invalidateFields($e->getFields());
+    }catch(Exception $e){
+      $this->form->onGeneralError($e);
+    }
+    
+    return null;
+  }
+  
+  private function createOrEditIssueLimited(array $data): ?int{
+    $tracker = $this->getTracker();
+    
+    $data['Type'] ??= '';
+    
+    $validator = new FormValidator($data);
+    $title = IssueFields::title($validator);
+    $description = IssueFields::description($validator);
+    $type = IssueFields::type($validator);
+    
+    try{
+      $validator->validate();
+      $issues = new IssueTable(DB::get(), $tracker);
+      
+      if ($this->issue_id === null){
+        $priority = IssuePriority::get(IssuePriority::MEDIUM);
+        $scale = IssueScale::get(IssueScale::MEDIUM);
+        $status = IssueStatus::get(IssueStatus::OPEN);
+        $id = $issues->addIssue($this->editor, $title, $description, $type, $priority, $scale, $status, 0, null, null);
+      }
+      else{
+        $issues->editIssueLimited($this->issue_id, $title, $description, $type);
         $id = $this->issue_id;
       }
       
