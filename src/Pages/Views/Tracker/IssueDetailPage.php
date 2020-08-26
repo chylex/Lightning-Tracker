@@ -5,6 +5,7 @@ namespace Pages\Views\Tracker;
 
 use Pages\Components\Html;
 use Pages\Components\Issues\IssueDetailComponent;
+use Pages\Components\Markup\LightMarkComponent;
 use Pages\Components\SplitComponent;
 use Pages\Models\Tracker\IssueDetailModel;
 use Pages\Views\AbstractTrackerIssuePage;
@@ -34,6 +35,8 @@ class IssueDetailPage extends AbstractTrackerIssuePage{
   
   protected function echoPageHead(): void{
     parent::echoPageHead();
+    LightMarkComponent::echoHead();
+    
     echo '<script type="text/javascript" src="~resources/js/issuedetail.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
   }
   

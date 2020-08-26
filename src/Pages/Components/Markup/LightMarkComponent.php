@@ -55,6 +55,12 @@ use Pages\IViewable;
  * ```
  */
 final class LightMarkComponent implements IViewable{
+  public static function echoHead(): void{
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/lightmark.css?v='.TRACKER_RESOURCE_VERSION.'">';
+    }
+  }
+  
   private string $text;
   private ?string $checkbox_name = null;
   

@@ -37,7 +37,6 @@ abstract class AbstractTrackerIssuePage extends AbstractTrackerPage{
     
     if (DEBUG){
       echo '<link rel="stylesheet" type="text/css" href="~resources/css/issues.css?v='.TRACKER_RESOURCE_VERSION.'">';
-      echo '<link rel="stylesheet" type="text/css" href="~resources/css/issuedetail.css?v='.TRACKER_RESOURCE_VERSION.'">';
     }
   }
   

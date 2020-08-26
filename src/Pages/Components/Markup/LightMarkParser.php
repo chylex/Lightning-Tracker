@@ -11,7 +11,7 @@ final class LightMarkParser{
   private const LEFT_SQUARE_BRACKET = 91;
   private const RIGHT_SQUARE_BRACKET = 93;
   
-  // TODO implement: paragraphs, block formatting, inline formatting
+  // TODO implement: block formatting, inline formatting
   
   private string $output = '';
   
@@ -32,24 +32,12 @@ final class LightMarkParser{
       return;
     }
     
-    $heading = $this->parseHeading($iter);
-    
-    if ($heading !== null){
-      $this->closeParagraph();
-      $this->output .= $heading;
+    if ($this->handleFullLineElement($iter, $this->parseHeading($iter)) ||
+        $this->handleFullLineElement($iter, $this->parseCheckBox($iter))
+    ){
       return;
     }
     
-    $iter->reset();
-    $checkbox = $this->parseCheckBox($iter);
-    
-    if ($checkbox !== null){
-      $this->closeParagraph();
-      $this->output .= $checkbox;
-      return;
-    }
-    
-    $iter->reset();
     $rest = trim($this->restToString($iter));
     
     if (empty($rest)){
@@ -65,7 +53,7 @@ final class LightMarkParser{
       $this->output .= '<p>';
     }
     else{
-      $this->output .= ' ';
+      $this->output .= '<br>';
     }
     
     $this->output .= $rest;
@@ -74,7 +62,7 @@ final class LightMarkParser{
   
   public function closeParser(): LightMarkParseResult{
     $this->closeParagraph();
-    return new LightMarkParseResult($this->output, $this->checkbox_count);
+    return new LightMarkParseResult('<div class="lightmark">'.$this->output.'</div>', $this->checkbox_count);
   }
   
   private function closeParagraph(): void{
@@ -87,6 +75,18 @@ final class LightMarkParser{
   }
   
   // Elements
+  
+  private function handleFullLineElement(UnicodeIterator $iter, ?string $parsed_element): bool{
+    if ($parsed_element === null){
+      $iter->reset();
+      return false;
+    }
+    else{
+      $this->closeParagraph();
+      $this->output .= $parsed_element;
+      return true;
+    }
+  }
   
   private function parseHeading(UnicodeIterator $iter): ?string{
     if ($iter->move() !== self::HASH){

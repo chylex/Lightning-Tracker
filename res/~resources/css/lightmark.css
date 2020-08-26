@@ -1,0 +1,56 @@
+.lightmark p {
+  margin: 10px 0 25px;
+}
+
+.lightmark h4,
+.lightmark h5,
+.lightmark h6 {
+  margin: 30px 0 15px;
+}
+
+.lightmark h4:first-child,
+.lightmark h5:first-child,
+.lightmark h6:first-child {
+  margin-top: 15px;
+}
+
+.lightmark h4 {
+  font-size: 30px;
+}
+
+.lightmark h5 {
+  font-size: 23px;
+}
+
+.lightmark h6 {
+  font-size: 18px;
+}
+
+.lightmark .field-group {
+  margin-bottom: 0;
+}
+
+.lightmark input[type=checkbox] {
+  margin-left: 1px;
+  margin-bottom: 5px;
+}
+
+.lightmark del {
+  text-decoration: none;
+}
+
+.lightmark del:after {
+  content: '';
+  display: block;
+  position: relative;
+  top: -9px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  margin-bottom: -2px;
+  background-color: #000000;
+}
+
+.lightmark del:hover:after {
+  display: none;
+}
