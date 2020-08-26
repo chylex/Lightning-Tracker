@@ -11,10 +11,10 @@ use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
 use Pages\Models\Tracker\MemberEditModel;
-use Pages\Models\Tracker\MembersModel;
 use Pages\Views\Tracker\MemberEditPage;
 use Routing\Link;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 use function Pages\Actions\error;
 use function Pages\Actions\redirect;
@@ -25,8 +25,8 @@ class MemberEditController extends AbstractTrackerController{
   
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireLoginState(true);
-    yield new RequireTrackerPermission($tracker, MembersModel::PERM_LIST);
-    yield new RequireTrackerPermission($tracker, MembersModel::PERM_MANAGE);
+    yield new RequireTrackerPermission($tracker, TrackerPermissions::LIST_MEMBERS);
+    yield new RequireTrackerPermission($tracker, TrackerPermissions::MANAGE_MEMBERS);
     yield new LoadStringId($this->member_name, 'member', $tracker);
   }
   

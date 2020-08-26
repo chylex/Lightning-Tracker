@@ -9,17 +9,17 @@ use Pages\Controllers\AbstractTrackerController;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
-use Pages\Models\Tracker\AbstractSettingsModel;
 use Pages\Models\Tracker\SettingsGeneralModel;
 use Pages\Views\Tracker\SettingsGeneralPage;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 use function Pages\Actions\view;
 
 class SettingsGeneralController extends AbstractTrackerController{
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireLoginState(true);
-    yield new RequireTrackerPermission($tracker, AbstractSettingsModel::PERM);
+    yield new RequireTrackerPermission($tracker, TrackerPermissions::MANAGE_SETTINGS);
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{

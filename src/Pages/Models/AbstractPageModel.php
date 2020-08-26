@@ -9,7 +9,7 @@ use Pages\Components\Text;
 use Pages\Controllers\Mixed\LoginController;
 use Pages\IModel;
 use Routing\Request;
-use Session\Permissions;
+use Session\PermissionManager;
 use Session\Session;
 
 abstract class AbstractPageModel implements IModel{
@@ -23,7 +23,7 @@ abstract class AbstractPageModel implements IModel{
   }
   
   protected abstract function createNavigation(): NavigationComponent;
-  protected abstract function setupNavigation(NavigationComponent $nav, Permissions $perms): void;
+  protected abstract function setupNavigation(NavigationComponent $nav, PermissionManager $perms): void;
   
   public function load(): IModel{
     $this->is_loaded = true;

@@ -21,7 +21,7 @@ use Pages\Models\Mixed\RegisterModel;
 use PDOException;
 use Routing\Link;
 use Routing\Request;
-use Session\Permissions;
+use Session\Permissions\SystemPermissions;
 use Session\Session;
 use Validation\FormValidator;
 use Validation\ValidationException;
@@ -29,16 +29,11 @@ use Validation\ValidationException;
 class UsersModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
   
-  public const PERM_LIST = 'users.list';
-  public const PERM_LIST_EMAIL = 'users.list.email';
-  public const PERM_ADD = 'users.add';
-  public const PERM_EDIT = 'users.edit';
-  
-  private Permissions $perms;
+  private SystemPermissions $perms;
   private TableComponent $table;
   private ?FormComponent $form;
   
-  public function __construct(Request $req, Permissions $perms){
+  public function __construct(Request $req, SystemPermissions $perms){
     parent::__construct($req);
     
     $this->perms = $perms;
@@ -46,7 +41,7 @@ class UsersModel extends BasicRootPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No users found.');
     
-    if ($perms->checkSystem(self::PERM_LIST_EMAIL)){
+    if ($perms->check(SystemPermissions::LIST_USER_EMAILS)){
       $this->table->addColumn('Username')->sort('name')->width(40)->wrap()->bold();
       $this->table->addColumn('Email')->width(40)->wrap();
     }
@@ -57,11 +52,11 @@ class UsersModel extends BasicRootPageModel{
     $this->table->addColumn('Role')->sort('role_title')->width(20);
     $this->table->addColumn('Registration Time')->sort('date_registered')->tight()->right();
     
-    if ($perms->checkSystem(self::PERM_EDIT)){
+    if ($perms->check(SystemPermissions::MANAGE_USERS)){
       $this->table->addColumn('Actions')->tight()->right();
     }
     
-    if ($perms->checkSystem(self::PERM_ADD)){
+    if ($perms->check(SystemPermissions::CREATE_USER)){
       $this->form = new FormComponent(self::ACTION_CREATE);
       $this->form->startTitledSection('Create User');
       $this->form->setMessagePlacementHere();
@@ -95,7 +90,7 @@ class UsersModel extends BasicRootPageModel{
     $req = $this->getReq();
     
     $logon_user_id = Session::get()->getLogonUserId();
-    $can_see_email = $this->perms->checkSystem(self::PERM_LIST_EMAIL);
+    $can_see_email = $this->perms->check(SystemPermissions::LIST_USER_EMAILS);
     
     $filter = new UserFilter($can_see_email);
     $users = new UserTable(DB::get());
@@ -116,7 +111,7 @@ class UsersModel extends BasicRootPageModel{
       $row[] = $user->getRoleTitleSafe() ?? Text::missing('Default');
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
-      if ($this->perms->checkSystem(self::PERM_EDIT)){
+      if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
         if ($user_id === $logon_user_id || $user->isAdmin()){
           $row[] = '';
         }
@@ -137,7 +132,7 @@ HTML
       
       $row = $this->table->addRow($row);
       
-      if ($this->perms->checkSystem(self::PERM_EDIT)){
+      if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
         $row->link(Link::fromBase($this->getReq(), 'users', $user_id));
       }
     }

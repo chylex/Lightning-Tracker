@@ -22,7 +22,7 @@ class RequireTrackerPermission implements IControlHandler{
   }
   
   public function run(Request $req, Session $sess): ?IAction{
-    if (!$sess->getPermissions()->checkTracker($this->tracker, $this->permission)){
+    if (!$sess->getPermissions()->tracker($this->tracker)->check($this->permission)){
       return error($req, 'Permission Error', $this->message, $this->tracker);
     }
     

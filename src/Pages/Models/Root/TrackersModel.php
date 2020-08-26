@@ -18,7 +18,7 @@ use Pages\Models\BasicRootPageModel;
 use PDOException;
 use Routing\Link;
 use Routing\Request;
-use Session\Permissions;
+use Session\Permissions\SystemPermissions;
 use Session\Session;
 use Validation\FormValidator;
 use Validation\ValidationException;
@@ -26,16 +26,11 @@ use Validation\ValidationException;
 class TrackersModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
   
-  public const PERM_LIST = 'trackers.list';
-  public const PERM_LIST_HIDDEN = 'trackers.list.hidden';
-  public const PERM_ADD = 'trackers.add';
-  public const PERM_EDIT = 'trackers.edit';
-  
-  private Permissions $perms;
+  private SystemPermissions $perms;
   private TableComponent $table;
   private ?FormComponent $form;
   
-  public function __construct(Request $req, Permissions $perms){
+  public function __construct(Request $req, SystemPermissions $perms){
     parent::__construct($req);
     
     $this->perms = $perms;
@@ -46,11 +41,11 @@ class TrackersModel extends BasicRootPageModel{
     $this->table->addColumn('Name')->sort('name')->width(50)->wrap()->bold();
     $this->table->addColumn('Link')->width(50);
     
-    if ($perms->checkSystem(self::PERM_EDIT)){
+    if ($perms->check(SystemPermissions::MANAGE_TRACKERS)){
       $this->table->addColumn('Actions')->tight()->right();
     }
     
-    if ($perms->checkSystem(self::PERM_ADD)){
+    if ($perms->check(SystemPermissions::CREATE_TRACKER)){
       $this->form = new FormComponent(self::ACTION_CREATE);
       $this->form->startTitledSection('Create Tracker');
       $this->form->setMessagePlacementHere();
@@ -70,10 +65,10 @@ class TrackersModel extends BasicRootPageModel{
   public function load(): IModel{
     parent::load();
     
-    if ($this->perms->checkSystem(self::PERM_LIST)){
+    if ($this->perms->check(SystemPermissions::LIST_PUBLIC_TRACKERS)){
       $filter = new TrackerFilter();
       
-      if (!$this->perms->checkSystem(self::PERM_LIST_HIDDEN)){
+      if (!$this->perms->check(SystemPermissions::LIST_ALL_TRACKERS)){
         $filter = $filter->visibleTo(Session::get()->getLogonUser());
       }
       
@@ -90,7 +85,7 @@ class TrackersModel extends BasicRootPageModel{
         
         $row = [$tracker->getNameSafe(), $link];
         
-        if ($this->perms->checkSystem(self::PERM_EDIT)){
+        if ($this->perms->check(SystemPermissions::MANAGE_TRACKERS)){
           $row[] = '<a href="'.Link::fromRoot('tracker', $url_enc, 'delete').'" class="icon"><span class="icon icon-circle-cross icon-color-red"></span></a>';
         }
         

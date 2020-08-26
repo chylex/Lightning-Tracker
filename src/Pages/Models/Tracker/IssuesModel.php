@@ -25,15 +25,10 @@ use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Link;
 use Routing\Request;
-use Session\Permissions;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 
 class IssuesModel extends BasicTrackerPageModel{
-  public const PERM_CREATE = 'issues.create';
-  public const PERM_FIELDS_ALL = 'issues.fields.all';
-  public const PERM_EDIT_ALL = 'issues.edit.all';
-  public const PERM_DELETE_ALL = 'issues.delete.all';
-  
   /**
    * @param FormSelectMultiple $select
    * @param IIssueTag[] $items
@@ -44,11 +39,11 @@ class IssuesModel extends BasicTrackerPageModel{
     }
   }
   
-  private Permissions $perms;
+  private TrackerPermissions $perms;
   private TableComponent $table;
   private SidemenuComponent $menu_actions;
   
-  public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms){
+  public function __construct(Request $req, TrackerInfo $tracker, TrackerPermissions $perms){
     parent::__construct($req, $tracker);
     
     $this->perms = $perms;
@@ -128,7 +123,7 @@ class IssuesModel extends BasicTrackerPageModel{
       $filtering_author->addOption(strval($logon_user_id), Text::missing('You'));
       $filtering_assignee->addOption(strval($logon_user_id), Text::missing('You'));
       
-      if ($this->perms->checkTracker($tracker, MembersModel::PERM_LIST)){
+      if ($this->perms->check(TrackerPermissions::LIST_MEMBERS)){
         foreach((new TrackerMemberTable(DB::get(), $tracker))->listMembers() as $member){
           $user_id = $member->getUserId();
           
@@ -143,7 +138,7 @@ class IssuesModel extends BasicTrackerPageModel{
       }
     }
     
-    if ($this->perms->checkTracker($tracker, self::PERM_CREATE)){
+    if ($this->perms->check(TrackerPermissions::CREATE_ISSUE)){
       $this->menu_actions->addLink(Text::withIcon('New Issue', 'pencil'), '/issues/new');
     }
     

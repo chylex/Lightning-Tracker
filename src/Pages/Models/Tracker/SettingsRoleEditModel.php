@@ -13,6 +13,7 @@ use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Pages\IModel;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
@@ -41,30 +42,30 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
     $this->form->addTextField('Title')->type('text');
     $this->form->startCheckBoxHierarchy('Permissions');
     
-    $this->addPermissionBox(AbstractSettingsModel::PERM)
+    $this->addPermissionBox(TrackerPermissions::MANAGE_SETTINGS)
          ->description('Full control over the tracker Settings, including editing all roles.');
     
-    $this->addPermissionBox(MembersModel::PERM_LIST)
+    $this->addPermissionBox(TrackerPermissions::LIST_MEMBERS)
          ->description('View all members of the tracker and their roles. Assign issues to members.')
          ->parent();
     
-    $this->addPermissionBox(MembersModel::PERM_MANAGE)
+    $this->addPermissionBox(TrackerPermissions::MANAGE_MEMBERS)
          ->description('Invite members to the tracker, assign roles to members, remove members from the tracker. Can only invite and manage members of a lower role.')
          ->lastChild();
     
-    $this->addPermissionBox(MilestonesModel::PERM_MANAGE)
+    $this->addPermissionBox(TrackerPermissions::MANAGE_MILESTONES)
          ->description('Create, edit, and delete milestones.');
     
-    $this->addPermissionBox(IssuesModel::PERM_CREATE)
+    $this->addPermissionBox(TrackerPermissions::CREATE_ISSUE)
          ->description('Create new issues.');
     
-    $this->addPermissionBox(IssuesModel::PERM_FIELDS_ALL)
+    $this->addPermissionBox(TrackerPermissions::MODIFY_ALL_ISSUE_FIELDS)
          ->description('Note: Without this permission, a member can only edit the issue type, title, and description on issues they created, and all fields on issues they are assigned to.');
     
-    $this->addPermissionBox(IssuesModel::PERM_EDIT_ALL)
+    $this->addPermissionBox(TrackerPermissions::EDIT_ALL_ISSUES)
          ->description('Note: Without this permission, a member can only edit issues they created or are assigned to.');
     
-    $this->addPermissionBox(IssuesModel::PERM_DELETE_ALL)
+    $this->addPermissionBox(TrackerPermissions::DELETE_ALL_ISSUES)
          ->description('Note: Unlike editing, a member cannot delete an issue they created or are assigned to.');
     
     $this->form->endCheckBoxHierarchy();

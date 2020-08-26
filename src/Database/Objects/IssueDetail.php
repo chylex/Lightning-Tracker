@@ -8,8 +8,13 @@ use Pages\Components\Issues\IssueScale;
 use Pages\Components\Issues\IssueStatus;
 use Pages\Components\Issues\IssueType;
 use Pages\Components\Markdown\MarkdownComponent;
+use Session\Permissions\TrackerPermissions;
 
 final class IssueDetail extends IssueInfo{
+  public const EDIT_FORBIDDEN = 0;
+  public const EDIT_BASIC_FIELDS = 1;
+  public const EDIT_ALL_FIELDS = 2;
+  
   private string $description;
   private ?int $milestone_id;
   private ?string $milestone_title;
@@ -69,6 +74,17 @@ final class IssueDetail extends IssueInfo{
   
   public function isAssignee(UserProfile $user): bool{
     return $this->assignee !== null && $user->getId() === $this->assignee->getId();
+  }
+  
+  public function getEditLevel(?UserProfile $user, TrackerPermissions $perms): int{
+    $can_edit = $this->isAuthorOrAssignee($user) || $perms->check(TrackerPermissions::EDIT_ALL_ISSUES);
+    
+    if (!$can_edit){
+      return self::EDIT_FORBIDDEN;
+    }
+    
+    $all_fields = $this->isAssignee($user) || $perms->check(TrackerPermissions::MODIFY_ALL_ISSUE_FIELDS);
+    return $all_fields ? self::EDIT_ALL_FIELDS : self::EDIT_BASIC_FIELDS;
   }
 }
 

@@ -20,7 +20,7 @@ class IssuesController extends AbstractTrackerController{
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
-    return view(new IssuesPage((new IssuesModel($req, $tracker, $sess->getPermissions()))->load()));
+    return view(new IssuesPage((new IssuesModel($req, $tracker, $sess->getPermissions()->tracker($tracker)))->load()));
   }
 }
 

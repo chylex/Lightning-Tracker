@@ -11,10 +11,10 @@ use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
 use Pages\Models\Tracker\IssueDeleteModel;
-use Pages\Models\Tracker\IssuesModel;
 use Pages\Views\Tracker\IssueDeletePage;
 use Routing\Link;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
@@ -24,7 +24,7 @@ class IssueDeleteController extends AbstractTrackerController{
   
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireLoginState(true);
-    yield new RequireTrackerPermission($tracker, IssuesModel::PERM_DELETE_ALL);
+    yield new RequireTrackerPermission($tracker, TrackerPermissions::DELETE_ALL_ISSUES);
     yield new LoadNumericId($this->issue_id, 'issue', $tracker);
   }
   

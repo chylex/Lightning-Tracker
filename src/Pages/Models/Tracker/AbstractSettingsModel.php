@@ -11,8 +11,6 @@ use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
 
 class AbstractSettingsModel extends BasicTrackerPageModel{
-  public const PERM = 'settings';
-  
   private SidemenuComponent $menu_links;
   
   public function __construct(Request $req, TrackerInfo $tracker){

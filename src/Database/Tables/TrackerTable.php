@@ -10,12 +10,9 @@ use Database\Objects\TrackerInfo;
 use Database\Objects\TrackerVisibilityInfo;
 use Database\Objects\UserProfile;
 use Exception;
-use Pages\Models\Tracker\AbstractSettingsModel;
-use Pages\Models\Tracker\IssuesModel;
-use Pages\Models\Tracker\MembersModel;
-use Pages\Models\Tracker\MilestonesModel;
 use PDO;
 use PDOException;
+use Session\Permissions\TrackerPermissions;
 
 final class TrackerTable extends AbstractTable{
   public function __construct(PDO $db){
@@ -53,23 +50,23 @@ final class TrackerTable extends AbstractTable{
       $members = new TrackerMemberTable($this->db, $tracker);
       
       $perms_reporter = [
-          IssuesModel::PERM_CREATE
+          TrackerPermissions::CREATE_ISSUE
       ];
       
       $perms_developer = array_merge($perms_reporter, [
-          IssuesModel::PERM_FIELDS_ALL,
-          IssuesModel::PERM_EDIT_ALL,
-          MilestonesModel::PERM_MANAGE,
-          MembersModel::PERM_LIST
+          TrackerPermissions::MODIFY_ALL_ISSUE_FIELDS,
+          TrackerPermissions::EDIT_ALL_ISSUES,
+          TrackerPermissions::MANAGE_MILESTONES,
+          TrackerPermissions::LIST_MEMBERS
       ]);
       
       $perms_moderator = array_merge($perms_developer, [
-          IssuesModel::PERM_DELETE_ALL,
-          MembersModel::PERM_MANAGE
+          TrackerPermissions::DELETE_ALL_ISSUES,
+          TrackerPermissions::MANAGE_MEMBERS
       ]);
       
       $perms_admin = array_merge($perms_moderator, [
-          AbstractSettingsModel::PERM
+          TrackerPermissions::MANAGE_SETTINGS
       ]);
       
       $owner_role_id = $perms->addRole('Owner', [], true);

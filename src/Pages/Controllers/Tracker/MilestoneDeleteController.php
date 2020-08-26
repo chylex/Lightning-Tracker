@@ -11,10 +11,10 @@ use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
 use Pages\Models\Tracker\MilestoneDeleteModel;
-use Pages\Models\Tracker\MilestonesModel;
 use Pages\Views\Tracker\MilestoneDeletePage;
 use Routing\Link;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
@@ -24,7 +24,7 @@ class MilestoneDeleteController extends AbstractTrackerController{
   
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireLoginState(true);
-    yield new RequireTrackerPermission($tracker, MilestonesModel::PERM_MANAGE);
+    yield new RequireTrackerPermission($tracker, TrackerPermissions::MANAGE_MILESTONES);
     yield new LoadNumericId($this->issue_id, 'milestone', $tracker);
   }
   

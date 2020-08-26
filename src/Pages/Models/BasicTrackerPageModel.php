@@ -15,10 +15,9 @@ use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Text;
 use Pages\IViewable;
-use Pages\Models\Tracker\AbstractSettingsModel;
-use Pages\Models\Tracker\MembersModel;
 use Routing\Request;
-use Session\Permissions;
+use Session\PermissionManager;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 
 class BasicTrackerPageModel extends AbstractPageModel{
@@ -36,16 +35,18 @@ class BasicTrackerPageModel extends AbstractPageModel{
     return new NavigationComponent($this->tracker->getNameSafe(), BASE_URL_ENC, $this->getReq()->getBasePath(), $this->getReq()->getRelativePath());
   }
   
-  protected function setupNavigation(NavigationComponent $nav, Permissions $perms): void{
+  protected function setupNavigation(NavigationComponent $nav, PermissionManager $perms): void{
     $nav->addLeft(Text::withIcon('Dashboard', 'stats-dots'), '');
     $nav->addLeft(Text::withIcon('Issues', 'info'), '/issues');
     $nav->addLeft(Text::withIcon('Milestones', 'calendar'), '/milestones');
     
-    if ($perms->checkTracker($this->tracker, MembersModel::PERM_LIST)){
+    $perms = $perms->tracker($this->tracker);
+    
+    if ($perms->check(TrackerPermissions::LIST_MEMBERS)){
       $nav->addLeft(Text::withIcon('Members', 'users'), '/members');
     }
     
-    if ($perms->checkTracker($this->tracker, AbstractSettingsModel::PERM)){
+    if ($perms->check(TrackerPermissions::MANAGE_SETTINGS)){
       $nav->addLeft(Text::withIcon('Settings', 'wrench'), '/settings');
     }
   }

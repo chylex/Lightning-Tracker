@@ -19,7 +19,7 @@ class RequireSystemPermission implements IControlHandler{
   }
   
   public function run(Request $req, Session $sess): ?IAction{
-    if (!$sess->getPermissions()->checkSystem($this->permission)){
+    if (!$sess->getPermissions()->system()->check($this->permission)){
       return error($req, 'Permission Error', $this->message);
     }
     

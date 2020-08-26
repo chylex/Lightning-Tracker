@@ -15,6 +15,7 @@ use Pages\Components\Text;
 use Pages\IModel;
 use Routing\Link;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
@@ -27,18 +28,18 @@ class SettingsRolesModel extends AbstractSettingsModel{
   private const ACTION_MOVE_DOWN = 'Down';
   
   public const PERM_NAMES = [
-      AbstractSettingsModel::PERM  => 'Manage Settings',
-      MembersModel::PERM_LIST      => 'View Members',
-      MembersModel::PERM_MANAGE    => 'Manage Members',
-      MilestonesModel::PERM_MANAGE => 'Manage Milestones',
-      IssuesModel::PERM_CREATE     => 'Create Issues',
-      IssuesModel::PERM_FIELDS_ALL => 'Modify All Issue Fields',
-      IssuesModel::PERM_EDIT_ALL   => 'Edit All Issues',
-      IssuesModel::PERM_DELETE_ALL => 'Delete All Issues'
+      TrackerPermissions::MANAGE_SETTINGS         => 'Manage Settings',
+      TrackerPermissions::LIST_MEMBERS            => 'View Members',
+      TrackerPermissions::MANAGE_MEMBERS          => 'Manage Members',
+      TrackerPermissions::MANAGE_MILESTONES       => 'Manage Milestones',
+      TrackerPermissions::CREATE_ISSUE            => 'Create Issues',
+      TrackerPermissions::MODIFY_ALL_ISSUE_FIELDS => 'Modify All Issue Fields',
+      TrackerPermissions::EDIT_ALL_ISSUES         => 'Edit All Issues',
+      TrackerPermissions::DELETE_ALL_ISSUES       => 'Delete All Issues'
   ];
   
   public const PERM_DEPENDENCIES = [
-      MembersModel::PERM_MANAGE => MembersModel::PERM_LIST
+      TrackerPermissions::MANAGE_MEMBERS => TrackerPermissions::LIST_MEMBERS
   ];
   
   private TableComponent $table;

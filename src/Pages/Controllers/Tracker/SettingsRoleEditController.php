@@ -10,11 +10,11 @@ use Pages\Controllers\Handlers\LoadNumericId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireTrackerPermission;
 use Pages\IAction;
-use Pages\Models\Tracker\AbstractSettingsModel;
 use Pages\Models\Tracker\SettingsRoleEditModel;
 use Pages\Views\Tracker\SettingsRoleEditPage;
 use Routing\Link;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
@@ -24,7 +24,7 @@ class SettingsRoleEditController extends AbstractTrackerController{
   
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
     yield new RequireLoginState(true);
-    yield new RequireTrackerPermission($tracker, AbstractSettingsModel::PERM);
+    yield new RequireTrackerPermission($tracker, TrackerPermissions::MANAGE_SETTINGS);
     yield new LoadNumericId($this->role_id, 'role', $tracker);
   }
   

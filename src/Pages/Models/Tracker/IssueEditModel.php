@@ -22,7 +22,7 @@ use Pages\Components\Issues\IssueType;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
-use Session\Permissions;
+use Session\Permissions\TrackerPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
@@ -62,7 +62,7 @@ class IssueEditModel extends BasicTrackerPageModel{
     }
   }
   
-  private Permissions $perms;
+  private TrackerPermissions $perms;
   private UserProfile $editor;
   private FormComponent $form;
   
@@ -70,7 +70,7 @@ class IssueEditModel extends BasicTrackerPageModel{
   private ?IssueDetail $issue;
   private bool $can_edit_all_fields;
   
-  public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms, UserProfile $editor, ?int $issue_id){
+  public function __construct(Request $req, TrackerInfo $tracker, TrackerPermissions $perms, UserProfile $editor, ?int $issue_id){
     parent::__construct($req, $tracker);
     
     $this->perms = $perms;
@@ -80,11 +80,11 @@ class IssueEditModel extends BasicTrackerPageModel{
     if ($issue_id !== null){
       $issues = new IssueTable(DB::get(), $this->getTracker());
       $this->issue = $issues->getIssueDetail($this->issue_id);
-      $this->can_edit_all_fields = $this->issue->isAssignee($editor) || $perms->checkTracker($tracker, IssuesModel::PERM_FIELDS_ALL);
+      $this->can_edit_all_fields = $this->issue->getEditLevel($editor, $perms) >= IssueDetail::EDIT_ALL_FIELDS;
     }
     else{
       $this->issue = null;
-      $this->can_edit_all_fields = $perms->checkTracker($tracker, IssuesModel::PERM_FIELDS_ALL);
+      $this->can_edit_all_fields = $perms->check(TrackerPermissions::MODIFY_ALL_ISSUE_FIELDS);
     }
     
     $this->form = new FormComponent(self::ACTION_CONFIRM);
@@ -105,7 +105,7 @@ class IssueEditModel extends BasicTrackerPageModel{
         $select_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitle());
       }
       
-      if ($perms->checkTracker($tracker, MembersModel::PERM_LIST)){
+      if ($perms->check(TrackerPermissions::LIST_MEMBERS)){
         foreach((new TrackerMemberTable(DB::get(), $tracker))->listMembers() as $member){
           $select_assignee->addOption(strval($member->getUserId()), $member->getUserName());
         }
@@ -268,7 +268,7 @@ class IssueEditModel extends BasicTrackerPageModel{
           }
         }
         
-        if (!$this->perms->checkTracker($tracker, MembersModel::PERM_LIST)){
+        if (!$this->perms->check(TrackerPermissions::LIST_MEMBERS)){
           $prev_assignee = $this->issue === null ? null : $this->issue->getAssignee();
           $assignee = $prev_assignee === null ? null : $prev_assignee->getId();
         }

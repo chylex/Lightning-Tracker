@@ -15,19 +15,19 @@ final class SessionLoginInfo{
   }
   
   private ?UserProfile $logon_user;
-  private Permissions $permissions;
+  private PermissionManager $permission_manager;
   
   private function __construct(?UserProfile $logon_user){
     $this->logon_user = $logon_user;
-    $this->permissions = new Permissions($logon_user);
+    $this->permission_manager = new PermissionManager($logon_user);
   }
   
   public function getLogonUser(): ?UserProfile{
     return $this->logon_user;
   }
   
-  public function getPermissions(): Permissions{
-    return $this->permissions;
+  public function getPermissionManager(): PermissionManager{
+    return $this->permission_manager;
   }
 }
 

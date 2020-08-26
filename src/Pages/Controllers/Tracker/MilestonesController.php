@@ -9,6 +9,7 @@ use Pages\IAction;
 use Pages\Models\Tracker\MilestonesModel;
 use Pages\Views\Tracker\MilestonesPage;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
@@ -16,14 +17,14 @@ use function Pages\Actions\view;
 class MilestonesController extends AbstractTrackerController{
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $action = $req->getAction();
-    $perms = $sess->getPermissions();
+    $perms = $sess->getPermissions()->tracker($tracker);
     $model = new MilestonesModel($req, $tracker, $perms);
     
     if ($action !== null){
       $data = $req->getData();
       
-      if (($action === $model::ACTION_CREATE && $perms->requireTracker($tracker, $model::PERM_MANAGE) && $model->createMilestone($data)) ||
-          ($action === $model::ACTION_MOVE && $perms->requireTracker($tracker, $model::PERM_MANAGE) && $model->moveMilestone($data)) ||
+      if (($action === $model::ACTION_CREATE && $perms->require(TrackerPermissions::MANAGE_MILESTONES) && $model->createMilestone($data)) ||
+          ($action === $model::ACTION_MOVE && $perms->require(TrackerPermissions::MANAGE_MILESTONES) && $model->moveMilestone($data)) ||
           ($action === $model::ACTION_TOGGLE_ACTIVE && $model->toggleActiveMilestone($data))
       ){
         return reload();

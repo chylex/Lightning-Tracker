@@ -10,10 +10,10 @@ use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireSystemPermission;
 use Pages\IAction;
 use Pages\Models\Root\UserDeleteModel;
-use Pages\Models\Root\UsersModel;
 use Pages\Views\Root\UserDeletePage;
 use Routing\Link;
 use Routing\Request;
+use Session\Permissions\SystemPermissions;
 use Session\Session;
 use function Pages\Actions\error;
 use function Pages\Actions\redirect;
@@ -24,8 +24,8 @@ class UserDeleteController extends AbstractHandlerController{
   
   protected function prerequisites(): Generator{
     yield new RequireLoginState(true);
-    yield new RequireSystemPermission(UsersModel::PERM_LIST);
-    yield new RequireSystemPermission(UsersModel::PERM_EDIT);
+    yield new RequireSystemPermission(SystemPermissions::LIST_USERS);
+    yield new RequireSystemPermission(SystemPermissions::MANAGE_USERS);
     yield new LoadNumericId($this->user_id, 'user');
   }
   

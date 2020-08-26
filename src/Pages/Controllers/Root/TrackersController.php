@@ -10,6 +10,7 @@ use Pages\IAction;
 use Pages\Models\Root\TrackersModel;
 use Pages\Views\Root\TrackersPage;
 use Routing\Request;
+use Session\Permissions\SystemPermissions;
 use Session\Session;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
@@ -20,10 +21,10 @@ class TrackersController extends AbstractHandlerController{
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $perms = $sess->getPermissions();
+    $perms = $sess->getPermissions()->system();
     $model = new TrackersModel($req, $perms);
     
-    if ($req->getAction() === $model::ACTION_CREATE && $perms->requireSystem($model::PERM_ADD) && $model->createTracker($req->getData(), $sess->getLogonUser())){
+    if ($req->getAction() === $model::ACTION_CREATE && $perms->require(SystemPermissions::CREATE_TRACKER) && $model->createTracker($req->getData(), $sess->getLogonUser())){
       return reload();
     }
     

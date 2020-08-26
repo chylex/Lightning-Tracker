@@ -12,23 +12,24 @@ use Pages\IAction;
 use Pages\Models\Tracker\MembersModel;
 use Pages\Views\Tracker\MembersPage;
 use Routing\Request;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
 
 class MembersController extends AbstractTrackerController{
   protected function trackerHandlers(TrackerInfo $tracker): Generator{
-    yield new RequireTrackerPermission($tracker, MembersModel::PERM_LIST);
+    yield new RequireTrackerPermission($tracker, TrackerPermissions::LIST_MEMBERS);
     yield new HandleFilteringRequest();
   }
   
   protected function runTracker(Request $req, Session $sess, TrackerInfo $tracker): IAction{
     $action = $req->getAction();
-    $perms = $sess->getPermissions();
+    $perms = $sess->getPermissions()->tracker($tracker);
     $model = new MembersModel($req, $tracker, $perms);
     
-    if (($action === $model::ACTION_INVITE && $perms->requireTracker($tracker, $model::PERM_MANAGE) && $model->inviteUser($req->getData())) ||
-        ($action === $model::ACTION_REMOVE && $perms->requireTracker($tracker, $model::PERM_MANAGE) && $model->removeMember($req->getData()))
+    if (($action === $model::ACTION_INVITE && $perms->require(TrackerPermissions::MANAGE_MEMBERS) && $model->inviteUser($req->getData())) ||
+        ($action === $model::ACTION_REMOVE && $perms->require(TrackerPermissions::MANAGE_MEMBERS) && $model->removeMember($req->getData()))
     ){
       return reload();
     }

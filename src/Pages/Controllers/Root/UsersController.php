@@ -12,6 +12,7 @@ use Pages\IAction;
 use Pages\Models\Root\UsersModel;
 use Pages\Views\Root\UsersPage;
 use Routing\Request;
+use Session\Permissions\SystemPermissions;
 use Session\Session;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
@@ -19,15 +20,15 @@ use function Pages\Actions\view;
 class UsersController extends AbstractHandlerController{
   protected function prerequisites(): Generator{
     yield new RequireLoginState(true);
-    yield new RequireSystemPermission(UsersModel::PERM_LIST);
+    yield new RequireSystemPermission(SystemPermissions::LIST_USERS);
     yield new HandleFilteringRequest();
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $perms = $sess->getPermissions();
+    $perms = $sess->getPermissions()->system();
     $model = new UsersModel($req, $perms);
     
-    if ($req->getAction() === $model::ACTION_CREATE && $perms->requireSystem($model::PERM_ADD) && $model->createUser($req->getData())){
+    if ($req->getAction() === $model::ACTION_CREATE && $perms->require(SystemPermissions::CREATE_USER) && $model->createUser($req->getData())){
       return reload();
     }
     

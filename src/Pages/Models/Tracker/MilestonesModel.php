@@ -20,7 +20,7 @@ use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Link;
 use Routing\Request;
-use Session\Permissions;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 use Validation\FormValidator;
 use Validation\ValidationException;
@@ -33,13 +33,11 @@ class MilestonesModel extends BasicTrackerPageModel{
   private const ACTION_MOVE_UP = 'Up';
   private const ACTION_MOVE_DOWN = 'Down';
   
-  public const PERM_MANAGE = 'milestones.manage';
-  
-  private Permissions $perms;
+  private TrackerPermissions $perms;
   private TableComponent $table;
   private ?FormComponent $form;
   
-  public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms){
+  public function __construct(Request $req, TrackerInfo $tracker, TrackerPermissions $perms){
     parent::__construct($req, $tracker);
     
     $this->perms = $perms;
@@ -53,7 +51,7 @@ class MilestonesModel extends BasicTrackerPageModel{
     $this->table->addColumn('Progress')->sort('progress')->width(35);
     $this->table->addColumn('Last Updated')->sort('date_updated')->tight()->right();
     
-    if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
+    if ($this->perms->check(TrackerPermissions::MANAGE_MILESTONES)){
       $this->table->addColumn('Actions')->tight()->right();
       
       $this->form = new FormComponent(self::ACTION_CREATE);
@@ -72,7 +70,6 @@ class MilestonesModel extends BasicTrackerPageModel{
     parent::load();
     
     $req = $this->getReq();
-    $tracker = $this->getTracker();
     
     $filter = new MilestoneFilter();
     $milestones = new MilestoneTable(DB::get(), $this->getTracker());
@@ -101,7 +98,7 @@ class MilestonesModel extends BasicTrackerPageModel{
               new ProgressBarComponent($milestone->getPercentageDone()),
               $update_date === null ? '<div class="center-text">-</div>' : new DateTimeComponent($update_date, true)];
       
-      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
+      if ($this->perms->check(TrackerPermissions::MANAGE_MILESTONES)){
         $form_move = new FormComponent(self::ACTION_MOVE);
         $form_move->addHidden('Milestone', $milestone_id_str);
         
@@ -136,7 +133,7 @@ HTML
       
       $row = $this->table->addRow($row);
       
-      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
+      if ($this->perms->check(TrackerPermissions::MANAGE_MILESTONES)){
         $row->link(Link::fromBase($req, 'milestones', $milestone_id_str));
       }
     }

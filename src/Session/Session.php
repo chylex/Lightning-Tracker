@@ -99,8 +99,8 @@ final class Session{
     return $logon_user->getId();
   }
   
-  public function getPermissions(): Permissions{
-    return $this->getLogin()->getPermissions();
+  public function getPermissions(): PermissionManager{
+    return $this->getLogin()->getPermissionManager();
   }
   
   public function tryLoginWithName(string $name): bool{

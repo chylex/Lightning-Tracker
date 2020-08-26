@@ -14,7 +14,7 @@ use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicTrackerPageModel;
 use Routing\Request;
-use Session\Permissions;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 
 class IssueDetailModel extends BasicTrackerPageModel{
@@ -29,12 +29,12 @@ class IssueDetailModel extends BasicTrackerPageModel{
   private int $issue_id;
   private bool $can_edit_progress;
   
-  private Permissions $perms;
+  private TrackerPermissions $perms;
   private MarkdownParseResult $description;
   private SidemenuComponent $menu_actions;
   private SidemenuComponent $menu_shortcuts;
   
-  public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms, int $issue_id){
+  public function __construct(Request $req, TrackerInfo $tracker, TrackerPermissions $perms, int $issue_id){
     parent::__construct($req, $tracker);
     
     $this->perms = $perms;
@@ -50,24 +50,14 @@ class IssueDetailModel extends BasicTrackerPageModel{
   public function load(): IModel{
     parent::load();
     
-    $tracker = $this->getTracker();
-    
     if ($this->issue === null){
       $this->can_edit_progress = false;
     }
     else{
-      $logon_user = Session::get()->getLogonUser();
+      $edit_level = $this->issue->getEditLevel(Session::get()->getLogonUser(), $this->perms);
+      $this->can_edit_progress = $edit_level >= IssueDetail::EDIT_ALL_FIELDS;
       
-      if ($logon_user === null){
-        $can_edit = $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL);
-        $this->can_edit_progress = $can_edit && $this->perms->checkTracker($tracker, IssuesModel::PERM_FIELDS_ALL);
-      }
-      else{
-        $can_edit = $this->issue->isAuthorOrAssignee($logon_user) || $this->perms->checkTracker($tracker, IssuesModel::PERM_EDIT_ALL);
-        $this->can_edit_progress = $can_edit && ($this->issue->isAssignee($logon_user) || $this->perms->checkTracker($tracker, IssuesModel::PERM_FIELDS_ALL));
-      }
-      
-      if ($can_edit){
+      if ($edit_level !== IssueDetail::EDIT_FORBIDDEN){
         $this->menu_actions->addLink(Text::withIcon('Edit Issue', 'pencil'), '/issues/'.$this->issue_id.'/edit');
       }
       
@@ -77,7 +67,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
         $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Rejected', IssueStatus::get(IssueStatus::REJECTED)), self::ACTION_MARK_REJECTED);
       }
       
-      if ($this->perms->checkTracker($tracker, IssuesModel::PERM_DELETE_ALL)){
+      if ($this->perms->check(TrackerPermissions::DELETE_ALL_ISSUES)){
         $this->menu_actions->addLink(Text::withIcon('Delete Issue', 'trash'), '/issues/'.$this->issue_id.'/delete');
       }
       

@@ -19,17 +19,14 @@ use Pages\Models\BasicTrackerPageModel;
 use PDOException;
 use Routing\Link;
 use Routing\Request;
-use Session\Permissions;
+use Session\Permissions\TrackerPermissions;
 use Session\Session;
 
 class MembersModel extends BasicTrackerPageModel{
   public const ACTION_INVITE = 'Invite';
   public const ACTION_REMOVE = 'Remove';
   
-  public const PERM_LIST = 'members.list';
-  public const PERM_MANAGE = 'members.manage';
-  
-  private Permissions $perms;
+  private TrackerPermissions $perms;
   private TableComponent $table;
   private ?FormComponent $form;
   
@@ -38,11 +35,10 @@ class MembersModel extends BasicTrackerPageModel{
    */
   private array $editable_roles = [];
   
-  public function __construct(Request $req, TrackerInfo $tracker, Permissions $perms){
+  public function __construct(Request $req, TrackerInfo $tracker, TrackerPermissions $perms){
     parent::__construct($req, $tracker);
     
     $this->perms = $perms;
-    $this->perms->requireTracker($tracker, self::PERM_LIST);
     
     $this->table = new TableComponent();
     $this->table->ifEmpty('No members found.');
@@ -50,7 +46,7 @@ class MembersModel extends BasicTrackerPageModel{
     $this->table->addColumn('Username')->sort('name')->width(60)->wrap()->bold();
     $this->table->addColumn('Role')->sort('role_order')->width(40);
     
-    if ($perms->checkTracker($tracker, self::PERM_MANAGE)){
+    if ($perms->check(TrackerPermissions::MANAGE_MEMBERS)){
       $this->table->addColumn('Actions')->right()->tight();
       
       $this->form = new FormComponent(self::ACTION_INVITE);
@@ -112,7 +108,7 @@ class MembersModel extends BasicTrackerPageModel{
       $user_id = $member->getUserId();
       $can_edit = $user_id !== $logon_user_id && $user_id !== $owner_id && in_array(strval($member->getRoleId() ?? ''), $this->editable_roles, true);
       
-      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE)){
+      if ($this->perms->check(TrackerPermissions::MANAGE_MEMBERS)){
         if ($can_edit){
           $form = new FormComponent(self::ACTION_REMOVE);
           $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
@@ -127,7 +123,7 @@ class MembersModel extends BasicTrackerPageModel{
       
       $row = $this->table->addRow($row);
       
-      if ($this->perms->checkTracker($tracker, self::PERM_MANAGE) && $can_edit){
+      if ($this->perms->check(TrackerPermissions::MANAGE_MEMBERS) && $can_edit){
         $row->link(Link::fromBase($this->getReq(), 'members', $name_safe));
       }
     }
