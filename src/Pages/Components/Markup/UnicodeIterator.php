@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Pages\Components\Markdown;
+namespace Pages\Components\Markup;
 
 use Iterator;
 

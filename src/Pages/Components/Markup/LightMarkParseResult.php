@@ -1,11 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace Pages\Components\Markdown;
+namespace Pages\Components\Markup;
 
 use Pages\IViewable;
 
-final class MarkdownParseResult implements IViewable{
+final class LightMarkParseResult implements IViewable{
   private string $html;
   private int $checkboxes;
   

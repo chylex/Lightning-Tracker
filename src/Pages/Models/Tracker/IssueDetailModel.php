@@ -8,7 +8,7 @@ use Database\Objects\IssueDetail;
 use Database\Objects\TrackerInfo;
 use Database\Tables\IssueTable;
 use Pages\Components\Issues\IssueStatus;
-use Pages\Components\Markdown\MarkdownParseResult;
+use Pages\Components\Markup\LightMarkParseResult;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Text;
 use Pages\IModel;
@@ -30,7 +30,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
   private bool $can_edit_progress;
   
   private TrackerPermissions $perms;
-  private MarkdownParseResult $description;
+  private LightMarkParseResult $description;
   private SidemenuComponent $menu_actions;
   private SidemenuComponent $menu_shortcuts;
   
@@ -95,7 +95,7 @@ class IssueDetailModel extends BasicTrackerPageModel{
     return $this->issue_id;
   }
   
-  public function getDescription(): MarkdownParseResult{
+  public function getDescription(): LightMarkParseResult{
     return $this->description;
   }
   

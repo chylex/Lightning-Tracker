@@ -7,7 +7,7 @@ use Pages\Components\Issues\IssuePriority;
 use Pages\Components\Issues\IssueScale;
 use Pages\Components\Issues\IssueStatus;
 use Pages\Components\Issues\IssueType;
-use Pages\Components\Markdown\MarkdownComponent;
+use Pages\Components\Markup\LightMarkComponent;
 use Session\Permissions\TrackerPermissions;
 
 final class IssueDetail extends IssueInfo{
@@ -44,8 +44,8 @@ final class IssueDetail extends IssueInfo{
     $this->assignee = $assignee;
   }
   
-  public function getDescription(): MarkdownComponent{
-    return new MarkdownComponent($this->description);
+  public function getDescription(): LightMarkComponent{
+    return new LightMarkComponent($this->description);
   }
   
   public function getMilestoneId(): ?int{

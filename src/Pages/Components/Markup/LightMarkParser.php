@@ -1,15 +1,17 @@
 <?php
 declare(strict_types = 1);
 
-namespace Pages\Components\Markdown;
+namespace Pages\Components\Markup;
 
 use Pages\Models\Tracker\IssueEditModel;
 
-final class MarkdownParser{
+final class LightMarkParser{
   private const SPACE = 32;
   private const HASH = 35;
   private const LEFT_SQUARE_BRACKET = 91;
   private const RIGHT_SQUARE_BRACKET = 93;
+  
+  // TODO implement: paragraphs, block formatting, inline formatting
   
   private string $output = '';
   
@@ -70,9 +72,9 @@ final class MarkdownParser{
     $this->is_paragraph_open = true;
   }
   
-  public function closeParser(): MarkdownParseResult{
+  public function closeParser(): LightMarkParseResult{
     $this->closeParagraph();
-    return new MarkdownParseResult($this->output, $this->checkbox_count);
+    return new LightMarkParseResult($this->output, $this->checkbox_count);
   }
   
   private function closeParagraph(): void{
