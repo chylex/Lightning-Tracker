@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Mixed;
 
 use Database\DB;
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Database\SQL;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
@@ -24,8 +24,8 @@ class RegisterModel extends BasicMixedPageModel{
   private FormComponent $form;
   private bool $successful_login;
   
-  public function __construct(Request $req, ?TrackerInfo $tracker, bool $successful_login = false){
-    parent::__construct($req, $tracker);
+  public function __construct(Request $req, ?ProjectInfo $project, bool $successful_login = false){
+    parent::__construct($req, $project);
     
     $this->form = new FormComponent(self::ACTION_REGISTER);
     

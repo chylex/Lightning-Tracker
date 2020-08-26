@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Handlers;
 
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Pages\Controllers\IControlHandler;
 use Pages\IAction;
 use Routing\Request;
@@ -14,13 +14,13 @@ class LoadStringId implements IControlHandler{
   private ?string $id_ref;
   private string $title;
   
-  private ?TrackerInfo $tracker;
+  private ?ProjectInfo $project;
   private bool $optional = false;
   
-  public function __construct(?string &$id_ref, string $title, ?TrackerInfo $tracker = null){
+  public function __construct(?string &$id_ref, string $title, ?ProjectInfo $project = null){
     $this->id_ref = &$id_ref;
     $this->title = $title;
-    $this->tracker = $tracker;
+    $this->project = $project;
   }
   
   public function allowMissing(): self{
@@ -37,7 +37,7 @@ class LoadStringId implements IControlHandler{
     }
     
     if ($issue_id === null){
-      return error($req, 'Load Error', 'Invalid '.$this->title.'.', $this->tracker);
+      return error($req, 'Load Error', 'Invalid '.$this->title.'.', $this->project);
     }
     
     $this->id_ref = $issue_id;

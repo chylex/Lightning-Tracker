@@ -146,7 +146,7 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
   if (empty($errors) && $submit_action === $action_value_install){
     $tests = [
         'users'      => ['user', 'users'],
-        'trackers'   => ['tracker', 'trackers'],
+        'projects'   => ['project', 'projects'],
         'milestones' => ['milestone', 'milestones'],
         'issues'     => ['issue', 'issues']
     ];
@@ -196,14 +196,14 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
         'SystemRolePerm'      => 'system_role_perms',
         'User'                => 'users',
         'UserLogin'           => 'user_logins',
-        'Tracker'             => 'trackers',
-        'TrackerRole'         => 'tracker_roles',
-        'TrackerRolePerm'     => 'tracker_role_perms',
-        'TrackerMember'       => 'tracker_members',
+        'Project'             => 'projects',
+        'ProjectRole'         => 'project_roles',
+        'ProjectRolePerm'     => 'project_role_perms',
+        'ProjectMember'       => 'project_members',
         'Milestone'           => 'milestones',
         'IssueWeight'         => 'issue_weights',
         'Issue'               => 'issues',
-        'TrackerUserSettings' => 'tracker_user_settings',
+        'ProjectUserSettings' => 'project_user_settings',
     ];
     
     $values = [

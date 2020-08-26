@@ -135,7 +135,7 @@ SQL;
   public function getUserStatistics(int $id): UserStatistics{
     $numbers = [];
     
-    foreach(['SELECT COUNT(*) FROM tracker_members WHERE user_id = ?',
+    foreach(['SELECT COUNT(*) FROM project_members WHERE user_id = ?',
              'SELECT COUNT(*) FROM issues WHERE author_id = ?',
              'SELECT COUNT(*) FROM issues WHERE assignee_id = ?'] as $sql){
       $stmt = $this->db->prepare($sql);

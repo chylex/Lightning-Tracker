@@ -8,7 +8,7 @@ use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Text;
 use Pages\IViewable;
-use Pages\Models\Tracker\IssueDetailModel;
+use Pages\Models\Project\IssueDetailModel;
 
 final class IssueDetailComponent implements IViewable{
   private IssueDetailModel $model;

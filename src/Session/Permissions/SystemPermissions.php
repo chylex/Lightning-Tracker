@@ -8,10 +8,10 @@ use Session\AbstractPermissionList;
 final class SystemPermissions extends AbstractPermissionList{
   // TODO rename & reconsider permissions when adding system role editing
   
-  public const LIST_PUBLIC_TRACKERS = 'trackers.list';
-  public const LIST_ALL_TRACKERS = 'trackers.list.hidden';
-  public const CREATE_TRACKER = 'trackers.add';
-  public const MANAGE_TRACKERS = 'trackers.edit';
+  public const LIST_PUBLIC_PROJECTS = 'trackers.list';
+  public const LIST_ALL_PROJECTS = 'trackers.list.hidden';
+  public const CREATE_PROJECT = 'trackers.add';
+  public const MANAGE_PROJECTS = 'trackers.edit';
   
   public const LIST_USERS = 'users.list';
   public const LIST_USER_EMAILS = 'users.list.email';

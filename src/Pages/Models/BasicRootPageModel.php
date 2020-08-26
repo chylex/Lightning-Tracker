@@ -22,7 +22,7 @@ class BasicRootPageModel extends AbstractPageModel{
   }
   
   protected function setupNavigation(NavigationComponent $nav, PermissionManager $perms): void{
-    $nav->addLeft(Text::withIcon('Trackers', 'book'), '');
+    $nav->addLeft(Text::withIcon('Projects', 'book'), '');
     
     $perms = $perms->system();
     

@@ -4,10 +4,10 @@ declare(strict_types = 1);
 namespace Pages\Models\Root;
 
 use Database\DB;
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Database\Objects\UserInfo;
 use Database\Objects\UserStatistics;
-use Database\Tables\TrackerTable;
+use Database\Tables\ProjectTable;
 use Database\Tables\UserTable;
 use Pages\Components\Forms\FormComponent;
 use Pages\IModel;
@@ -23,9 +23,9 @@ class UserDeleteModel extends BasicRootPageModel{
   private FormComponent $form;
   
   /**
-   * @var TrackerInfo[]
+   * @var ProjectInfo[]
    */
-  private array $owned_trackers = [];
+  private array $owned_projects = [];
   
   private UserStatistics $statistics;
   
@@ -45,8 +45,8 @@ class UserDeleteModel extends BasicRootPageModel{
     parent::load();
     
     if ($this->user !== null){
-      foreach((new TrackerTable(DB::get()))->listTrackersOwnedBy($this->user_id) as $tracker){
-        $this->owned_trackers[] = $tracker;
+      foreach((new ProjectTable(DB::get()))->listProjectsOwnedBy($this->user_id) as $project){
+        $this->owned_projects[] = $project;
       }
       
       $this->statistics = (new UserTable(DB::get()))->getUserStatistics($this->user_id);
@@ -67,8 +67,8 @@ class UserDeleteModel extends BasicRootPageModel{
     return $this->user === null || !$this->user->isAdmin(); // null allows page to be shown instead of error message
   }
   
-  public function getOwnedTrackers(): array{
-    return $this->owned_trackers;
+  public function getOwnedProjects(): array{
+    return $this->owned_projects;
   }
   
   public function getStatistics(): UserStatistics{

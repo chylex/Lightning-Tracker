@@ -3,10 +3,10 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Mixed;
 
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Generator;
 use Pages\Controllers\AbstractHandlerController;
-use Pages\Controllers\Handlers\LoadTracker;
+use Pages\Controllers\Handlers\LoadProject;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\IAction;
 use Pages\Models\Mixed\LoginModel;
@@ -39,15 +39,15 @@ class LoginController extends AbstractHandlerController{
     return empty($return) ? '' : '?return='.$return;
   }
   
-  private ?TrackerInfo $tracker;
+  private ?ProjectInfo $project;
   
   protected function prerequisites(): Generator{
     yield new RequireLoginState(false);
-    yield (new LoadTracker($this->tracker))->allowMissing();
+    yield (new LoadProject($this->project))->allowMissing();
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new LoginModel($req, $this->tracker);
+    $model = new LoginModel($req, $this->project);
     
     if ($req->getAction() === $model::ACTION_LOGIN && $model->loginUser($req->getData(), $sess)){
       $return = $_GET['return'] ?? '';

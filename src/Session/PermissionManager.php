@@ -4,24 +4,24 @@ declare(strict_types = 1);
 namespace Session;
 
 use Database\DB;
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
+use Database\Tables\ProjectPermTable;
 use Database\Tables\SystemPermTable;
-use Database\Tables\TrackerPermTable;
 use Exception;
 use Logging\Log;
+use Session\Permissions\ProjectPermissions;
 use Session\Permissions\SystemPermissions;
-use Session\Permissions\TrackerPermissions;
 
 final class PermissionManager{
   private ?UserProfile $user;
   private ?SystemPermissions $system;
-  private array $tracker;
+  private array $project;
   
   public function __construct(?UserProfile $user){
     $this->user = $user;
     $this->system = null;
-    $this->tracker = [];
+    $this->project = [];
   }
   
   public function system(): SystemPermissions{
@@ -43,25 +43,25 @@ final class PermissionManager{
     return $this->system;
   }
   
-  public function tracker(TrackerInfo $tracker): TrackerPermissions{
-    $id = $tracker->getId();
+  public function project(ProjectInfo $project): ProjectPermissions{
+    $id = $project->getId();
     
-    if (!isset($this->tracker[$id])){
-      if ($this->user !== null && ($this->user->isAdmin() || $tracker->getOwnerId() === $this->user->getId())){
-        $this->tracker[$id] = TrackerPermissions::permitAll();
+    if (!isset($this->project[$id])){
+      if ($this->user !== null && ($this->user->isAdmin() || $project->getOwnerId() === $this->user->getId())){
+        $this->project[$id] = ProjectPermissions::permitAll();
       }
       else{
         try{
-          $perms = new TrackerPermTable(DB::get(), $tracker);
-          $this->tracker[$id] = TrackerPermissions::permitList($perms->listUserPerms($this->user));
+          $perms = new ProjectPermTable(DB::get(), $project);
+          $this->project[$id] = ProjectPermissions::permitList($perms->listUserPerms($this->user));
         }catch(Exception $e){
           Log::critical($e);
-          $this->tracker[$id] = TrackerPermissions::permitList([]);
+          $this->project[$id] = ProjectPermissions::permitList([]);
         }
       }
     }
     
-    return $this->tracker[$id];
+    return $this->project[$id];
   }
 }
 

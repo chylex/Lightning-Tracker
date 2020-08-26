@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Mixed;
 
 use Database\DB;
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
@@ -20,8 +20,8 @@ class AccountSecurityModel extends AccountModel{
   
   private FormComponent $change_password_form;
   
-  public function __construct(Request $req, UserProfile $logon_user, ?TrackerInfo $tracker){
-    parent::__construct($req, $logon_user, $tracker);
+  public function __construct(Request $req, UserProfile $logon_user, ?ProjectInfo $project){
+    parent::__construct($req, $logon_user, $project);
     
     $form = new FormComponent(self::ACTION_CHANGE_PASSWORD);
     $form->startTitledSection('Change Password');

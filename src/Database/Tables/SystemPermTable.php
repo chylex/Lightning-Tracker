@@ -11,8 +11,8 @@ use PDOException;
 use Session\Permissions\SystemPermissions;
 
 final class SystemPermTable extends AbstractTable{
-  private const GUEST_PERMS = [SystemPermissions::LIST_PUBLIC_TRACKERS];
-  private const LOGON_PERMS = [SystemPermissions::LIST_PUBLIC_TRACKERS];
+  private const GUEST_PERMS = [SystemPermissions::LIST_PUBLIC_PROJECTS];
+  private const LOGON_PERMS = [SystemPermissions::LIST_PUBLIC_PROJECTS];
   
   public function __construct(PDO $db){
     parent::__construct($db);

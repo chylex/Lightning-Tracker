@@ -3,13 +3,13 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
-use Database\AbstractTrackerTable;
+use Database\AbstractProjectTable;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Types\IssueFilter;
 use Database\Objects\IssueDetail;
 use Database\Objects\IssueInfo;
 use Database\Objects\IssueUser;
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
 use LogicException;
 use Pages\Components\Issues\IssuePriority;
@@ -19,9 +19,9 @@ use Pages\Components\Issues\IssueType;
 use PDO;
 use PDOException;
 
-final class IssueTable extends AbstractTrackerTable{
-  public function __construct(PDO $db, TrackerInfo $tracker){
-    parent::__construct($db, $tracker);
+final class IssueTable extends AbstractProjectTable{
+  public function __construct(PDO $db, ProjectInfo $project){
+    parent::__construct($db, $project);
   }
   
   public function addIssue(UserProfile $author,
@@ -38,8 +38,8 @@ final class IssueTable extends AbstractTrackerTable{
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare('SELECT (1 + IFNULL(MAX(issue_id), 0)) FROM issues WHERE tracker_id = ?');
-      $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt = $this->db->prepare('SELECT (1 + IFNULL(MAX(issue_id), 0)) FROM issues WHERE project_id = ?');
+      $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
       $stmt->execute();
       $next_id = $this->fetchOneColumn($stmt);
       
@@ -49,12 +49,12 @@ final class IssueTable extends AbstractTrackerTable{
       }
       
       $stmt = $this->db->prepare(<<<SQL
-INSERT INTO issues (tracker_id, issue_id, author_id, assignee_id, milestone_id, title, description, type, priority, scale, status, progress, date_created, date_updated)
-VALUES (:tracker_id, :issue_id, :author_id, :assignee_id, :milestone_id, :title, :description, :type, :priority, :scale, :status, :progress, NOW(), NOW())
+INSERT INTO issues (project_id, issue_id, author_id, assignee_id, milestone_id, title, description, type, priority, scale, status, progress, date_created, date_updated)
+VALUES (:project_id, :issue_id, :author_id, :assignee_id, :milestone_id, :title, :description, :type, :priority, :scale, :status, :progress, NOW(), NOW())
 SQL
       );
       
-      $stmt->bindValue('tracker_id', $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt->bindValue('project_id', $this->getProjectId(), PDO::PARAM_INT);
       $stmt->bindValue('issue_id', $next_id, PDO::PARAM_INT);
       $stmt->bindValue('author_id', $author->getId(), PDO::PARAM_INT);
       $stmt->bindValue('assignee_id', $assignee_id, $assignee_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
@@ -99,11 +99,11 @@ SET title = :title,
     assignee_id = :assignee_id,
     milestone_id = :milestone_id,
     date_updated = NOW()
-WHERE issue_id = :issue_id AND tracker_id = :tracker_id
+WHERE issue_id = :issue_id AND project_id = :project_id
 SQL
     );
     
-    $stmt->bindValue('tracker_id', $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue('project_id', $this->getProjectId(), PDO::PARAM_INT);
     $stmt->bindValue('issue_id', $id, PDO::PARAM_INT);
     $stmt->bindValue('assignee_id', $assignee_id, $assignee_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
     $stmt->bindValue('milestone_id', $milestone_id, $milestone_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
@@ -124,11 +124,11 @@ SET title = :title,
     description = :description,
     type = :type,
     date_updated = NOW()
-WHERE issue_id = :issue_id AND tracker_id = :tracker_id
+WHERE issue_id = :issue_id AND project_id = :project_id
 SQL
     );
     
-    $stmt->bindValue('tracker_id', $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue('project_id', $this->getProjectId(), PDO::PARAM_INT);
     $stmt->bindValue('issue_id', $id, PDO::PARAM_INT);
     $stmt->bindValue('title', $title);
     $stmt->bindValue('description', $description);
@@ -142,14 +142,14 @@ UPDATE issues
 SET status = ?,
     progress = IFNULL(?, progress),
     date_updated = NOW()
-WHERE issue_id = ? AND tracker_id = ?
+WHERE issue_id = ? AND project_id = ?
 SQL
     );
     
     $stmt->bindValue(1, $status->getId());
     $stmt->bindValue(2, $progress, $progress === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
     $stmt->bindValue(3, $id, PDO::PARAM_INT);
-    $stmt->bindValue(4, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(4, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
   }
   
@@ -173,14 +173,14 @@ SET description = ?,
     progress = ?,
     status = IF($condition, '$auto_status', status),
     date_updated = NOW()
-WHERE issue_id = ? AND tracker_id = ?
+WHERE issue_id = ? AND project_id = ?
 SQL
     );
     
     $stmt->bindValue(1, $description);
     $stmt->bindValue(2, $progress, PDO::PARAM_INT);
     $stmt->bindValue(3, $id, PDO::PARAM_INT);
-    $stmt->bindValue(4, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(4, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
   }
   
@@ -191,7 +191,7 @@ SQL
       $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues i', AbstractFilter::STMT_COUNT);
     }
     else{
-      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues i LEFT JOIN milestones m ON i.tracker_id = m.tracker_id AND i.milestone_id = m.milestone_id', AbstractFilter::STMT_COUNT);
+      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues i LEFT JOIN milestones m ON i.project_id = m.project_id AND i.milestone_id = m.milestone_id', AbstractFilter::STMT_COUNT);
     }
     
     $stmt->execute();
@@ -218,7 +218,7 @@ SELECT i.issue_id AS id,
        i.date_created,
        i.date_updated
 FROM issues i
-LEFT JOIN milestones m ON i.tracker_id = m.tracker_id AND i.milestone_id = m.milestone_id
+LEFT JOIN milestones m ON i.project_id = m.project_id AND i.milestone_id = m.milestone_id
 SQL
     );
     
@@ -261,12 +261,12 @@ SELECT issues.title        AS title,
 FROM issues
 LEFT JOIN users author ON issues.author_id = author.id
 LEFT JOIN users assignee ON issues.assignee_id = assignee.id
-LEFT JOIN milestones milestone ON issues.tracker_id = milestone.tracker_id AND issues.milestone_id = milestone.milestone_id
-WHERE issues.issue_id = :issue_id AND issues.tracker_id = :tracker_id
+LEFT JOIN milestones milestone ON issues.project_id = milestone.project_id AND issues.milestone_id = milestone.milestone_id
+WHERE issues.issue_id = :issue_id AND issues.project_id = :project_id
 SQL
     );
     
-    $stmt->bindValue('tracker_id', $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue('project_id', $this->getProjectId(), PDO::PARAM_INT);
     $stmt->bindValue('issue_id', $id, PDO::PARAM_INT);
     $stmt->execute();
     $res = $this->fetchOne($stmt);
@@ -292,17 +292,17 @@ SQL
   }
   
   public function getIssueDescription(int $id): string{
-    $stmt = $this->db->prepare('SELECT description FROM issues WHERE issue_id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('SELECT description FROM issues WHERE issue_id = ? AND project_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     return $this->fetchOneColumn($stmt);
   }
   
   public function deleteById(int $id): void{
-    $stmt = $this->db->prepare('DELETE FROM issues WHERE issue_id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('DELETE FROM issues WHERE issue_id = ? AND project_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
   }
 }

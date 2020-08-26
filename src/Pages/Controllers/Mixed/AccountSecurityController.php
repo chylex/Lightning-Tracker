@@ -12,7 +12,7 @@ use function Pages\Actions\view;
 
 class AccountSecurityController extends AccountController{
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new AccountSecurityModel($req, $sess->getLogonUser(), $this->tracker);
+    $model = new AccountSecurityModel($req, $sess->getLogonUser(), $this->project);
     
     if ($req->getAction() === $model::ACTION_CHANGE_PASSWORD && $model->changePassword($req->getData())){
       return $model->getChangePasswordForm()->reload($req);

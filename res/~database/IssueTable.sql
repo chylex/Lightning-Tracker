@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `issues` (
-	`tracker_id`   INT NOT NULL,
+	`project_id`   INT NOT NULL,
 	`issue_id`     INT NOT NULL,
 	`author_id`    INT NULL,
 	`assignee_id`  INT NULL,
@@ -13,9 +13,9 @@ CREATE TABLE IF NOT EXISTS `issues` (
 	`progress`     TINYINT DEFAULT 0 NOT NULL,
 	`date_created` DATETIME NOT NULL,
 	`date_updated` DATETIME NOT NULL,
-	PRIMARY KEY (`tracker_id`, `issue_id`),
-	FOREIGN KEY (`tracker_id`)
-		REFERENCES `trackers` (`id`)
+	PRIMARY KEY (`project_id`, `issue_id`),
+	FOREIGN KEY (`project_id`)
+		REFERENCES `projects` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE,
 	FOREIGN KEY (`author_id`)
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS `issues` (
 		REFERENCES `users` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
-	FOREIGN KEY (`milestone_id`, `tracker_id`)
-		# Ensures the milestone-tracker pair is always valid.
-		REFERENCES `milestones` (`milestone_id`, `tracker_id`)
+	FOREIGN KEY (`milestone_id`, `project_id`)
+		# Ensures the milestone-project pair is always valid.
+		REFERENCES `milestones` (`milestone_id`, `project_id`)
 		ON UPDATE CASCADE
 		ON DELETE RESTRICT,
 	FOREIGN KEY (`scale`)

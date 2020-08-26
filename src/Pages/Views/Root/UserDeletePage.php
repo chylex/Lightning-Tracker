@@ -44,21 +44,21 @@ class UserDeletePage extends AbstractPage{
       return;
     }
     
-    $owned_trackers = $this->model->getOwnedTrackers();
-    $owned_tracker_count = count($owned_trackers);
+    $owned_projects = $this->model->getOwnedProjects();
+    $owned_project_count = count($owned_projects);
     
-    if ($owned_tracker_count > 0){
+    if ($owned_project_count > 0){
       $name = $user->getNameSafe();
-      $tracker_count_text = $owned_tracker_count === 1 ? '1 tracker' : $owned_tracker_count.' trackers';
+      $project_count_text = $owned_project_count === 1 ? '1 project' : $owned_project_count.' projects';
       
       echo <<<HTML
-<p>User <strong>$name</strong> is the owner of $tracker_count_text and cannot be deleted.</p>
+<p>User <strong>$name</strong> is the owner of $project_count_text and cannot be deleted.</p>
 <ul>
 HTML;
       
-      foreach($owned_trackers as $tracker){
-        $url_enc = Link::fromRoot('tracker', rawurlencode($tracker->getUrl()));
-        echo '<li><a href="'.$url_enc.'" class="plain">'.$tracker->getNameSafe().' <span class="icon icon-out"></span></a></li>';
+      foreach($owned_projects as $project){
+        $url_enc = Link::fromRoot('project', rawurlencode($project->getUrl()));
+        echo '<li><a href="'.$url_enc.'" class="plain">'.$project->getNameSafe().' <span class="icon icon-out"></span></a></li>';
       }
       
       echo <<<HTML
@@ -68,14 +68,14 @@ HTML;
     else{
       $statistics = $this->model->getStatistics();
       
-      $tracker_membership_count = $statistics->getTrackerMembershipCount();
+      $project_membership_count = $statistics->getProjectMembershipCount();
       $issues_created_count = $statistics->getIssuesCreatedCount();
       $issues_assigned_count = $statistics->getIssuesAssignedCount();
       
       $deletion_events = [];
       
-      if ($tracker_membership_count > 0){
-        $title = $tracker_membership_count === 1 ? '1 tracker' : $tracker_membership_count.' trackers';
+      if ($project_membership_count > 0){
+        $title = $project_membership_count === 1 ? '1 project' : $project_membership_count.' projects';
         $deletion_events[] = 'Their membership in '.$title.' will be removed.';
       }
       

@@ -48,6 +48,7 @@ try{
     $db = DB::get();
     
     $db->query('ALTER TABLE system_roles ADD special BOOL DEFAULT FALSE NOT NULL');
+    /** @noinspection SqlResolve */
     $db->query('ALTER TABLE tracker_roles ADD special BOOL DEFAULT FALSE NOT NULL');
     
     $stmt = $db->prepare(<<<SQL
@@ -74,8 +75,10 @@ SQL
     /** @noinspection SqlResolve */
     $db->query('ALTER TABLE milestones CHANGE id milestone_id INT NOT NULL AFTER tracker_id');
     $db->query('ALTER TABLE milestones DROP PRIMARY KEY');
+    /** @noinspection SqlResolve */
     $db->query('ALTER TABLE milestones ADD PRIMARY KEY (tracker_id, milestone_id)');
     
+    /** @noinspection SqlResolve */
     $db->query(<<<SQL
 ALTER TABLE issues
   ADD FOREIGN KEY (`milestone_id`, `tracker_id`)
@@ -85,6 +88,7 @@ ALTER TABLE issues
 SQL
     );
     
+    /** @noinspection SqlResolve */
     $db->query(<<<SQL
 ALTER TABLE tracker_user_settings
   ADD FOREIGN KEY (`active_milestone`, `tracker_id`)
@@ -96,7 +100,7 @@ SQL
     
     begin_transaction($db);
     
-    /** @noinspection SqlInsertValues */
+    /** @noinspection SqlResolve */
     $db->query(<<<SQL
 INSERT INTO tracker_roles (tracker_id, title, special)
 SELECT tracker_id, 'Owner' AS title, TRUE AS special
@@ -143,15 +147,18 @@ SQL
       $db->query('ALTER TABLE `'.$row['tbl'].'` DROP FOREIGN KEY `'.$row['constr'].'`');
     }
     
+    /** @noinspection SqlResolve */
     $db->query('DROP TABLE tracker_role_perms');
+    /** @noinspection SqlResolve */
     $db->query('DROP TABLE tracker_roles');
     
     $db->query(read_sql_file('TrackerRoleTable.sql'));
     $db->query(read_sql_file('TrackerRolePermTable.sql'));
     
-    /** @noinspection SqlWithoutWhere */
+    /** @noinspection SqlResolve */
     $db->query('UPDATE tracker_members SET role_id = NULL');
     
+    /** @noinspection SqlResolve */
     $db->query(<<<SQL
 ALTER TABLE tracker_members
   ADD FOREIGN KEY (`role_id`, `tracker_id`)
@@ -163,6 +170,7 @@ SQL
     
     begin_transaction($db);
     
+    /** @noinspection SqlResolve */
     $db->query(<<<SQL
 INSERT INTO tracker_roles (tracker_id, role_id, title, ordering, special)
 SELECT t.id, 1 AS role_id, 'Owner' AS title, 0 AS ordering, TRUE AS special
@@ -171,6 +179,7 @@ GROUP BY t.id
 SQL
     );
     
+    /** @noinspection SqlResolve */
     $db->query(<<<SQL
 INSERT INTO tracker_members (tracker_id, user_id, role_id)
 SELECT t.id AS tracker_id, t.owner_id AS user_id, tr.role_id AS role_id
@@ -186,10 +195,12 @@ SQL
   if ($migration_version === 3){
     $db = DB::get();
     
+    /** @noinspection SqlResolve */
     $db->query('ALTER TABLE tracker_role_perms MODIFY permission ENUM (\'settings\', \'members.list\', \'members.manage\', \'milestones.manage\', \'issues.create\', \'issues.fields.all\', \'issues.edit.all\', \'issues.delete.all\') NOT NULL');
     
     begin_transaction($db);
     
+    /** @noinspection SqlResolve */
     $db->query(<<<SQL
 INSERT IGNORE INTO tracker_role_perms (tracker_id, role_id, permission)
 SELECT tr.tracker_id AS tracker_id, tr.role_id AS role_id, 'issues.fields.all' AS permission
@@ -199,6 +210,31 @@ SQL
     );
     
     upgrade_config($db, $migration_version = 4);
+  }
+  
+  if ($migration_version === 4){
+    $db = DB::get();
+    
+    $db->query('RENAME TABLE trackers TO projects');
+    $db->query('RENAME TABLE tracker_roles TO project_roles');
+    $db->query('RENAME TABLE tracker_role_perms TO project_role_perms');
+    $db->query('RENAME TABLE tracker_members TO project_members');
+    $db->query('RENAME TABLE tracker_user_settings TO project_user_settings');
+    
+    /** @noinspection SqlResolve */
+    $db->query('ALTER TABLE project_roles CHANGE tracker_id project_id INT NOT NULL');
+    /** @noinspection SqlResolve */
+    $db->query('ALTER TABLE project_role_perms CHANGE tracker_id project_id INT NOT NULL');
+    /** @noinspection SqlResolve */
+    $db->query('ALTER TABLE project_members CHANGE tracker_id project_id INT NOT NULL');
+    /** @noinspection SqlResolve */
+    $db->query('ALTER TABLE project_user_settings CHANGE tracker_id project_id INT NOT NULL');
+    /** @noinspection SqlResolve */
+    $db->query('ALTER TABLE issues CHANGE tracker_id project_id INT NOT NULL');
+    /** @noinspection SqlResolve */
+    $db->query('ALTER TABLE milestones CHANGE tracker_id project_id INT NOT NULL');
+    
+    upgrade_config($db, $migration_version = 5);
   }
 }catch(Exception $e){
   if (isset($db) && $db->inTransaction()){

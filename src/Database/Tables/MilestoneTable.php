@@ -3,18 +3,18 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
-use Database\AbstractTrackerTable;
+use Database\AbstractProjectTable;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\MilestoneInfo;
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use LogicException;
 use PDO;
 use PDOException;
 
-final class MilestoneTable extends AbstractTrackerTable{
-  public function __construct(PDO $db, TrackerInfo $tracker){
-    parent::__construct($db, $tracker);
+final class MilestoneTable extends AbstractProjectTable{
+  public function __construct(PDO $db, ProjectInfo $project){
+    parent::__construct($db, $project);
   }
   
   public function addMilestone(string $title): void{
@@ -25,11 +25,11 @@ final class MilestoneTable extends AbstractTrackerTable{
 SELECT IFNULL(MAX(milestone_id) + 1, 1) AS id,
        IFNULL(MAX(ordering) + 1, 1)     AS ordering
 FROM milestones
-WHERE tracker_id = ?
+WHERE project_id = ?
 SQL
       );
       
-      $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
       $stmt->execute();
       
       $next = $this->fetchOne($stmt);
@@ -39,9 +39,9 @@ SQL
         throw new LogicException('Error calculating next milestone ID.');
       }
       
-      $stmt = $this->db->prepare('INSERT INTO milestones (milestone_id, tracker_id, ordering, title) VALUES (?, ?, ?, ?)');
-      $stmt->bindValue(1, $next['id'], PDO::PARAM_INT);
-      $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+      $stmt = $this->db->prepare('INSERT INTO milestones (project_id, milestone_id, ordering, title) VALUES (?, ?, ?, ?)');
+      $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
+      $stmt->bindValue(2, $next['id'], PDO::PARAM_INT);
       $stmt->bindValue(3, $next['ordering'], PDO::PARAM_INT);
       $stmt->bindValue(4, $title);
       $stmt->execute();
@@ -99,8 +99,8 @@ SQL
   }
   
   public function findMaxOrdering(): ?int{
-    $stmt = $this->db->prepare('SELECT MAX(ordering) FROM milestones WHERE tracker_id = ?');
-    $stmt->bindValue(1, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt = $this->db->prepare('SELECT MAX(ordering) FROM milestones WHERE project_id = ?');
+    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     
     $limit = $this->fetchOneColumn($stmt);
@@ -108,23 +108,23 @@ SQL
   }
   
   private function swapMilestonesInternal(int $id, int $current_ordering, int $other_ordering): void{
-    $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE ordering = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE ordering = ? AND project_id = ?');
     $stmt->bindValue(1, $current_ordering, PDO::PARAM_INT);
     $stmt->bindValue(2, $other_ordering, PDO::PARAM_INT);
-    $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     
-    $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE milestone_id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE milestone_id = ? AND project_id = ?');
     $stmt->bindValue(1, $other_ordering, PDO::PARAM_INT);
     $stmt->bindValue(2, $id, PDO::PARAM_INT);
-    $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
   }
   
   private function getMilestoneOrdering(int $id): ?int{
-    $stmt = $this->db->prepare('SELECT ordering FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('SELECT ordering FROM milestones WHERE milestone_id = ? AND project_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     
     $res = $this->fetchOneColumn($stmt);
@@ -157,7 +157,7 @@ SELECT m.milestone_id                                                   AS miles
        FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS progress,
        MAX(i.date_updated)                                              AS date_updated
 FROM milestones m
-LEFT JOIN issues i ON m.tracker_id = i.tracker_id AND m.milestone_id = i.milestone_id
+LEFT JOIN issues i ON m.project_id = i.project_id AND m.milestone_id = i.milestone_id
 LEFT JOIN issue_weights iw ON i.scale = iw.scale
 # WHERE
 GROUP BY m.milestone_id, m.title
@@ -184,17 +184,17 @@ SQL;
   }
   
   public function setMilestoneTitle(int $id, string $title): void{
-    $stmt = $this->db->prepare('UPDATE milestones SET title = ? WHERE milestone_id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('UPDATE milestones SET title = ? WHERE milestone_id = ? AND project_id = ?');
     $stmt->bindValue(1, $title);
     $stmt->bindValue(2, $id, PDO::PARAM_INT);
-    $stmt->bindValue(3, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
   }
   
   public function getMilestoneTitle(int $id): ?string{
-    $stmt = $this->db->prepare('SELECT title FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
+    $stmt = $this->db->prepare('SELECT title FROM milestones WHERE milestone_id = ? AND project_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getTrackerId(), PDO::PARAM_INT);
+    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     
     $title = $this->fetchOneColumn($stmt);
@@ -202,7 +202,7 @@ SQL;
   }
   
   public function deleteById(int $id, ?int $replacement_id): void{
-    $tracker = $this->getTrackerId();
+    $project = $this->getProjectId();
     
     $this->db->beginTransaction();
     
@@ -214,23 +214,23 @@ SQL;
         return;
       }
       
-      $stmt = $this->db->prepare('UPDATE milestones SET ordering = ordering - 1 WHERE ordering > ? AND tracker_id = ?');
+      $stmt = $this->db->prepare('UPDATE milestones SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ?');
       $stmt->bindValue(1, $ordering, PDO::PARAM_INT);
-      $stmt->bindValue(2, $tracker, PDO::PARAM_INT);
+      $stmt->bindValue(2, $project, PDO::PARAM_INT);
       $stmt->execute();
       
-      foreach(['UPDATE issues SET milestone_id = ? WHERE milestone_id = ? AND tracker_id = ?',
-               'UPDATE tracker_user_settings SET active_milestone = ? WHERE active_milestone = ? AND tracker_id = ?'] as $sql){
+      foreach(['UPDATE issues SET milestone_id = ? WHERE milestone_id = ? AND project_id = ?',
+               'UPDATE project_user_settings SET active_milestone = ? WHERE active_milestone = ? AND project_id = ?'] as $sql){
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(1, $replacement_id, $replacement_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
         $stmt->bindValue(2, $id, PDO::PARAM_INT);
-        $stmt->bindValue(3, $tracker, PDO::PARAM_INT);
+        $stmt->bindValue(3, $project, PDO::PARAM_INT);
         $stmt->execute();
       }
       
-      $stmt = $this->db->prepare('DELETE FROM milestones WHERE milestone_id = ? AND tracker_id = ?');
+      $stmt = $this->db->prepare('DELETE FROM milestones WHERE milestone_id = ? AND project_id = ?');
       $stmt->bindValue(1, $id, PDO::PARAM_INT);
-      $stmt->bindValue(2, $tracker, PDO::PARAM_INT);
+      $stmt->bindValue(2, $project, PDO::PARAM_INT);
       $stmt->execute();
       
       $this->db->commit();

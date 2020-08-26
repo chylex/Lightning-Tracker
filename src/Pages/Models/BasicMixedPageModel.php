@@ -3,12 +3,12 @@ declare(strict_types = 1);
 
 namespace Pages\Models;
 
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Routing\Request;
 
 class BasicMixedPageModel extends AbstractWrapperModel{
-  public function __construct(Request $req, ?TrackerInfo $tracker){
-    parent::__construct(($tracker === null) ? new BasicRootPageModel($req) : new BasicTrackerPageModel($req, $tracker));
+  public function __construct(Request $req, ?ProjectInfo $project){
+    parent::__construct(($project === null) ? new BasicRootPageModel($req) : new BasicProjectPageModel($req, $project));
   }
 }
 

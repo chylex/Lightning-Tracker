@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Mixed;
 
 use Database\DB;
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Database\Tables\UserTable;
 use Exception;
 use Pages\Components\Forms\FormComponent;
@@ -18,8 +18,8 @@ class LoginModel extends BasicMixedPageModel{
   
   private FormComponent $form;
   
-  public function __construct(Request $req, ?TrackerInfo $tracker){
-    parent::__construct($req, $tracker);
+  public function __construct(Request $req, ?ProjectInfo $project){
+    parent::__construct($req, $project);
     
     $this->form = new FormComponent(self::ACTION_LOGIN);
     

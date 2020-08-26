@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Mixed;
 
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Text;
@@ -18,8 +18,8 @@ class AccountModel extends BasicMixedPageModel{
   private SidemenuComponent $menu_links;
   private SidemenuComponent $menu_actions;
   
-  public function __construct(Request $req, UserProfile $logon_user, ?TrackerInfo $tracker){
-    parent::__construct($req, $tracker);
+  public function __construct(Request $req, UserProfile $logon_user, ?ProjectInfo $project){
+    parent::__construct($req, $project);
     $this->logon_user = $logon_user;
     $this->menu_links = new SidemenuComponent($req);
     $this->menu_actions = new SidemenuComponent($req);

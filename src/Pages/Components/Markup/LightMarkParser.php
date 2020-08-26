@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Components\Markup;
 
-use Pages\Models\Tracker\IssueEditModel;
+use Pages\Models\Project\IssueEditModel;
 
 final class LightMarkParser{
   private const SPACE = 32;

@@ -3,10 +3,10 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Mixed;
 
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Generator;
 use Pages\Controllers\AbstractHandlerController;
-use Pages\Controllers\Handlers\LoadTracker;
+use Pages\Controllers\Handlers\LoadProject;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\IControlHandler;
 use Pages\IAction;
@@ -19,11 +19,11 @@ use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
 class AccountController extends AbstractHandlerController{
-  protected ?TrackerInfo $tracker;
+  protected ?ProjectInfo $project;
   
   protected final function prerequisites(): Generator{
     yield new RequireLoginState(true);
-    yield (new LoadTracker($this->tracker))->allowMissing();
+    yield (new LoadProject($this->project))->allowMissing();
     
     yield new class implements IControlHandler{
       public function run(Request $req, Session $sess): ?IAction{
@@ -38,7 +38,7 @@ class AccountController extends AbstractHandlerController{
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    return view(new AccountPage((new AccountModel($req, $sess->getLogonUser(), $this->tracker))->load()));
+    return view(new AccountPage((new AccountModel($req, $sess->getLogonUser(), $this->project))->load()));
   }
 }
 

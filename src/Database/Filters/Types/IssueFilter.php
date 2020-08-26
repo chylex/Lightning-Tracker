@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Database\Filters\Types;
 
-use Database\Filters\AbstractTrackerIdFilter;
+use Database\Filters\AbstractProjectIdFilter;
 use Database\Filters\Conditions\FieldLike;
 use Database\Filters\Conditions\FieldOneOf;
 use Database\Filters\Conditions\FieldOneOfNullable;
@@ -12,7 +12,7 @@ use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
 
-final class IssueFilter extends AbstractTrackerIdFilter{
+final class IssueFilter extends AbstractProjectIdFilter{
   public static function empty(): self{
     return new self();
   }

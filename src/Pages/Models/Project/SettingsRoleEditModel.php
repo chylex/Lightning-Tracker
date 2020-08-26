@@ -1,0 +1,150 @@
+<?php
+declare(strict_types = 1);
+
+namespace Pages\Models\Project;
+
+use Database\DB;
+use Database\Objects\ProjectInfo;
+use Database\Tables\ProjectPermTable;
+use Database\Validation\RoleFields;
+use Exception;
+use Pages\Components\Forms\Elements\FormCheckBoxHierarchyItem;
+use Pages\Components\Forms\FormComponent;
+use Pages\Components\Text;
+use Pages\IModel;
+use Routing\Request;
+use Session\Permissions\ProjectPermissions;
+use Validation\FormValidator;
+use Validation\ValidationException;
+
+class SettingsRoleEditModel extends AbstractSettingsModel{
+  public const ACTION_CONFIRM = 'Confirm';
+  
+  private static function perm(string $permission): string{
+    return 'Perm-'.str_replace('.', '_', $permission);
+  }
+  
+  private int $role_id;
+  private ?string $role_title;
+  
+  /**
+   * @var string[]
+   */
+  private array $all_perms;
+  
+  private FormComponent $form;
+  
+  public function __construct(Request $req, ProjectInfo $project, int $role_id){
+    parent::__construct($req, $project);
+    $this->role_id = $role_id;
+    
+    $this->form = new FormComponent(self::ACTION_CONFIRM);
+    $this->form->addTextField('Title')->type('text');
+    $this->form->startCheckBoxHierarchy('Permissions');
+    
+    $this->addPermissionBox(ProjectPermissions::MANAGE_SETTINGS)
+         ->description('Full control over the project Settings, including editing all roles.');
+    
+    $this->addPermissionBox(ProjectPermissions::LIST_MEMBERS)
+         ->description('View all members of the project and their roles. Assign issues to members.')
+         ->parent();
+    
+    $this->addPermissionBox(ProjectPermissions::MANAGE_MEMBERS)
+         ->description('Invite members to the project, assign roles to members, remove members from the project. Can only invite and manage members of a lower role.')
+         ->lastChild();
+    
+    $this->addPermissionBox(ProjectPermissions::MANAGE_MILESTONES)
+         ->description('Create, edit, and delete milestones.');
+    
+    $this->addPermissionBox(ProjectPermissions::CREATE_ISSUE)
+         ->description('Create new issues.');
+    
+    $this->addPermissionBox(ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS)
+         ->description('Note: Without this permission, a member can only edit the issue type, title, and description on issues they created, and all fields on issues they are assigned to.');
+    
+    $this->addPermissionBox(ProjectPermissions::EDIT_ALL_ISSUES)
+         ->description('Note: Without this permission, a member can only edit issues they created or are assigned to.');
+    
+    $this->addPermissionBox(ProjectPermissions::DELETE_ALL_ISSUES)
+         ->description('Note: Unlike editing, a member cannot delete an issue they created or are assigned to.');
+    
+    $this->form->endCheckBoxHierarchy();
+    $this->form->addButton('submit', 'Edit Role')->icon('pencil');
+  }
+  
+  private function addPermissionBox(string $permission): FormCheckBoxHierarchyItem{
+    $this->all_perms[] = $permission;
+    return $this->form->addCheckBoxHierarchyItem(self::perm($permission))->label(SettingsRolesModel::PERM_NAMES[$permission]);
+  }
+  
+  public function load(): IModel{
+    parent::load();
+    
+    $perms = new ProjectPermTable(DB::get(), $this->getProject());
+    $this->role_title = $perms->getRoleTitleIfNotSpecial($this->role_id);
+    
+    if ($this->role_title !== null && !$this->form->isFilled()){
+      $fill = ['Title' => $this->role_title];
+      
+      foreach($perms->listRolePerms($this->role_id) as $perm){
+        $fill[self::perm($perm)] = true;
+      }
+      
+      $this->form->fill($fill);
+    }
+    
+    return $this;
+  }
+  
+  public function hasRole(): bool{
+    return $this->role_title !== null;
+  }
+  
+  public function getRoleTitleSafe(): string{
+    return protect($this->role_title);
+  }
+  
+  public function getEditForm(): FormComponent{
+    return $this->form;
+  }
+  
+  public function editRole(array $data): bool{
+    if (!$this->form->accept($data)){
+      return false;
+    }
+    
+    $validator = new FormValidator($data);
+    $title = RoleFields::title($validator);
+    $checked_perms = array_values(array_filter($this->all_perms, fn($perm): bool => (bool)($data[self::perm($perm)] ?? false)));
+    
+    foreach($checked_perms as $perm){
+      $dependency = SettingsRolesModel::PERM_DEPENDENCIES[$perm] ?? null;
+      
+      if ($dependency !== null && !in_array($dependency, $checked_perms, true)){
+        $validator->bool(self::perm($perm))
+                  ->isTrue(fn($ignore): bool => in_array($dependency, $checked_perms, true), 'This permission requires the \''.SettingsRolesModel::PERM_NAMES[$dependency].'\' permission.');
+      }
+    }
+    
+    try{
+      $validator->validate();
+      $perms = new ProjectPermTable(DB::get(), $this->getProject());
+      
+      if ($perms->getRoleTitleIfNotSpecial($this->role_id) === null){
+        $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid role.'));
+        return false;
+      }
+      
+      $perms->editRole($this->role_id, $title, $checked_perms);
+      return true;
+    }catch(ValidationException $e){
+      $this->form->invalidateFields($e->getFields());
+    }catch(Exception $e){
+      $this->form->onGeneralError($e);
+    }
+    
+    return false;
+  }
+}
+
+?>

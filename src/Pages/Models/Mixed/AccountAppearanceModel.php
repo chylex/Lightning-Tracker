@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Mixed;
 
 use Database\Filters\General\Pagination;
-use Database\Objects\TrackerInfo;
+use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
@@ -17,8 +17,8 @@ class AccountAppearanceModel extends AccountModel{
   
   private FormComponent $appearance_form;
   
-  public function __construct(Request $req, UserProfile $logon_user, ?TrackerInfo $tracker){
-    parent::__construct($req, $logon_user, $tracker);
+  public function __construct(Request $req, UserProfile $logon_user, ?ProjectInfo $project){
+    parent::__construct($req, $logon_user, $project);
     
     $form = new FormComponent(self::ACTION_CHANGE_APPEARANCE);
     $form->startTitledSection('Appearance');
