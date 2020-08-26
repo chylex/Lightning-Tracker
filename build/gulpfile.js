@@ -2,6 +2,7 @@ const { src, dest, series } = require("gulp");
 const concat = require("gulp-concat");
 const replace = require("gulp-replace");
 const css = require("gulp-clean-css");
+const autoprefix = require("gulp-autoprefixer");
 const del = require("del");
 const glob = require("glob");
 const merge = require("merge-stream");
@@ -46,7 +47,14 @@ function taskCSS(){
     const resources = res + "/~resources";
     
     // noinspection JSUnusedGlobalSymbols
-    const settings = {
+    const prefixSettings = {
+        cascade: false,
+        remove: false,
+        overrideBrowserslist: [ "last 1000 versions" ]
+    };
+    
+    // noinspection JSUnusedGlobalSymbols
+    const cssSettings = {
         format: "keep-breaks",
         rebase: true,
         rebaseTo: resources,
@@ -61,7 +69,8 @@ function taskCSS(){
     return src([ resources + "/css/main.css",
                  resources + "/css/!(main).css" ])
         .pipe(concat("style.min.css"))
-        .pipe(css(settings))
+        .pipe(autoprefix(prefixSettings))
+        .pipe(css(cssSettings))
         .pipe(dest(out + "/~resources"));
 }
 

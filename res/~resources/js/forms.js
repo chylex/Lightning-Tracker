@@ -24,10 +24,13 @@ document.addEventListener("DOMContentLoaded", function(){
         const memoizedPairs = new Map();
         
         for(/** @type HTMLDetailsElement */ const multiselect of multiselects){
+            const summary = multiselect.querySelector("summary");
+            const summaryInitialText = getText(summary);
+            
             const label = multiselect.previousElementSibling;
             
             label.addEventListener("click", function(){
-                multiselect.open = !multiselect.open;
+                summary.click();
             });
             
             /**
@@ -47,9 +50,6 @@ document.addEventListener("DOMContentLoaded", function(){
                     return null;
                 }
             }
-            
-            const summary = multiselect.querySelector("summary");
-            const summaryInitialText = getText(summary);
             
             const checkboxes = multiselect.getElementsByTagName("input");
             

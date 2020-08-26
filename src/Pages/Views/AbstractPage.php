@@ -69,6 +69,7 @@ abstract class AbstractPage implements IViewable{
     
     <base href="$base_url/">
     <link rel="icon" type="image/png" href="~resources/img/favicon.png?v=$v">
+    <script type="text/javascript" src="~resources/js/polyfill/details.js?v=$v"></script>
 HTML;
     
     if (DEBUG){

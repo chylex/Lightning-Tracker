@@ -78,8 +78,6 @@ textarea {
 
 select {
   appearance: none;
-  -moz-appearance: none;
-  -webkit-appearance: none;
 }
 
 select[size] {
@@ -93,13 +91,22 @@ select:not([size]) {
   overflow: hidden;
   text-overflow: ellipsis;
   height: 36px;
-  padding: 0 22px 0 8px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3E%3Cpath d='M3.996,5l3.996,-5l-7.992,0l3.996,5Z'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) 50% / 11px;
+  padding: 0 0 0 8px;
 }
 
 select:not([size]):disabled {
-  background: #e2e2e2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%237d7d7d' viewBox='0 0 8 5'%3E%3Cpath d='M3.996,5l3.996,-5l-7.992,0l3.996,5Z'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) 50% / 11px;
   color: #222222;
+}
+
+@supports (appearance: none) {
+  select:not([size]) {
+    padding-right: 22px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'%3E%3Cpath d='M3.996,5l3.996,-5l-7.992,0l3.996,5Z'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) 50% / 11px;
+  }
+
+  select:not([size]):disabled {
+    background: #e2e2e2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%237d7d7d' viewBox='0 0 8 5'%3E%3Cpath d='M3.996,5l3.996,-5l-7.992,0l3.996,5Z'/%3E%3C/svg%3E") no-repeat calc(100% - 8px) 50% / 11px;
+  }
 }
 
 @supports (-moz-appearance: none) {
