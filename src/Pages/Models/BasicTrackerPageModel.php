@@ -14,6 +14,7 @@ use Pages\Components\Html;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Text;
+use Pages\Controllers\Mixed\LoginController;
 use Pages\IViewable;
 use Routing\Request;
 use Session\PermissionManager;
@@ -49,6 +50,10 @@ class BasicTrackerPageModel extends AbstractPageModel{
     if ($perms->check(TrackerPermissions::MANAGE_SETTINGS)){
       $nav->addLeft(Text::withIcon('Settings', 'wrench'), '/settings');
     }
+  }
+  
+  protected function getLoginReturnQuery(): string{
+    return LoginController::getReturnQuery($this->getReq());
   }
   
   public function getTracker(): TrackerInfo{

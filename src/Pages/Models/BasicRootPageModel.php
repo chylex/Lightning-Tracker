@@ -5,6 +5,7 @@ namespace Pages\Models;
 
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
+use Pages\Controllers\Mixed\LoginController;
 use Pages\Models\Root\SettingsModel;
 use Routing\Request;
 use Routing\UrlString;
@@ -34,6 +35,10 @@ class BasicRootPageModel extends AbstractPageModel{
     }
     
     $nav->addLeft(Text::withIcon('About', 'info'), '/about');
+  }
+  
+  protected function getLoginReturnQuery(): string{
+    return LoginController::getReturnQuery($this->getReq(), true);
   }
 }
 
