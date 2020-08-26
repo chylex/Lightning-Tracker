@@ -137,7 +137,7 @@ option {
   outline: none;
 }
 
-option:not(:disabled) {
+select:not(:disabled) option:not(:disabled) {
   cursor: pointer;
 }
 

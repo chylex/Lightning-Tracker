@@ -77,13 +77,13 @@ final class IssueDetail extends IssueInfo{
   }
   
   public function getEditLevel(?UserProfile $user, TrackerPermissions $perms): int{
-    $can_edit = $this->isAuthorOrAssignee($user) || $perms->check(TrackerPermissions::EDIT_ALL_ISSUES);
+    $can_edit = ($user !== null && $this->isAuthorOrAssignee($user)) || $perms->check(TrackerPermissions::EDIT_ALL_ISSUES);
     
     if (!$can_edit){
       return self::EDIT_FORBIDDEN;
     }
     
-    $all_fields = $this->isAssignee($user) || $perms->check(TrackerPermissions::MODIFY_ALL_ISSUE_FIELDS);
+    $all_fields = ($user !== null && $this->isAssignee($user)) || $perms->check(TrackerPermissions::MODIFY_ALL_ISSUE_FIELDS);
     return $all_fields ? self::EDIT_ALL_FIELDS : self::EDIT_BASIC_FIELDS;
   }
 }

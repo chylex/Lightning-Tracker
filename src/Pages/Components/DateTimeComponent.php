@@ -7,11 +7,7 @@ use Pages\IViewable;
 
 final class DateTimeComponent implements IViewable{
   public static function echoHead(): void{
-    $v = TRACKER_RESOURCE_VERSION;
-    
-    echo <<<HTML
-<script type="text/javascript" src="~resources/js/datetime.js?v=$v"></script>
-HTML;
+    echo '<script type="text/javascript" src="~resources/js/datetime.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
   }
   
   private int $datetime;
