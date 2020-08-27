@@ -9,20 +9,21 @@ use Pages\Controllers\AbstractHandlerController;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireSystemPermission;
 use Pages\IAction;
-use Pages\Models\Root\SettingsModel;
-use Pages\Views\Root\SettingsPage;
+use Pages\Models\Root\SettingsGeneralModel;
+use Pages\Views\Root\SettingsGeneralPage;
 use Routing\Request;
+use Session\Permissions\SystemPermissions;
 use Session\Session;
 use function Pages\Actions\view;
 
-class SettingsController extends AbstractHandlerController{
+class SettingsGeneralController extends AbstractHandlerController{
   protected function prerequisites(): Generator{
     yield new RequireLoginState(true);
-    yield new RequireSystemPermission(SettingsModel::PERM);
+    yield new RequireSystemPermission(SystemPermissions::MANAGE_SETTINGS);
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new SettingsModel($req);
+    $model = new SettingsGeneralModel($req);
     
     if ($req->getAction() === $model::ACTION_SUBMIT){
       $data = $req->getData();
@@ -35,7 +36,7 @@ class SettingsController extends AbstractHandlerController{
       }
     }
     
-    return view(new SettingsPage($model->load()));
+    return view(new SettingsGeneralPage($model->load()));
   }
 }
 

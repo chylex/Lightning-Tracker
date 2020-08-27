@@ -24,7 +24,11 @@ class ProjectsController extends AbstractHandlerController{
     $perms = $sess->getPermissions()->system();
     $model = new ProjectModel($req, $perms);
     
-    if ($req->getAction() === $model::ACTION_CREATE && $perms->require(SystemPermissions::CREATE_PROJECT) && $model->createProject($req->getData(), $sess->getLogonUser())){
+    if ($req->getAction() === $model::ACTION_CREATE &&
+        $perms->require(SystemPermissions::LIST_VISIBLE_PROJECTS) &&
+        $perms->require(SystemPermissions::CREATE_PROJECT) &&
+        $model->createProject($req->getData(), $sess->getLogonUser())
+    ){
       return reload();
     }
     

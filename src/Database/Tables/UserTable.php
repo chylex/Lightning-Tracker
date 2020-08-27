@@ -34,15 +34,15 @@ final class UserTable extends AbstractTable{
   /**
    * @param int $id
    * @param string $name
-   * @param string $email
+   * @param string|null $email If null, the email will not be changed.
    * @param string|null $password If null, the password will not be changed.
    * @param int|null $role_id
    * @throws Exception
    */
-  public function editUser(int $id, string $name, string $email, ?string $password, ?int $role_id): void{
+  public function editUser(int $id, string $name, ?string $email, ?string $password, ?int $role_id): void{
     $stmt = $this->db->prepare(<<<SQL
 UPDATE users
-SET name = ?, email = ?, password = IFNULL(?, password), role_id = ?
+SET name = ?, email = IFNULL(?, email), password = IFNULL(?, password), role_id = ?
 WHERE id = ?
 SQL
     );

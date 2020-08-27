@@ -6,18 +6,25 @@ namespace Database\Tables;
 use Database\AbstractTable;
 use Database\Objects\RoleInfo;
 use Database\Objects\UserProfile;
+use Exception;
 use PDO;
 use PDOException;
 use Session\Permissions\SystemPermissions;
 
 final class SystemPermTable extends AbstractTable{
-  private const GUEST_PERMS = [SystemPermissions::LIST_PUBLIC_PROJECTS];
-  private const LOGON_PERMS = [SystemPermissions::LIST_PUBLIC_PROJECTS];
+  private const GUEST_PERMS = [SystemPermissions::LIST_VISIBLE_PROJECTS];
+  private const LOGON_PERMS = [SystemPermissions::LIST_VISIBLE_PROJECTS];
   
   public function __construct(PDO $db){
     parent::__construct($db);
   }
   
+  /**
+   * @param string $title
+   * @param array $perms
+   * @param bool $special
+   * @throws Exception
+   */
   public function addRole(string $title, array $perms, bool $special = false): void{
     $this->db->beginTransaction();
     
@@ -28,16 +35,14 @@ final class SystemPermTable extends AbstractTable{
       $stmt->execute();
       
       if (!empty($perms)){
-        $sql = 'INSERT INTO system_role_perms (role_id, permission) VALUES ()';
-        $values = implode(',', array_map(fn($ignore): string => '(LAST_INSERT_ID(), ?)', $perms));
+        $id = $this->getLastInsertId();
         
-        $stmt = $this->db->prepare(str_replace('()', $values, $sql));
-        
-        for($i = 0, $count = count($perms); $i < $count; $i++){
-          $stmt->bindValue($i + 1, $perms[$i]);
+        if ($id === false){
+          $this->db->rollBack();
+          throw new Exception('Could not retrieve role ID.');
         }
         
-        $stmt->execute();
+        $this->addRolePermissions($id, $perms);
       }
       
       $this->db->commit();
@@ -45,6 +50,50 @@ final class SystemPermTable extends AbstractTable{
       $this->db->rollBack();
       throw $e;
     }
+  }
+  
+  public function editRole(int $id, string $title, array $perms): void{
+    $this->db->beginTransaction();
+    
+    try{
+      $stmt = $this->db->prepare('UPDATE system_roles SET title = ? WHERE id = ?');
+      $stmt->bindValue(1, $title);
+      $stmt->bindValue(2, $id, PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $stmt = $this->db->prepare('DELETE FROM system_role_perms WHERE role_id = ?');
+      $stmt->bindValue(1, $id, PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $this->addRolePermissions($id, $perms);
+      
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+      throw $e;
+    }
+  }
+  
+  /**
+   * @param int $id
+   * @param array $perms
+   */
+  private function addRolePermissions(int $id, array $perms): void{
+    if (empty($perms)){
+      return;
+    }
+    
+    $sql = 'INSERT INTO system_role_perms (role_id, permission) VALUES ()';
+    $values = implode(',', array_map(fn($ignore): string => '(?, ?)', $perms));
+    
+    $stmt = $this->db->prepare(str_replace('()', $values, $sql));
+    
+    for($i = 0, $count = count($perms); $i < $count; $i++){
+      $stmt->bindValue(($i * 2) + 1, $id, PDO::PARAM_INT);
+      $stmt->bindValue(($i * 2) + 2, $perms[$i]);
+    }
+    
+    $stmt->execute();
   }
   
   /**
@@ -64,10 +113,23 @@ final class SystemPermTable extends AbstractTable{
   }
   
   /**
+   * @param int $id
+   * @return string[]
+   */
+  public function listRolePerms(int $id): array{
+    $stmt = $this->db->prepare('SELECT permission FROM system_role_perms WHERE role_id = ?');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    return $perms === false ? [] : $perms;
+  }
+  
+  /**
    * @param ?UserProfile $user
    * @return string[]
    */
-  public function listPerms(?UserProfile $user): array{
+  public function listUserPerms(?UserProfile $user): array{
     if ($user === null){
       return self::GUEST_PERMS;
     }
@@ -82,6 +144,15 @@ final class SystemPermTable extends AbstractTable{
     
     $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
     return $perms === false ? [] : $perms;
+  }
+  
+  public function getRoleTitleIfNotSpecial(int $id): ?string{
+    $stmt = $this->db->prepare('SELECT title FROM system_roles WHERE id = ? AND special = FALSE');
+    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $title = $this->fetchOneColumn($stmt);
+    return $title === false ? null : $title;
   }
   
   public function deleteById(int $id): void{

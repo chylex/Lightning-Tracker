@@ -21,7 +21,7 @@ use function Pages\Actions\view;
 class ProjectDeleteController extends AbstractProjectController{
   protected function projectPrerequisites(ProjectInfo $project): Generator{
     yield new RequireLoginState(true);
-    yield new RequireSystemPermission(SystemPermissions::LIST_PUBLIC_PROJECTS);
+    yield new RequireSystemPermission(SystemPermissions::LIST_VISIBLE_PROJECTS);
     yield new RequireSystemPermission(SystemPermissions::MANAGE_PROJECTS);
   }
   

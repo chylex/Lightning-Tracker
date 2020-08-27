@@ -9,8 +9,8 @@ use Pages\Controllers\Handlers\LoadNumericId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireSystemPermission;
 use Pages\IAction;
-use Pages\Models\Root\UserEditModel;
-use Pages\Views\Root\UserEditPage;
+use Pages\Models\Root\SettingsRoleEditModel;
+use Pages\Views\Root\SettingsRoleEditPage;
 use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
@@ -18,24 +18,23 @@ use Session\Session;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
-class UserEditController extends AbstractHandlerController{
-  private ?int $user_id;
+class SettingsRoleEditController extends AbstractHandlerController{
+  private ?int $role_id;
   
   protected function prerequisites(): Generator{
     yield new RequireLoginState(true);
-    yield new RequireSystemPermission(SystemPermissions::LIST_USERS);
-    yield new RequireSystemPermission(SystemPermissions::MANAGE_USERS);
-    yield new LoadNumericId($this->user_id, 'user');
+    yield new RequireSystemPermission(SystemPermissions::MANAGE_SETTINGS);
+    yield new LoadNumericId($this->role_id, 'role');
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new UserEditModel($req, $sess->getPermissions()->system(), $this->user_id);
+    $model = new SettingsRoleEditModel($req, $this->role_id);
     
-    if ($req->getAction() === $model::ACTION_CONFIRM && $model->editUser($req->getData())){
-      return redirect(Link::fromBase($req, 'users'));
+    if ($req->getAction() === $model::ACTION_CONFIRM && $model->editRole($req->getData())){
+      return redirect(Link::fromBase($req, 'settings', 'roles'));
     }
     
-    return view(new UserEditPage($model->load()));
+    return view(new SettingsRoleEditPage($model->load()));
   }
 }
 

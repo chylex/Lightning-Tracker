@@ -41,7 +41,7 @@ class UsersModel extends BasicRootPageModel{
     $this->table = new TableComponent();
     $this->table->ifEmpty('No users found.');
     
-    if ($perms->check(SystemPermissions::LIST_USER_EMAILS)){
+    if ($perms->check(SystemPermissions::SEE_USER_EMAILS)){
       $this->table->addColumn('Username')->sort('name')->width(40)->wrap()->bold();
       $this->table->addColumn('Email')->width(40)->wrap();
     }
@@ -90,7 +90,7 @@ class UsersModel extends BasicRootPageModel{
     $req = $this->getReq();
     
     $logon_user_id = Session::get()->getLogonUserId();
-    $can_see_email = $this->perms->check(SystemPermissions::LIST_USER_EMAILS);
+    $can_see_email = $this->perms->check(SystemPermissions::SEE_USER_EMAILS);
     
     $filter = new UserFilter($can_see_email);
     $users = new UserTable(DB::get());

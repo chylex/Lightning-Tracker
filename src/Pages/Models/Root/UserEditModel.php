@@ -16,6 +16,7 @@ use Pages\Models\BasicRootPageModel;
 use Pages\Models\Mixed\RegisterModel;
 use PDOException;
 use Routing\Request;
+use Session\Permissions\SystemPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
@@ -25,10 +26,13 @@ class UserEditModel extends BasicRootPageModel{
   private int $user_id;
   private ?UserInfo $user;
   
+  private SystemPermissions $perms;
   private FormComponent $form;
   
-  public function __construct(Request $req, int $user_id){
+  public function __construct(Request $req, SystemPermissions $perms, int $user_id){
     parent::__construct($req);
+    
+    $this->perms = $perms;
     $this->user_id = $user_id;
     
     $this->form = new FormComponent(self::ACTION_CONFIRM);
@@ -40,9 +44,17 @@ class UserEditModel extends BasicRootPageModel{
                ->type('text')
                ->autocomplete('username');
     
-    $this->form->addTextField('Email')
-               ->type('email')
-               ->autocomplete('email');
+    if ($perms->check(SystemPermissions::SEE_USER_EMAILS)){
+      $this->form->addTextField('Email')
+                 ->type('email')
+                 ->autocomplete('email');
+    }
+    else{
+      $this->form->addTextField('Email')
+                 ->type('email')
+                 ->placeholder('Leave blank to keep current email.')
+                 ->autocomplete('email');
+    }
     
     $this->form->endSplitGroup();
     $this->form->startSplitGroup(50);
@@ -77,7 +89,7 @@ class UserEditModel extends BasicRootPageModel{
       $role_id = $user->getRoleId();
       
       $this->form->fill(['Name'  => $user->getName(),
-                         'Email' => $user->getEmail(),
+                         'Email' => $this->perms->check(SystemPermissions::SEE_USER_EMAILS) ? $user->getEmail() : '',
                          'Role'  => $role_id === null ? '' : strval($role_id)]);
     }
     
@@ -99,7 +111,7 @@ class UserEditModel extends BasicRootPageModel{
     
     $validator = new FormValidator($data);
     $name = UserFields::name($validator);
-    $email = UserFields::email($validator);
+    $email = empty($data['Email']) ? null : UserFields::email($validator);
     $password = empty($data['Password']) ? null : UserFields::password($validator);
     $role = empty($data['Role']) ? null : (int)$data['Role'];
     

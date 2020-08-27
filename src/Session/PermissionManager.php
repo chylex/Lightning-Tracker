@@ -32,7 +32,7 @@ final class PermissionManager{
       else{
         try{
           $perms = new SystemPermTable(DB::get());
-          $this->system = SystemPermissions::permitList($perms->listPerms($this->user));
+          $this->system = SystemPermissions::permitList($perms->listUserPerms($this->user));
         }catch(Exception $e){
           Log::critical($e);
           $this->system = SystemPermissions::permitList([]);

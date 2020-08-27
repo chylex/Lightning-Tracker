@@ -236,6 +236,14 @@ SQL
     
     upgrade_config($db, $migration_version = 5);
   }
+  
+  if ($migration_version === 5){
+    $db = DB::get();
+    
+    $db->query('ALTER TABLE system_role_perms MODIFY permission ENUM (\'settings\', \'projects.list\', \'projects.list.all\', \'projects.create\', \'projects.manage\', \'users.list\', \'users.view.emails\', \'users.create\', \'users.manage\') NOT NULL');
+    
+    upgrade_config($db, $migration_version = 6);
+  }
 }catch(Exception $e){
   if (isset($db) && $db->inTransaction()){
     $db->rollBack();

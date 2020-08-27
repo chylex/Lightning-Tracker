@@ -65,7 +65,7 @@ class ProjectModel extends BasicRootPageModel{
   public function load(): IModel{
     parent::load();
     
-    if ($this->perms->check(SystemPermissions::LIST_PUBLIC_PROJECTS)){
+    if ($this->perms->check(SystemPermissions::LIST_VISIBLE_PROJECTS)){
       $filter = new ProjectFilter();
       
       if (!$this->perms->check(SystemPermissions::LIST_ALL_PROJECTS)){

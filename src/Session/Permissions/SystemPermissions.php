@@ -6,17 +6,17 @@ namespace Session\Permissions;
 use Session\AbstractPermissionList;
 
 final class SystemPermissions extends AbstractPermissionList{
-  // TODO rename & reconsider permissions when adding system role editing
+  public const MANAGE_SETTINGS = 'settings';
   
-  public const LIST_PUBLIC_PROJECTS = 'trackers.list';
-  public const LIST_ALL_PROJECTS = 'trackers.list.hidden';
-  public const CREATE_PROJECT = 'trackers.add';
-  public const MANAGE_PROJECTS = 'trackers.edit';
+  public const LIST_VISIBLE_PROJECTS = 'projects.list';
+  public const LIST_ALL_PROJECTS = 'projects.list.all';
+  public const CREATE_PROJECT = 'projects.create';
+  public const MANAGE_PROJECTS = 'projects.manage';
   
   public const LIST_USERS = 'users.list';
-  public const LIST_USER_EMAILS = 'users.list.email';
-  public const CREATE_USER = 'users.add';
-  public const MANAGE_USERS = 'users.edit';
+  public const SEE_USER_EMAILS = 'users.see.emails';
+  public const CREATE_USER = 'users.create';
+  public const MANAGE_USERS = 'users.manage';
   
   public static function permitAll(): self{
     return new self(true, []);

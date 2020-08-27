@@ -6,16 +6,13 @@ namespace Pages\Models\Root;
 use Configuration\SystemConfig;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
-use Pages\Models\BasicRootPageModel;
 use Routing\Request;
 use Validation\ValidationException;
 
-class SettingsModel extends BasicRootPageModel{
+class SettingsGeneralModel extends AbstractSettingsModel{
   public const ACTION_SUBMIT = 'Submit';
   public const BUTTON_UPDATE_SETTINGS = 'UpdateSettings';
   public const BUTTON_REMOVE_BACKUP = 'RemoveBackup';
-  
-  public const PERM = 'settings';
   
   private FormComponent $form;
   

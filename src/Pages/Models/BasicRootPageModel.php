@@ -6,7 +6,6 @@ namespace Pages\Models;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
 use Pages\Controllers\Mixed\LoginController;
-use Pages\Models\Root\SettingsModel;
 use Routing\Request;
 use Routing\UrlString;
 use Session\PermissionManager;
@@ -30,7 +29,7 @@ class BasicRootPageModel extends AbstractPageModel{
       $nav->addLeft(Text::withIcon('Users', 'users'), '/users');
     }
     
-    if ($perms->check(SettingsModel::PERM)){
+    if ($perms->check(SystemPermissions::MANAGE_SETTINGS)){
       $nav->addLeft(Text::withIcon('Settings', 'wrench'), '/settings');
     }
     

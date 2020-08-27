@@ -1,52 +1,52 @@
 <?php
 declare(strict_types = 1);
 
-namespace Pages\Models\Project;
+namespace Pages\Models\Root;
 
 use Database\DB;
-use Database\Objects\ProjectInfo;
-use Database\Tables\ProjectPermTable;
+use Database\Tables\SystemPermTable;
 use Database\Validation\RoleFields;
 use Exception;
-use Pages\Components\CompositeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Pages\IModel;
 use Routing\Link;
 use Routing\Request;
-use Session\Permissions\ProjectPermissions;
+use Session\Permissions\SystemPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
 class SettingsRolesModel extends AbstractSettingsModel{
   public const ACTION_CREATE = 'Create';
-  public const ACTION_MOVE = 'Move';
   public const ACTION_DELETE = 'Delete';
   
-  private const ACTION_MOVE_UP = 'Up';
-  private const ACTION_MOVE_DOWN = 'Down';
-  
   public const PERM_NAMES = [
-      ProjectPermissions::MANAGE_SETTINGS         => 'Manage Settings',
-      ProjectPermissions::LIST_MEMBERS            => 'View Members',
-      ProjectPermissions::MANAGE_MEMBERS          => 'Manage Members',
-      ProjectPermissions::MANAGE_MILESTONES       => 'Manage Milestones',
-      ProjectPermissions::CREATE_ISSUE            => 'Create Issues',
-      ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS => 'Modify All Issue Fields',
-      ProjectPermissions::EDIT_ALL_ISSUES         => 'Edit All Issues',
-      ProjectPermissions::DELETE_ALL_ISSUES       => 'Delete All Issues'
+      SystemPermissions::MANAGE_SETTINGS       => 'Manage Settings',
+      SystemPermissions::LIST_VISIBLE_PROJECTS => 'View Public Projects',
+      SystemPermissions::LIST_ALL_PROJECTS     => 'View All Projects',
+      SystemPermissions::CREATE_PROJECT        => 'Create Projects',
+      SystemPermissions::MANAGE_PROJECTS       => 'Manage Projects',
+      SystemPermissions::LIST_USERS            => 'View Users',
+      SystemPermissions::SEE_USER_EMAILS       => 'View User Emails',
+      SystemPermissions::CREATE_USER           => 'Create Users',
+      SystemPermissions::MANAGE_USERS          => 'Manage Users'
   ];
   
   public const PERM_DEPENDENCIES = [
-      ProjectPermissions::MANAGE_MEMBERS => ProjectPermissions::LIST_MEMBERS
+      SystemPermissions::LIST_ALL_PROJECTS => SystemPermissions::LIST_VISIBLE_PROJECTS,
+      SystemPermissions::CREATE_PROJECT    => SystemPermissions::LIST_VISIBLE_PROJECTS,
+      SystemPermissions::MANAGE_PROJECTS   => SystemPermissions::LIST_VISIBLE_PROJECTS,
+      SystemPermissions::SEE_USER_EMAILS   => SystemPermissions::LIST_USERS,
+      SystemPermissions::CREATE_USER       => SystemPermissions::LIST_USERS,
+      SystemPermissions::MANAGE_USERS      => SystemPermissions::LIST_USERS
   ];
   
   private TableComponent $table;
   private FormComponent $form;
   
-  public function __construct(Request $req, ProjectInfo $project){
-    parent::__construct($req, $project);
+  public function __construct(Request $req){
+    parent::__construct($req);
     
     $this->table = new TableComponent();
     $this->table->ifEmpty('No roles found.');
@@ -65,8 +65,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
   public function load(): IModel{
     parent::load();
     
-    $perms = new ProjectPermTable(DB::get(), $this->getProject());
-    $ordering_limit = $perms->findMaxOrdering();
+    $perms = new SystemPermTable(DB::get());
     
     foreach($perms->listRoles() as $role){
       $role_id = $role->getId();
@@ -81,28 +80,11 @@ class SettingsRolesModel extends AbstractSettingsModel{
         $row[] = '';
       }
       else{
-        $form_move = new FormComponent(self::ACTION_MOVE);
-        $form_move->addHidden('Role', $role_id_str);
-        
-        $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
-        $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
-        
-        $ordering = $role->getOrdering();
-        
-        if ($ordering === 0 || $ordering === 1){
-          $btn_move_up->disabled();
-        }
-        
-        if ($ordering === 0 || $ordering === $ordering_limit){
-          $btn_move_down->disabled();
-        }
-        
         $form_delete = new FormComponent(self::ACTION_DELETE);
         $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
         $form_delete->addHidden('Role', $role_id_str);
         $form_delete->addIconButton('submit', 'circle-cross')->color('red');
-        
-        $row[] = new CompositeComponent($form_move, $form_delete);
+        $row[] = $form_delete;
       }
       
       $row = $this->table->addRow($row);
@@ -133,35 +115,13 @@ class SettingsRolesModel extends AbstractSettingsModel{
     
     try{
       $validator->validate();
-      $perms = new ProjectPermTable(DB::get(), $this->getProject());
+      $perms = new SystemPermTable(DB::get());
       $perms->addRole($title, []);
       return true;
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());
     }catch(Exception $e){
       $this->form->onGeneralError($e);
-    }
-    
-    return false;
-  }
-  
-  public function moveRole(array $data): bool{
-    $button = $data[FormComponent::BUTTON_KEY] ?? null;
-    $role = get_int($data, 'Role');
-    
-    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $role === null){
-      return false;
-    }
-    
-    $perms = new ProjectPermTable(DB::get(), $this->getProject());
-    
-    if ($button === self::ACTION_MOVE_UP){
-      $perms->moveRoleUp($role);
-      return true;
-    }
-    elseif ($button === self::ACTION_MOVE_DOWN){
-      $perms->moveRoleDown($role);
-      return true;
     }
     
     return false;
@@ -174,7 +134,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       return false;
     }
     
-    $perms = new ProjectPermTable(DB::get(), $this->getProject());
+    $perms = new SystemPermTable(DB::get());
     $perms->deleteById($role);
     return true;
   }
