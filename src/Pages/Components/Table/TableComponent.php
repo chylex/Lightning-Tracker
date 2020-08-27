@@ -56,7 +56,7 @@ final class TableComponent implements IViewable{
     $this->empty_html = $empty_html;
   }
   
-  public function setupColumnSorting(Sorting $sorting){
+  public function setupColumnSorting(Sorting $sorting): void{
     foreach($this->columns as $column){
       $column->setupSorting($sorting);
     }

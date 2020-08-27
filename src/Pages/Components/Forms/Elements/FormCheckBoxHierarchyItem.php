@@ -7,10 +7,6 @@ final class FormCheckBoxHierarchyItem extends FormCheckBox{
   private ?string $description = null;
   private string $layout_class;
   
-  public function __construct(string $id, string $name){
-    parent::__construct($id, $name);
-  }
-  
   public function description(string $description): FormCheckBoxHierarchyItem{
     $this->description = $description;
     return $this;

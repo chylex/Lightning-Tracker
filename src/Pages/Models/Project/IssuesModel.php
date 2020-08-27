@@ -107,7 +107,7 @@ class IssuesModel extends BasicProjectPageModel{
     $filtering_milestone->addOption('', Text::missing('None'));
     
     foreach((new MilestoneTable(DB::get(), $project))->listMilestones() as $milestone){
-      $filtering_milestone->addOption(strval($milestone->getMilestoneId()), Text::plain($milestone->getTitle()));
+      $filtering_milestone->addOption((string)$milestone->getMilestoneId(), Text::plain($milestone->getTitle()));
     }
     
     // TODO get rid of IDs and allow filtering by manually typing username (either add a field, or just in the URL & add the options if the user cannot see everyone)
@@ -120,15 +120,15 @@ class IssuesModel extends BasicProjectPageModel{
     $filtering_assignee->addOption('', Text::missing('Nobody'));
     
     if ($logon_user_id !== null){
-      $filtering_author->addOption(strval($logon_user_id), Text::missing('You'));
-      $filtering_assignee->addOption(strval($logon_user_id), Text::missing('You'));
+      $filtering_author->addOption((string)$logon_user_id, Text::missing('You'));
+      $filtering_assignee->addOption((string)$logon_user_id, Text::missing('You'));
       
       if ($this->perms->check(ProjectPermissions::LIST_MEMBERS)){
         foreach((new ProjectMemberTable(DB::get(), $project))->listMembers() as $member){
           $user_id = $member->getUserId();
           
           if ($user_id !== $logon_user_id){
-            $user_id_str = strval($user_id);
+            $user_id_str = (string)$user_id;
             $user_name = $member->getUserName();
             
             $filtering_author->addOption($user_id_str, Text::plain($user_name));

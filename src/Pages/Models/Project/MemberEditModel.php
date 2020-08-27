@@ -54,14 +54,14 @@ class MemberEditModel extends BasicProjectPageModel{
       $this->has_member = true;
       $this->member_role = $member_role;
       
-      $this->can_edit = self::canEditMember($logon_user_id, $this->user_id, empty($member_role) ? null : intval($member_role), $project);
+      $this->can_edit = self::canEditMember($logon_user_id, $this->user_id, empty($member_role) ? null : (int)$member_role, $project);
       
       $select_role = $this->form->addSelect('Role')
                                 ->dropdown()
                                 ->addOption('', '(Default)');
       
       foreach((new ProjectPermTable($db, $project))->listRolesAssignableBy($logon_user_id) as $role){
-        $select_role->addOption(strval($role->getId()), $role->getTitle());
+        $select_role->addOption((string)$role->getId(), $role->getTitle());
       }
       
       $select_role->value($member_role);

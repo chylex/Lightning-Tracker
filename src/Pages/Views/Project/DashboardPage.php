@@ -3,17 +3,9 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Project;
 
-use Pages\Models\BasicProjectPageModel;
 use Pages\Views\AbstractProjectPage;
 
 class DashboardPage extends AbstractProjectPage{
-  private BasicProjectPageModel $model;
-  
-  public function __construct(BasicProjectPageModel $model){
-    parent::__construct($model);
-    $this->model = $model;
-  }
-  
   protected function getHeading(): string{
     return 'Dashboard';
   }

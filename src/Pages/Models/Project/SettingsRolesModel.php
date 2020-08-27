@@ -70,7 +70,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
     
     foreach($perms->listRoles() as $role){
       $role_id = $role->getId();
-      $role_id_str = strval($role_id);
+      $role_id_str = (string)$role_id;
       
       $perm_list = implode(', ', array_map(fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
       $perm_list_str = $role->isSpecial() ? '<div class="center-text">-</div>' : (empty($perm_list) ? Text::missing('None') : $perm_list);

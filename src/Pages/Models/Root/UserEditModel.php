@@ -70,7 +70,7 @@ class UserEditModel extends BasicRootPageModel{
                               ->dropdown();
     
     foreach((new SystemPermTable(DB::get()))->listRoles() as $role){
-      $select_role->addOption(strval($role->getId()), $role->getTitle());
+      $select_role->addOption((string)$role->getId(), $role->getTitle());
     }
     
     $this->form->endSplitGroup();
@@ -90,7 +90,7 @@ class UserEditModel extends BasicRootPageModel{
       
       $this->form->fill(['Name'  => $user->getName(),
                          'Email' => $this->perms->check(SystemPermissions::SEE_USER_EMAILS) ? $user->getEmail() : '',
-                         'Role'  => $role_id === null ? '' : strval($role_id)]);
+                         'Role'  => $role_id === null ? '' : (string)$role_id]);
     }
     
     return $this;

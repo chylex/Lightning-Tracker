@@ -51,7 +51,7 @@ HTML;
     $page_2 = min($page_1 + self::PAGES_SHOWN - 1, $total_pages);
     
     for($page = $page_1; $page <= $page_2; $page++){
-      $this->echoPageNumber($page, strval($page));
+      $this->echoPageNumber($page, (string)$page);
     }
     
     $this->echoPageIcon($total_pages, 'forward');

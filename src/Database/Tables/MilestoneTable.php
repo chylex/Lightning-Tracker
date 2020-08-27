@@ -7,16 +7,11 @@ use Database\AbstractProjectTable;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\MilestoneInfo;
-use Database\Objects\ProjectInfo;
 use LogicException;
 use PDO;
 use PDOException;
 
 final class MilestoneTable extends AbstractProjectTable{
-  public function __construct(PDO $db, ProjectInfo $project){
-    parent::__construct($db, $project);
-  }
-  
   public function addMilestone(string $title): void{
     $this->db->beginTransaction();
     

@@ -13,10 +13,6 @@ use Exception;
 use PDO;
 
 final class UserTable extends AbstractTable{
-  public function __construct(PDO $db){
-    parent::__construct($db);
-  }
-  
   /**
    * @param string $name
    * @param string $email

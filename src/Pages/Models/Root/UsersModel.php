@@ -116,7 +116,7 @@ class UsersModel extends BasicRootPageModel{
           $row[] = '';
         }
         else{
-          $link_delete = Link::fromBase($req, 'users', strval($user_id), 'delete');
+          $link_delete = Link::fromBase($req, 'users', (string)$user_id, 'delete');
           $btn_delete = new Html(<<<HTML
 <form action="$link_delete">
   <button type="submit" class="icon">

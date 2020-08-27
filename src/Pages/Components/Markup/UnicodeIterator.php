@@ -24,12 +24,12 @@ final class UnicodeIterator implements Iterator{
     $this->reset();
   }
   
-  public function reset(){
+  public function reset(): void{
     $this->pos = 0;
     $this->last_size = 0;
   }
   
-  public function rewind(){
+  public function rewind(): void{
     // allow multiple foreach loops in parsing
   }
   
@@ -80,7 +80,7 @@ final class UnicodeIterator implements Iterator{
     return $chr;
   }
   
-  public function next(){
+  public function next(): void{
     $this->pos += $this->last_size;
     $this->last_size = 0;
   }

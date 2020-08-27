@@ -6,15 +6,10 @@ namespace Database\Tables;
 use Database\AbstractProjectTable;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Types\ProjectMemberFilter;
-use Database\Objects\ProjectInfo;
 use Database\Objects\ProjectMember;
 use PDO;
 
 final class ProjectMemberTable extends AbstractProjectTable{
-  public function __construct(PDO $db, ProjectInfo $project){
-    parent::__construct($db, $project);
-  }
-  
   public function addMember(int $user_id, ?int $role_id): void{
     $stmt = $this->db->prepare('INSERT INTO project_members (project_id, user_id, role_id) VALUES (?, ?, ?)');
     $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
@@ -69,7 +64,7 @@ SQL;
     return $results;
   }
   
-  public function setRole(int $user_id, ?int $role_id){
+  public function setRole(int $user_id, ?int $role_id): void{
     $stmt = $this->db->prepare('UPDATE project_members SET role_id = ? WHERE user_id = ? AND project_id = ?');
     $stmt->bindValue(1, $role_id, $role_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
     $stmt->bindValue(2, $user_id, PDO::PARAM_INT);
@@ -84,7 +79,7 @@ SQL;
     $stmt->execute();
     
     $res = $this->fetchOneColumn($stmt);
-    return $res === false ? null : ($res === null ? '' : strval((int)$res));
+    return $res === false ? null : ($res === null ? '' : (string)(int)$res);
   }
   
   public function checkMembershipExists(int $user_id): bool{

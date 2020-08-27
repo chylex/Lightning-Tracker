@@ -85,9 +85,7 @@ abstract class AbstractFilter{
       
       $sql = str_replace("\r", '', $sql);
       
-      foreach($clauses as $comment => $data){
-        $name = $data[0];
-        $contents = $data[1];
+      foreach($clauses as $comment => [$name, $contents]){
         $replacement = empty($contents) ? '' : $name.' '.$contents;
         
         $count = 0;
@@ -146,11 +144,7 @@ abstract class AbstractFilter{
     $cols = [];
     $rules = $this->sorting === null || $this->sorting->isEmpty() ? $this->getDefaultSortingRuleList() : $this->sorting->getRuleList();
     
-    foreach($rules as $item){
-      /** @var Field $field */
-      $field = $item[0];
-      $direction = $item[1];
-      
+    foreach($rules as [/** @var Field $field */ $field, $direction]){
       if (!$direction){
         continue;
       }

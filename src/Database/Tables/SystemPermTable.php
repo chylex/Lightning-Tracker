@@ -15,10 +15,6 @@ final class SystemPermTable extends AbstractTable{
   private const GUEST_PERMS = [SystemPermissions::LIST_VISIBLE_PROJECTS];
   private const LOGON_PERMS = [SystemPermissions::LIST_VISIBLE_PROJECTS];
   
-  public function __construct(PDO $db){
-    parent::__construct($db);
-  }
-  
   /**
    * @param string $title
    * @param array $perms
@@ -87,12 +83,12 @@ final class SystemPermTable extends AbstractTable{
     $values = implode(',', array_map(fn($ignore): string => '(?, ?)', $perms));
     
     $stmt = $this->db->prepare(str_replace('()', $values, $sql));
-    
-    for($i = 0, $count = count($perms); $i < $count; $i++){
+  
+    foreach($perms as $i => $perm){
       $stmt->bindValue(($i * 2) + 1, $id, PDO::PARAM_INT);
-      $stmt->bindValue(($i * 2) + 2, $perms[$i]);
+      $stmt->bindValue(($i * 2) + 2, $perm);
     }
-    
+  
     $stmt->execute();
   }
   
@@ -100,8 +96,7 @@ final class SystemPermTable extends AbstractTable{
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->db->prepare('SELECT id, title, special FROM system_roles ORDER BY special DESC, id ASC');
-    $stmt->execute();
+    $stmt = $this->db->query('SELECT id, title, special FROM system_roles ORDER BY special DESC, id ASC');
     
     $results = [];
     

@@ -22,7 +22,7 @@ header_remove('x-powered-by');
 // Bootstrap
 
 spl_autoload_extensions('.php');
-spl_autoload_register(function($class){
+spl_autoload_register(static function($class){
   // default autoload implementation is garbage because
   // it converts paths to lowercase and breaks on linux
   /** @noinspection PhpIncludeInspection */
@@ -82,7 +82,7 @@ if (!empty($_POST) && isset($_SERVER['HTTP_ORIGIN'])){
 
 require_once 'Pages/Actions/actions.php';
 
-$route = isset($_GET['route']) ? $_GET['route'] : '';
+$route = $_GET['route'] ?? '';
 unset($_GET['route']);
 
 $router = new Router();

@@ -25,8 +25,8 @@ class AccountAppearanceModel extends AccountModel{
     $form->addHTML('<p>These settings are saved in this browser, they will not be synchronized across all of your devices.</p>');
     $form->setMessagePlacementHere();
     
-    $form->addNumberField('TablePaginationElements', 5, 50)
-         ->value(strval((int)($_COOKIE[Pagination::COOKIE_ELEMENTS] ?? Pagination::DEFAULT_ELEMENTS_PER_PAGE)))
+    $form->addNumberField('TablePaginationElements', Pagination::MIN_ELEMENTS_PER_PAGE, 50)
+         ->value((string)(int)($_COOKIE[Pagination::COOKIE_ELEMENTS] ?? Pagination::DEFAULT_ELEMENTS_PER_PAGE))
          ->label('Table Pagination - Elements Per Page');
     
     $form->addButton('submit', 'Update Appearance')

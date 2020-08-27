@@ -7,7 +7,7 @@ abstract class AbstractFormField implements IFormField{
   private string $name;
   private array $errors = [];
   
-  protected string $value = "";
+  protected string $value = '';
   protected bool $disabled = false;
   
   public function __construct(string $name){

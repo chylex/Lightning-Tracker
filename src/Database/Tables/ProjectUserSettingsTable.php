@@ -5,15 +5,10 @@ namespace Database\Tables;
 
 use Database\AbstractProjectTable;
 use Database\Objects\MilestoneProgress;
-use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
 use PDO;
 
 final class ProjectUserSettingsTable extends AbstractProjectTable{
-  public function __construct(PDO $db, ProjectInfo $project){
-    parent::__construct($db, $project);
-  }
-  
   public function toggleActiveMilestone(UserProfile $user, int $milestone_id): void{
     $stmt = $this->db->prepare(<<<SQL
 INSERT INTO project_user_settings (project_id, user_id, active_milestone)

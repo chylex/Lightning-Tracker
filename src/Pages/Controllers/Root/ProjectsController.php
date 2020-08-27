@@ -12,6 +12,7 @@ use Pages\Views\Root\ProjectsPage;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
 use Session\Session;
+use function Pages\Actions\error;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
 
@@ -24,12 +25,18 @@ class ProjectsController extends AbstractHandlerController{
     $perms = $sess->getPermissions()->system();
     $model = new ProjectModel($req, $perms);
     
-    if ($req->getAction() === $model::ACTION_CREATE &&
-        $perms->require(SystemPermissions::LIST_VISIBLE_PROJECTS) &&
-        $perms->require(SystemPermissions::CREATE_PROJECT) &&
-        $model->createProject($req->getData(), $sess->getLogonUser())
-    ){
-      return reload();
+    if ($req->getAction() === $model::ACTION_CREATE){
+      $perms->require(SystemPermissions::LIST_VISIBLE_PROJECTS);
+      $perms->require(SystemPermissions::CREATE_PROJECT);
+      
+      $logon_user = $sess->getLogonUser();
+      
+      if ($logon_user === null || !$perms->require(SystemPermissions::LIST_VISIBLE_PROJECTS) || !$perms->require(SystemPermissions::CREATE_PROJECT)){
+        return error($req, 'Permission Error', 'You do not have permission to create a project.');
+      }
+      else{
+        return reload();
+      }
     }
     
     return view(new ProjectsPage($model->load()));

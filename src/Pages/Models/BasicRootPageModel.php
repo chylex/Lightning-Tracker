@@ -6,16 +6,11 @@ namespace Pages\Models;
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\Components\Text;
 use Pages\Controllers\Mixed\LoginController;
-use Routing\Request;
 use Routing\UrlString;
 use Session\PermissionManager;
 use Session\Permissions\SystemPermissions;
 
 class BasicRootPageModel extends AbstractPageModel{
-  public function __construct(Request $req){
-    parent::__construct($req);
-  }
-  
   protected function createNavigation(): NavigationComponent{
     return new NavigationComponent('Lightning Tracker', BASE_URL_ENC, new UrlString(''), $this->getReq()->getRelativePath());
   }

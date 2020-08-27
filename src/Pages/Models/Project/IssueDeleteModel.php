@@ -57,7 +57,7 @@ class IssueDeleteModel extends BasicProjectPageModel{
     
     $confirmation = $data['Id'] ?? null;
     
-    if ($confirmation !== strval($this->issue_id)){
+    if ($confirmation !== (string)$this->issue_id){
       $this->form->invalidateField('Id', 'Incorrect issue ID.');
       return false;
     }

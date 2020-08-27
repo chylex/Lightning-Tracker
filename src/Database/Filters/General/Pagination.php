@@ -8,6 +8,7 @@ final class Pagination{
   public const COOKIE_ELEMENTS = 'pagination_elements';
   
   public const DEFAULT_ELEMENTS_PER_PAGE = 15;
+  public const MIN_ELEMENTS_PER_PAGE = 5;
   
   public static function empty(): self{
     return new self(1, 0, 1);
@@ -17,7 +18,7 @@ final class Pagination{
     $current_page = (int)($_GET[self::GET_PAGE] ?? 1);
     $elements_per_page = (int)($_COOKIE[self::COOKIE_ELEMENTS] ?? self::DEFAULT_ELEMENTS_PER_PAGE);
     
-    return new self($current_page, $total_elements, $elements_per_page);
+    return new self($current_page, $total_elements, max($elements_per_page, self::MIN_ELEMENTS_PER_PAGE));
   }
   
   private int $current_page;
@@ -26,7 +27,7 @@ final class Pagination{
   private int $total_elements;
   private int $elements_per_page;
   
-  public function __construct(int $current_page, int $total_elements, int $elements_per_page){
+  private function __construct(int $current_page, int $total_elements, int $elements_per_page){
     $this->total_pages = (int)ceil((float)$total_elements / $elements_per_page);
     $this->current_page = max(1, min($this->total_pages, $current_page));
     

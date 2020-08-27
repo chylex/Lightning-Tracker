@@ -102,12 +102,12 @@ class IssueEditModel extends BasicProjectPageModel{
       $select_assignee = $this->form->addSelect('Assignee')->addOption('', '(None)')->dropdown();
       
       foreach((new MilestoneTable(DB::get(), $project))->listMilestones() as $milestone){
-        $select_milestone->addOption(strval($milestone->getMilestoneId()), $milestone->getTitle());
+        $select_milestone->addOption((string)$milestone->getMilestoneId(), $milestone->getTitle());
       }
       
       if ($perms->check(ProjectPermissions::LIST_MEMBERS)){
         foreach((new ProjectMemberTable(DB::get(), $project))->listMembers() as $member){
-          $select_assignee->addOption(strval($member->getUserId()), $member->getUserName());
+          $select_assignee->addOption((string)$member->getUserId(), $member->getUserName());
         }
       }
       else{
@@ -116,7 +116,7 @@ class IssueEditModel extends BasicProjectPageModel{
         $assignee = $this->issue === null ? null : $this->issue->getAssignee();
         
         if ($assignee !== null){
-          $select_assignee->addOption(strval($assignee->getId()), $assignee->getName());
+          $select_assignee->addOption((string)$assignee->getId(), $assignee->getName());
         }
       }
       
@@ -143,7 +143,7 @@ class IssueEditModel extends BasicProjectPageModel{
     }
     
     $this->form->endTitledSection();
-    $this->form->addHTML("</div></div>");
+    $this->form->addHTML('</div></div>');
     
     $this->form->startTitledSection('Confirm');
     $this->form->setMessagePlacementHere();
@@ -171,9 +171,9 @@ class IssueEditModel extends BasicProjectPageModel{
                            'Priority'    => $issue->getPriority()->getId(),
                            'Scale'       => $issue->getScale()->getId(),
                            'Status'      => $issue->getStatus()->getId(),
-                           'Progress'    => strval($issue->getProgress()),
-                           'Milestone'   => $milestone === null ? '' : strval($milestone),
-                           'Assignee'    => $assignee === null ? '' : strval($assignee->getId())]);
+                           'Progress'    => (string)$issue->getProgress(),
+                           'Milestone'   => $milestone === null ? '' : (string)$milestone,
+                           'Assignee'    => $assignee === null ? '' : (string)$assignee->getId()]);
       }
     }
     
@@ -237,7 +237,7 @@ class IssueEditModel extends BasicProjectPageModel{
         $real_assignee = $this->issue === null ? null : $this->issue->getAssignee();
         
         $this->form->invalidateField('Assignee', 'Assignee must be a member of the project.');
-        $this->form->fill(['Assignee' => $real_assignee === null ? '' : strval($real_assignee->getId())]);
+        $this->form->fill(['Assignee' => $real_assignee === null ? '' : (string)$real_assignee->getId()]);
         return null;
       }
       

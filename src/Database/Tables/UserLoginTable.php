@@ -8,10 +8,6 @@ use Database\Objects\UserProfile;
 use PDO;
 
 final class UserLoginTable extends AbstractTable{
-  public function __construct(PDO $db){
-    parent::__construct($db);
-  }
-  
   // TODO periodically delete expired tokens
   
   public function checkLogin(string $token): ?UserProfile{

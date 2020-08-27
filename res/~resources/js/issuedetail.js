@@ -37,6 +37,11 @@ document.addEventListener("DOMContentLoaded", function(){
                 
                 if (response.ok){
                     response.json().then(data => {
+                        if (data.length === 0){
+                            alert("Error updating issue status.");
+                            return;
+                        }
+                        
                         const label = document.querySelector("label[for='" + task.id + "']");
                         const text = label.textContent.trim();
                         label.innerHTML = task.checked ? "<del>" + text + "</del>" : text;

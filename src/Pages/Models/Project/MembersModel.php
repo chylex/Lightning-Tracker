@@ -68,7 +68,7 @@ class MembersModel extends BasicProjectPageModel{
         $this->editable_roles[] = '';
         
         foreach((new ProjectPermTable(DB::get(), $project))->listRolesAssignableBy($logon_user_id) as $role){
-          $role_id_str = strval($role->getId());
+          $role_id_str = (string)$role->getId();
           $select_role->addOption($role_id_str, $role->getTitle());
           $this->editable_roles[] = $role_id_str;
         }
@@ -106,13 +106,13 @@ class MembersModel extends BasicProjectPageModel{
               $member->getRoleTitleSafe() ?? Text::missing('Default')];
       
       $user_id = $member->getUserId();
-      $can_edit = $user_id !== $logon_user_id && $user_id !== $owner_id && in_array(strval($member->getRoleId() ?? ''), $this->editable_roles, true);
+      $can_edit = $user_id !== $logon_user_id && $user_id !== $owner_id && in_array((string)($member->getRoleId() ?? ''), $this->editable_roles, true);
       
       if ($this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
         if ($can_edit){
           $form = new FormComponent(self::ACTION_REMOVE);
           $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
-          $form->addHidden('User', strval($user_id));
+          $form->addHidden('User', (string)$user_id);
           $form->addIconButton('submit', 'circle-cross')->color('red');
           $row[] = $form;
         }
@@ -123,7 +123,7 @@ class MembersModel extends BasicProjectPageModel{
       
       $row = $this->table->addRow($row);
       
-      if ($this->perms->check(ProjectPermissions::MANAGE_MEMBERS) && $can_edit){
+      if ($can_edit && $this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
         $row->link(Link::fromBase($this->getReq(), 'members', $name_safe));
       }
     }
@@ -233,7 +233,7 @@ class MembersModel extends BasicProjectPageModel{
     $members = new ProjectMemberTable($db, $project);
     $role = $members->getRoleIdStr($user);
     
-    if (!MemberEditModel::canEditMember(Session::get()->getLogonUserIdOrThrow(), $user, empty($role) ? null : intval($role), $project)){
+    if (!MemberEditModel::canEditMember(Session::get()->getLogonUserIdOrThrow(), $user, empty($role) ? null : (int)$role, $project)){
       return false;
     }
     

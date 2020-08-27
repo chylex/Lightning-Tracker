@@ -7,6 +7,7 @@ use Exception;
 
 final class Log{
   public static function critical(Exception $e): void{
+    /** @noinspection ForgottenDebugOutputInspection */
     error_log($e->getMessage());
   }
 }

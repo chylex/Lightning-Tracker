@@ -46,7 +46,7 @@ class MilestoneDeleteModel extends BasicProjectPageModel{
         $this->milestone_issue_count = $issues->countIssues($filter) ?? 0;
       }
       else{
-        $select_milestone->addOption(strval($id), $milestone->getTitle());
+        $select_milestone->addOption((string)$id, $milestone->getTitle());
       }
     }
     

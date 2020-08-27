@@ -38,7 +38,7 @@ final class Link{
   }
   
   private static function process(array $parts): string{
-    return implode('/', array_filter(array_map(fn($part): string => trim(strval($part), '/'), $parts), fn($part): bool => !empty($part)));
+    return implode('/', array_filter(array_map(fn($part): string => trim((string)$part, '/'), $parts), fn($part): bool => !empty($part)));
   }
 }
 

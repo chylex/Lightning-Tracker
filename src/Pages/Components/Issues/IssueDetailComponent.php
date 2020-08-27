@@ -21,6 +21,10 @@ final class IssueDetailComponent implements IViewable{
   public function echoBody(): void{
     $issue = $this->model->getIssue();
     
+    if ($issue === null){
+      return;
+    }
+    
     echo <<<HTML
 <form action="" method="post">
   <h3>Details</h3>

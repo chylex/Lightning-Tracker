@@ -9,7 +9,6 @@ use Database\Filters\Types\IssueFilter;
 use Database\Objects\IssueDetail;
 use Database\Objects\IssueInfo;
 use Database\Objects\IssueUser;
-use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
 use LogicException;
 use Pages\Components\Issues\IssuePriority;
@@ -20,10 +19,6 @@ use PDO;
 use PDOException;
 
 final class IssueTable extends AbstractProjectTable{
-  public function __construct(PDO $db, ProjectInfo $project){
-    parent::__construct($db, $project);
-  }
-  
   public function addIssue(UserProfile $author,
                            string $title,
                            string $description,

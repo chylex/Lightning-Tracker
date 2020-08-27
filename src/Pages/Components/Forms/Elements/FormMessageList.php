@@ -22,9 +22,7 @@ final class FormMessageList implements IViewable{
   }
   
   public function echoBody(): void{
-    foreach($this->messages as $message){
-      $level = $message[0];
-      $text = $message[1];
+    foreach($this->messages as [$level, $text]){
       echo '<p class="message '.$level.'">'.$text.'</p>';
     }
   }

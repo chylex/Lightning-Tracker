@@ -85,7 +85,7 @@ class MilestonesModel extends BasicProjectPageModel{
     
     foreach($milestones->listMilestones($filter) as $milestone){
       $milestone_id = $milestone->getMilestoneId();
-      $milestone_id_str = strval($milestone_id);
+      $milestone_id_str = (string)$milestone_id;
       $update_date = $milestone->getLastUpdateDate();
       
       $form_toggle_active = new FormComponent(self::ACTION_TOGGLE_ACTIVE);

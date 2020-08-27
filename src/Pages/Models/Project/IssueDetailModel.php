@@ -134,10 +134,10 @@ class IssueDetailModel extends BasicProjectPageModel{
     $issues = new IssueTable(DB::get(), $this->getProject());
     $description = $issues->getIssueDescription($this->issue_id);
     
-    $checked_indices = array_map(fn($i): int => intval($i), $data[self::CHECKBOX_NAME] ?? []);
+    $checked_indices = array_map(fn($i): int => (int)$i, $data[self::CHECKBOX_NAME] ?? []);
     $index = 0;
     
-    $description = preg_replace_callback(IssueEditModel::TASK_REGEX, function(array $matches) use ($checked_indices, &$index): string{
+    $description = preg_replace_callback(IssueEditModel::TASK_REGEX, static function(array $matches) use ($checked_indices, &$index): string{
       return in_array(++$index, $checked_indices, true) ? '['.IssueEditModel::TASK_CHECKED_CHARS[0].']' : '[ ]';
     }, $description);
     
@@ -149,6 +149,11 @@ class IssueDetailModel extends BasicProjectPageModel{
   public function getProgressUpdate(): array{
     $issues = new IssueTable(DB::get(), $this->getProject());
     $issue = $issues->getIssueDetail($this->issue_id);
+    
+    if ($issue === null){
+      return [];
+    }
+    
     $status = $issue->getStatus();
     
     $active_milestone = $this->getActiveMilestone();

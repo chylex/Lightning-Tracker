@@ -35,7 +35,8 @@ final class Sorting{
     if (empty($rule_str)){
       return new Sorting($req, $associative_fields, $rules);
     }
-    
+  
+    /** @var string $rule */
     foreach(explode(self::RULE_SEPARATOR, $rule_str) as $rule){
       if (empty($rule)){
         continue;
@@ -117,8 +118,8 @@ final class Sorting{
     
     $new_rules_str = [];
     
-    foreach($new_rules as $column => $direction){
-      $new_rules_str[] = ($direction === self::SQL_DESC ? self::REVERSE_DIRECTION_CHAR : '').$column;
+    foreach($new_rules as $col => $direction){
+      $new_rules_str[] = ($direction === self::SQL_DESC ? self::REVERSE_DIRECTION_CHAR : '').$col;
     }
     
     return Link::withGet($this->req, self::GET_SORT, empty($new_rules_str) ? null : implode(self::RULE_SEPARATOR, $new_rules_str));

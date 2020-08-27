@@ -8,6 +8,10 @@ abstract class AbstractPermissionList{
   public abstract static function permitList(array $perms): self;
   
   private bool $override;
+  
+  /**
+   * @var string[]
+   */
   private array $perms;
   
   protected function __construct(bool $override, array $perms){
@@ -18,7 +22,7 @@ abstract class AbstractPermissionList{
   protected abstract function getType(): string;
   
   public final function check(string $permission): bool{
-    return $this->override || in_array($permission, $this->perms);
+    return $this->override || in_array($permission, $this->perms, true);
   }
   
   public final function require(string $permission): bool{

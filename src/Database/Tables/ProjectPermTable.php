@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Database\Tables;
 
 use Database\AbstractProjectTable;
-use Database\Objects\ProjectInfo;
 use Database\Objects\RoleInfo;
 use Database\Objects\UserProfile;
 use Exception;
@@ -13,10 +12,6 @@ use PDO;
 use PDOException;
 
 final class ProjectPermTable extends AbstractProjectTable{
-  public function __construct(PDO $db, ProjectInfo $project){
-    parent::__construct($db, $project);
-  }
-  
   /**
    * @param string $title
    * @param array $perms
@@ -118,13 +113,13 @@ SQL
     $values = implode(',', array_map(fn($ignore): string => '(?, ?, ?)', $perms));
     
     $stmt = $this->db->prepare(str_replace('()', $values, $sql));
-    
-    for($i = 0, $count = count($perms); $i < $count; $i++){
+  
+    foreach($perms as $i => $perm){
       $stmt->bindValue(($i * 3) + 1, $project, PDO::PARAM_INT);
       $stmt->bindValue(($i * 3) + 2, $id, PDO::PARAM_INT);
-      $stmt->bindValue(($i * 3) + 3, $perms[$i]);
+      $stmt->bindValue(($i * 3) + 3, $perm);
     }
-    
+  
     $stmt->execute();
   }
   

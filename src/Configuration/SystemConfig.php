@@ -12,7 +12,7 @@ final class SystemConfig{
   }
   
   public static function fromForm(array $data): SystemConfig{
-    return new SystemConfig(boolval($data['SysEnableRegistration'] ?? false),
+    return new SystemConfig((bool)($data['SysEnableRegistration'] ?? false),
                             rtrim($data['BaseUrl'], '/'),
                             $data['DbName'],
                             $data['DbHost'],

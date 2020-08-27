@@ -104,7 +104,7 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     try{
       $db = DB::get();
     }catch(PDOException $e){
-      $code = strval($e->getCode());
+      $code = (string)$e->getCode();
       
       if ($code === '2002'){
         $errors[] = 'Database error - server did not respond.';
@@ -217,16 +217,16 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     try{
       if ($conflict_action === $conflict_resolution_delete){
         foreach(array_reverse($tables, true) as $file => $table){
-          $db->query('DROP TABLE '.$table);
+          $db->exec('DROP TABLE '.$table);
         }
       }
       
       foreach($tables as $file => $table){
-        $db->query(read_sql_file($file.'Table.sql'));
+        $db->exec(read_sql_file($file.'Table.sql'));
       }
       
       foreach($values as $file){
-        $db->query(read_sql_file($file.'Values.sql'));
+        $db->exec(read_sql_file($file.'Values.sql'));
       }
     }catch(PDOException $e){
       $errors[] = 'Error setting up database: '.$e->getMessage();

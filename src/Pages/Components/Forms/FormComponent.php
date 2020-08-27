@@ -78,7 +78,7 @@ final class FormComponent implements IViewable{
   }
   
   public function setMessagePlacementHere(): void{
-    $key = array_search($this->message_list, $this->elements);
+    $key = array_search($this->message_list, $this->elements, true);
     
     if ($key !== false){
       unset($this->elements[$key]);
@@ -271,7 +271,7 @@ final class FormComponent implements IViewable{
   
   public function onGeneralError(Exception $e): void{
     Log::critical($e);
-    $this->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('An error occurred while processing your request.'));
+    $this->addMessage(self::MESSAGE_ERROR, Text::blocked('An error occurred while processing your request.'));
   }
   
   public function echoBody(): void{
