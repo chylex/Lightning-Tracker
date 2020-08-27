@@ -42,10 +42,17 @@ HTML
     );
     
     $this->form->startTitledSection('Database');
+    
     $this->form->addTextField('DbName')->label('Name')->value(DB_NAME);
     $this->form->addTextField('DbHost')->label('Host')->value(DB_HOST);
     $this->form->addTextField('DbUser')->label('User')->value(DB_USER);
-    $this->form->addTextField('DbPassword')->label('Password')->type('password')->autocomplete('new-password')->value(DB_PASSWORD);
+    
+    $this->form->addTextField('DbPassword')
+               ->label('Password')
+               ->type('password')
+               ->autocomplete('new-password')
+               ->placeholder('Leave blank to keep current password.');
+    
     $this->form->endTitledSection();
     
     $this->form->addHTML(<<<HTML
@@ -93,6 +100,10 @@ HTML;
   public function updateConfig(array $data): bool{
     if (!$this->form->accept($data)){
       return false;
+    }
+    
+    if (empty($data['DbPassword'])){
+      $data['DbPassword'] = DB_PASSWORD;
     }
     
     $config = SystemConfig::fromForm($data);

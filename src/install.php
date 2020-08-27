@@ -68,6 +68,10 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     }
   }
   
+  if (empty($value_db_password)){
+    $errors[] = 'Database password must not be empty.';
+  }
+  
   if (empty($value_admin_name)){
     $errors[] = 'Administrator account name must not be empty.';
   }
