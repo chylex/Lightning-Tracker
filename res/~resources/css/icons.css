@@ -72,17 +72,17 @@ span.icon {
 .icon-cog:before {
   content: "\e994";
 }
+.icon-hammer:before {
+  content: "\e996";
+}
 .icon-wand:before {
   content: "\e997";
 }
 .icon-bug:before {
   content: "\e999";
 }
-.icon-stats-dots:before {
+.icon-chart:before {
   content: "\e99b";
-}
-.icon-leaf:before {
-  content: "\e9a4";
 }
 .icon-gavel:before {
   content: "\e9a8";
@@ -107,6 +107,9 @@ span.icon {
 }
 .icon-eye:before {
   content: "\e9ce";
+}
+.icon-notification:before {
+  content: "\ea08";
 }
 .icon-info:before {
   content: "\ea0c";

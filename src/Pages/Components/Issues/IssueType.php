@@ -17,7 +17,7 @@ final class IssueType implements IIssueTag{
   private static self $unknown;
   
   public static function init(): void{
-    $types = [new IssueType(self::FEATURE, 'Feature', 'leaf'),
+    $types = [new IssueType(self::FEATURE, 'Feature', 'hammer'),
               new IssueType(self::ENHANCEMENT, 'Enhancement', 'wand'),
               new IssueType(self::BUG, 'Bug', 'bug'),
               new IssueType(self::CRASH, 'Crash', 'fire'),

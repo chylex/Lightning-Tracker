@@ -37,8 +37,8 @@ class BasicProjectPageModel extends AbstractPageModel{
   }
   
   protected function setupNavigation(NavigationComponent $nav, PermissionManager $perms): void{
-    $nav->addLeft(Text::withIcon('Dashboard', 'stats-dots'), '');
-    $nav->addLeft(Text::withIcon('Issues', 'info'), '/issues');
+    $nav->addLeft(Text::withIcon('Dashboard', 'chart'), '');
+    $nav->addLeft(Text::withIcon('Issues', 'notification'), '/issues');
     $nav->addLeft(Text::withIcon('Milestones', 'calendar'), '/milestones');
     
     $perms = $perms->project($this->project);

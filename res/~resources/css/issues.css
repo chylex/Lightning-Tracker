@@ -70,8 +70,8 @@ option.issue-tag:before {
 }
 
 .issue-id {
-  font-size: 0.9em;
-  letter-spacing: 0.5px;
+  font-size: 14px;
+  letter-spacing: 0.03em;
 }
 
 .issue-details {

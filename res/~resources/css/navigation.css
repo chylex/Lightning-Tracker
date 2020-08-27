@@ -74,12 +74,12 @@
 }
 
 #navigation .item .icon {
-  margin-right: 4px;
-  font-size: 1.3em;
-  line-height: 0.75em;
-  vertical-align: -20%;
+  margin-right: 5px;
+  font-size: 23px;
+  line-height: 17px;
+  vertical-align: -22.5%;
 }
 
 #navigation .item .icon.icon-enter {
-  vertical-align: -25%;
+  vertical-align: -27.5%;
 }
