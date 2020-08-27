@@ -13,7 +13,7 @@ use Exception;
 use Pages\Components\CompositeComponent;
 use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
-use Pages\Components\Html;
+use Pages\Components\Forms\IconButtonFormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\IModel;
@@ -116,14 +116,8 @@ class MilestonesModel extends BasicProjectPageModel{
         }
         
         $link_delete = Link::fromBase($req, 'milestones', $milestone_id_str, 'delete');
-        $btn_delete = new Html(<<<HTML
-<form action="$link_delete">
-  <button type="submit" class="icon">
-    <span class="icon icon-circle-cross icon-color-red"></span>
-  </button>
-</form>
-HTML
-        );
+        $btn_delete = new IconButtonFormComponent($link_delete, 'circle-cross');
+        $btn_delete->color('red');
         
         $row[] = new CompositeComponent($form_move, $btn_delete);
       }
