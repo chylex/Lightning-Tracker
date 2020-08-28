@@ -37,7 +37,7 @@ class MemberEditController extends AbstractProjectController{
       return error($req, 'Permission Error', 'You are not allowed to edit this member.', $project);
     }
     
-    if ($req->getAction() === $model::ACTION_EDIT && $model->editMember($req->getData())){
+    if ($req->getAction() === $model::ACTION_CONFIRM && $model->editMember($req->getData())){
       return redirect(Link::fromBase($req, 'members'));
     }
     

@@ -16,7 +16,7 @@ use Validation\FormValidator;
 use Validation\ValidationException;
 
 class MemberEditModel extends BasicProjectPageModel{
-  public const ACTION_EDIT = 'Edit';
+  public const ACTION_CONFIRM = 'Confirm';
   
   public static function canEditMember(int $editor_id, int $target_id, ?int $target_role, ProjectInfo $project): bool{
     return (
@@ -40,7 +40,7 @@ class MemberEditModel extends BasicProjectPageModel{
     $this->member_name = $member_name;
     $this->logon_user_id = $logon_user_id;
     
-    $this->form = new FormComponent(self::ACTION_EDIT);
+    $this->form = new FormComponent(self::ACTION_CONFIRM);
     
     $db = DB::get();
     

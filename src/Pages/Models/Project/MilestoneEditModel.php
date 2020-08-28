@@ -16,7 +16,7 @@ use Validation\FormValidator;
 use Validation\ValidationException;
 
 class MilestoneEditModel extends BasicProjectPageModel{
-  public const ACTION_EDIT = 'Edit';
+  public const ACTION_CONFIRM = 'Confirm';
   
   private int $milestone_id;
   private ?string $milestone_title;
@@ -27,7 +27,7 @@ class MilestoneEditModel extends BasicProjectPageModel{
     parent::__construct($req, $project);
     $this->milestone_id = $milestone_id;
     
-    $this->form = new FormComponent(self::ACTION_EDIT);
+    $this->form = new FormComponent(self::ACTION_CONFIRM);
     $this->form->addTextField('Title')->type('text');
     $this->form->addButton('submit', 'Edit Milestone')->icon('pencil');
   }

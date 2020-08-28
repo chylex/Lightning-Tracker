@@ -31,7 +31,7 @@ class MilestoneEditController extends AbstractProjectController{
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
     $model = new MilestoneEditModel($req, $project, $this->milestone_id);
     
-    if ($req->getAction() === $model::ACTION_EDIT && $model->editMilestone($req->getData())){
+    if ($req->getAction() === $model::ACTION_CONFIRM && $model->editMilestone($req->getData())){
       return redirect(Link::fromBase($req, 'milestones'));
     }
     
