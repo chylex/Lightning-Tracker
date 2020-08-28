@@ -30,7 +30,7 @@ class MemberEditModel extends BasicProjectPageModel{
   private string $member_name;
   private string $member_role;
   private ?int $user_id;
-  private bool $can_edit;
+  private bool $can_edit = false;
   private bool $has_member = false;
   
   private FormComponent $form;
@@ -47,8 +47,12 @@ class MemberEditModel extends BasicProjectPageModel{
     $users = new UserTable($db);
     $this->user_id = $users->findIdByName($member_name);
     
-    $members = new ProjectMemberTable($db, $project);
-    $member_role = $members->getRoleIdStr($this->user_id);
+    if ($this->user_id === null){
+      $member_role = null;
+    }
+    else{
+      $member_role = (new ProjectMemberTable($db, $project))->getRoleIdStr($this->user_id);
+    }
     
     if ($member_role !== null){
       $this->has_member = true;

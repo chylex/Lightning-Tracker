@@ -33,12 +33,14 @@ class MemberEditController extends AbstractProjectController{
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
     $model = new MemberEditModel($req, $project, $this->member_name, $sess->getLogonUserIdOrThrow());
     
-    if (!$model->canEdit()){
-      return error($req, 'Permission Error', 'You are not allowed to edit this member.', $project);
-    }
-    
-    if ($req->getAction() === $model::ACTION_CONFIRM && $model->editMember($req->getData())){
-      return redirect(Link::fromBase($req, 'members'));
+    if ($model->hasMember()){
+      if (!$model->canEdit()){
+        return error($req, 'Permission Error', 'You are not allowed to edit this member.', $project);
+      }
+      
+      if ($req->getAction() === $model::ACTION_CONFIRM && $model->editMember($req->getData())){
+        return redirect(Link::fromBase($req, 'members'));
+      }
     }
     
     return view(new MemberEditPage($model->load()));
