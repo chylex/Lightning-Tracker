@@ -105,19 +105,24 @@ class IssueEditModel extends BasicProjectPageModel{
         $select_milestone->addOption((string)$milestone->getMilestoneId(), $milestone->getTitle());
       }
       
+      $issue_assignee = $this->issue === null ? null : $this->issue->getAssignee();
+      $issue_assignee_id = $issue_assignee === null ? null : $issue_assignee->getId();
+      
+      if ($issue_assignee !== null){
+        $select_assignee->addOption((string)$issue_assignee_id, $issue_assignee->getName());
+      }
+      
       if ($perms->check(ProjectPermissions::LIST_MEMBERS)){
         foreach((new ProjectMemberTable(DB::get(), $project))->listMembers() as $member){
-          $select_assignee->addOption((string)$member->getUserId(), $member->getUserName());
+          $id = $member->getUserId();
+          
+          if ($id !== $issue_assignee_id){
+            $select_assignee->addOption((string)$id, $member->getUserName());
+          }
         }
       }
       else{
         $select_assignee->disable();
-        
-        $assignee = $this->issue === null ? null : $this->issue->getAssignee();
-        
-        if ($assignee !== null){
-          $select_assignee->addOption((string)$assignee->getId(), $assignee->getName());
-        }
       }
       
       $this->form->endTitledSection();
@@ -160,24 +165,33 @@ class IssueEditModel extends BasicProjectPageModel{
                            'Scale'    => IssueScale::MEDIUM,
                            'Status'   => IssueStatus::OPEN]);
       }
-      elseif ($this->issue !== null){
-        $issue = $this->issue;
-        $milestone = $issue->getMilestoneId();
-        $assignee = $issue->getAssignee();
-        
-        $this->form->fill(['Title'       => $issue->getTitle(),
-                           'Description' => $issue->getDescription()->getRawText(),
-                           'Type'        => $issue->getType()->getId(),
-                           'Priority'    => $issue->getPriority()->getId(),
-                           'Scale'       => $issue->getScale()->getId(),
-                           'Status'      => $issue->getStatus()->getId(),
-                           'Progress'    => (string)$issue->getProgress(),
-                           'Milestone'   => $milestone === null ? '' : (string)$milestone,
-                           'Assignee'    => $assignee === null ? '' : (string)$assignee->getId()]);
+      else{
+        $this->fillFormWithCurrentIssue();
       }
     }
     
     return $this;
+  }
+  
+  private function fillFormWithCurrentIssue(): void{
+    $issue = $this->issue;
+    
+    if ($issue === null){
+      return;
+    }
+    
+    $milestone = $issue->getMilestoneId();
+    $assignee = $issue->getAssignee();
+  
+    $this->form->fill(['Title'       => $issue->getTitle(),
+                       'Description' => $issue->getDescription()->getRawText(),
+                       'Type'        => $issue->getType()->getId(),
+                       'Priority'    => $issue->getPriority()->getId(),
+                       'Scale'       => $issue->getScale()->getId(),
+                       'Status'      => $issue->getStatus()->getId(),
+                       'Progress'    => (string)$issue->getProgress(),
+                       'Milestone'   => $milestone === null ? '' : (string)$milestone,
+                       'Assignee'    => $assignee === null ? '' : (string)$assignee->getId()]);
   }
   
   public function isNewIssue(): bool{
@@ -233,11 +247,13 @@ class IssueEditModel extends BasicProjectPageModel{
       $validator->validate();
       $issues = new IssueTable(DB::get(), $project);
       
-      if ($assignee !== null && !(new ProjectMemberTable(DB::get(), $project))->checkMembershipExists($assignee)){
-        $real_assignee = $this->issue === null ? null : $this->issue->getAssignee();
-        
+      $prev_assignee = $this->issue === null ? null : $this->issue->getAssignee();
+      $prev_assignee_id = $prev_assignee === null ? null : $prev_assignee->getId();
+      
+      if ($assignee !== null && $assignee !== $prev_assignee_id && !(new ProjectMemberTable(DB::get(), $project))->checkMembershipExists($assignee)){
         $this->form->invalidateField('Assignee', 'Assignee must be a member of the project.');
-        $this->form->fill(['Assignee' => $real_assignee === null ? '' : (string)$real_assignee->getId()]);
+        $this->form->fill(['Assignee' => $prev_assignee === null ? '' : (string)$prev_assignee_id]);
+        $this->fillFormWithCurrentIssue();
         return null;
       }
       
