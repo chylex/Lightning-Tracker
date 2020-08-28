@@ -107,6 +107,7 @@ $router->add('project/:project/&/milestones/:id', 'Project/MilestoneEditControll
 $router->add('project/:project/&/milestones/:id/delete', 'Project/MilestoneDeleteController');
 $router->add('project/:project/&/members', 'Project/MembersController');
 $router->add('project/:project/&/members/:id', 'Project/MemberEditController');
+$router->add('project/:project/&/members/:id/remove', 'Project/MemberRemoveController');
 $router->add('project/:project/&/settings', 'Project/SettingsGeneralController');
 $router->add('project/:project/&/settings/roles', 'Project/SettingsRolesController');
 $router->add('project/:project/&/settings/roles/:id', 'Project/SettingsRoleEditController');

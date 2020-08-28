@@ -12,6 +12,7 @@ use Database\Tables\ProjectPermTable;
 use Database\Tables\UserTable;
 use Exception;
 use Pages\Components\Forms\FormComponent;
+use Pages\Components\Forms\IconButtonFormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Pages\IModel;
@@ -24,7 +25,6 @@ use Session\Session;
 
 class MembersModel extends BasicProjectPageModel{
   public const ACTION_INVITE = 'Invite';
-  public const ACTION_REMOVE = 'Remove';
   
   private ProjectPermissions $perms;
   private TableComponent $table;
@@ -87,6 +87,8 @@ class MembersModel extends BasicProjectPageModel{
   public function load(): IModel{
     parent::load();
     
+    $req = $this->getReq();
+    
     $project = $this->getProject();
     $owner_id = $project->getOwnerId();
     $logon_user_id = Session::get()->getLogonUserId();
@@ -110,11 +112,10 @@ class MembersModel extends BasicProjectPageModel{
       
       if ($this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
         if ($can_edit){
-          $form = new FormComponent(self::ACTION_REMOVE);
-          $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
-          $form->addHidden('User', (string)$user_id);
-          $form->addIconButton('submit', 'circle-cross')->color('red');
-          $row[] = $form;
+          $link_delete = Link::fromBase($req, 'members', $name_safe, 'remove');
+          $btn_delete = new IconButtonFormComponent($link_delete, 'circle-cross');
+          $btn_delete->color('red');
+          $row[] = $btn_delete;
         }
         else{
           $row[] = '';
@@ -218,27 +219,6 @@ class MembersModel extends BasicProjectPageModel{
     }
     
     return false;
-  }
-  
-  public function removeMember(array $data): bool{ // TODO make it a dedicated page with additional checks
-    $user = get_int($data, 'User');
-    
-    if ($user === null){
-      return false;
-    }
-    
-    $db = DB::get();
-    $project = $this->getProject();
-    
-    $members = new ProjectMemberTable($db, $project);
-    $role = $members->getRoleIdStr($user);
-    
-    if (!MemberEditModel::canEditMember(Session::get()->getLogonUserIdOrThrow(), $user, empty($role) ? null : (int)$role, $project)){
-      return false;
-    }
-    
-    $members->removeUserId($user);
-    return true;
   }
 }
 

@@ -8,6 +8,7 @@ use Database\Filters\AbstractFilter;
 use Database\Filters\Types\ProjectMemberFilter;
 use Database\Objects\ProjectMember;
 use PDO;
+use PDOException;
 
 final class ProjectMemberTable extends AbstractProjectTable{
   public function addMember(int $user_id, ?int $role_id): void{
@@ -90,11 +91,28 @@ SQL;
     return (bool)$this->fetchOneColumn($stmt);
   }
   
-  public function removeUserId(int $user_id): void{
-    $stmt = $this->db->prepare('DELETE FROM project_members WHERE user_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+  public function removeByUserId(int $user_id, bool $reassign_issues, ?int $reassign_user_id = null): void{
+    $this->db->beginTransaction();
+    
+    try{
+      if ($reassign_issues){
+        $stmt = $this->db->prepare('UPDATE issues SET assignee_id = ? WHERE assignee_id = ? AND project_id = ?');
+        $stmt->bindValue(1, $reassign_user_id, $reassign_user_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+        $stmt->bindValue(2, $user_id, PDO::PARAM_INT);
+        $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
+        $stmt->execute();
+      }
+      
+      $stmt = $this->db->prepare('DELETE FROM project_members WHERE user_id = ? AND project_id = ?');
+      $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
+      $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
+      $stmt->execute();
+      
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+      throw $e;
+    }
   }
 }
 

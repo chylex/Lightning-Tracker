@@ -28,9 +28,7 @@ class MembersController extends AbstractProjectController{
     $perms = $sess->getPermissions()->project($project);
     $model = new MembersModel($req, $project, $perms);
     
-    if (($action === $model::ACTION_INVITE && $perms->require(ProjectPermissions::MANAGE_MEMBERS) && $model->inviteUser($req->getData())) ||
-        ($action === $model::ACTION_REMOVE && $perms->require(ProjectPermissions::MANAGE_MEMBERS) && $model->removeMember($req->getData()))
-    ){
+    if ($action === $model::ACTION_INVITE && $perms->require(ProjectPermissions::MANAGE_MEMBERS) && $model->inviteUser($req->getData())){
       return reload();
     }
     
