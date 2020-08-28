@@ -20,11 +20,12 @@ final class IconButtonFormComponent implements IViewable{
     return $this;
   }
   
+  /** @noinspection JSUnresolvedVariable */
   public function echoBody(): void{
     $color_class = $this->color === null ? '' : ' icon-color-'.$this->color;
     
     echo <<<HTML
-<form action="$this->url">
+<form action="$this->url" method="get" onsubmit="window.location=this.action;return false">
   <button type="submit" class="icon">
     <span class="icon icon-$this->icon$color_class"></span>
   </button>
