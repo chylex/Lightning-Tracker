@@ -240,7 +240,9 @@ SQL
   if ($migration_version === 5){
     $db = DB::get();
     
-    $db->exec('ALTER TABLE system_role_perms MODIFY permission ENUM (\'settings\', \'projects.list\', \'projects.list.all\', \'projects.create\', \'projects.manage\', \'users.list\', \'users.view.emails\', \'users.create\', \'users.manage\') NOT NULL');
+    $db->exec('RENAME TABLE project_role_perms TO project_role_permissions');
+    $db->exec('RENAME TABLE system_role_perms TO system_role_permissions');
+    $db->exec('ALTER TABLE system_role_permissions MODIFY permission ENUM (\'settings\', \'projects.list\', \'projects.list.all\', \'projects.create\', \'projects.manage\', \'users.list\', \'users.view.emails\', \'users.create\', \'users.manage\') NOT NULL');
     
     upgrade_config($db, $migration_version = 6);
   }

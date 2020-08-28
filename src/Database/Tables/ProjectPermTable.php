@@ -84,7 +84,7 @@ SQL
       $stmt->bindValue(3, $project, PDO::PARAM_INT);
       $stmt->execute();
       
-      $stmt = $this->db->prepare('DELETE FROM project_role_perms WHERE role_id = ? AND project_id = ?');
+      $stmt = $this->db->prepare('DELETE FROM project_role_permissions WHERE role_id = ? AND project_id = ?');
       $stmt->bindValue(1, $id, PDO::PARAM_INT);
       $stmt->bindValue(2, $project, PDO::PARAM_INT);
       $stmt->execute();
@@ -109,7 +109,7 @@ SQL
     
     $project = $this->getProjectId();
     
-    $sql = 'INSERT INTO project_role_perms (project_id, role_id, permission) VALUES ()';
+    $sql = 'INSERT INTO project_role_permissions (project_id, role_id, permission) VALUES ()';
     $values = implode(',', array_map(fn($ignore): string => '(?, ?, ?)', $perms));
     
     $stmt = $this->db->prepare(str_replace('()', $values, $sql));
@@ -285,7 +285,7 @@ SQL
    * @return string[]
    */
   public function listRolePerms(int $id): array{
-    $stmt = $this->db->prepare('SELECT permission FROM project_role_perms WHERE role_id = ? AND project_id = ?');
+    $stmt = $this->db->prepare('SELECT permission FROM project_role_permissions WHERE role_id = ? AND project_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
@@ -305,7 +305,7 @@ SQL
     
     $stmt = $this->db->prepare(<<<SQL
 SELECT prp.permission
-FROM project_role_perms prp
+FROM project_role_permissions prp
 JOIN project_members pm ON prp.project_id = pm.project_id AND prp.role_id = pm.role_id
 WHERE pm.user_id = ? AND pm.project_id = ?
 SQL

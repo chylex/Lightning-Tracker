@@ -57,7 +57,7 @@ final class SystemPermTable extends AbstractTable{
       $stmt->bindValue(2, $id, PDO::PARAM_INT);
       $stmt->execute();
       
-      $stmt = $this->db->prepare('DELETE FROM system_role_perms WHERE role_id = ?');
+      $stmt = $this->db->prepare('DELETE FROM system_role_permissions WHERE role_id = ?');
       $stmt->bindValue(1, $id, PDO::PARAM_INT);
       $stmt->execute();
       
@@ -79,7 +79,7 @@ final class SystemPermTable extends AbstractTable{
       return;
     }
     
-    $sql = 'INSERT INTO system_role_perms (role_id, permission) VALUES ()';
+    $sql = 'INSERT INTO system_role_permissions (role_id, permission) VALUES ()';
     $values = implode(',', array_map(fn($ignore): string => '(?, ?)', $perms));
     
     $stmt = $this->db->prepare(str_replace('()', $values, $sql));
@@ -112,7 +112,7 @@ final class SystemPermTable extends AbstractTable{
    * @return string[]
    */
   public function listRolePerms(int $id): array{
-    $stmt = $this->db->prepare('SELECT permission FROM system_role_perms WHERE role_id = ?');
+    $stmt = $this->db->prepare('SELECT permission FROM system_role_permissions WHERE role_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->execute();
     
@@ -133,7 +133,7 @@ final class SystemPermTable extends AbstractTable{
       return self::LOGON_PERMS;
     }
     
-    $stmt = $this->db->prepare('SELECT permission FROM system_role_perms WHERE role_id = ?');
+    $stmt = $this->db->prepare('SELECT permission FROM system_role_permissions WHERE role_id = ?');
     $stmt->bindValue(1, $user->getSystemRoleId(), PDO::PARAM_INT);
     $stmt->execute();
     

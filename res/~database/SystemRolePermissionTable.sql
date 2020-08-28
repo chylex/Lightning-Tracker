@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `system_role_perms` (
+CREATE TABLE IF NOT EXISTS `system_role_permissions` (
 	`role_id`    SMALLINT NOT NULL,
 	`permission` ENUM (
 		'settings',

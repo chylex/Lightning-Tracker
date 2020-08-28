@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `project_role_perms` (
+CREATE TABLE IF NOT EXISTS `project_role_permissions` (
 	`project_id` INT NOT NULL,
 	`role_id`    INT NOT NULL,
 	`permission` ENUM (
