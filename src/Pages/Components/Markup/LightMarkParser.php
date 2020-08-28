@@ -7,22 +7,25 @@ use Pages\Models\Project\IssueEditModel;
 
 final class LightMarkParser{
   private const SPACE = 32;
+  private const EXCLAMATION_MARK = 33;
   private const HASH = 35;
+  private const LEFT_PARENTHESIS = 40;
+  private const RIGHT_PARENTHESIS = 41;
   private const LEFT_SQUARE_BRACKET = 91;
   private const RIGHT_SQUARE_BRACKET = 93;
   
   // TODO implement: block formatting, inline formatting
   
+  private LightMarkProperties $props;
   private string $output = '';
   
-  private ?string $checkbox_name;
   private int $checkbox_count = 0;
   
   private bool $last_line_empty = false;
   private bool $is_paragraph_open = false;
   
-  public function __construct(?string $checkbox_name = null){
-    $this->checkbox_name = $checkbox_name;
+  public function __construct(LightMarkProperties $props){
+    $this->props = $props;
   }
   
   /** @noinspection HtmlMissingClosingTag */
@@ -38,7 +41,7 @@ final class LightMarkParser{
       return;
     }
     
-    $rest = trim($this->restToString($iter));
+    $rest = trim($this->parseRestAsInline($iter));
     
     if (empty($rest)){
       $this->last_line_empty = true;
@@ -74,7 +77,26 @@ final class LightMarkParser{
     $this->last_line_empty = false;
   }
   
-  // Elements
+  // Helpers
+  
+  private function readUntil(UnicodeIterator $iter, int $terminator): ?string{
+    $text = '';
+    
+    while($iter->valid()){
+      $next = $iter->move();
+      
+      if ($next === $terminator){
+        return $text;
+      }
+      else{
+        $text .= mb_chr($next);
+      }
+    }
+    
+    return null;
+  }
+  
+  // Full line elements
   
   private function handleFullLineElement(UnicodeIterator $iter, ?string $parsed_element): bool{
     if ($parsed_element === null){
@@ -112,7 +134,7 @@ final class LightMarkParser{
     }
     
     $tag = 'h'.($count + 3);
-    $rest = trim($this->restToString($iter));
+    $rest = trim($this->parseRestAsInline($iter));
     
     return "<$tag>$rest</$tag>";
   }
@@ -139,14 +161,16 @@ final class LightMarkParser{
     
     ++$this->checkbox_count;
     
-    $rest = trim($this->restToString($iter));
+    $rest = trim($this->parseRestAsInline($iter));
     $checked_attr = $checked ? ' checked' : '';
     
     if ($checked){
       $rest = '<del>'.$rest.'</del>';
     }
     
-    if ($this->checkbox_name === null){
+    $cb_name = $this->props->getCheckBoxName();
+    
+    if ($cb_name === null){
       return <<<HTML
 <div class="field-group">
   <input type="checkbox"$checked_attr disabled>
@@ -155,25 +179,105 @@ final class LightMarkParser{
 HTML;
     }
     else{
-      $id = $this->checkbox_name.'-'.$this->checkbox_count;
+      $id = $cb_name.'-'.$this->checkbox_count;
+      $name = $cb_name.'[]';
       
       return <<<HTML
 <div class="field-group">
-  <input id="$id" name="$this->checkbox_name[]" type="checkbox" value="$this->checkbox_count"$checked_attr>
+  <input id="$id" name="$name" type="checkbox" value="$this->checkbox_count"$checked_attr>
   <label for="$id">$rest</label>
 </div>
 HTML;
     }
   }
   
-  private function restToString(UnicodeIterator $iter): string{
+  // Inline elements
+  
+  private function parseRestAsInline(UnicodeIterator $iter): string{
     $str = '';
     
-    foreach($iter as $code){
-      $str .= mb_chr($code);
+    while($iter->valid()){
+      $next = $iter->move();
+      $parsed = null;
+      
+      if ($next === self::LEFT_SQUARE_BRACKET){
+        $iter->beginSection();
+        $parsed = $this->thenParseLink($iter);
+      }
+      elseif ($next === self::EXCLAMATION_MARK){
+        $iter->beginSection();
+        $parsed = $this->thenParseImage($iter);
+      }
+      else{
+        $str .= protect(mb_chr($next));
+        continue;
+      }
+      
+      if ($parsed === null){
+        $iter->rewindSection();
+        $str .= protect(mb_chr($next));
+      }
+      else{
+        $iter->endSection();
+        $str .= $parsed;
+      }
     }
     
-    return protect($str);
+    return $str;
+  }
+  
+  private function thenParseLink(UnicodeIterator $iter): ?string{
+    $text = $this->readUntil($iter, self::RIGHT_SQUARE_BRACKET);
+    
+    if ($text === null || $iter->move() !== self::LEFT_PARENTHESIS){
+      return null;
+    }
+    
+    $url = $this->readUntil($iter, self::RIGHT_PARENTHESIS);
+    
+    if ($url === null){
+      return null;
+    }
+    
+    $scheme = parse_url($url, PHP_URL_SCHEME);
+    
+    if ($scheme === null || !$this->props->isAllowedLinkScheme($scheme)){
+      return null;
+    }
+    
+    $url = protect($url);
+    $text = protect($text);
+    
+    return '<a href="'.$url.'">'.$text.'</a>';
+  }
+  
+  private function thenParseImage(UnicodeIterator $iter): ?string{
+    if ($iter->move() !== self::LEFT_SQUARE_BRACKET){
+      return null;
+    }
+    
+    $alt = $this->readUntil($iter, self::RIGHT_SQUARE_BRACKET);
+    
+    if ($alt === null || $iter->move() !== self::LEFT_PARENTHESIS){
+      return null;
+    }
+    
+    $url = $this->readUntil($iter, self::RIGHT_PARENTHESIS);
+    
+    if ($url === null){
+      return null;
+    }
+    
+    $scheme = parse_url($url, PHP_URL_SCHEME);
+    
+    if ($scheme === null || !$this->props->isAllowedImageScheme($scheme)){
+      return null;
+    }
+    
+    $url = protect($url);
+    $alt = protect($alt);
+    
+    return '<a href="'.$url.'" title="'.$alt.'"><img src="'.$url.'" alt="'.$alt.'"></a>';
   }
 }
 

@@ -18,6 +18,7 @@ final class UnicodeIterator implements Iterator{
   private string $text;
   private int $pos;
   private int $last_size;
+  private array $mark_pos = [];
   
   public function prepare(string &$text): void{
     $this->text = &$text;
@@ -26,6 +27,19 @@ final class UnicodeIterator implements Iterator{
   
   public function reset(): void{
     $this->pos = 0;
+    $this->last_size = 0;
+  }
+  
+  public function beginSection(): void{
+    $this->mark_pos[] = $this->pos;
+  }
+  
+  public function endSection(): void{
+    array_pop($this->mark_pos);
+  }
+  
+  public function rewindSection(): void{
+    $this->pos = array_pop($this->mark_pos);
     $this->last_size = 0;
   }
   

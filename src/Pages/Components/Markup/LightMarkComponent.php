@@ -36,8 +36,8 @@ use Pages\IViewable;
  *
  * `code` --> <code>code</code>
  *
- * \[text](url) --> (link)
- * \![alt](url) --> (image with alt text)
+ * [text](url) --> (link)
+ * ![alt](url) --> (image with alt text)
  *
  * ```
  *
@@ -78,7 +78,15 @@ final class LightMarkComponent implements IViewable{
   }
   
   public function parse(): LightMarkParseResult{
-    $parser = new LightMarkParser($this->checkbox_name);
+    $props = new LightMarkProperties();
+    $props->setAllowedLinkSchemes(['http', 'https', 'ftp', 'mailto']);
+    $props->setAllowedImageSchemes(['http', 'https', 'ftp']);
+    
+    if ($this->checkbox_name !== null){
+      $props->setCheckBoxName($this->checkbox_name);
+    }
+    
+    $parser = new LightMarkParser($props);
     $iter = new UnicodeIterator();
     $lines = mb_split("\n", $this->text);
     
