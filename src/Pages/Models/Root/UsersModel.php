@@ -5,7 +5,6 @@ namespace Pages\Models\Root;
 
 use Database\DB;
 use Database\Filters\Types\UserFilter;
-use Database\SQL;
 use Database\Tables\SystemPermTable;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
@@ -18,7 +17,6 @@ use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicRootPageModel;
 use Pages\Models\Mixed\RegisterModel;
-use PDOException;
 use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
@@ -173,17 +171,16 @@ class UsersModel extends BasicRootPageModel{
     
     try{
       $validator->validate();
+      
+      if (RegisterModel::checkDuplicateUser($this->form, $name, $email)){
+        return false;
+      }
+      
       $users = new UserTable(DB::get());
       $users->addUser($name, $email, $password);
       return true;
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());
-    }catch(PDOException $e){
-      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION && RegisterModel::checkDuplicateUser($this->form, $name, $email)){
-        return false;
-      }
-      
-      $this->form->onGeneralError($e);
     }catch(Exception $e){
       $this->form->onGeneralError($e);
     }

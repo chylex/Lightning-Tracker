@@ -6,7 +6,6 @@ namespace Pages\Models\Project;
 use Database\DB;
 use Database\Filters\Types\ProjectMemberFilter;
 use Database\Objects\ProjectInfo;
-use Database\SQL;
 use Database\Tables\ProjectMemberTable;
 use Database\Tables\ProjectPermTable;
 use Database\Tables\UserTable;
@@ -17,7 +16,6 @@ use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Pages\IModel;
 use Pages\Models\BasicProjectPageModel;
-use PDOException;
 use Routing\Link;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
@@ -197,24 +195,14 @@ class MembersModel extends BasicProjectPageModel{
       }
       
       $members = new ProjectMemberTable($db, $project);
-      $members->addMember($user_id, $role_id); // TODO add a proper invitation system
-      return true;
-    }catch(PDOException $e){
-      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION){
-        try{
-          $members = new ProjectMemberTable($db, $project);
-          
-          if ($user_id !== null && $members->checkMembershipExists($user_id)){
-            $this->form->invalidateField('Name', 'User is already a member of this project.');
-            return false;
-          }
-        }catch(Exception $e){
-          $this->form->onGeneralError($e);
-          return false;
-        }
+      
+      if ($members->checkMembershipExists($user_id)){
+        $this->form->invalidateField('Name', 'User is already a member of this project.');
+        return false;
       }
       
-      $this->form->onGeneralError($e);
+      $members->addMember($user_id, $role_id); // TODO add a proper invitation system
+      return true;
     }catch(Exception $e){
       $this->form->onGeneralError($e);
     }

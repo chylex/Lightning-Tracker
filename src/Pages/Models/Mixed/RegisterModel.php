@@ -6,14 +6,12 @@ namespace Pages\Models\Mixed;
 use Data\UserId;
 use Database\DB;
 use Database\Objects\ProjectInfo;
-use Database\SQL;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
 use Exception;
 use LogicException;
 use Pages\Components\Forms\FormComponent;
 use Pages\Models\BasicMixedPageModel;
-use PDOException;
 use Routing\Request;
 use Session\Session;
 use Validation\FormValidator;
@@ -75,6 +73,11 @@ class RegisterModel extends BasicMixedPageModel{
     
     try{
       $validator->validate();
+      
+      if (self::checkDuplicateUser($this->form, $name, $email)){
+        return false;
+      }
+      
       $users = new UserTable(DB::get());
       $users->addUser($name, $email, $password);
       
@@ -86,12 +89,6 @@ class RegisterModel extends BasicMixedPageModel{
       }
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());
-    }catch(PDOException $e){
-      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION && self::checkDuplicateUser($this->form, $name, $email)){
-        return false;
-      }
-      
-      $this->form->onGeneralError($e);
     }catch(Exception $e){
       $this->form->onGeneralError($e);
     }

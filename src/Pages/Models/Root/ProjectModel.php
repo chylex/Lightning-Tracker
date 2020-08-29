@@ -7,7 +7,6 @@ use Database\DB;
 use Database\Filters\General\Pagination;
 use Database\Filters\Types\ProjectFilter;
 use Database\Objects\UserProfile;
-use Database\SQL;
 use Database\Tables\ProjectTable;
 use Database\Validation\ProjectFields;
 use Exception;
@@ -15,7 +14,6 @@ use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\IModel;
 use Pages\Models\BasicRootPageModel;
-use PDOException;
 use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
@@ -127,26 +125,16 @@ class ProjectModel extends BasicRootPageModel{
     try{
       $validator->validate();
       $projects = new ProjectTable(DB::get());
+      
+      if ($projects->checkUrlExists($url)){
+        $this->form->invalidateField('Url', 'Project with this URL already exists.');
+        return null;
+      }
+      
       $projects->addProject($name, $url, $hidden, $owner);
       return $url;
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());
-    }catch(PDOException $e){
-      if ($e->getCode() === SQL::CONSTRAINT_VIOLATION){
-        try{
-          $projects = new ProjectTable(DB::get());
-          
-          if ($projects->checkUrlExists($url)){
-            $this->form->invalidateField('Url', 'Project with this URL already exists.');
-            return null;
-          }
-        }catch(Exception $e){
-          $this->form->onGeneralError($e);
-          return null;
-        }
-      }
-      
-      $this->form->onGeneralError($e);
     }catch(Exception $e){
       $this->form->onGeneralError($e);
     }
