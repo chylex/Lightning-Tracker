@@ -101,7 +101,9 @@ class UsersModel extends BasicRootPageModel{
     $sorting = $filter->sort($this->getReq());
     
     foreach($users->listUsers($filter) as $user){
-      $user_id_formatted = $user->getPublicId()->formatted();
+      $user_id = $user->getId();
+      $user_id_formatted = $user_id->formatted();
+      
       $row = [$user->getNameSafe()];
       
       if ($can_see_email){
@@ -112,7 +114,7 @@ class UsersModel extends BasicRootPageModel{
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
       if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
-        if ($user->getId() === $logon_user_id || $user->isAdmin()){
+        if ($user_id->equals($logon_user_id) || $user->isAdmin()){
           $row[] = '';
         }
         else{

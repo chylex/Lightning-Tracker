@@ -3,14 +3,16 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
+use Data\UserId;
+
 final class UserProfile{
-  private int $id;
+  private string $id;
   private string $name;
   private string $email;
   private ?int $sys_role_id;
   private bool $admin;
   
-  public function __construct(int $id, string $name, string $email, ?int $sys_role_id, bool $admin){
+  public function __construct(string $id, string $name, string $email, ?int $sys_role_id, bool $admin){
     $this->id = $id;
     $this->name = $name;
     $this->email = $email;
@@ -18,8 +20,8 @@ final class UserProfile{
     $this->admin = $admin;
   }
   
-  public function getId(): int{
-    return $this->id;
+  public function getId(): UserId{
+    return UserId::fromRaw($this->id);
   }
   
   public function getName(): string{

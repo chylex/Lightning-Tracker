@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Session;
 
+use Data\UserId;
 use Database\DB;
 use Database\Objects\UserProfile;
 use Database\Tables\UserLoginTable;
@@ -84,12 +85,12 @@ final class Session{
     return $this->getLogin()->getLogonUser();
   }
   
-  public function getLogonUserId(): ?int{
+  public function getLogonUserId(): ?UserId{
     $logon_user = $this->getLogonUser();
     return $logon_user === null ? null : $logon_user->getId();
   }
   
-  public function getLogonUserIdOrThrow(): int{
+  public function getLogonUserIdOrThrow(): UserId{
     $logon_user = $this->getLogonUser();
     
     if ($logon_user === null){
@@ -108,7 +109,7 @@ final class Session{
     
     try{
       $users = new UserTable(DB::get());
-      $id = $users->findLegacyIdByName($name);
+      $id = $users->findIdByName($name);
     }catch(Exception $e){
       Log::critical($e);
       return false;
@@ -117,7 +118,7 @@ final class Session{
     return $id !== null && $this->tryLoginWithId($id);
   }
   
-  public function tryLoginWithId(int $id): bool{
+  public function tryLoginWithId(UserId $id): bool{
     if ($this->login !== null){
       $this->login = SessionLoginInfo::guest();
     }

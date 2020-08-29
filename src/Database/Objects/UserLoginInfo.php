@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
+use Data\UserId;
 use Exception;
 
 final class UserLoginInfo{
@@ -21,16 +22,16 @@ final class UserLoginInfo{
     return $hash;
   }
   
-  private int $id;
+  private string $id;
   private string $password_hash;
   
-  public function __construct(int $id, string $password_hash){
+  public function __construct(string $id, string $password_hash){
     $this->id = $id;
     $this->password_hash = $password_hash;
   }
   
-  public function getId(): int{
-    return $this->id;
+  public function getId(): UserId{
+    return UserId::fromRaw($this->id);
   }
   
   public function checkPassword(string $password): bool{

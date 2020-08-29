@@ -102,17 +102,17 @@ class MembersModel extends BasicProjectPageModel{
     $sorting = $filter->sort($this->getReq());
     
     foreach($members->listMembers($filter) as $member){
-      $name_safe = $member->getUserNameSafe();
-      
-      $row = [$name_safe,
+      $row = [$member->getUserNameSafe(),
               $member->getRoleTitleSafe() ?? Text::missing('Default')];
       
       $user_id = $member->getUserId();
-      $can_edit = $user_id !== $logon_user_id && $user_id !== $owner_id && in_array((string)($member->getRoleId() ?? ''), $this->editable_roles, true);
+      $user_id_str = $user_id->formatted();
+      
+      $can_edit = !$user_id->equals($logon_user_id) && !$user_id->equals($owner_id) && in_array((string)($member->getRoleId() ?? ''), $this->editable_roles, true);
       
       if ($this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
         if ($can_edit){
-          $link_delete = Link::fromBase($req, 'members', $name_safe, 'remove');
+          $link_delete = Link::fromBase($req, 'members', $user_id_str, 'remove');
           $btn_delete = new IconButtonFormComponent($link_delete, 'circle-cross');
           $btn_delete->color('red');
           $row[] = $btn_delete;
@@ -125,7 +125,7 @@ class MembersModel extends BasicProjectPageModel{
       $row = $this->table->addRow($row);
       
       if ($can_edit && $this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
-        $row->link(Link::fromBase($this->getReq(), 'members', $name_safe));
+        $row->link(Link::fromBase($this->getReq(), 'members', $user_id_str));
       }
     }
     
@@ -164,7 +164,6 @@ class MembersModel extends BasicProjectPageModel{
     
     $name = $data['Name'];
     $role = $data['Role'];
-    $user_id = null;
     
     if (empty($role)){
       $role_id = null;
@@ -177,15 +176,17 @@ class MembersModel extends BasicProjectPageModel{
       return false;
     }
     
+    $user_id = null;
+    
     try{
       $users = new UserTable($db);
-      $user_id = $users->findLegacyIdByName($name);
+      $user_id = $users->findIdByName($name);
       
       if ($user_id === null){
         $this->form->invalidateField('Name', 'User not found.');
         return false;
       }
-      elseif ($user_id === $project->getOwnerId()){
+      elseif ($user_id->equals($project->getOwnerId())){
         $this->form->invalidateField('Name', 'User is the owner of this project.');
         return false;
       }

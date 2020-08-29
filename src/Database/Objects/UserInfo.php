@@ -6,8 +6,7 @@ namespace Database\Objects;
 use Data\UserId;
 
 final class UserInfo{
-  private int $id;
-  private string $public_id;
+  private string $id;
   private string $name;
   private string $email;
   private ?int $role_id;
@@ -15,9 +14,8 @@ final class UserInfo{
   private bool $admin;
   private string $date_registered;
   
-  public function __construct(int $id, string $public_id, string $name, string $email, ?int $role_id, ?string $role_title, bool $admin, string $date_registered){
+  public function __construct(string $id, string $name, string $email, ?int $role_id, ?string $role_title, bool $admin, string $date_registered){
     $this->id = $id;
-    $this->public_id = $public_id;
     $this->name = $name;
     $this->email = $email;
     $this->role_id = $role_id;
@@ -26,12 +24,8 @@ final class UserInfo{
     $this->date_registered = $date_registered;
   }
   
-  public function getId(): int{
-    return $this->id;
-  }
-  
-  public function getPublicId(): UserId{
-    return UserId::fromRaw($this->public_id);
+  public function getId(): UserId{
+    return UserId::fromRaw($this->id);
   }
   
   public function getName(): string{

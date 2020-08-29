@@ -120,15 +120,15 @@ class IssuesModel extends BasicProjectPageModel{
     $filtering_assignee->addOption('', Text::missing('Nobody'));
     
     if ($logon_user_id !== null){
-      $filtering_author->addOption((string)$logon_user_id, Text::missing('You'));
-      $filtering_assignee->addOption((string)$logon_user_id, Text::missing('You'));
+      $filtering_author->addOption($logon_user_id->raw(), Text::missing('You'));
+      $filtering_assignee->addOption($logon_user_id->raw(), Text::missing('You'));
       
       if ($this->perms->check(ProjectPermissions::LIST_MEMBERS)){
         foreach((new ProjectMemberTable(DB::get(), $project))->listMembers() as $member){
           $user_id = $member->getUserId();
           
-          if ($user_id !== $logon_user_id){
-            $user_id_str = (string)$user_id;
+          if (!$user_id->equals($logon_user_id)){
+            $user_id_str = $user_id->raw();
             $user_name = $member->getUserName();
             
             $filtering_author->addOption($user_id_str, Text::plain($user_name));

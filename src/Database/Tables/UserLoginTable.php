@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
+use Data\UserId;
 use Database\AbstractTable;
 use Database\Objects\UserProfile;
 use PDO;
@@ -25,7 +26,7 @@ SQL
     return $res === false ? null : new UserProfile($res['id'], $res['name'], $res['email'], $res['role_id'], (bool)$res['admin']);
   }
   
-  public function addOrRenewToken(int $id, string $token, int $expire_in_minutes): void{
+  public function addOrRenewToken(UserId $id, string $token, int $expire_in_minutes): void{
     $stmt = $this->db->prepare(<<<SQL
 INSERT INTO user_logins (id, token, expires)
 VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))
@@ -33,7 +34,7 @@ ON DUPLICATE KEY UPDATE expires = GREATEST(expires, VALUES(expires))
 SQL
     );
     
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
+    $stmt->bindValue(1, $id);
     $stmt->bindValue(2, $token);
     $stmt->bindValue(3, $expire_in_minutes, PDO::PARAM_INT);
     $stmt->execute();

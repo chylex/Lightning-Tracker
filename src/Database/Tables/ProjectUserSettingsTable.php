@@ -18,7 +18,7 @@ SQL
     );
     
     $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->bindValue(2, $user->getId(), PDO::PARAM_INT);
+    $stmt->bindValue(2, $user->getId());
     $stmt->bindValue(3, $milestone_id, PDO::PARAM_INT);
     $stmt->execute();
   }
@@ -37,7 +37,7 @@ GROUP BY m.milestone_id
 SQL
     );
     
-    $stmt->bindValue(1, $user->getId(), PDO::PARAM_INT);
+    $stmt->bindValue(1, $user->getId());
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     

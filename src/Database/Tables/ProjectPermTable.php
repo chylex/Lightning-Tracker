@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
+use Data\UserId;
 use Database\AbstractProjectTable;
 use Database\Objects\RoleInfo;
 use Database\Objects\UserProfile;
@@ -209,7 +210,7 @@ SQL
     return (bool)$this->fetchOneColumn($stmt);
   }
   
-  public function isRoleAssignableBy(int $role_id, int $user_id): bool{
+  public function isRoleAssignableBy(int $role_id, UserId $user_id): bool{
     $stmt = $this->db->prepare(<<<SQL
 SELECT 1
 FROM project_roles pr
@@ -225,7 +226,7 @@ SQL
     
     $stmt->bindValue(1, $role_id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->bindValue(3, $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(3, $user_id);
     $stmt->execute();
     return $this->fetchOneColumn($stmt) !== false;
   }
@@ -248,10 +249,10 @@ SQL
   }
   
   /**
-   * @param int $user_id
+   * @param UserId $user_id
    * @return RoleInfo[]
    */
-  public function listRolesAssignableBy(int $user_id): array{
+  public function listRolesAssignableBy(UserId $user_id): array{
     $stmt = $this->db->prepare(<<<SQL
 SELECT role_id, title, ordering, special
 FROM project_roles pr
@@ -267,7 +268,7 @@ SQL
     );
     
     $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->bindValue(2, $user_id, PDO::PARAM_INT);
+    $stmt->bindValue(2, $user_id);
     $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     

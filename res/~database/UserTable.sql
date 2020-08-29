@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS `users` (
-	`id`              INT NOT NULL AUTO_INCREMENT,
-	`public_id`       CHAR(9) NOT NULL,
+	`id`              CHAR(9) NOT NULL,
 	`name`            VARCHAR(32) NOT NULL,
 	`email`           VARCHAR(191) NOT NULL, # Size limit needed due to low key size limits in older versions of MySQL.
 	`password`        VARCHAR(255) NOT NULL,
@@ -8,7 +7,6 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`admin`           BOOL NOT NULL DEFAULT FALSE,
 	`date_registered` DATETIME NOT NULL,
 	PRIMARY KEY (`id`),
-	UNIQUE KEY (`public_id`),
 	UNIQUE KEY `name` (`name`),
 	UNIQUE KEY `email` (`email`),
 	CONSTRAINT fk__user__role FOREIGN KEY (`role_id`)

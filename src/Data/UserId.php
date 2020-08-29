@@ -56,6 +56,10 @@ final class UserId{
   public function formatted(): string{
     return implode('-', str_split($this->id, 3));
   }
+  
+  public function __toString(): string{
+    return $this->id;
+  }
 }
 
 ?>

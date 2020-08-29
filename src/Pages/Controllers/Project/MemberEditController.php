@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Project;
 
+use Data\UserId;
 use Database\Objects\ProjectInfo;
 use Generator;
 use Pages\Controllers\AbstractProjectController;
@@ -21,17 +22,17 @@ use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
 class MemberEditController extends AbstractProjectController{
-  private ?string $member_name;
+  private ?string $member_id;
   
   protected function projectPrerequisites(ProjectInfo $project): Generator{
     yield new RequireLoginState(true);
     yield new RequireProjectPermission($project, ProjectPermissions::LIST_MEMBERS);
     yield new RequireProjectPermission($project, ProjectPermissions::MANAGE_MEMBERS);
-    yield new LoadStringId($this->member_name, 'member', $project);
+    yield new LoadStringId($this->member_id, 'member', $project);
   }
   
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
-    $model = new MemberEditModel($req, $project, $this->member_name, $sess->getLogonUserIdOrThrow());
+    $model = new MemberEditModel($req, $project, UserId::fromFormatted($this->member_id), $sess->getLogonUserIdOrThrow());
     
     if ($model->hasMember()){
       if (!$model->canEdit()){

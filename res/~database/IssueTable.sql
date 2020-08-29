@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `issues` (
 	`project_id`   INT NOT NULL,
 	`issue_id`     INT NOT NULL,
-	`author_id`    INT NULL,
-	`assignee_id`  INT NULL,
+	`author_id`    CHAR(9) NULL,
+	`assignee_id`  CHAR(9) NULL,
 	`milestone_id` INT DEFAULT NULL,
 	`title`        VARCHAR(128) NOT NULL,
 	`description`  TEXT NOT NULL,

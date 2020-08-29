@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\UserId;
 use Database\DB;
 use Database\Objects\ProjectInfo;
 use Database\Tables\ProjectMemberTable;
@@ -18,47 +19,47 @@ use Validation\ValidationException;
 class MemberEditModel extends BasicProjectPageModel{
   public const ACTION_CONFIRM = 'Confirm';
   
-  public static function canEditMember(int $editor_id, int $target_id, ?int $target_role, ProjectInfo $project): bool{
+  public static function canEditMember(UserId $editor_id, UserId $target_id, ?int $target_role, ProjectInfo $project): bool{
     return (
-        $target_id !== $editor_id &&
-        $target_id !== $project->getOwnerId() &&
+        !$target_id->equals($editor_id) &&
+        !$target_id->equals($project->getOwnerId()) &&
         ($target_role === null || (new ProjectPermTable(DB::get(), $project))->isRoleAssignableBy($target_role, $editor_id))
     );
   }
   
-  private int $logon_user_id;
-  private string $member_name;
+  private UserId $member_user_id;
+  private UserId $logon_user_id;
+  private ?string $member_name;
   private string $member_role;
-  private ?int $user_id;
   private bool $can_edit = false;
   private bool $has_member = false;
   
   private FormComponent $form;
   
-  public function __construct(Request $req, ProjectInfo $project, string $member_name, int $logon_user_id){
+  public function __construct(Request $req, ProjectInfo $project, UserId $member_user_id, UserId $logon_user_id){
     parent::__construct($req, $project);
-    $this->member_name = $member_name;
+    $this->member_user_id = $member_user_id;
     $this->logon_user_id = $logon_user_id;
-    
-    $this->form = new FormComponent(self::ACTION_CONFIRM);
     
     $db = DB::get();
     
-    $users = new UserTable($db);
-    $this->user_id = $users->findLegacyIdByName($member_name);
+    $this->form = new FormComponent(self::ACTION_CONFIRM);
     
-    if ($this->user_id === null){
+    $users = new UserTable($db);
+    $this->member_name = $users->getUserName($member_user_id);
+    
+    if ($this->member_name === null){
       $member_role = null;
     }
     else{
-      $member_role = (new ProjectMemberTable($db, $project))->getRoleIdStr($this->user_id);
+      $member_role = (new ProjectMemberTable($db, $project))->getRoleIdStr($member_user_id);
     }
     
     if ($member_role !== null){
       $this->has_member = true;
       $this->member_role = $member_role;
       
-      $this->can_edit = self::canEditMember($logon_user_id, $this->user_id, empty($member_role) ? null : (int)$member_role, $project);
+      $this->can_edit = self::canEditMember($logon_user_id, $member_user_id, empty($member_role) ? null : (int)$member_role, $project);
       
       $select_role = $this->form->addSelect('Role')
                                 ->dropdown()
@@ -111,7 +112,7 @@ class MemberEditModel extends BasicProjectPageModel{
       }
       
       $members = new ProjectMemberTable($db, $project);
-      $members->setRole($this->user_id, $role_id);
+      $members->setRole($this->member_user_id, $role_id);
       return true;
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());

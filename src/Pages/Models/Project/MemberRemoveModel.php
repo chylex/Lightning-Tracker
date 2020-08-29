@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\UserId;
 use Database\DB;
 use Database\Filters\Types\IssueFilter;
 use Database\Objects\ProjectInfo;
@@ -18,49 +19,50 @@ use Routing\Request;
 class MemberRemoveModel extends BasicProjectPageModel{
   public const ACTION_CONFIRM = 'Confirm';
   
-  private string $member_name;
-  private ?int $user_id;
+  private UserId $member_user_id;
+  private ?string $member_name;
   private bool $can_edit;
   private bool $has_member = false;
   private int $assigned_issue_count;
   
   private FormComponent $form;
   
-  public function __construct(Request $req, ProjectInfo $project, string $member_name, int $logon_user_id){
+  public function __construct(Request $req, ProjectInfo $project, UserId $member_user_id, UserId $logon_user_id){
     parent::__construct($req, $project);
-    $this->member_name = $member_name;
-    
-    $this->form = new FormComponent(self::ACTION_CONFIRM);
+    $this->member_user_id = $member_user_id;
     
     $db = DB::get();
     
-    $users = new UserTable($db);
-    $user_id = $users->findLegacyIdByName($member_name);
-    $this->user_id = $user_id;
+    $this->form = new FormComponent(self::ACTION_CONFIRM);
     
-    if ($user_id !== null){
+    $users = new UserTable($db);
+    $this->member_name = $users->getUserName($member_user_id);
+    
+    if ($this->member_name !== null){
       $members = new ProjectMemberTable($db, $project);
-      $member_role = $members->getRoleIdStr($user_id);
+      $member_role = $members->getRoleIdStr($member_user_id);
       
       if ($member_role !== null){
+        $user_id_str = $member_user_id->raw();
+        
         $this->has_member = true;
-        $this->can_edit = MemberEditModel::canEditMember($logon_user_id, $this->user_id, empty($member_role) ? null : (int)$member_role, $project);
+        $this->can_edit = MemberEditModel::canEditMember($logon_user_id, $this->member_user_id, empty($member_role) ? null : (int)$member_role, $project);
         
         $issues = new IssueTable($db, $project);
         $filter = new IssueFilter();
-        $filter->filterManual(['assignee' => [$user_id]]);
+        $filter->filterManual(['assignee' => [$user_id_str]]);
         $this->assigned_issue_count = $issues->countIssues($filter) ?? 0;
         
         $select_replacement = $this->form->addSelect('Reassign')
-                                         ->addOption((string)$user_id, '(Do Not Reassign)')
+                                         ->addOption($user_id_str, '(Do Not Reassign)')
                                          ->addOption('', '(Reassign To Nobody)')
                                          ->dropdown();
         
         foreach($members->listMembers() as $member){
           $id = $member->getUserId();
           
-          if ($id !== $user_id){
-            $select_replacement->addOption((string)$id, $member->getUserName());
+          if (!$id->equals($member_user_id)){
+            $select_replacement->addOption($id->raw(), $member->getUserName());
           }
         }
         
@@ -73,7 +75,7 @@ class MemberRemoveModel extends BasicProjectPageModel{
     parent::load();
     
     if ($this->has_member && !$this->form->isFilled()){
-      $this->form->fill(['Reassign' => (string)$this->user_id]);
+      $this->form->fill(['Reassign' => $this->member_user_id->raw()]);
     }
     
     return $this;
@@ -106,7 +108,7 @@ class MemberRemoveModel extends BasicProjectPageModel{
     
     try{
       $members = new ProjectMemberTable(DB::get(), $this->getProject());
-      $members->removeByUserId($this->user_id, false);
+      $members->removeByUserId($this->member_user_id, false);
       return true;
     }catch(Exception $e){
       $this->form->onGeneralError($e);
@@ -120,22 +122,11 @@ class MemberRemoveModel extends BasicProjectPageModel{
       return false;
     }
     
-    $replacement = $data['Reassign'];
-    
-    if (empty($replacement)){
-      $replacement = null;
-    }
-    elseif (is_numeric($replacement)){
-      $replacement = (int)$replacement;
-    }
-    else{
-      $this->form->invalidateField('Reassign', 'Invalid member.');
-      return false;
-    }
+    $replacement = empty($data['Reassign']) ? null : UserId::fromRaw($data['Reassign']);
     
     try{
       $members = new ProjectMemberTable(DB::get(), $this->getProject());
-      $members->removeByUserId($this->user_id, $replacement !== $this->user_id, $replacement);
+      $members->removeByUserId($this->member_user_id, !$this->member_user_id->equals($replacement), $replacement);
       return true;
     }catch(Exception $e){
       $this->form->onGeneralError($e);

@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\UserId;
 use Database\DB;
 use Database\Objects\IssueDetail;
 use Database\Objects\ProjectInfo;
@@ -108,16 +109,16 @@ class IssueEditModel extends BasicProjectPageModel{
       $issue_assignee = $this->issue === null ? null : $this->issue->getAssignee();
       $issue_assignee_id = $issue_assignee === null ? null : $issue_assignee->getId();
       
-      if ($issue_assignee !== null){
-        $select_assignee->addOption((string)$issue_assignee_id, $issue_assignee->getName());
+      if ($issue_assignee_id !== null){
+        $select_assignee->addOption($issue_assignee_id->raw(), $issue_assignee->getName());
       }
       
       if ($perms->check(ProjectPermissions::LIST_MEMBERS)){
         foreach((new ProjectMemberTable(DB::get(), $project))->listMembers() as $member){
           $id = $member->getUserId();
           
-          if ($id !== $issue_assignee_id){
-            $select_assignee->addOption((string)$id, $member->getUserName());
+          if (!$id->equals($issue_assignee_id)){
+            $select_assignee->addOption($id->raw(), $member->getUserName());
           }
         }
       }
@@ -182,7 +183,7 @@ class IssueEditModel extends BasicProjectPageModel{
     
     $milestone = $issue->getMilestoneId();
     $assignee = $issue->getAssignee();
-  
+    
     $this->form->fill(['Title'       => $issue->getTitle(),
                        'Description' => $issue->getDescription()->getRawText(),
                        'Type'        => $issue->getType()->getId(),
@@ -191,7 +192,7 @@ class IssueEditModel extends BasicProjectPageModel{
                        'Status'      => $issue->getStatus()->getId(),
                        'Progress'    => (string)$issue->getProgress(),
                        'Milestone'   => $milestone === null ? '' : (string)$milestone,
-                       'Assignee'    => $assignee === null ? '' : (string)$assignee->getId()]);
+                       'Assignee'    => $assignee === null ? '' : $assignee->getId()->raw()]);
   }
   
   public function isNewIssue(): bool{
@@ -240,8 +241,8 @@ class IssueEditModel extends BasicProjectPageModel{
     $status = IssueFields::status($validator);
     $progress = IssueFields::progress($validator);
     
-    $milestone = empty($data['Milestone']) ? null : (int)$data['Milestone'];
-    $assignee = empty($data['Assignee']) ? null : (int)$data['Assignee'];
+    $milestone = empty($data['Milestone']) ? null : UserId::fromRaw($data['Milestone']);
+    $assignee = empty($data['Assignee']) ? null : UserId::fromRaw($data['Assignee']);
     
     try{
       $validator->validate();
@@ -252,7 +253,7 @@ class IssueEditModel extends BasicProjectPageModel{
       
       if ($assignee !== null && $assignee !== $prev_assignee_id && !(new ProjectMemberTable(DB::get(), $project))->checkMembershipExists($assignee)){
         $this->form->invalidateField('Assignee', 'Assignee must be a member of the project.');
-        $this->form->fill(['Assignee' => $prev_assignee === null ? '' : (string)$prev_assignee_id]);
+        $this->form->fill(['Assignee' => $prev_assignee_id === null ? '' : $prev_assignee_id->raw()]);
         $this->fillFormWithCurrentIssue();
         return null;
       }

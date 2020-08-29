@@ -47,13 +47,12 @@ class UserDeleteModel extends BasicRootPageModel{
     
     if ($this->user !== null){
       $users = new UserTable(DB::get());
-      $legacy_id = $users->findLegacyId($this->user_id);
       
-      foreach((new ProjectTable(DB::get()))->listProjectsOwnedBy($legacy_id) as $project){
+      foreach((new ProjectTable(DB::get()))->listProjectsOwnedBy($this->user_id) as $project){
         $this->owned_projects[] = $project;
       }
       
-      $this->statistics = $users->getUserStatistics($legacy_id);
+      $this->statistics = $users->getUserStatistics($this->user_id);
     }
     
     return $this;

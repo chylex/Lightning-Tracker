@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
+use Data\UserId;
 use Database\AbstractTable;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Types\ProjectFilter;
@@ -31,7 +32,7 @@ final class ProjectTable extends AbstractTable{
       $stmt->bindValue('name', $name);
       $stmt->bindValue('url', $url);
       $stmt->bindValue('hidden', $hidden, PDO::PARAM_BOOL);
-      $stmt->bindValue('owner_id', $owner->getId(), PDO::PARAM_INT);
+      $stmt->bindValue('owner_id', $owner->getId());
       $stmt->execute();
       
       $id = $this->getLastInsertId();
@@ -41,7 +42,7 @@ final class ProjectTable extends AbstractTable{
         throw new Exception('Could not retrieve project ID.');
       }
       
-      $project = new ProjectInfo($id, $name, $url, $owner->getId());
+      $project = new ProjectInfo($id, $name, $url, $owner->getId()->raw());
       $perms = new ProjectPermTable($this->db, $project);
       $members = new ProjectMemberTable($this->db, $project);
       
@@ -117,15 +118,14 @@ final class ProjectTable extends AbstractTable{
     return $results;
   }
   
-  public function listProjectsOwnedBy(int $user_id): array{
+  public function listProjectsOwnedBy(UserId $user_id): array{
     $stmt = $this->db->prepare('SELECT id, name, url FROM projects WHERE owner_id = ?');
-    $stmt->bindValue(1, $user_id, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt->execute([$user_id]);
     
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new ProjectInfo($res['id'], $res['name'], $res['url'], $user_id);
+      $results[] = new ProjectInfo($res['id'], $res['name'], $res['url'], $user_id->raw());
     }
     
     return $results;

@@ -240,8 +240,8 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
   
   if (empty($errors) && $conflict_action !== $conflict_resolution_reuse){
     try{
-      $stmt = $db->prepare('INSERT INTO users (public_id, name, email, password, admin, date_registered) VALUES (?, ?, ?, ?, TRUE, NOW())');
-      $stmt->bindValue(1, UserId::generateNew()->raw());
+      $stmt = $db->prepare('INSERT INTO users (id, name, email, password, admin, date_registered) VALUES (?, ?, ?, ?, TRUE, NOW())');
+      $stmt->bindValue(1, UserId::generateNew());
       $stmt->bindValue(2, $value_admin_name);
       $stmt->bindValue(3, $value_admin_email);
       $stmt->bindValue(4, UserLoginInfo::hashPassword($value_admin_password));

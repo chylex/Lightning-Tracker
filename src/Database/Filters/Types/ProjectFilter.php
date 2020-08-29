@@ -10,7 +10,6 @@ use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
 use Database\Objects\UserProfile;
-use PDO;
 use PDOStatement;
 
 final class ProjectFilter extends AbstractFilter{
@@ -21,8 +20,8 @@ final class ProjectFilter extends AbstractFilter{
   }
   
   public static function bindUserVisibility(PDOStatement $stmt, UserProfile $user): void{
-    bind($stmt, 'user_id_1', $user->getId(), PDO::PARAM_INT);
-    bind($stmt, 'user_id_2', $user->getId(), PDO::PARAM_INT);
+    bind($stmt, 'user_id_1', $user->getId());
+    bind($stmt, 'user_id_2', $user->getId());
   }
   
   public static function empty(): self{

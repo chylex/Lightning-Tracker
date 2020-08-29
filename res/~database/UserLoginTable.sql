@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `user_logins` (
-	`id`      INT NOT NULL,
+	`id`      CHAR(9) NOT NULL,
 	`token`   VARCHAR(191) NOT NULL, # Size limit needed due to low key size limits in older versions of MySQL.
 	`expires` DATETIME NOT NULL,
 	PRIMARY KEY (`id`, `token`),

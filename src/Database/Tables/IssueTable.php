@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
+use Data\UserId;
 use Database\AbstractProjectTable;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Types\IssueFilter;
@@ -27,8 +28,8 @@ final class IssueTable extends AbstractProjectTable{
                            IssueScale $scale,
                            IssueStatus $status,
                            int $progress,
-                           ?int $milestone_id,
-                           ?int $assignee_id
+                           ?UserId $milestone_id,
+                           ?UserId $assignee_id
   ): int{
     $this->db->beginTransaction();
     
@@ -51,9 +52,9 @@ SQL
       
       $stmt->bindValue('project_id', $this->getProjectId(), PDO::PARAM_INT);
       $stmt->bindValue('issue_id', $next_id, PDO::PARAM_INT);
-      $stmt->bindValue('author_id', $author->getId(), PDO::PARAM_INT);
-      $stmt->bindValue('assignee_id', $assignee_id, $assignee_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-      $stmt->bindValue('milestone_id', $milestone_id, $milestone_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+      $stmt->bindValue('author_id', $author->getId());
+      $stmt->bindValue('assignee_id', $assignee_id);
+      $stmt->bindValue('milestone_id', $milestone_id);
       $stmt->bindValue('title', $title);
       $stmt->bindValue('description', $description);
       $stmt->bindValue('type', $type->getId());
@@ -79,8 +80,8 @@ SQL
                             IssueScale $scale,
                             IssueStatus $status,
                             int $progress,
-                            ?int $milestone_id,
-                            ?int $assignee_id
+                            ?UserId $milestone_id,
+                            ?UserId $assignee_id
   ): void{
     $stmt = $this->db->prepare(<<<SQL
 UPDATE issues
@@ -100,8 +101,8 @@ SQL
     
     $stmt->bindValue('project_id', $this->getProjectId(), PDO::PARAM_INT);
     $stmt->bindValue('issue_id', $id, PDO::PARAM_INT);
-    $stmt->bindValue('assignee_id', $assignee_id, $assignee_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-    $stmt->bindValue('milestone_id', $milestone_id, $milestone_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+    $stmt->bindValue('assignee_id', $assignee_id);
+    $stmt->bindValue('milestone_id', $milestone_id);
     $stmt->bindValue('title', $title);
     $stmt->bindValue('description', $description);
     $stmt->bindValue('type', $type->getId());

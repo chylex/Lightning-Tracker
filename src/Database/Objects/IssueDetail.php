@@ -69,11 +69,11 @@ final class IssueDetail extends IssueInfo{
     $author = $this->author;
     $assignee = $this->assignee;
     
-    return ($author !== null && $user_id === $author->getId()) || ($assignee !== null && $user_id === $assignee->getId());
+    return ($author !== null && $user_id->equals($author->getId())) || ($assignee !== null && $user_id->equals($assignee->getId()));
   }
   
   public function isAssignee(UserProfile $user): bool{
-    return $this->assignee !== null && $user->getId() === $this->assignee->getId();
+    return $this->assignee !== null && $user->getId()->equals($this->assignee->getId());
   }
   
   public function getEditLevel(?UserProfile $user, ProjectPermissions $perms): int{

@@ -3,17 +3,19 @@ declare(strict_types = 1);
 
 namespace Database\Objects;
 
+use Data\UserId;
+
 final class IssueUser{
-  private int $id;
+  private string $id;
   private string $name;
   
-  public function __construct(int $id, string $name){
+  public function __construct(string $id, string $name){
     $this->id = $id;
     $this->name = $name;
   }
   
-  public function getId(): int{
-    return $this->id;
+  public function getId(): UserId{
+    return UserId::fromRaw($this->id);
   }
   
   public function getName(): string{
