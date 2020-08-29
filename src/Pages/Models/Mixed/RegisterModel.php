@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Mixed;
 
+use Data\UserId;
 use Database\DB;
 use Database\Objects\ProjectInfo;
 use Database\SQL;
@@ -98,7 +99,7 @@ class RegisterModel extends BasicMixedPageModel{
     return false;
   }
   
-  public static function checkDuplicateUser(FormComponent $form, string $name, string $email, ?int $exclude_id = null): bool{
+  public static function checkDuplicateUser(FormComponent $form, string $name, string $email, ?UserId $exclude_id = null): bool{
     try{
       $users = new UserTable(DB::get());
       $has_duplicate = false;
@@ -106,12 +107,12 @@ class RegisterModel extends BasicMixedPageModel{
       $name_match = $users->findIdByName($name);
       $email_match = $users->findIdByEmail($email);
       
-      if ($name_match !== null && ($exclude_id === null || $exclude_id !== $name_match)){
+      if ($name_match !== null && !$name_match->equals($exclude_id)){
         $form->invalidateField('Name', 'User with this name already exists.');
         $has_duplicate = true;
       }
       
-      if ($email_match !== null && ($exclude_id === null || $exclude_id !== $email_match)){
+      if ($email_match !== null && !$email_match->equals($exclude_id)){
         $form->invalidateField('Email', 'User with this email already exists.');
         $has_duplicate = true;
       }

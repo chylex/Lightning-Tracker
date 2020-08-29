@@ -45,7 +45,7 @@ class MemberEditModel extends BasicProjectPageModel{
     $db = DB::get();
     
     $users = new UserTable($db);
-    $this->user_id = $users->findIdByName($member_name);
+    $this->user_id = $users->findLegacyIdByName($member_name);
     
     if ($this->user_id === null){
       $member_role = null;

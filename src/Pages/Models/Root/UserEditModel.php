@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Root;
 
+use Data\UserId;
 use Database\DB;
 use Database\Objects\UserInfo;
 use Database\SQL;
@@ -23,13 +24,13 @@ use Validation\ValidationException;
 class UserEditModel extends BasicRootPageModel{
   public const ACTION_CONFIRM = 'Confirm';
   
-  private int $user_id;
+  private UserId $user_id;
   private ?UserInfo $user;
   
   private SystemPermissions $perms;
   private FormComponent $form;
   
-  public function __construct(Request $req, SystemPermissions $perms, int $user_id){
+  public function __construct(Request $req, SystemPermissions $perms, UserId $user_id){
     parent::__construct($req);
     
     $this->perms = $perms;

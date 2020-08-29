@@ -108,7 +108,7 @@ final class Session{
     
     try{
       $users = new UserTable(DB::get());
-      $id = $users->findIdByName($name);
+      $id = $users->findLegacyIdByName($name);
     }catch(Exception $e){
       Log::critical($e);
       return false;

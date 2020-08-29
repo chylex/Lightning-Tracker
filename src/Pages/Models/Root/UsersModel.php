@@ -101,7 +101,7 @@ class UsersModel extends BasicRootPageModel{
     $sorting = $filter->sort($this->getReq());
     
     foreach($users->listUsers($filter) as $user){
-      $user_id = $user->getId();
+      $user_id_formatted = $user->getPublicId()->formatted();
       $row = [$user->getNameSafe()];
       
       if ($can_see_email){
@@ -112,11 +112,11 @@ class UsersModel extends BasicRootPageModel{
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
       if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
-        if ($user_id === $logon_user_id || $user->isAdmin()){
+        if ($user->getId() === $logon_user_id || $user->isAdmin()){
           $row[] = '';
         }
         else{
-          $link_delete = Link::fromBase($req, 'users', (string)$user_id, 'delete');
+          $link_delete = Link::fromBase($req, 'users', $user_id_formatted, 'delete');
           $btn_delete = new IconButtonFormComponent($link_delete, 'circle-cross');
           $btn_delete->color('red');
           $row[] = $btn_delete;
@@ -126,7 +126,7 @@ class UsersModel extends BasicRootPageModel{
       $row = $this->table->addRow($row);
       
       if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
-        $row->link(Link::fromBase($this->getReq(), 'users', $user_id));
+        $row->link(Link::fromBase($this->getReq(), 'users', $user_id_formatted));
       }
     }
     

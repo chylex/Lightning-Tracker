@@ -18,7 +18,6 @@ use Routing\Request;
 class MemberRemoveModel extends BasicProjectPageModel{
   public const ACTION_CONFIRM = 'Confirm';
   
-  private int $logon_user_id;
   private string $member_name;
   private ?int $user_id;
   private bool $can_edit;
@@ -30,14 +29,13 @@ class MemberRemoveModel extends BasicProjectPageModel{
   public function __construct(Request $req, ProjectInfo $project, string $member_name, int $logon_user_id){
     parent::__construct($req, $project);
     $this->member_name = $member_name;
-    $this->logon_user_id = $logon_user_id;
     
     $this->form = new FormComponent(self::ACTION_CONFIRM);
     
     $db = DB::get();
     
     $users = new UserTable($db);
-    $user_id = $users->findIdByName($member_name);
+    $user_id = $users->findLegacyIdByName($member_name);
     $this->user_id = $user_id;
     
     if ($user_id !== null){

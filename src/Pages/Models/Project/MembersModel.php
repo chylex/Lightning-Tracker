@@ -179,7 +179,7 @@ class MembersModel extends BasicProjectPageModel{
     
     try{
       $users = new UserTable($db);
-      $user_id = $users->findIdByName($name);
+      $user_id = $users->findLegacyIdByName($name);
       
       if ($user_id === null){
         $this->form->invalidateField('Name', 'User not found.');

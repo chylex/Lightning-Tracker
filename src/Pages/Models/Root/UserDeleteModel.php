@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Root;
 
+use Data\UserId;
 use Database\DB;
 use Database\Objects\ProjectInfo;
 use Database\Objects\UserInfo;
@@ -17,7 +18,7 @@ use Routing\Request;
 class UserDeleteModel extends BasicRootPageModel{
   public const ACTION_CONFIRM = 'Confirm';
   
-  private int $user_id;
+  private UserId $user_id;
   private ?UserInfo $user;
   
   private FormComponent $form;
@@ -29,7 +30,7 @@ class UserDeleteModel extends BasicRootPageModel{
   
   private UserStatistics $statistics;
   
-  public function __construct(Request $req, int $user_id){
+  public function __construct(Request $req, UserId $user_id){
     parent::__construct($req);
     $this->user_id = $user_id;
     
@@ -45,11 +46,14 @@ class UserDeleteModel extends BasicRootPageModel{
     parent::load();
     
     if ($this->user !== null){
-      foreach((new ProjectTable(DB::get()))->listProjectsOwnedBy($this->user_id) as $project){
+      $users = new UserTable(DB::get());
+      $legacy_id = $users->findLegacyId($this->user_id);
+      
+      foreach((new ProjectTable(DB::get()))->listProjectsOwnedBy($legacy_id) as $project){
         $this->owned_projects[] = $project;
       }
       
-      $this->statistics = (new UserTable(DB::get()))->getUserStatistics($this->user_id);
+      $this->statistics = $users->getUserStatistics($legacy_id);
     }
     
     return $this;

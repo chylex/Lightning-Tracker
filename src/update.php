@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 
 use Configuration\SystemConfig;
+use Data\UserId;
 use Database\DB;
 use Logging\Log;
 
@@ -245,6 +246,25 @@ SQL
     $db->exec('ALTER TABLE system_role_permissions MODIFY permission ENUM (\'settings\', \'projects.list\', \'projects.list.all\', \'projects.create\', \'projects.manage\', \'users.list\', \'users.view.emails\', \'users.create\', \'users.manage\') NOT NULL');
     
     upgrade_config($db, $migration_version = 6);
+  }
+  
+  if ($migration_version === 6){
+    $db = DB::get();
+    
+    $db->exec('ALTER TABLE users ADD public_id CHAR(9) NOT NULL AFTER id');
+    
+    $stmt = $db->query('SELECT id FROM users');
+    
+    while(($res = $stmt->fetchColumn()) !== false){
+      $s2 = $db->prepare('UPDATE users SET public_id = ? WHERE id = ?');
+      $s2->bindValue(1, UserId::generateNew()->raw());
+      $s2->bindValue(2, (int)$res, PDO::PARAM_INT);
+      $s2->execute();
+    }
+    
+    $db->exec('ALTER TABLE users ADD UNIQUE (public_id);');
+    
+    upgrade_config($db, $migration_version = 7);
   }
 }catch(Exception $e){
   if (isset($db) && $db->inTransaction()){

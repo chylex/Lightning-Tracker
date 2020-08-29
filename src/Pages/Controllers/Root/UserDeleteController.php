@@ -3,9 +3,10 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Root;
 
+use Data\UserId;
 use Generator;
 use Pages\Controllers\AbstractHandlerController;
-use Pages\Controllers\Handlers\LoadNumericId;
+use Pages\Controllers\Handlers\LoadStringId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireSystemPermission;
 use Pages\IAction;
@@ -20,17 +21,17 @@ use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
 class UserDeleteController extends AbstractHandlerController{
-  private ?int $user_id;
+  private ?string $user_id;
   
   protected function prerequisites(): Generator{
     yield new RequireLoginState(true);
     yield new RequireSystemPermission(SystemPermissions::LIST_USERS);
     yield new RequireSystemPermission(SystemPermissions::MANAGE_USERS);
-    yield new LoadNumericId($this->user_id, 'user');
+    yield new LoadStringId($this->user_id, 'user');
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new UserDeleteModel($req, $this->user_id);
+    $model = new UserDeleteModel($req, UserId::fromFormatted($this->user_id));
     
     if (!$model->canDelete()){
       return error($req, 'Permission Error', 'You are not allowed to delete this user.');

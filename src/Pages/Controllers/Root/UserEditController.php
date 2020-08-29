@@ -3,9 +3,10 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Root;
 
+use Data\UserId;
 use Generator;
 use Pages\Controllers\AbstractHandlerController;
-use Pages\Controllers\Handlers\LoadNumericId;
+use Pages\Controllers\Handlers\LoadStringId;
 use Pages\Controllers\Handlers\RequireLoginState;
 use Pages\Controllers\Handlers\RequireSystemPermission;
 use Pages\IAction;
@@ -19,17 +20,17 @@ use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
 class UserEditController extends AbstractHandlerController{
-  private ?int $user_id;
+  private ?string $user_id;
   
   protected function prerequisites(): Generator{
     yield new RequireLoginState(true);
     yield new RequireSystemPermission(SystemPermissions::LIST_USERS);
     yield new RequireSystemPermission(SystemPermissions::MANAGE_USERS);
-    yield new LoadNumericId($this->user_id, 'user');
+    yield new LoadStringId($this->user_id, 'user');
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new UserEditModel($req, $sess->getPermissions()->system(), $this->user_id);
+    $model = new UserEditModel($req, $sess->getPermissions()->system(), UserId::fromFormatted($this->user_id));
     
     if ($req->getAction() === $model::ACTION_CONFIRM && $model->editUser($req->getData())){
       return redirect(Link::fromBase($req, 'users'));
