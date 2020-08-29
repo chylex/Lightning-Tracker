@@ -114,9 +114,9 @@ class ProjectModel extends BasicRootPageModel{
     return $this->form;
   }
   
-  public function createProject(array $data, ?UserProfile $owner): bool{
-    if (!$this->form->accept($data) || $owner === null){
-      return false;
+  public function createProject(array $data, UserProfile $owner): ?string{
+    if (!$this->form->accept($data)){
+      return null;
     }
     
     $validator = new FormValidator($data);
@@ -128,7 +128,7 @@ class ProjectModel extends BasicRootPageModel{
       $validator->validate();
       $projects = new ProjectTable(DB::get());
       $projects->addProject($name, $url, $hidden, $owner);
-      return true;
+      return $url;
     }catch(ValidationException $e){
       $this->form->invalidateFields($e->getFields());
     }catch(PDOException $e){
@@ -138,11 +138,11 @@ class ProjectModel extends BasicRootPageModel{
           
           if ($projects->checkUrlExists($url)){
             $this->form->invalidateField('Url', 'Project with this URL already exists.');
-            return false;
+            return null;
           }
         }catch(Exception $e){
           $this->form->onGeneralError($e);
-          return false;
+          return null;
         }
       }
       
@@ -151,7 +151,7 @@ class ProjectModel extends BasicRootPageModel{
       $this->form->onGeneralError($e);
     }
     
-    return false;
+    return null;
   }
 }
 

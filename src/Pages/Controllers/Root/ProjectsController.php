@@ -9,11 +9,12 @@ use Pages\Controllers\Handlers\HandleFilteringRequest;
 use Pages\IAction;
 use Pages\Models\Root\ProjectModel;
 use Pages\Views\Root\ProjectsPage;
+use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
 use Session\Session;
 use function Pages\Actions\error;
-use function Pages\Actions\reload;
+use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
 class ProjectsController extends AbstractHandlerController{
@@ -26,16 +27,16 @@ class ProjectsController extends AbstractHandlerController{
     $model = new ProjectModel($req, $perms);
     
     if ($req->getAction() === $model::ACTION_CREATE){
-      $perms->require(SystemPermissions::LIST_VISIBLE_PROJECTS);
-      $perms->require(SystemPermissions::CREATE_PROJECT);
-      
       $logon_user = $sess->getLogonUser();
       
-      if ($logon_user === null || !$perms->require(SystemPermissions::LIST_VISIBLE_PROJECTS) || !$perms->require(SystemPermissions::CREATE_PROJECT)){
+      if ($logon_user === null || !$perms->check(SystemPermissions::LIST_VISIBLE_PROJECTS) || !$perms->check(SystemPermissions::CREATE_PROJECT)){
         return error($req, 'Permission Error', 'You do not have permission to create a project.');
       }
-      else{
-        return reload();
+      
+      $url = $model->createProject($req->getData(), $logon_user);
+      
+      if ($url !== null){
+        return redirect(Link::fromRoot('project', rawurlencode($url)));
       }
     }
     
