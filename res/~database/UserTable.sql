@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 	UNIQUE KEY (`public_id`),
 	UNIQUE KEY `name` (`name`),
 	UNIQUE KEY `email` (`email`),
-	FOREIGN KEY (`role_id`)
+	CONSTRAINT fk__user__role FOREIGN KEY (`role_id`)
 		REFERENCES `system_roles` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL

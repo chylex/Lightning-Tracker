@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `projects` (
 	`hidden`   BOOL NOT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY (`url`),
-	FOREIGN KEY (`owner_id`)
+	CONSTRAINT fk__project__owner FOREIGN KEY (`owner_id`)
 		REFERENCES `users` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE RESTRICT

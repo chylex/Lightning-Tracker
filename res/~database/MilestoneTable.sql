@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `milestones` (
 	`title`        VARCHAR(64) NOT NULL,
 	PRIMARY KEY (`project_id`, `milestone_id`),
 	KEY (`milestone_id`, `project_id`), # Needed for milestone-project pair checks.
-	FOREIGN KEY (`project_id`)
+	CONSTRAINT fk__milestone__project FOREIGN KEY (`project_id`)
 		REFERENCES `projects` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE

@@ -251,6 +251,40 @@ SQL
   if ($migration_version === 6){
     $db = DB::get();
     
+    $stmt = $db->prepare(<<<SQL
+SELECT DISTINCT TABLE_NAME AS tbl, CONSTRAINT_NAME AS constr
+FROM information_schema.KEY_COLUMN_USAGE
+WHERE TABLE_SCHEMA = :db_name AND REFERENCED_TABLE_SCHEMA = TABLE_SCHEMA
+SQL
+    );
+    
+    $stmt->bindValue('db_name', DB_NAME);
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+    
+    foreach($rows as $row){
+      /** @noinspection SqlResolve */
+      $db->exec('ALTER TABLE `'.$row['tbl'].'` DROP FOREIGN KEY `'.$row['constr'].'`');
+    }
+    
+    $db->exec('ALTER TABLE issues ADD CONSTRAINT fk__issue__project FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE issues ADD CONSTRAINT fk__issue__author FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE SET NULL');
+    $db->exec('ALTER TABLE issues ADD CONSTRAINT fk__issue__assignee FOREIGN KEY (`assignee_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE SET NULL');
+    $db->exec('ALTER TABLE issues ADD CONSTRAINT fk__issue__milestone FOREIGN KEY (`milestone_id`, `project_id`) REFERENCES `milestones` (`milestone_id`, `project_id`) ON UPDATE CASCADE ON DELETE RESTRICT');
+    $db->exec('ALTER TABLE issues ADD CONSTRAINT fk__issue__scale FOREIGN KEY (`scale`) REFERENCES `issue_weights` (`scale`) ON UPDATE RESTRICT ON DELETE RESTRICT');
+    $db->exec('ALTER TABLE milestones ADD CONSTRAINT fk__milestone__project FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE project_members ADD CONSTRAINT fk__project_member__project FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE project_members ADD CONSTRAINT fk__project_member__user FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE project_members ADD CONSTRAINT fk__project_member__role FOREIGN KEY (`role_id`, `project_id`) REFERENCES `project_roles` (`role_id`, `project_id`) ON UPDATE CASCADE ON DELETE RESTRICT');
+    $db->exec('ALTER TABLE project_role_permissions ADD CONSTRAINT fk__project_role_permission__role FOREIGN KEY (`role_id`, `project_id`) REFERENCES `project_roles` (`role_id`, `project_id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE project_roles ADD CONSTRAINT fk__project_role__project FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON UPDATE CASCADE ON DELETE CASCADE ');
+    $db->exec('ALTER TABLE projects ADD CONSTRAINT fk__project__owner FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT');
+    $db->exec('ALTER TABLE project_user_settings ADD CONSTRAINT fk__project_user_setting__user FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE project_user_settings ADD CONSTRAINT fk__project_user_setting__active_milestone FOREIGN KEY (`active_milestone`, `project_id`) REFERENCES `milestones` (`milestone_id`, `project_id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE system_role_permissions ADD CONSTRAINT fk__system_role_permission__role FOREIGN KEY (`role_id`) REFERENCES `system_roles` (`id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE user_logins ADD CONSTRAINT fk__user_login__user FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE');
+    $db->exec('ALTER TABLE users ADD CONSTRAINT fk__user__role FOREIGN KEY (`role_id`) REFERENCES `system_roles` (`id`) ON UPDATE CASCADE ON DELETE SET NULL');
+    
     $db->exec('ALTER TABLE users ADD public_id CHAR(9) NOT NULL AFTER id');
     
     $stmt = $db->query('SELECT id FROM users');

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `project_role_permissions` (
 		'issues.edit.all',
 		'issues.delete.all') NOT NULL,
 	PRIMARY KEY (`project_id`, `role_id`, `permission`),
-	FOREIGN KEY (`role_id`, `project_id`)
+	CONSTRAINT fk__project_role_permission__role FOREIGN KEY (`role_id`, `project_id`)
 		REFERENCES `project_roles` (`role_id`, `project_id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE

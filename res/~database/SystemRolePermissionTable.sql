@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `system_role_permissions` (
 		'users.create',
 		'users.manage') NOT NULL,
 	PRIMARY KEY (`role_id`, `permission`),
-	FOREIGN KEY (`role_id`)
+	CONSTRAINT fk__system_role_permission__role FOREIGN KEY (`role_id`)
 		REFERENCES `system_roles` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE

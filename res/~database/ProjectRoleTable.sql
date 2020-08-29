@@ -6,9 +6,8 @@ CREATE TABLE IF NOT EXISTS `project_roles` (
 	`special`    BOOL NOT NULL DEFAULT FALSE,
 	PRIMARY KEY (`project_id`, `role_id`),
 	UNIQUE KEY (`project_id`, `title`),
-	KEY (`role_id`, `project_id`),
-	# Needed for role-project pair checks.
-	FOREIGN KEY (`project_id`)
+	KEY (`role_id`, `project_id`), # Needed for role-project pair checks.
+	CONSTRAINT fk__project_role__project FOREIGN KEY (`project_id`)
 		REFERENCES `projects` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE

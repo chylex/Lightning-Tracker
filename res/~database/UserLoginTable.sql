@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `user_logins` (
 	`expires` DATETIME NOT NULL,
 	PRIMARY KEY (`id`, `token`),
 	UNIQUE KEY (`token`),
-	FOREIGN KEY (`id`)
+	CONSTRAINT fk__user_login__user FOREIGN KEY (`id`)
 		REFERENCES `users` (`id`)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE
