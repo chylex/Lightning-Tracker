@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Database\Tables;
 
 use Data\UserId;
+use Data\UserPassword;
 use Database\AbstractTable;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Types\UserFilter;
@@ -45,7 +46,7 @@ final class UserTable extends AbstractTable{
     $stmt->bindValue(1, $id);
     $stmt->bindValue(2, $name);
     $stmt->bindValue(3, $email);
-    $stmt->bindValue(4, UserLoginInfo::hashPassword($password));
+    $stmt->bindValue(4, UserPassword::hash($password));
     $stmt->execute();
   }
   
@@ -67,7 +68,7 @@ SQL
     
     $stmt->bindValue(1, $name);
     $stmt->bindValue(2, $email);
-    $stmt->bindValue(3, $password === null ? null : UserLoginInfo::hashPassword($password));
+    $stmt->bindValue(3, $password === null ? null : UserPassword::hash($password));
     $stmt->bindValue(4, $role_id, $role_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
     $stmt->bindValue(5, $id);
     $stmt->execute();
@@ -80,7 +81,7 @@ SQL
    */
   public function changePassword(UserId $id, string $password): void{
     $stmt = $this->db->prepare('UPDATE users SET password = ? WHERE id = ?');
-    $stmt->execute([UserLoginInfo::hashPassword($password), $id]);
+    $stmt->execute([UserPassword::hash($password), $id]);
   }
   
   public function countUsers(?UserFilter $filter = null): ?int{
@@ -118,7 +119,7 @@ SQL;
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new UserInfo($res['id'], $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
+      $results[] = new UserInfo(UserId::fromRaw($res['id']), $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
     }
     
     return $results;
@@ -144,7 +145,7 @@ SQL;
     $stmt->execute([$id]);
     
     $res = $this->fetchOne($stmt);
-    return $res === false ? null : new UserInfo($res['id'], $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
+    return $res === false ? null : new UserInfo(UserId::fromRaw($res['id']), $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
   }
   
   public function getLoginInfo(string $name): ?UserLoginInfo{
@@ -152,7 +153,7 @@ SQL;
     $stmt->execute([$name]);
     
     $res = $this->fetchOne($stmt);
-    return $res === false ? null : new UserLoginInfo($res['id'], $res['password']);
+    return $res === false ? null : new UserLoginInfo(UserId::fromRaw($res['id']), new UserPassword($res['password']));
   }
   
   public function getUserStatistics(UserId $id): UserStatistics{

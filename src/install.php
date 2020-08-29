@@ -3,8 +3,8 @@ declare(strict_types = 1);
 
 use Configuration\SystemConfig;
 use Data\UserId;
+use Data\UserPassword;
 use Database\DB;
-use Database\Objects\UserLoginInfo;
 use Routing\UrlString;
 use Validation\ValidationException;
 
@@ -244,7 +244,7 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
       $stmt->bindValue(1, UserId::generateNew());
       $stmt->bindValue(2, $value_admin_name);
       $stmt->bindValue(3, $value_admin_email);
-      $stmt->bindValue(4, UserLoginInfo::hashPassword($value_admin_password));
+      $stmt->bindValue(4, UserPassword::hash($value_admin_password));
       $stmt->execute();
     }catch(Exception $e){
       $errors[] = 'Error setting up administrator account: '.$e->getMessage();

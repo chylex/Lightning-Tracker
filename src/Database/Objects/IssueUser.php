@@ -6,16 +6,16 @@ namespace Database\Objects;
 use Data\UserId;
 
 final class IssueUser{
-  private string $id;
+  private UserId $id;
   private string $name;
   
-  public function __construct(string $id, string $name){
+  public function __construct(UserId $id, string $name){
     $this->id = $id;
     $this->name = $name;
   }
   
   public function getId(): UserId{
-    return UserId::fromRaw($this->id);
+    return $this->id;
   }
   
   public function getName(): string{

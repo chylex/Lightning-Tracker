@@ -3,11 +3,11 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\IssueStatus;
 use Database\DB;
 use Database\Objects\IssueDetail;
 use Database\Objects\ProjectInfo;
 use Database\Tables\IssueTable;
-use Pages\Components\Issues\IssueStatus;
 use Pages\Components\Markup\LightMarkParseResult;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Text;

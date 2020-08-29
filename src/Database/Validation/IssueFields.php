@@ -3,10 +3,10 @@ declare(strict_types = 1);
 
 namespace Database\Validation;
 
-use Pages\Components\Issues\IssuePriority;
-use Pages\Components\Issues\IssueScale;
-use Pages\Components\Issues\IssueStatus;
-use Pages\Components\Issues\IssueType;
+use Data\IssuePriority;
+use Data\IssueScale;
+use Data\IssueStatus;
+use Data\IssueType;
 use Validation\FormValidator;
 
 final class IssueFields{

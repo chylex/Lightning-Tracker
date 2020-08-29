@@ -1,7 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Pages\Components\Issues;
+namespace Data;
+
+use Pages\Components\Issues\AbstractIssueTag;
 
 final class IssueStatus extends AbstractIssueTag{
   public const OPEN = 'open';

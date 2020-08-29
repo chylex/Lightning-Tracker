@@ -77,7 +77,7 @@ class AccountSecurityModel extends AccountModel{
         return false;
       }
       
-      $validator->str('OldPassword')->isTrue(fn($v): bool => $login_info->checkPassword($v), 'Password does not match.');
+      $validator->str('OldPassword')->isTrue(fn($v): bool => $login_info->getPassword()->check($v), 'Password does not match.');
       $validator->validate();
       
       $users->changePassword($user->getId(), $new_password);

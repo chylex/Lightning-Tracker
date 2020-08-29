@@ -6,12 +6,12 @@ namespace Database\Objects;
 use Data\UserId;
 
 final class ProjectMember{
-  private string $user_id;
+  private UserId $user_id;
   private string $user_name;
   private ?int $role_id;
   private ?string $role_title;
   
-  public function __construct(string $user_id, string $user_name, ?int $role_id, ?string $role_title){
+  public function __construct(UserId $user_id, string $user_name, ?int $role_id, ?string $role_title){
     $this->user_id = $user_id;
     $this->user_name = $user_name;
     $this->role_id = $role_id;
@@ -19,7 +19,7 @@ final class ProjectMember{
   }
   
   public function getUserId(): UserId{
-    return UserId::fromRaw($this->user_id);
+    return $this->user_id;
   }
   
   public function getUserName(): string{

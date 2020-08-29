@@ -3,6 +3,10 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\IssuePriority;
+use Data\IssueScale;
+use Data\IssueStatus;
+use Data\IssueType;
 use Database\DB;
 use Database\Filters\Types\IssueFilter;
 use Database\Objects\ProjectInfo;
@@ -13,10 +17,6 @@ use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\Elements\FormSelectMultiple;
 use Pages\Components\Html;
 use Pages\Components\Issues\IIssueTag;
-use Pages\Components\Issues\IssuePriority;
-use Pages\Components\Issues\IssueScale;
-use Pages\Components\Issues\IssueStatus;
-use Pages\Components\Issues\IssueType;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Table\TableComponent;

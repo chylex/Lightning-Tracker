@@ -3,6 +3,10 @@ declare(strict_types = 1);
 
 namespace Database\Tables;
 
+use Data\IssuePriority;
+use Data\IssueScale;
+use Data\IssueStatus;
+use Data\IssueType;
 use Data\UserId;
 use Database\AbstractProjectTable;
 use Database\Filters\AbstractFilter;
@@ -12,10 +16,6 @@ use Database\Objects\IssueInfo;
 use Database\Objects\IssueUser;
 use Database\Objects\UserProfile;
 use LogicException;
-use Pages\Components\Issues\IssuePriority;
-use Pages\Components\Issues\IssueScale;
-use Pages\Components\Issues\IssueStatus;
-use Pages\Components\Issues\IssueType;
 use PDO;
 use PDOException;
 
@@ -283,8 +283,8 @@ SQL
                            $res['date_updated'],
                            $res['milestone_id'],
                            $res['milestone_title'],
-                           $res['author_id'] === null ? null : new IssueUser($res['author_id'], $res['author_name']),
-                           $res['assignee_id'] === null ? null : new IssueUser($res['assignee_id'], $res['assignee_name']));
+                           $res['author_id'] === null ? null : new IssueUser(UserId::fromRaw($res['author_id']), $res['author_name']),
+                           $res['assignee_id'] === null ? null : new IssueUser(UserId::fromRaw($res['assignee_id']), $res['assignee_name']));
   }
   
   public function getIssueDescription(int $id): string{

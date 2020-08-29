@@ -60,7 +60,7 @@ SQL;
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new ProjectMember($res['user_id'], $res['name'], $res['role_id'], $res['role_title']);
+      $results[] = new ProjectMember(UserId::fromRaw($res['user_id']), $res['name'], $res['role_id'], $res['role_title']);
     }
     
     return $results;

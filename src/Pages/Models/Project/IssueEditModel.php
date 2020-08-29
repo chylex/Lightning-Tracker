@@ -3,6 +3,10 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\IssuePriority;
+use Data\IssueScale;
+use Data\IssueStatus;
+use Data\IssueType;
 use Data\UserId;
 use Database\DB;
 use Database\Objects\IssueDetail;
@@ -16,10 +20,6 @@ use Exception;
 use Pages\Components\Forms\Elements\FormSelect;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Issues\IIssueTag;
-use Pages\Components\Issues\IssuePriority;
-use Pages\Components\Issues\IssueScale;
-use Pages\Components\Issues\IssueStatus;
-use Pages\Components\Issues\IssueType;
 use Pages\IModel;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Request;

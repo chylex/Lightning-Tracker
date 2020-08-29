@@ -9,9 +9,9 @@ final class ProjectInfo{
   private int $id;
   private string $name;
   private string $url;
-  private string $owner_id;
+  private UserId $owner_id;
   
-  public function __construct(int $id, string $name, string $url, string $owner_id){
+  public function __construct(int $id, string $name, string $url, UserId $owner_id){
     $this->id = $id;
     $this->name = $name;
     $this->url = $url;
@@ -39,7 +39,7 @@ final class ProjectInfo{
   }
   
   public function getOwnerId(): UserId{
-    return UserId::fromRaw($this->owner_id);
+    return $this->owner_id;
   }
 }
 

@@ -6,13 +6,13 @@ namespace Database\Objects;
 use Data\UserId;
 
 final class UserProfile{
-  private string $id;
+  private UserId $id;
   private string $name;
   private string $email;
   private ?int $sys_role_id;
   private bool $admin;
   
-  public function __construct(string $id, string $name, string $email, ?int $sys_role_id, bool $admin){
+  public function __construct(UserId $id, string $name, string $email, ?int $sys_role_id, bool $admin){
     $this->id = $id;
     $this->name = $name;
     $this->email = $email;
@@ -21,7 +21,7 @@ final class UserProfile{
   }
   
   public function getId(): UserId{
-    return UserId::fromRaw($this->id);
+    return $this->id;
   }
   
   public function getName(): string{

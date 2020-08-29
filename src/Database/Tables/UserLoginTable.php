@@ -23,7 +23,7 @@ SQL
     $stmt->execute([$token]);
     
     $res = $this->fetchOne($stmt);
-    return $res === false ? null : new UserProfile($res['id'], $res['name'], $res['email'], $res['role_id'], (bool)$res['admin']);
+    return $res === false ? null : new UserProfile(UserId::fromRaw($res['id']), $res['name'], $res['email'], $res['role_id'], (bool)$res['admin']);
   }
   
   public function addOrRenewToken(UserId $id, string $token, int $expire_in_minutes): void{

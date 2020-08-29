@@ -42,7 +42,7 @@ final class ProjectTable extends AbstractTable{
         throw new Exception('Could not retrieve project ID.');
       }
       
-      $project = new ProjectInfo($id, $name, $url, $owner->getId()->raw());
+      $project = new ProjectInfo($id, $name, $url, $owner->getId());
       $perms = new ProjectPermTable($this->db, $project);
       $members = new ProjectMemberTable($this->db, $project);
       
@@ -112,7 +112,7 @@ final class ProjectTable extends AbstractTable{
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new ProjectInfo($res['id'], $res['name'], $res['url'], $res['owner_id']);
+      $results[] = new ProjectInfo($res['id'], $res['name'], $res['url'], UserId::fromRaw($res['owner_id']));
     }
     
     return $results;
@@ -125,7 +125,7 @@ final class ProjectTable extends AbstractTable{
     $results = [];
     
     while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new ProjectInfo($res['id'], $res['name'], $res['url'], $user_id->raw());
+      $results[] = new ProjectInfo($res['id'], $res['name'], $res['url'], $user_id);
     }
     
     return $results;
@@ -143,7 +143,7 @@ final class ProjectTable extends AbstractTable{
     $stmt->execute();
     
     $res = $this->fetchOne($stmt);
-    return $res === false ? null : new ProjectVisibilityInfo(new ProjectInfo($res['id'], $res['name'], $url, $res['owner_id']), (bool)$res['visible']);
+    return $res === false ? null : new ProjectVisibilityInfo(new ProjectInfo($res['id'], $res['name'], $url, UserId::fromRaw($res['owner_id'])), (bool)$res['visible']);
   }
   
   public function checkUrlExists(string $url): bool{

@@ -1,7 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace Pages\Components\Issues;
+namespace Data;
+
+use Pages\Components\Issues\AbstractIssueTag;
 
 final class IssuePriority extends AbstractIssueTag{
   public const LOW = 'low';

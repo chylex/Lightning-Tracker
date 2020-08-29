@@ -1,9 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Pages\Components\Issues;
+namespace Data;
 
 use Pages\Components\Html;
+use Pages\Components\Issues\IIssueTag;
 use Pages\IViewable;
 
 final class IssueType implements IIssueTag{

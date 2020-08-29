@@ -49,7 +49,7 @@ class LoginModel extends BasicMixedPageModel{
       $users = new UserTable(DB::get());
       $login_info = $users->getLoginInfo($data['Name']);
       
-      if ($login_info === null || !$login_info->checkPassword($data['Password'])){
+      if ($login_info === null || !$login_info->getPassword()->check($data['Password'])){
         $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid username or password.'));
         return false;
       }
