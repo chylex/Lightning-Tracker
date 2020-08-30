@@ -3,8 +3,6 @@ declare(strict_types = 1);
 
 define('DEBUG', true);
 
-define('INSTALLED_MIGRATION_VERSION', TRACKER_MIGRATION_VERSION);
-
 define('SYS_ENABLE_REGISTRATION', true);
 define('BASE_URL', 'http://localhost');
 

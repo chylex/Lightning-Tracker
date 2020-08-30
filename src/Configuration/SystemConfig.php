@@ -57,7 +57,7 @@ final class SystemConfig{
     $validator->validate();
   }
   
-  public function generate(int $migration_version = TRACKER_MIGRATION_VERSION): string{
+  public function generate(): string{
     $sys_enable_registration = $this->sys_enable_registration ? 'true' : 'false';
     $base_url = addcslashes($this->base_url, '\'\\');
     $db_name = addcslashes($this->db_name, '\'\\');
@@ -69,8 +69,6 @@ final class SystemConfig{
     $contents = <<<PHP
 <?php
 declare(strict_types = 1);
-
-define('INSTALLED_MIGRATION_VERSION', $migration_version);
 
 define('SYS_ENABLE_REGISTRATION', $sys_enable_registration);
 define('BASE_URL', '$base_url');
@@ -84,6 +82,10 @@ define('DB_PASSWORD', '$db_password');
 PHP;
     
     return $contents;
+  }
+  
+  public function write(string $file): bool{
+    return file_put_contents($file, $this->generate(), LOCK_EX) !== false;
   }
 }
 

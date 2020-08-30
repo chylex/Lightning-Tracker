@@ -120,7 +120,7 @@ HTML;
       return false;
     }
     
-    if (!file_put_contents(CONFIG_FILE, $config->generate(), LOCK_EX)){
+    if (!$config->write(CONFIG_FILE)){
       $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Error updating \'config.php\'.'));
       return false;
     }

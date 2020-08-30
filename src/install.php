@@ -253,7 +253,7 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
   
   // Configuration File
   
-  if (empty($errors) && !file_put_contents(__DIR__.'/config.php', $config->generate(), LOCK_EX)){
+  if (empty($errors) && !$config->write(CONFIG_FILE)){
     $errors[] = 'Error creating \'config.php\'.';
   }
   
