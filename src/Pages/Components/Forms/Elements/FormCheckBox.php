@@ -8,13 +8,7 @@ use Pages\Components\Forms\AbstractFormField;
 class FormCheckBox extends AbstractFormField{
   protected const CHECKED_VALUE = 'on';
   
-  private string $id;
   private ?string $label;
-  
-  public function __construct(string $id, string $name){
-    parent::__construct($name);
-    $this->id = $id;
-  }
   
   public final function label(string $label): self{
     $this->label = $label;
@@ -50,19 +44,19 @@ class FormCheckBox extends AbstractFormField{
   public function echoBody(): void{
     $checked_value = self::CHECKED_VALUE;
     
+    $id = $this->getId();
     $name = $this->getName();
     $label = $this->label ?? $name;
     
     $checked_attr = $this->value !== $checked_value ? '' : ' checked';
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
-    $disabled_class = $this->disabled === false ? '' : ' class="disabled"';
     
     echo <<<HTML
 <div class="field-group">
-  <input id="$this->id" name="$name" type="checkbox" value="$checked_value"$checked_attr$disabled_attr>
-  <label for="$this->id"$disabled_class>$label</label>
+  <input id="$id" name="$name" type="checkbox" value="$checked_value" $checked_attr$disabled_attr>
 HTML;
     
+    $this->echoLabel($label);
     $this->echoErrors();
     
     echo <<<HTML

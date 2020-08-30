@@ -7,7 +7,6 @@ use Pages\Components\Forms\AbstractFormField;
 use Pages\IViewable;
 
 final class FormSelectMultiple extends AbstractFormField{
-  private string $id;
   private ?string $label;
   private array $options = [];
   
@@ -15,11 +14,6 @@ final class FormSelectMultiple extends AbstractFormField{
    * @var string[]
    */
   private array $checked = [];
-  
-  public function __construct(string $id, string $name){
-    parent::__construct($name);
-    $this->id = $id;
-  }
   
   public function label(string $label): self{
     $this->label = $label;
@@ -53,6 +47,7 @@ final class FormSelectMultiple extends AbstractFormField{
   
   /** @noinspection HtmlMissingClosingTag */
   public function echoBody(): void{
+    $id = $this->getId();
     $name = $this->getName();
     $name_as_array = $name.'[]';
     $label = $this->label ?? $name;
@@ -60,12 +55,13 @@ final class FormSelectMultiple extends AbstractFormField{
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
     $disabled_class = $this->disabled === false ? '' : ' class="disabled"';
     
+    echo '<div class="field-group">';
+    $this->echoLabel($label);
+    
     echo <<<HTML
-<div class="field-group">
-  <label for="$this->id"$disabled_class>$label</label>
-  <details class="multiselect" id="$this->id">
-    <summary>Select options...</summary>
-    <article>
+<details class="multiselect" id="$id">
+  <summary>Select options...</summary>
+  <article>
 HTML;
     
     foreach($this->options as $option){
@@ -73,33 +69,30 @@ HTML;
       $value_safe = protect($value);
       $option_label = $option[1];
       
-      $id = $this->id.'-'.$value_safe;
+      $option_id = $id.'-'.$value_safe;
       $checked_attr = in_array($value, $this->checked, true) ? ' checked' : '';
       
       echo <<<HTML
-      <div class="field-group">
-        <input id="$id" name="$name_as_array" type="checkbox" value="$value_safe"$checked_attr$disabled_attr>
-        <label for="$id"$disabled_class>
+    <div class="field-group">
+      <input id="$option_id" name="$name_as_array" type="checkbox" value="$value_safe" $checked_attr$disabled_attr>
+      <label for="$option_id" $disabled_class>
 HTML;
       
       $option_label->echoBody();
       
       echo <<<HTML
-        </label>
-      </div>
+      </label>
+    </div>
 HTML;
     }
     
     echo <<<HTML
-    </article>
-  </details>
+  </article>
+</details>
 HTML;
     
     $this->echoErrors();
-    
-    echo <<<HTML
-</div>
-HTML;
+    echo '</div>';
   }
 }
 

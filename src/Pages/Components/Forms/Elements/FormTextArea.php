@@ -8,14 +8,8 @@ use Pages\Components\Forms\AbstractFormField;
 final class FormTextArea extends AbstractFormField{
   private const CONTROL_WHOLELINE_TOGGLE = 'wholeline-toggle';
   
-  private string $id;
   private ?string $label;
   private bool $markdown_editor = false;
-  
-  public function __construct(string $id, string $name){
-    parent::__construct($name);
-    $this->id = $id;
-  }
   
   public function label(string $label): self{
     $this->label = $label;
@@ -28,18 +22,16 @@ final class FormTextArea extends AbstractFormField{
   }
   
   public function echoBody(): void{
+    $id = $this->getId();
     $name = $this->getName();
     $label = $this->label ?? $name;
     $value = protect($this->value);
     
     $markdown_editor_attr = $this->markdown_editor ? ' data-markdown-editor' : '';
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
-    $disabled_class = $this->disabled === false ? '' : ' class="disabled"';
     
-    echo <<<HTML
-<div class="field-group">
-  <label for="$this->id"$disabled_class>$label</label>
-HTML;
+    echo '<div class="field-group">';
+    $this->echoLabel($label);
     
     if ($this->markdown_editor){
       echo '<div data-markdown-editor-controls>';
@@ -56,15 +48,10 @@ HTML;
       echo '</div>';
     }
     
-    echo <<<HTML
-  <textarea id="$this->id" name="$name"$markdown_editor_attr$disabled_attr>$value</textarea>
-HTML;
+    echo '<textarea id="'.$id.'" name="'.$name.'" '.$markdown_editor_attr.$disabled_attr.'>'.$value.'</textarea>';
     
     $this->echoErrors();
-    
-    echo <<<HTML
-</div>
-HTML;
+    echo '</div>';
   }
   
   private static function editorButtonIcon(string $attr_name, string $attr_value, string $icon = null): void{

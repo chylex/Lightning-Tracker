@@ -4,17 +4,23 @@ declare(strict_types = 1);
 namespace Pages\Components\Forms;
 
 abstract class AbstractFormField implements IFormField{
+  private string $id;
   private string $name;
   private array $errors = [];
   
   protected string $value = '';
   protected bool $disabled = false;
   
-  public function __construct(string $name){
+  public function __construct(string $id, string $name){
+    $this->id = $id;
     $this->name = $name;
   }
   
-  public function getName(): string{
+  protected function getId(): string{
+    return $this->id;
+  }
+  
+  protected function getName(): string{
     return $this->name;
   }
   
@@ -44,6 +50,10 @@ abstract class AbstractFormField implements IFormField{
     foreach($this->errors as $error){
       echo '<p class="message error">'.$error.'</p>';
     }
+  }
+  
+  protected final function echoLabel(string $label): void{
+    echo '<label for="', $this->id, '"', ($this->disabled ? ' class="disabled"' : ''), '>', $label, '</label>';
   }
 }
 

@@ -6,7 +6,6 @@ namespace Pages\Components\Forms\Elements;
 use Pages\Components\Forms\AbstractFormField;
 
 final class FormSelect extends AbstractFormField{
-  private string $id;
   private ?string $label;
   private bool $dropdown = false;
   private bool $optional = false;
@@ -15,11 +14,6 @@ final class FormSelect extends AbstractFormField{
    * @var FormSelectOption[]
    */
   private array $options = [];
-  
-  public function __construct(string $id, string $name){
-    parent::__construct($name);
-    $this->id = $id;
-  }
   
   public function label(string $label): self{
     $this->label = $label;
@@ -54,19 +48,19 @@ final class FormSelect extends AbstractFormField{
     return $this->optional;
   }
   
-  /** @noinspection HtmlMissingClosingTag */
   public function echoBody(): void{
+    $id = $this->getId();
     $name = $this->getName();
     $label = $this->label ?? $name;
     
     $size_attr = $this->dropdown ? '' : ' size="'.count($this->options).'"';
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
-    $disabled_class = $this->disabled === false ? '' : ' class="disabled"';
+    
+    echo '<div class="field-group">';
+    $this->echoLabel($label);
     
     echo <<<HTML
-<div class="field-group">
-  <label for="$this->id"$disabled_class>$label</label>
-  <select id="$this->id" name="$name" $size_attr$disabled_attr>
+  <select id="$id" name="$name" $size_attr$disabled_attr>
 HTML;
     
     foreach($this->options as $option){
@@ -74,15 +68,10 @@ HTML;
       $option->echoBody();
     }
     
-    echo <<<HTML
-  </select>
-HTML;
+    echo '</select>';
     
     $this->echoErrors();
-    
-    echo <<<HTML
-</div>
-HTML;
+    echo '</div>';
   }
 }
 

@@ -6,15 +6,13 @@ namespace Pages\Components\Forms\Elements;
 use Pages\Components\Forms\AbstractFormField;
 
 final class FormNumberField extends AbstractFormField{
-  private string $id;
   private ?string $label;
   private int $min;
   private int $max;
   private int $step = 1;
   
   public function __construct(string $id, string $name, int $min, int $max){
-    parent::__construct($name);
-    $this->id = $id;
+    parent::__construct($id, $name);
     $this->min = $min;
     $this->max = $max;
   }
@@ -30,24 +28,22 @@ final class FormNumberField extends AbstractFormField{
   }
   
   public function echoBody(): void{
+    $id = $this->getId();
     $name = $this->getName();
     $label = $this->label ?? $name;
     $value = min($this->max, max($this->min, (int)$this->value));
     
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
-    $disabled_class = $this->disabled === false ? '' : ' class="disabled"';
+    
+    echo '<div class="field-group">';
+    $this->echoLabel($label);
     
     echo <<<HTML
-<div class="field-group">
-  <label for="$this->id"$disabled_class>$label</label>
-  <input id="$this->id" name="$name" type="number" min="$this->min" max="$this->max" data-step="$this->step" value="$value"$disabled_attr>
+  <input id="$id" name="$name" type="number" min="$this->min" max="$this->max" data-step="$this->step" value="$value"$disabled_attr>
 HTML;
     
     $this->echoErrors();
-    
-    echo <<<HTML
-</div>
-HTML;
+    echo '</div>';
   }
 }
 
