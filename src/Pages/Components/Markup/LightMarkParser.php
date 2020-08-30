@@ -173,7 +173,7 @@ final class LightMarkParser{
     if ($cb_name === null){
       return <<<HTML
 <div class="field-group">
-  <input type="checkbox"$checked_attr disabled>
+  <input type="checkbox" disabled $checked_attr>
   <label class="disabled">$rest</label>
 </div>
 HTML;
@@ -184,7 +184,7 @@ HTML;
       
       return <<<HTML
 <div class="field-group">
-  <input id="$id" name="$name" type="checkbox" value="$this->checkbox_count"$checked_attr>
+  <input id="$id" name="$name" type="checkbox" value="$this->checkbox_count" $checked_attr>
   <label for="$id">$rest</label>
 </div>
 HTML;

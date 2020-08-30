@@ -279,7 +279,7 @@ final class FormComponent implements IViewable{
     $confirm_attr = $this->confirm_message === null ? '' : ' onsubmit="return confirm(\''.protect($this->confirm_message).'\');"';
     
     echo <<<HTML
-<form id="$this->id" action="" method="post"$confirm_attr>
+<form id="$this->id" action="" method="post" $confirm_attr>
 HTML;
     
     $groups = [];

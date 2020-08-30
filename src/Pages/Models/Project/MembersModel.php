@@ -100,6 +100,7 @@ class MembersModel extends BasicProjectPageModel{
     $sorting = $filter->sort($this->getReq());
     
     foreach($members->listMembers($filter) as $member){
+      /** @noinspection ProperNullCoalescingOperatorUsageInspection */
       $row = [$member->getUserNameSafe(),
               $member->getRoleTitleSafe() ?? Text::missing('Default')];
       

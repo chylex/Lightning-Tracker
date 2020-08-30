@@ -306,7 +306,7 @@ echo <<<HTML
       <h2>Lightning Tracker</h2>
       <form action="" method="post">
         
-        <div id="form-install-section"$form_section_install_style>
+        <div id="form-install-section" $form_section_install_style>
           <div class="split-wrapper split-collapse-800">
             <div class="split-33">
               
@@ -384,7 +384,7 @@ echo <<<HTML
           </article>
         </div>
         
-        <div id="form-conflict-section"$form_section_conflict_style>
+        <div id="form-conflict-section" $form_section_conflict_style>
           <h3>Previous Installation Detected</h3>
           <article>
             <p>It appears Lightning Tracker (or another application with conflicting database tables) was already installed in this database.</p>

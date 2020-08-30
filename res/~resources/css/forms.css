@@ -83,6 +83,7 @@ select {
 select[size] {
   padding: 0;
   overflow: hidden;
+  /*noinspection CssUnknownProperty*/
   scrollbar-width: none;
   -ms-overflow-style: none;
 }

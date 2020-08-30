@@ -4,7 +4,10 @@ declare(strict_types = 1);
 namespace Session;
 
 abstract class AbstractPermissionList{
+  /** @noinspection PhpUnused */
   public abstract static function permitAll(): self;
+  
+  /** @noinspection PhpUnused */
   public abstract static function permitList(array $perms): self;
   
   private bool $override;

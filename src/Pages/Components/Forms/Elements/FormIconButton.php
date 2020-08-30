@@ -39,7 +39,7 @@ final class FormIconButton implements IViewable{
     $disabled_attr = $this->disabled ? ' disabled' : '';
     
     echo <<<HTML
-<button type="$this->type" class="icon"$value$disabled_attr>
+<button type="$this->type" class="icon" $value$disabled_attr>
   <span class="icon icon-$this->icon$color_class"></span>
 </button>
 HTML;

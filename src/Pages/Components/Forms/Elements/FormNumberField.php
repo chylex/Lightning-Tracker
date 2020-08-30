@@ -39,7 +39,7 @@ final class FormNumberField extends AbstractFormField{
     $this->echoLabel($label);
     
     echo <<<HTML
-  <input id="$id" name="$name" type="number" min="$this->min" max="$this->max" data-step="$this->step" value="$value"$disabled_attr>
+  <input id="$id" name="$name" type="number" min="$this->min" max="$this->max" data-step="$this->step" value="$value" $disabled_attr>
 HTML;
     
     $this->echoErrors();

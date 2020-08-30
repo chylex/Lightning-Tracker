@@ -5,6 +5,8 @@ namespace Pages\Models\Project;
 
 use Pages\Models\BasicProjectPageModel;
 
+/** @noinspection PhpUnused */
+
 class DashboardModel extends BasicProjectPageModel{
 
 }

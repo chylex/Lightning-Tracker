@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 }
             }
             
+            // noinspection JSCheckFunctionSignatures
             fetch(form.action, {
                 method: "POST",
                 body: new URLSearchParams(data),

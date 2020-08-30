@@ -58,14 +58,6 @@ final class SplitComponent implements IViewable{
     return $this;
   }
   
-  public function addLeftIfNotNull(?IViewable $component): self{
-    if ($component !== null){
-      $this->left[] = $component;
-    }
-    
-    return $this;
-  }
-  
   public function addRightIfNotNull(?IViewable $component): self{
     if ($component !== null){
       $this->right[] = $component;

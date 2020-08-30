@@ -4,16 +4,7 @@ document.addEventListener("DOMContentLoaded", function(){
      */
     function canUseFixedLayout(table){
         const head = table.tHead;
-        
-        if (head === null || head.rows.length === 0){
-            return false;
-        }
-        
-        if (Array.from(table.rows).some(row => row.parentElement.tagName !== "TFOOT" && Array.from(row.cells).some(cell => cell.colSpan > 1))){
-            return false;
-        }
-        
-        return true;
+        return head !== null && head.rows.length > 0 && !Array.from(table.rows).some(row => row.parentElement.tagName !== "TFOOT" && Array.from(row.cells).some(cell => cell.colSpan > 1));
     }
     
     /**

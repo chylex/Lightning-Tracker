@@ -108,6 +108,7 @@ class UsersModel extends BasicRootPageModel{
         $row[] = $user->getEmailSafe();
       }
       
+      /** @noinspection ProperNullCoalescingOperatorUsageInspection */
       $row[] = $user->getRoleTitleSafe() ?? Text::missing('Default');
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       

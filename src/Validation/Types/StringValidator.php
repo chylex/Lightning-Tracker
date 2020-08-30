@@ -41,14 +41,6 @@ class StringValidator extends AbstractFieldValidator{
     return $this;
   }
   
-  public function length(int $length, ?string $message = null): self{
-    if ($this->noError() && strlen($this->value) !== $length){
-      $this->fail($message ?? $this->label.' must be exactly '.$length.' characters long.');
-    }
-    
-    return $this;
-  }
-  
   public function minLength(int $minLength, ?string $message = null): self{
     if ($this->noError() && strlen($this->value) < $minLength){
       $this->fail($message ?? $this->label.' must be at least '.$minLength.' characters long.');

@@ -171,7 +171,7 @@ abstract class AbstractFilter{
     $limit_offset = ($this->pagination->getCurrentPage() - 1) * $this->pagination->getElementsPerPage();
     $limit_count = $this->pagination->getElementsPerPage();
     
-    return (int)$limit_offset.', '.(int)$limit_count;
+    return $limit_offset.', '.$limit_count;
   }
 }
 

@@ -32,7 +32,7 @@ final class FormButton implements IViewable{
     $icon = $this->icon === null ? '' : '<span class="icon icon-'.$this->icon.'"></span> ';
     
     echo <<<HTML
-<button class="styled" type="$this->type"$value>$icon$this->label</button>
+<button class="styled" type="$this->type" $value>$icon$this->label</button>
 HTML;
   }
 }
