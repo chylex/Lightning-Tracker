@@ -19,10 +19,6 @@ use Validation\ValidationException;
 class SettingsRoleEditModel extends AbstractSettingsModel{
   public const ACTION_CONFIRM = 'Confirm';
   
-  private static function perm(string $permission): string{
-    return 'Perm-'.str_replace('.', '_', $permission);
-  }
-  
   private int $role_id;
   private ?string $role_title;
   
@@ -82,7 +78,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
   
   private function addPermissionBox(string $permission): FormCheckBoxHierarchyItem{
     $this->all_perms[] = $permission;
-    return $this->form->addCheckBoxHierarchyItem(self::perm($permission))->label(SettingsRolesModel::PERM_NAMES[$permission]);
+    return $this->form->addCheckBoxHierarchyItem(RoleFields::permissionFieldName($permission))->label(SettingsRolesModel::PERM_NAMES[$permission]);
   }
   
   public function load(): IModel{
@@ -95,7 +91,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
       $fill = ['Title' => $this->role_title];
       
       foreach($perms->listRolePerms($this->role_id) as $perm){
-        $fill[self::perm($perm)] = true;
+        $fill[RoleFields::permissionFieldName($perm)] = true;
       }
       
       $this->form->fill($fill);
@@ -123,16 +119,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
     
     $validator = new FormValidator($data);
     $title = RoleFields::title($validator);
-    $checked_perms = array_values(array_filter($this->all_perms, fn($perm): bool => (bool)($data[self::perm($perm)] ?? false)));
-    
-    foreach($checked_perms as $perm){
-      $dependency = SettingsRolesModel::PERM_DEPENDENCIES[$perm] ?? null;
-      
-      if ($dependency !== null && !in_array($dependency, $checked_perms, true)){
-        $validator->bool(self::perm($perm))
-                  ->isTrue(fn($ignore): bool => in_array($dependency, $checked_perms, true), 'This permission requires the \''.SettingsRolesModel::PERM_NAMES[$dependency].'\' permission.');
-      }
-    }
+    $checked_perms = RoleFields::permissions($validator, SettingsRolesModel::PERM_NAMES, SettingsRolesModel::PERM_DEPENDENCIES, $this->all_perms);
     
     try{
       $validator->validate();
