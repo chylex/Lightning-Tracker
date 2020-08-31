@@ -11,10 +11,23 @@ final class LightMarkParser{
   private const HASH = 35;
   private const LEFT_PARENTHESIS = 40;
   private const RIGHT_PARENTHESIS = 41;
+  private const ASTERISK = 42;
   private const LEFT_SQUARE_BRACKET = 91;
   private const RIGHT_SQUARE_BRACKET = 93;
+  private const UNDERSCORE = 95;
+  private const TILDE = 126;
   
-  // TODO implement: block formatting, inline formatting
+  private const SINGLE_CHAR_FORMATTING = [
+      self::ASTERISK => 'strong'
+  ];
+  
+  private const DOUBLED_CHAR_FORMATTING = [
+      self::ASTERISK   => 'em',
+      self::UNDERSCORE => 'ins',
+      self::TILDE      => 'del'
+  ];
+  
+  // TODO implement: inline code, block formatting
   
   private LightMarkProperties $props;
   private string $output = '';
@@ -195,12 +208,51 @@ HTML;
   
   private function parseRestAsInline(UnicodeIterator $iter): string{
     $str = '';
+    $formatting = [];
     
     while($iter->valid()){
       $next = $iter->move();
       $parsed = null;
       
-      if ($next === self::LEFT_SQUARE_BRACKET){
+      if ($next === self::ASTERISK || $next === self::UNDERSCORE || $next === self::TILDE){
+        $iter->beginSection();
+        
+        if ($iter->move() === $next){
+          $tag = self::DOUBLED_CHAR_FORMATTING[$next] ?? null;
+        }
+        else{
+          $tag = self::SINGLE_CHAR_FORMATTING[$next] ?? null;
+          $iter->rewindSection();
+          $iter->beginSection();
+        }
+        
+        if ($tag === null){
+          $parsed = null;
+        }
+        else{
+          $found_index = array_search($tag, $formatting, true);
+          
+          if ($found_index === false){
+            $parsed = '<'.$tag.'>';
+            $formatting[] = $tag;
+          }
+          else{
+            $parsed = '';
+            
+            for($i = count($formatting) - 1; $i >= $found_index; $i--){
+              $parsed .= '</'.$formatting[$i].'>';
+            }
+            
+            unset($formatting[$found_index]);
+            $formatting = array_values($formatting);
+            
+            for($i = $found_index, $count = count($formatting); $i < $count; $i++){
+              $parsed .= '<'.$formatting[$i].'>';
+            }
+          }
+        }
+      }
+      elseif ($next === self::LEFT_SQUARE_BRACKET){
         $iter->beginSection();
         $parsed = $this->thenParseLink($iter);
       }
@@ -221,6 +273,10 @@ HTML;
         $iter->endSection();
         $str .= $parsed;
       }
+    }
+    
+    while(!empty($formatting)){
+      $str .= '</'.array_pop($formatting).'>';
     }
     
     return $str;

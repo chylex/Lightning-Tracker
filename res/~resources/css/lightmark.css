@@ -30,16 +30,16 @@
   margin-bottom: 0;
 }
 
-.lightmark input[type=checkbox] {
+.lightmark .field-group input[type=checkbox] {
   margin-left: 1px;
   margin-bottom: 5px;
 }
 
-.lightmark del {
+.lightmark .field-group del {
   text-decoration: none;
 }
 
-.lightmark del:after {
+.lightmark .field-group del:after {
   content: '';
   display: block;
   position: relative;
@@ -51,7 +51,7 @@
   background-color: #000000;
 }
 
-.lightmark del:hover:after {
+.lightmark .field-group del:hover:after {
   display: none;
 }
 
