@@ -4,44 +4,44 @@ declare(strict_types = 1);
 namespace Pages\Models\Mixed;
 
 use Database\DB;
-use Database\Objects\ProjectInfo;
 use Database\Tables\UserTable;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Pages\Models\BasicMixedPageModel;
-use Routing\Request;
 use Session\Session;
 
 class LoginModel extends BasicMixedPageModel{
   public const ACTION_LOGIN = 'Login';
   
-  private FormComponent $form;
+  private FormComponent $login_form;
   
-  public function __construct(Request $req, ?ProjectInfo $project){
-    parent::__construct($req, $project);
+  public function getLoginForm(): FormComponent{
+    if (isset($this->login_form)){
+      return $this->login_form;
+    }
     
-    $this->form = new FormComponent(self::ACTION_LOGIN);
+    $form = new FormComponent(self::ACTION_LOGIN);
     
-    $this->form->addTextField('Name')
-               ->label('Username')
-               ->type('text')
-               ->autocomplete('username');
+    $form->addTextField('Name')
+         ->label('Username')
+         ->type('text')
+         ->autocomplete('username');
     
-    $this->form->addTextField('Password')
-               ->type('password')
-               ->autocomplete('current-password');
+    $form->addTextField('Password')
+         ->type('password')
+         ->autocomplete('current-password');
     
-    $this->form->addButton('submit', 'Login')
-               ->icon('enter');
-  }
-  
-  public function getForm(): FormComponent{
-    return $this->form;
+    $form->addButton('submit', 'Login')
+         ->icon('enter');
+    
+    return $this->login_form = $form;
   }
   
   public function loginUser(array $data, Session $sess): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getLoginForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
@@ -50,13 +50,13 @@ class LoginModel extends BasicMixedPageModel{
       $login_info = $users->getLoginInfo($data['Name']);
       
       if ($login_info === null || !$login_info->getPassword()->check($data['Password'])){
-        $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid username or password.'));
+        $form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid username or password.'));
         return false;
       }
       
       return $sess->tryLoginWithId($login_info->getId());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
       return false;
     }
   }

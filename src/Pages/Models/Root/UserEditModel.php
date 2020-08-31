@@ -22,74 +22,32 @@ use Validation\ValidationException;
 class UserEditModel extends BasicRootPageModel{
   public const ACTION_CONFIRM = 'Confirm';
   
+  private SystemPermissions $perms;
   private UserId $user_id;
   private ?UserInfo $user;
   
-  private SystemPermissions $perms;
-  private FormComponent $form;
+  private FormComponent $edit_form;
   
   public function __construct(Request $req, SystemPermissions $perms, UserId $user_id){
     parent::__construct($req);
-    
     $this->perms = $perms;
     $this->user_id = $user_id;
-    
-    $this->form = new FormComponent(self::ACTION_CONFIRM);
-    
-    $this->form->startSplitGroup(50);
-    
-    $this->form->addTextField('Name')
-               ->label('Username')
-               ->type('text')
-               ->autocomplete('username');
-    
-    if ($perms->check(SystemPermissions::SEE_USER_EMAILS)){
-      $this->form->addTextField('Email')
-                 ->type('email')
-                 ->autocomplete('email');
-    }
-    else{
-      $this->form->addTextField('Email')
-                 ->type('email')
-                 ->placeholder('Leave blank to keep current email.')
-                 ->autocomplete('email');
-    }
-    
-    $this->form->endSplitGroup();
-    $this->form->startSplitGroup(50);
-    
-    $this->form->addTextField('Password')
-               ->label('Password')
-               ->type('password')
-               ->placeholder('Leave blank to keep current password.')
-               ->autocomplete('new-password');
-    
-    $select_role = $this->form->addSelect('Role')
-                              ->addOption('', '(None)')
-                              ->dropdown();
-    
-    foreach((new SystemPermTable(DB::get()))->listRoles() as $role){
-      $select_role->addOption((string)$role->getId(), $role->getTitle());
-    }
-    
-    $this->form->endSplitGroup();
-    
-    $this->form->addButton('submit', 'Edit User')->icon('pencil');
+    $this->user = (new UserTable(DB::get()))->getUserInfo($user_id);
   }
   
   public function load(): IModel{
     parent::load();
     
-    $users = new UserTable(DB::get());
-    $user = $users->getUserInfo($this->user_id);
-    $this->user = $user;
-    
-    if ($user !== null && !$this->form->isFilled()){
-      $role_id = $user->getRoleId();
+    if ($this->user !== null){
+      $form = $this->getEditForm();
       
-      $this->form->fill(['Name'  => $user->getName(),
-                         'Email' => $this->perms->check(SystemPermissions::SEE_USER_EMAILS) ? $user->getEmail() : '',
-                         'Role'  => $role_id === null ? '' : (string)$role_id]);
+      if (!$form->isFilled()){
+        $role_id = $this->user->getRoleId();
+        
+        $form->fill(['Name'  => $this->user->getName(),
+                     'Email' => $this->perms->check(SystemPermissions::SEE_USER_EMAILS) ? $this->user->getEmail() : '',
+                     'Role'  => $role_id === null ? '' : (string)$role_id]);
+      }
     }
     
     return $this;
@@ -100,11 +58,59 @@ class UserEditModel extends BasicRootPageModel{
   }
   
   public function getEditForm(): FormComponent{
-    return $this->form;
+    if (isset($this->edit_form)){
+      return $this->edit_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CONFIRM);
+    
+    $form->startSplitGroup(50);
+    
+    $form->addTextField('Name')
+         ->label('Username')
+         ->type('text')
+         ->autocomplete('username');
+    
+    if ($this->perms->check(SystemPermissions::SEE_USER_EMAILS)){
+      $form->addTextField('Email')
+           ->type('email')
+           ->autocomplete('email');
+    }
+    else{
+      $form->addTextField('Email')
+           ->type('email')
+           ->placeholder('Leave blank to keep current email.')
+           ->autocomplete('email');
+    }
+    
+    $form->endSplitGroup();
+    $form->startSplitGroup(50);
+    
+    $form->addTextField('Password')
+         ->label('Password')
+         ->type('password')
+         ->placeholder('Leave blank to keep current password.')
+         ->autocomplete('new-password');
+    
+    $select_role = $form->addSelect('Role')
+                        ->addOption('', '(None)')
+                        ->dropdown();
+    
+    foreach((new SystemPermTable(DB::get()))->listRoles() as $role){
+      $select_role->addOption((string)$role->getId(), $role->getTitle());
+    }
+    
+    $form->endSplitGroup();
+    
+    $form->addButton('submit', 'Edit User')->icon('pencil');
+    
+    return $this->edit_form = $form;
   }
   
   public function editUser(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getEditForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
@@ -117,7 +123,7 @@ class UserEditModel extends BasicRootPageModel{
     try{
       $validator->validate();
       
-      if (RegisterModel::checkDuplicateUser($this->form, $name, $email, $this->user_id)){
+      if (RegisterModel::checkDuplicateUser($form, $name, $email, $this->user_id)){
         return false;
       }
       
@@ -125,9 +131,9 @@ class UserEditModel extends BasicRootPageModel{
       $users->editUser($this->user_id, $name, $email, $password, $role);
       return true;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

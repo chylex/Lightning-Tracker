@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Project;
 
+use Pages\Components\TitledSectionComponent;
 use Pages\IViewable;
 use Pages\Models\Project\SettingsGeneralModel;
 
@@ -15,7 +16,7 @@ class SettingsGeneralPage extends AbstractSettingsPage{
   }
   
   protected function getSettingsPageColumn(): IViewable{
-    return $this->model->getForm();
+    return new TitledSectionComponent('Project', $this->model->getSettingsForm());
   }
 }
 

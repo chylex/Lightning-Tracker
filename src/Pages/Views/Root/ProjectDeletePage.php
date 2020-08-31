@@ -34,7 +34,7 @@ class ProjectDeletePage extends AbstractPage{
   
   /** @noinspection HtmlMissingClosingTag */
   protected function echoPageBody(): void{
-    $stats = $this->model->getDeletionStats();
+    $stats = $this->model->calculateDeletionStats();
     $stats_str = implode('', array_map(fn($v): string => '<li>'.$v[0].' '.($v[0] === 1 ? $v[1] : $v[2]).'</li>', $stats));
     
     echo <<<HTML

@@ -14,7 +14,6 @@ use Pages\Components\Forms\FormComponent;
 use Pages\Components\Forms\IconButtonFormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
-use Pages\IModel;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Link;
 use Routing\Request;
@@ -25,8 +24,8 @@ class MembersModel extends BasicProjectPageModel{
   public const ACTION_INVITE = 'Invite';
   
   private ProjectPermissions $perms;
-  private TableComponent $table;
-  private ?FormComponent $form;
+  
+  private FormComponent $invite_form;
   
   /**
    * @var string[]
@@ -35,61 +34,35 @@ class MembersModel extends BasicProjectPageModel{
   
   public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms){
     parent::__construct($req, $project);
-    
     $this->perms = $perms;
     
-    $this->table = new TableComponent();
-    $this->table->ifEmpty('No members found.');
-    
-    $this->table->addColumn('Username')->sort('name')->width(60)->wrap()->bold();
-    $this->table->addColumn('Role')->sort('role_order')->width(40);
-    
     if ($perms->check(ProjectPermissions::MANAGE_MEMBERS)){
-      $this->table->addColumn('Actions')->right()->tight();
-      
-      $this->form = new FormComponent(self::ACTION_INVITE);
-      $this->form->startTitledSection('Invite User');
-      $this->form->setMessagePlacementHere();
-      
-      $this->form->addTextField('Name')
-                 ->label('Username')
-                 ->type('text')
-                 ->autocomplete('username');
-      
-      $select_role = $this->form->addSelect('Role')
-                                ->dropdown()
-                                ->addOption('', '(Default)');
-      
       $logon_user_id = Session::get()->getLogonUserId();
       
       if ($logon_user_id !== null){
-        $this->editable_roles[] = '';
-        
         foreach((new ProjectPermTable(DB::get(), $project))->listRolesAssignableBy($logon_user_id) as $role){
-          $role_id_str = (string)$role->getId();
-          $select_role->addOption($role_id_str, $role->getTitle());
-          $this->editable_roles[] = $role_id_str;
+          $this->editable_roles[$role->getId()] = $role->getTitle();
         }
       }
-      
-      $this->form->addButton('submit', 'Invite User')
-                 ->icon('user');
-      
-      $this->form->endTitledSection();
-    }
-    else{
-      $this->form = null;
     }
   }
   
-  public function load(): IModel{
-    parent::load();
-    
+  public function createMemberTable(): TableComponent{
     $req = $this->getReq();
-    
     $project = $this->getProject();
-    $owner_id = $project->getOwnerId();
     $logon_user_id = Session::get()->getLogonUserId();
+    
+    $table = new TableComponent();
+    $table->ifEmpty('No members found.');
+    
+    $table->addColumn('Username')->sort('name')->width(60)->wrap()->bold();
+    $table->addColumn('Role')->sort('role_order')->width(40);
+    
+    if ($this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
+      $table->addColumn('Actions')->right()->tight();
+    }
+    
+    $owner_id = $project->getOwnerId();
     
     $filter = new ProjectMemberFilter();
     $members = new ProjectMemberTable(DB::get(), $project);
@@ -107,7 +80,12 @@ class MembersModel extends BasicProjectPageModel{
       $user_id = $member->getUserId();
       $user_id_str = $user_id->formatted();
       
-      $can_edit = !$user_id->equals($logon_user_id) && !$user_id->equals($owner_id) && in_array((string)($member->getRoleId() ?? ''), $this->editable_roles, true);
+      $can_edit = (
+          $this->perms->check(ProjectPermissions::MANAGE_MEMBERS) &&
+          !$user_id->equals($logon_user_id) &&
+          !$user_id->equals($owner_id) &&
+          ($member->getRoleId() === null || array_key_exists($member->getRoleId(), $this->editable_roles))
+      );
       
       if ($this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
         if ($can_edit){
@@ -121,17 +99,17 @@ class MembersModel extends BasicProjectPageModel{
         }
       }
       
-      $row = $this->table->addRow($row);
+      $row = $table->addRow($row);
       
-      if ($can_edit && $this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
+      if ($can_edit){
         $row->link(Link::fromBase($this->getReq(), 'members', $user_id_str));
       }
     }
     
-    $this->table->setupColumnSorting($sorting);
-    $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('members');
+    $table->setupColumnSorting($sorting);
+    $table->setPaginationFooter($this->getReq(), $pagination)->elementName('members');
     
-    $header = $this->table->setFilteringHeader($filtering);
+    $header = $table->setFilteringHeader($filtering);
     $header->addTextField('name')->label('Username');
     
     $filtering_role = $header->addMultiSelect('role')->label('Role');
@@ -142,19 +120,43 @@ class MembersModel extends BasicProjectPageModel{
       $filtering_role->addOption($title, Text::plain($title));
     }
     
-    return $this;
-  }
-  
-  public function getMemberTable(): TableComponent{
-    return $this->table;
+    return $table;
   }
   
   public function getInviteForm(): ?FormComponent{
-    return $this->form;
+    if (!$this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
+      return null;
+    }
+    
+    if (isset($this->invite_form)){
+      return $this->invite_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_INVITE);
+    
+    $form->addTextField('Name')
+         ->label('Username')
+         ->type('text')
+         ->autocomplete('username');
+    
+    $select_role = $form->addSelect('Role')
+                        ->dropdown()
+                        ->addOption('', '(Default)');
+    
+    foreach($this->editable_roles as $id => $title){
+      $select_role->addOption((string)$id, $title);
+    }
+    
+    $form->addButton('submit', 'Invite User')
+         ->icon('user');
+    
+    return $this->invite_form = $form;
   }
   
   public function inviteUser(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getInviteForm();
+    
+    if ($form === null || !$form->accept($data)){
       return false;
     }
     
@@ -171,7 +173,7 @@ class MembersModel extends BasicProjectPageModel{
       $role_id = (int)$role;
     }
     else{
-      $this->form->invalidateField('Role', 'Invalid role.');
+      $form->invalidateField('Role', 'Invalid role.');
       return false;
     }
     
@@ -182,30 +184,30 @@ class MembersModel extends BasicProjectPageModel{
       $user_id = $users->findIdByName($name);
       
       if ($user_id === null){
-        $this->form->invalidateField('Name', 'User not found.');
+        $form->invalidateField('Name', 'User not found.');
         return false;
       }
       elseif ($user_id->equals($project->getOwnerId())){
-        $this->form->invalidateField('Name', 'User is the owner of this project.');
+        $form->invalidateField('Name', 'User is the owner of this project.');
         return false;
       }
       
       if ($role_id !== null && !(new ProjectPermTable($db, $project))->isRoleAssignableBy($role_id, Session::get()->getLogonUserIdOrThrow())){
-        $this->form->invalidateField('Role', 'Invalid role.');
+        $form->invalidateField('Role', 'Invalid role.');
         return false;
       }
       
       $members = new ProjectMemberTable($db, $project);
       
       if ($members->checkMembershipExists($user_id)){
-        $this->form->invalidateField('Name', 'User is already a member of this project.');
+        $form->invalidateField('Name', 'User is already a member of this project.');
         return false;
       }
       
       $members->addMember($user_id, $role_id); // TODO add a proper invitation system
       return true;
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

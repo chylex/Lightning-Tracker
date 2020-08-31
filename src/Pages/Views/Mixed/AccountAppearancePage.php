@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Mixed;
 
+use Pages\Components\TitledSectionComponent;
 use Pages\IViewable;
 use Pages\Models\Mixed\AccountAppearanceModel;
 
@@ -19,7 +20,7 @@ class AccountAppearancePage extends AccountPage{
   }
   
   protected function getAccountPageColumn(): IViewable{
-    return $this->model->getAppearanceSettingsForm();
+    return new TitledSectionComponent('Appearance', $this->model->getAppearanceSettingsForm());
   }
 }
 

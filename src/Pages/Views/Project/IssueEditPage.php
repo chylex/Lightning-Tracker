@@ -55,7 +55,7 @@ class IssueEditPage extends AbstractProjectIssuePage{
       return;
     }
     
-    $this->model->getForm()->echoBody();
+    $this->model->getEditForm()->echoBody();
   }
 }
 

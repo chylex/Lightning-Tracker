@@ -10,9 +10,7 @@ use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
-use Pages\IModel;
 use Routing\Link;
-use Routing\Request;
 use Session\Permissions\SystemPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
@@ -42,28 +40,15 @@ class SettingsRolesModel extends AbstractSettingsModel{
       SystemPermissions::MANAGE_USERS      => SystemPermissions::LIST_USERS
   ];
   
-  private TableComponent $table;
-  private FormComponent $form;
+  private FormComponent $create_form;
   
-  public function __construct(Request $req){
-    parent::__construct($req);
+  public function createRoleTable(): TableComponent{
+    $table = new TableComponent();
+    $table->ifEmpty('No roles found.');
     
-    $this->table = new TableComponent();
-    $this->table->ifEmpty('No roles found.');
-    $this->table->addColumn('Title')->width(20)->bold();
-    $this->table->addColumn('Permissions')->width(80)->wrap();
-    $this->table->addColumn('Actions')->tight()->right();
-    
-    $this->form = new FormComponent(self::ACTION_CREATE);
-    $this->form->startTitledSection('Create Role');
-    $this->form->setMessagePlacementHere();
-    $this->form->addTextField('Title')->type('text');
-    $this->form->addButton('submit', 'Create Role')->icon('pencil');
-    $this->form->endTitledSection();
-  }
-  
-  public function load(): IModel{
-    parent::load();
+    $table->addColumn('Title')->width(20)->bold();
+    $table->addColumn('Permissions')->width(80)->wrap();
+    $table->addColumn('Actions')->tight()->right();
     
     $perms = new SystemPermTable(DB::get());
     
@@ -87,26 +72,32 @@ class SettingsRolesModel extends AbstractSettingsModel{
         $row[] = $form_delete;
       }
       
-      $row = $this->table->addRow($row);
+      $row = $table->addRow($row);
       
       if (!$role->isSpecial()){
         $row->link(Link::fromBase($this->getReq(), 'settings', 'roles', $role_id_str));
       }
     }
     
-    return $this;
-  }
-  
-  public function getRoleTable(): TableComponent{
-    return $this->table;
+    return $table;
   }
   
   public function getCreateForm(): FormComponent{
-    return $this->form;
+    if (isset($this->create_form)){
+      return $this->create_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CREATE);
+    $form->addTextField('Title')->type('text');
+    $form->addButton('submit', 'Create Role')->icon('pencil');
+    
+    return $this->create_form = $form;
   }
   
   public function createRole(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getCreateForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
@@ -119,9 +110,9 @@ class SettingsRolesModel extends AbstractSettingsModel{
       $perms->addRole($title, []);
       return true;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

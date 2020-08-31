@@ -12,7 +12,6 @@ use Database\Validation\ProjectFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
-use Pages\IModel;
 use Pages\Models\BasicRootPageModel;
 use Routing\Link;
 use Routing\Request;
@@ -25,43 +24,24 @@ class ProjectModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
   
   private SystemPermissions $perms;
-  private TableComponent $table;
-  private ?FormComponent $form;
+  
+  private FormComponent $create_form;
   
   public function __construct(Request $req, SystemPermissions $perms){
     parent::__construct($req);
-    
     $this->perms = $perms;
-    
-    $this->table = new TableComponent();
-    $this->table->ifEmpty('No projects found. Some projects may not be visible to your account.');
-    
-    $this->table->addColumn('Name')->sort('name')->width(50)->wrap()->bold();
-    $this->table->addColumn('Link')->width(50);
-    
-    if ($perms->check(SystemPermissions::MANAGE_PROJECTS)){
-      $this->table->addColumn('Actions')->tight()->right();
-    }
-    
-    if ($perms->check(SystemPermissions::CREATE_PROJECT)){
-      $this->form = new FormComponent(self::ACTION_CREATE);
-      $this->form->startTitledSection('Create Project');
-      $this->form->setMessagePlacementHere();
-      
-      $this->form->addTextField('Name')->type('text');
-      $this->form->addTextField('Url')->type('text');
-      $this->form->addCheckBox('Hidden');
-      $this->form->addButton('submit', 'Create Project')->icon('pencil');
-      
-      $this->form->endTitledSection();
-    }
-    else{
-      $this->form = null;
-    }
   }
   
-  public function load(): IModel{
-    parent::load();
+  public function createProjectTable(): TableComponent{
+    $table = new TableComponent();
+    $table->ifEmpty('No projects found. Some projects may not be visible to your account.');
+    
+    $table->addColumn('Name')->sort('name')->width(50)->wrap()->bold();
+    $table->addColumn('Link')->width(50);
+    
+    if ($this->perms->check(SystemPermissions::MANAGE_PROJECTS)){
+      $table->addColumn('Actions')->tight()->right();
+    }
     
     if ($this->perms->check(SystemPermissions::LIST_VISIBLE_PROJECTS)){
       $filter = new ProjectFilter();
@@ -87,33 +67,45 @@ class ProjectModel extends BasicRootPageModel{
           $row[] = '<a href="'.Link::fromRoot('project', $url_enc, 'delete').'" class="icon"><span class="icon icon-circle-cross icon-color-red"></span></a>';
         }
         
-        $this->table->addRow($row);
+        $table->addRow($row);
       }
       
-      $this->table->setupColumnSorting($sorting);
-      $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('projects');
+      $table->setupColumnSorting($sorting);
+      $table->setPaginationFooter($this->getReq(), $pagination)->elementName('projects');
       
-      $header = $this->table->setFilteringHeader($filtering);
+      $header = $table->setFilteringHeader($filtering);
       $header->addTextField('name')->label('Name');
       $header->addTextField('url')->label('Link');
     }
     else{
-      $this->table->setPaginationFooter($this->getReq(), Pagination::empty())->elementName('projects');
+      $table->setPaginationFooter($this->getReq(), Pagination::empty())->elementName('projects');
     }
     
-    return $this;
-  }
-  
-  public function getProjectTable(): TableComponent{
-    return $this->table;
+    return $table;
   }
   
   public function getCreateForm(): ?FormComponent{
-    return $this->form;
+    if (!$this->perms->check(SystemPermissions::CREATE_PROJECT)){
+      return null;
+    }
+    
+    if (isset($this->create_form)){
+      return $this->create_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CREATE);
+    $form->addTextField('Name')->type('text');
+    $form->addTextField('Url')->type('text');
+    $form->addCheckBox('Hidden');
+    $form->addButton('submit', 'Create Project')->icon('pencil');
+    
+    return $this->create_form = $form;
   }
   
   public function createProject(array $data, UserProfile $owner): ?string{
-    if (!$this->form->accept($data)){
+    $form = $this->getCreateForm();
+    
+    if ($form === null || !$form->accept($data)){
       return null;
     }
     
@@ -127,16 +119,16 @@ class ProjectModel extends BasicRootPageModel{
       $projects = new ProjectTable(DB::get());
       
       if ($projects->checkUrlExists($url)){
-        $this->form->invalidateField('Url', 'Project with this URL already exists.');
+        $form->invalidateField('Url', 'Project with this URL already exists.');
         return null;
       }
       
       $projects->addProject($name, $url, $hidden, $owner);
       return $url;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return null;

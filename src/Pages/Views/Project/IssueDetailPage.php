@@ -54,7 +54,7 @@ class IssueDetailPage extends AbstractProjectIssuePage{
     
     $split->addLeft(new IssueDetailComponent($this->model));
     
-    $menus = array_filter([$this->model->getMenuActions(), $this->model->getMenuShortcuts()], fn($v): bool => $v !== null);
+    $menus = array_filter([$this->model->createMenuActions(), $this->model->createMenuShortcuts()], fn($v): bool => $v !== null);
     
     if (!empty($menus)){
       $split->addRight(new Html('<h3>Actions</h3>'));

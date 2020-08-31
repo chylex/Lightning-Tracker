@@ -32,7 +32,7 @@ class RegisterPage extends AbstractPage{
       echo '<p>Registration successful, you are now logged in!</p>';
     }
     else{
-      $this->model->getForm()->echoBody();
+      $this->model->getRegisterForm()->echoBody();
     }
   }
 }

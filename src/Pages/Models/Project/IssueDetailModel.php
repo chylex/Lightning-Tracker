@@ -11,7 +11,6 @@ use Database\Tables\IssueTable;
 use Pages\Components\Markup\LightMarkParseResult;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Text;
-use Pages\IModel;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
@@ -25,89 +24,84 @@ class IssueDetailModel extends BasicProjectPageModel{
   public const ACTION_MARK_FINISHED = 'MarkFinished';
   public const ACTION_MARK_REJECTED = 'MarkRejected';
   
-  private ?IssueDetail $issue;
-  private int $issue_id;
-  private bool $can_edit_progress;
-  
   private ProjectPermissions $perms;
-  private LightMarkParseResult $description;
-  private SidemenuComponent $menu_actions;
-  private SidemenuComponent $menu_shortcuts;
+  private int $issue_id;
+  private ?IssueDetail $issue;
+  private int $edit_level;
   
   public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, int $issue_id){
     parent::__construct($req, $project);
-    
     $this->perms = $perms;
     $this->issue_id = $issue_id;
     
     $issues = new IssueTable(DB::get(), $project);
     $this->issue = $issues->getIssueDetail($issue_id);
     
-    $this->menu_actions = new SidemenuComponent($req);
-    $this->menu_shortcuts = new SidemenuComponent($req);
-  }
-  
-  public function load(): IModel{
-    parent::load();
-    
     if ($this->issue === null){
-      $this->can_edit_progress = false;
+      $this->edit_level = IssueDetail::EDIT_FORBIDDEN;
     }
     else{
-      $edit_level = $this->issue->getEditLevel(Session::get()->getLogonUser(), $this->perms);
-      $this->can_edit_progress = $edit_level >= IssueDetail::EDIT_ALL_FIELDS;
-      
-      if ($edit_level !== IssueDetail::EDIT_FORBIDDEN){
-        $this->menu_actions->addLink(Text::withIcon('Edit Issue', 'pencil'), '/issues/'.$this->issue_id.'/edit');
-      }
-      
-      if ($this->can_edit_progress){
-        $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Ready to Test', IssueStatus::get(IssueStatus::READY_TO_TEST)), self::ACTION_MARK_READY_TO_TEST);
-        $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Finished', IssueStatus::get(IssueStatus::FINISHED)), self::ACTION_MARK_FINISHED);
-        $this->menu_shortcuts->addActionButton(Text::withIssueTag('Mark as Rejected', IssueStatus::get(IssueStatus::REJECTED)), self::ACTION_MARK_REJECTED);
-      }
-      
-      if ($this->perms->check(ProjectPermissions::DELETE_ALL_ISSUES)){
-        $this->menu_actions->addLink(Text::withIcon('Delete Issue', 'trash'), '/issues/'.$this->issue_id.'/delete');
-      }
-      
-      $desc = $this->issue->getDescription();
-      
-      if ($this->can_edit_progress){
-        $desc->setCheckboxNameForEditing(self::CHECKBOX_NAME);
-      }
-      
-      $this->description = $desc->parse();
+      $this->edit_level = $this->issue->getEditLevel(Session::get()->getLogonUser(), $perms);
     }
-    
-    return $this;
-  }
-  
-  public function canEditCheckboxes(): bool{
-    return $this->can_edit_progress;
-  }
-  
-  public function getIssue(): ?IssueDetail{
-    return $this->issue;
   }
   
   public function getIssueId(): int{
     return $this->issue_id;
   }
   
-  public function getDescription(): LightMarkParseResult{
-    return $this->description;
+  public function getIssue(): ?IssueDetail{
+    return $this->issue;
   }
   
-  public function getMenuActions(): ?SidemenuComponent{
-    return $this->menu_actions->getIfNotEmpty();
+  public function canEditStatus(): bool{
+    return $this->edit_level >= IssueDetail::EDIT_ALL_FIELDS;
   }
   
-  public function getMenuShortcuts(): ?SidemenuComponent{
-    return $this->menu_shortcuts->getIfNotEmpty();
+  public function parseDescription(): LightMarkParseResult{
+    $desc = $this->issue->getDescription();
+    
+    if ($this->canEditStatus()){
+      $desc->setCheckboxNameForEditing(self::CHECKBOX_NAME);
+    }
+    
+    return $desc->parse();
+  }
+  
+  public function createMenuActions(): ?SidemenuComponent{
+    if ($this->issue === null){
+      return null;
+    }
+    
+    $menu = new SidemenuComponent($this->getReq());
+    
+    if ($this->edit_level !== IssueDetail::EDIT_FORBIDDEN){
+      $menu->addLink(Text::withIcon('Edit Issue', 'pencil'), '/issues/'.$this->issue_id.'/edit');
+    }
+    
+    if ($this->perms->check(ProjectPermissions::DELETE_ALL_ISSUES)){
+      $menu->addLink(Text::withIcon('Delete Issue', 'trash'), '/issues/'.$this->issue_id.'/delete');
+    }
+    
+    return $menu->getIfNotEmpty();
+  }
+  
+  public function createMenuShortcuts(): ?SidemenuComponent{
+    if ($this->issue === null || !$this->canEditStatus()){
+      return null;
+    }
+    
+    $menu = new SidemenuComponent($this->getReq());
+    $menu->addActionButton(Text::withIssueTag('Mark as Ready to Test', IssueStatus::get(IssueStatus::READY_TO_TEST)), self::ACTION_MARK_READY_TO_TEST);
+    $menu->addActionButton(Text::withIssueTag('Mark as Finished', IssueStatus::get(IssueStatus::FINISHED)), self::ACTION_MARK_FINISHED);
+    $menu->addActionButton(Text::withIssueTag('Mark as Rejected', IssueStatus::get(IssueStatus::REJECTED)), self::ACTION_MARK_REJECTED);
+    return $menu;
   }
   
   public function tryUseShortcut(string $action): bool{
+    if (!$this->canEditStatus()){
+      return false;
+    }
+    
     switch($action){
       case self::ACTION_MARK_READY_TO_TEST:
         $status = IssueStatus::READY_TO_TEST;
@@ -131,6 +125,10 @@ class IssueDetailModel extends BasicProjectPageModel{
   }
   
   public function updateCheckboxes(array $data): void{
+    if (!$this->canEditStatus()){
+      return;
+    }
+    
     $issues = new IssueTable(DB::get(), $this->getProject());
     $description = $issues->getIssueDescription($this->issue_id);
     

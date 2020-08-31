@@ -6,6 +6,7 @@ namespace Pages\Views\Project;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\TitledSectionComponent;
 use Pages\Models\Project\MembersModel;
 use Pages\Views\AbstractProjectPage;
 
@@ -36,8 +37,8 @@ class MembersPage extends AbstractProjectPage{
     $split->collapseAt(800, true);
     $split->setRightWidthLimits(250, 400);
     
-    $split->addLeft($this->model->getMemberTable());
-    $split->addRightIfNotNull($this->model->getInviteForm());
+    $split->addLeft($this->model->createMemberTable());
+    $split->addRightIfNotNull(TitledSectionComponent::wrap('Invite User', $this->model->getInviteForm()));
     
     $split->echoBody();
   }

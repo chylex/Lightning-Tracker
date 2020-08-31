@@ -49,7 +49,7 @@ class IssueDeletePage extends AbstractProjectIssuePage{
   <div class="max-width-250">
 HTML;
     
-    $this->model->getConfirmationForm()->echoBody();
+    $this->model->getDeleteForm()->echoBody();
     
     echo <<<HTML
   </div>

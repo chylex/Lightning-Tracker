@@ -6,7 +6,6 @@ namespace Pages\Models\Root;
 use Configuration\SystemConfig;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
-use Routing\Request;
 use Validation\ValidationException;
 
 class SettingsGeneralModel extends AbstractSettingsModel{
@@ -14,48 +13,50 @@ class SettingsGeneralModel extends AbstractSettingsModel{
   public const BUTTON_UPDATE_SETTINGS = 'UpdateSettings';
   public const BUTTON_REMOVE_BACKUP = 'RemoveBackup';
   
-  private FormComponent $form;
+  private FormComponent $settings_form;
   
   /** @noinspection HtmlMissingClosingTag */
-  public function __construct(Request $req){
-    parent::__construct($req);
+  public function getSettingsForm(): FormComponent{
+    if (isset($this->settings_form)){
+      return $this->settings_form;
+    }
     
-    $this->form = new FormComponent(self::ACTION_SUBMIT);
-    $this->form->addHTML(<<<HTML
+    $form = new FormComponent(self::ACTION_SUBMIT);
+    $form->addHTML(<<<HTML
 <div class="split-wrapper split-collapse-640">
   <div class="split-50">
 HTML
     );
     
-    $this->form->startTitledSection('System');
-    $this->form->addCheckBox('SysEnableRegistration')->label('Enable User Registration')->value(SYS_ENABLE_REGISTRATION);
-    $this->form->endTitledSection();
+    $form->startTitledSection('System');
+    $form->addCheckBox('SysEnableRegistration')->label('Enable User Registration')->value(SYS_ENABLE_REGISTRATION);
+    $form->endTitledSection();
     
-    $this->form->startTitledSection('Site');
-    $this->form->addTextField('BaseUrl')->label('Base URL')->value(BASE_URL);
-    $this->form->endTitledSection();
+    $form->startTitledSection('Site');
+    $form->addTextField('BaseUrl')->label('Base URL')->value(BASE_URL);
+    $form->endTitledSection();
     
-    $this->form->addHTML(<<<HTML
+    $form->addHTML(<<<HTML
   </div>
   <div class="split-50">
 HTML
     );
     
-    $this->form->startTitledSection('Database');
+    $form->startTitledSection('Database');
     
-    $this->form->addTextField('DbName')->label('Name')->value(DB_NAME);
-    $this->form->addTextField('DbHost')->label('Host')->value(DB_HOST);
-    $this->form->addTextField('DbUser')->label('User')->value(DB_USER);
+    $form->addTextField('DbName')->label('Name')->value(DB_NAME);
+    $form->addTextField('DbHost')->label('Host')->value(DB_HOST);
+    $form->addTextField('DbUser')->label('User')->value(DB_USER);
     
-    $this->form->addTextField('DbPassword')
-               ->label('Password')
-               ->type('password')
-               ->autocomplete('new-password')
-               ->placeholder('Leave blank to keep current password.');
+    $form->addTextField('DbPassword')
+         ->label('Password')
+         ->type('password')
+         ->autocomplete('new-password')
+         ->placeholder('Leave blank to keep current password.');
     
-    $this->form->endTitledSection();
+    $form->endTitledSection();
     
-    $this->form->addHTML(<<<HTML
+    $form->addHTML(<<<HTML
   </div>
 </div>
 <h3>Confirm</h3>
@@ -66,39 +67,41 @@ HTML
 HTML
     );
     
-    $this->form->setMessagePlacementHere();
-    $this->form->addButton('submit', 'Update Settings')->value(self::BUTTON_UPDATE_SETTINGS)->icon('pencil');
+    $form->setMessagePlacementHere();
+    $form->addButton('submit', 'Update Settings')->value(self::BUTTON_UPDATE_SETTINGS)->icon('pencil');
     
     if (file_exists(CONFIG_BACKUP_FILE)){
-      $this->form->addButton('submit', 'Remove Backup File')->value(self::BUTTON_REMOVE_BACKUP)->icon('trash');
+      $form->addButton('submit', 'Remove Backup File')->value(self::BUTTON_REMOVE_BACKUP)->icon('trash');
     }
     
     echo <<<HTML
 </article>
 HTML;
-  }
-  
-  public function getForm(): FormComponent{
-    return $this->form;
+    
+    return $this->settings_form = $form;
   }
   
   public function removeBackupFile(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getSettingsForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
     if (@unlink(CONFIG_BACKUP_FILE)){
-      $this->form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Backup file removed.'));
+      $form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Backup file removed.'));
       return true;
     }
     else{
-      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Backup file could not be removed.'));
+      $form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Backup file could not be removed.'));
       return false;
     }
   }
   
   public function updateConfig(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getSettingsForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
@@ -111,21 +114,21 @@ HTML;
     try{
       $config->validate();
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
       return false;
     }
     
     if (!copy(CONFIG_FILE, CONFIG_BACKUP_FILE)){
-      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Error creating backup of \'config.php\'.'));
+      $form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Error creating backup of \'config.php\'.'));
       return false;
     }
     
     if (!$config->write(CONFIG_FILE)){
-      $this->form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Error updating \'config.php\'.'));
+      $form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Error updating \'config.php\'.'));
       return false;
     }
     
-    $this->form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Configuration was updated.'));
+    $form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Configuration was updated.'));
     return true;
   }
 }

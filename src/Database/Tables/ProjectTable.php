@@ -118,6 +118,10 @@ final class ProjectTable extends AbstractTable{
     return $results;
   }
   
+  /**
+   * @param UserId $user_id
+   * @return ProjectInfo[]
+   */
   public function listProjectsOwnedBy(UserId $user_id): array{
     $stmt = $this->db->prepare('SELECT id, name, url FROM projects WHERE owner_id = ?');
     $stmt->execute([$user_id]);

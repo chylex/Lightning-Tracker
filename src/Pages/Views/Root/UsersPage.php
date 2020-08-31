@@ -7,6 +7,7 @@ use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\TitledSectionComponent;
 use Pages\Models\Root\UsersModel;
 use Pages\Views\AbstractPage;
 
@@ -38,8 +39,8 @@ class UsersPage extends AbstractPage{
     $split->collapseAt(800, true);
     $split->setRightWidthLimits(250, 500);
     
-    $split->addLeft($this->model->getUserTable());
-    $split->addRightIfNotNull($this->model->getCreateForm());
+    $split->addLeft($this->model->createUserTable());
+    $split->addRightIfNotNull(TitledSectionComponent::wrap('Create User', $this->model->getCreateForm()));
     
     $split->echoBody();
   }

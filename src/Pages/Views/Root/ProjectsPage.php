@@ -6,6 +6,7 @@ namespace Pages\Views\Root;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\TitledSectionComponent;
 use Pages\Models\Root\ProjectModel;
 use Pages\Views\AbstractPage;
 
@@ -40,8 +41,8 @@ class ProjectsPage extends AbstractPage{
     $split->collapseAt(800, true);
     $split->setRightWidthLimits(250, 500);
     
-    $split->addLeft($this->model->getProjectTable());
-    $split->addRightIfNotNull($this->model->getCreateForm());
+    $split->addLeft($this->model->createProjectTable());
+    $split->addRightIfNotNull(TitledSectionComponent::wrap('Create Project', $this->model->getCreateForm()));
     
     $split->echoBody();
   }

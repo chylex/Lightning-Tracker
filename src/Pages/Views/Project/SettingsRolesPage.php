@@ -5,6 +5,7 @@ namespace Pages\Views\Project;
 
 use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\TitledSectionComponent;
 use Pages\IViewable;
 use Pages\Models\Project\SettingsRolesModel;
 
@@ -34,8 +35,8 @@ class SettingsRolesPage extends AbstractSettingsPage{
     $split->collapseAt(1024, true);
     $split->setRightWidthLimits(250, 500);
     
-    $split->addLeft($this->model->getRoleTable());
-    $split->addRight($this->model->getCreateForm());
+    $split->addLeft($this->model->createRoleTable());
+    $split->addRight(TitledSectionComponent::wrap('Create Role', $this->model->getCreateForm()));
     
     return $split;
   }

@@ -71,14 +71,14 @@ HTML;
   <article class="issue-description">
 HTML;
     
-    $description = $this->model->getDescription();
+    $description = $this->model->parseDescription();
     $description->echoBody();
     
     echo <<<HTML
   </article>
 HTML;
     
-    if ($this->model->canEditCheckboxes() && $description->hasCheckboxes()){
+    if ($this->model->canEditStatus() && $description->hasCheckboxes()){
       echo <<<HTML
   <h3 data-task-submit>Tasks</h3>
   <article data-task-submit>

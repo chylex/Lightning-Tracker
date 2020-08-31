@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Mixed;
 
+use Pages\Components\TitledSectionComponent;
 use Pages\IViewable;
 use Pages\Models\Mixed\AccountSecurityModel;
 
@@ -19,7 +20,7 @@ class AccountSecurityPage extends AccountPage{
   }
   
   protected function getAccountPageColumn(): IViewable{
-    return $this->model->getChangePasswordForm();
+    return new TitledSectionComponent('Change Password', $this->model->getChangePasswordForm());
   }
 }
 

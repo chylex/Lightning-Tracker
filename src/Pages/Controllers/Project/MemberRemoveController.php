@@ -36,7 +36,7 @@ class MemberRemoveController extends AbstractProjectController{
     $model = new MemberRemoveModel($req, $project, UserId::fromFormatted($this->member_id), $sess->getLogonUserIdOrThrow());
     
     if ($model->hasMember()){
-      if (!$model->canEdit()){
+      if (!$model->canRemove()){
         return error($req, 'Permission Error', 'You are not allowed to edit this member.', $project);
       }
       

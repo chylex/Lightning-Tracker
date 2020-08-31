@@ -28,7 +28,7 @@ class LoginPage extends AbstractPage{
   }
   
   protected function echoPageBody(): void{
-    $this->model->getForm()->echoBody();
+    $this->model->getLoginForm()->echoBody();
   }
 }
 

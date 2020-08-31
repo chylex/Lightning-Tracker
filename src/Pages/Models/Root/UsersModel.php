@@ -14,7 +14,6 @@ use Pages\Components\Forms\FormComponent;
 use Pages\Components\Forms\IconButtonFormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
-use Pages\IModel;
 use Pages\Models\BasicRootPageModel;
 use Pages\Models\Mixed\RegisterModel;
 use Routing\Link;
@@ -28,67 +27,37 @@ class UsersModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
   
   private SystemPermissions $perms;
-  private TableComponent $table;
-  private ?FormComponent $form;
+  
+  private FormComponent $create_form;
   
   public function __construct(Request $req, SystemPermissions $perms){
     parent::__construct($req);
-    
     $this->perms = $perms;
-    
-    $this->table = new TableComponent();
-    $this->table->ifEmpty('No users found.');
-    
-    if ($perms->check(SystemPermissions::SEE_USER_EMAILS)){
-      $this->table->addColumn('Username')->sort('name')->width(40)->wrap()->bold();
-      $this->table->addColumn('Email')->width(40)->wrap();
-    }
-    else{
-      $this->table->addColumn('Username')->sort('name')->width(80)->wrap()->bold();
-    }
-    
-    $this->table->addColumn('Role')->sort('role_title')->width(20);
-    $this->table->addColumn('Registration Time')->sort('date_registered')->tight()->right();
-    
-    if ($perms->check(SystemPermissions::MANAGE_USERS)){
-      $this->table->addColumn('Actions')->tight()->right();
-    }
-    
-    if ($perms->check(SystemPermissions::CREATE_USER)){
-      $this->form = new FormComponent(self::ACTION_CREATE);
-      $this->form->startTitledSection('Create User');
-      $this->form->setMessagePlacementHere();
-      
-      $this->form->addTextField('Name')
-                 ->label('Username')
-                 ->type('text')
-                 ->autocomplete('username');
-      
-      $this->form->addTextField('Password')
-                 ->type('password')
-                 ->autocomplete('new-password');
-      
-      $this->form->addTextField('Email')
-                 ->type('email')
-                 ->autocomplete('email');
-      
-      $this->form->addButton('submit', 'Create User')
-                 ->icon('pencil');
-      
-      $this->form->endTitledSection();
-    }
-    else{
-      $this->form = null;
-    }
   }
   
-  public function load(): IModel{
-    parent::load();
-    
+  public function createUserTable(): TableComponent{
     $req = $this->getReq();
     
     $logon_user_id = Session::get()->getLogonUserId();
     $can_see_email = $this->perms->check(SystemPermissions::SEE_USER_EMAILS);
+    
+    $table = new TableComponent();
+    $table->ifEmpty('No users found.');
+    
+    if ($can_see_email){
+      $table->addColumn('Username')->sort('name')->width(40)->wrap()->bold();
+      $table->addColumn('Email')->width(40)->wrap();
+    }
+    else{
+      $table->addColumn('Username')->sort('name')->width(80)->wrap()->bold();
+    }
+    
+    $table->addColumn('Role')->sort('role_title')->width(20);
+    $table->addColumn('Registration Time')->sort('date_registered')->tight()->right();
+    
+    if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
+      $table->addColumn('Actions')->tight()->right();
+    }
     
     $filter = new UserFilter($can_see_email);
     $users = new UserTable(DB::get());
@@ -96,7 +65,7 @@ class UsersModel extends BasicRootPageModel{
     $filtering = $filter->filter();
     $total_count = $users->countUsers($filter);
     $pagination = $filter->page($total_count);
-    $sorting = $filter->sort($this->getReq());
+    $sorting = $filter->sort($req);
     
     foreach($users->listUsers($filter) as $user){
       $user_id = $user->getId();
@@ -124,17 +93,17 @@ class UsersModel extends BasicRootPageModel{
         }
       }
       
-      $row = $this->table->addRow($row);
+      $row = $table->addRow($row);
       
       if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
-        $row->link(Link::fromBase($this->getReq(), 'users', $user_id_formatted));
+        $row->link(Link::fromBase($req, 'users', $user_id_formatted));
       }
     }
     
-    $this->table->setupColumnSorting($sorting);
-    $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('users');
+    $table->setupColumnSorting($sorting);
+    $table->setPaginationFooter($req, $pagination)->elementName('users');
     
-    $header = $this->table->setFilteringHeader($filtering);
+    $header = $table->setFilteringHeader($filtering);
     $header->addTextField('name')->label('Username');
     
     if ($can_see_email){
@@ -149,19 +118,43 @@ class UsersModel extends BasicRootPageModel{
       $filtering_role->addOption($title, Text::plain($title));
     }
     
-    return $this;
-  }
-  
-  public function getUserTable(): TableComponent{
-    return $this->table;
+    return $table;
   }
   
   public function getCreateForm(): ?FormComponent{
-    return $this->form;
+    if (!$this->perms->check(SystemPermissions::CREATE_USER)){
+      return null;
+    }
+    
+    if (isset($this->create_form)){
+      return $this->create_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CREATE);
+    
+    $form->addTextField('Name')
+         ->label('Username')
+         ->type('text')
+         ->autocomplete('username');
+    
+    $form->addTextField('Password')
+         ->type('password')
+         ->autocomplete('new-password');
+    
+    $form->addTextField('Email')
+         ->type('email')
+         ->autocomplete('email');
+    
+    $form->addButton('submit', 'Create User')
+         ->icon('pencil');
+    
+    return $this->create_form = $form;
   }
   
   public function createUser(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getCreateForm();
+    
+    if ($form === null || !$form->accept($data)){
       return false;
     }
     
@@ -173,7 +166,7 @@ class UsersModel extends BasicRootPageModel{
     try{
       $validator->validate();
       
-      if (RegisterModel::checkDuplicateUser($this->form, $name, $email)){
+      if (RegisterModel::checkDuplicateUser($form, $name, $email)){
         return false;
       }
       
@@ -181,9 +174,9 @@ class UsersModel extends BasicRootPageModel{
       $users->addUser($name, $email, $password);
       return true;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

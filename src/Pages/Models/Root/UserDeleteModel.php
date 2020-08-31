@@ -11,7 +11,6 @@ use Database\Objects\UserStatistics;
 use Database\Tables\ProjectTable;
 use Database\Tables\UserTable;
 use Pages\Components\Forms\FormComponent;
-use Pages\IModel;
 use Pages\Models\BasicRootPageModel;
 use Routing\Request;
 
@@ -21,72 +20,56 @@ class UserDeleteModel extends BasicRootPageModel{
   private UserId $user_id;
   private ?UserInfo $user;
   
-  private FormComponent $form;
-  
-  /**
-   * @var ProjectInfo[]
-   */
-  private array $owned_projects = [];
-  
-  private UserStatistics $statistics;
+  private FormComponent $delete_form;
   
   public function __construct(Request $req, UserId $user_id){
     parent::__construct($req);
     $this->user_id = $user_id;
-    
-    $users = new UserTable(DB::get());
-    $this->user = $users->getUserInfo($user_id);
-    
-    $this->form = new FormComponent(self::ACTION_CONFIRM);
-    $this->form->addTextField('Name')->label('Username');
-    $this->form->addButton('submit', 'Delete User')->icon('trash');
-  }
-  
-  public function load(): IModel{
-    parent::load();
-    
-    if ($this->user !== null){
-      $users = new UserTable(DB::get());
-      
-      foreach((new ProjectTable(DB::get()))->listProjectsOwnedBy($this->user_id) as $project){
-        $this->owned_projects[] = $project;
-      }
-      
-      $this->statistics = $users->getUserStatistics($this->user_id);
-    }
-    
-    return $this;
+    $this->user = (new UserTable(DB::get()))->getUserInfo($user_id);
   }
   
   public function getUser(): ?UserInfo{
     return $this->user;
   }
   
-  public function getDeleteForm(): FormComponent{
-    return $this->form;
-  }
-  
   public function canDelete(): bool{
     return $this->user === null || !$this->user->isAdmin(); // null allows page to be shown instead of error message
   }
   
+  /**
+   * @return ProjectInfo[]
+   */
   public function getOwnedProjects(): array{
-    return $this->owned_projects;
+    return (new ProjectTable(DB::get()))->listProjectsOwnedBy($this->user_id);
   }
   
   public function getStatistics(): UserStatistics{
-    return $this->statistics;
+    return (new UserTable(DB::get()))->getUserStatistics($this->user_id);
+  }
+  
+  public function getDeleteForm(): FormComponent{
+    if (isset($this->delete_form)){
+      return $this->delete_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CONFIRM);
+    $form->addTextField('Name')->label('Username');
+    $form->addButton('submit', 'Delete User')->icon('trash');
+    
+    return $this->delete_form = $form;
   }
   
   public function deleteUser(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getDeleteForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
     $confirmation = $data['Name'] ?? null;
     
     if ($confirmation !== $this->user->getName()){
-      $this->form->invalidateField('Name', 'Incorrect username.');
+      $form->invalidateField('Name', 'Incorrect username.');
       return false;
     }
     

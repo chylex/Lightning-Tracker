@@ -26,7 +26,7 @@ class SettingsGeneralController extends AbstractProjectController{
     $model = new SettingsGeneralModel($req, $project);
     
     if ($req->getAction() === $model::ACTION_UPDATE && $model->updateSettings($req->getData())){
-      return $model->getForm()->reload($req);
+      return $model->getSettingsForm()->reload($req);
     }
     
     return view(new SettingsGeneralPage($model->load()));

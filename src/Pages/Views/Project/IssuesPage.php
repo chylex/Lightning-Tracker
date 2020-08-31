@@ -46,8 +46,8 @@ class IssuesPage extends AbstractProjectPage{
     $split->collapseAt(1024, true);
     $split->setRightWidthLimits(250, 400);
     
-    $split->addLeft($this->model->getIssueTable());
-    $split->addRightIfNotNull($this->model->getMenuActions());
+    $split->addLeft($this->model->createIssueTable());
+    $split->addRightIfNotNull($this->model->createMenuAction());
     $split->addRightIfNotNull($this->model->getActiveMilestoneComponent());
     
     $split->echoBody();

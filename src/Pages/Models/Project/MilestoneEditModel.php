@@ -21,24 +21,23 @@ class MilestoneEditModel extends BasicProjectPageModel{
   private int $milestone_id;
   private ?string $milestone_title;
   
-  private FormComponent $form;
+  private FormComponent $edit_form;
   
   public function __construct(Request $req, ProjectInfo $project, int $milestone_id){
     parent::__construct($req, $project);
     $this->milestone_id = $milestone_id;
-    
-    $this->form = new FormComponent(self::ACTION_CONFIRM);
-    $this->form->addTextField('Title')->type('text');
-    $this->form->addButton('submit', 'Edit Milestone')->icon('pencil');
+    $this->milestone_title = (new MilestoneTable(DB::get(), $project))->getMilestoneTitle($milestone_id);
   }
   
   public function load(): IModel{
     parent::load();
     
-    $this->milestone_title = (new MilestoneTable(DB::get(), $this->getProject()))->getMilestoneTitle($this->milestone_id);
-    
-    if ($this->milestone_title !== null && !$this->form->isFilled()){
-      $this->form->fill(['Title' => $this->milestone_title]);
+    if ($this->milestone_title !== null){
+      $form = $this->getEditForm();
+      
+      if (!$form->isFilled()){
+        $form->fill(['Title' => $this->milestone_title]);
+      }
     }
     
     return $this;
@@ -53,11 +52,21 @@ class MilestoneEditModel extends BasicProjectPageModel{
   }
   
   public function getEditForm(): FormComponent{
-    return $this->form;
+    if (isset($this->edit_form)){
+      return $this->edit_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CONFIRM);
+    $form->addTextField('Title')->type('text');
+    $form->addButton('submit', 'Edit Milestone')->icon('pencil');
+    
+    return $this->edit_form = $form;
   }
   
   public function editMilestone(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getEditForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
@@ -70,9 +79,9 @@ class MilestoneEditModel extends BasicProjectPageModel{
       $milestones->setMilestoneTitle($this->milestone_id, $title);
       return true;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

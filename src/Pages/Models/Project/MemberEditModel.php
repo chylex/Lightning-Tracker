@@ -30,11 +30,10 @@ class MemberEditModel extends BasicProjectPageModel{
   private UserId $member_user_id;
   private UserId $logon_user_id;
   private ?string $member_name;
-  private string $member_role;
+  private ?string $member_role;
   private bool $can_edit = false;
-  private bool $has_member = false;
   
-  private FormComponent $form;
+  private FormComponent $edit_form;
   
   public function __construct(Request $req, ProjectInfo $project, UserId $member_user_id, UserId $logon_user_id){
     parent::__construct($req, $project);
@@ -43,36 +42,12 @@ class MemberEditModel extends BasicProjectPageModel{
     
     $db = DB::get();
     
-    $this->form = new FormComponent(self::ACTION_CONFIRM);
+    $this->member_name = (new UserTable($db))->getUserName($member_user_id);
+    $this->member_role = $this->member_name === null ? null : (new ProjectMemberTable($db, $project))->getRoleIdStr($member_user_id);
     
-    $users = new UserTable($db);
-    $this->member_name = $users->getUserName($member_user_id);
-    
-    if ($this->member_name === null){
-      $member_role = null;
+    if ($this->member_role !== null){
+      $this->can_edit = self::canEditMember($logon_user_id, $member_user_id, empty($this->member_role) ? null : (int)$this->member_role, $project);
     }
-    else{
-      $member_role = (new ProjectMemberTable($db, $project))->getRoleIdStr($member_user_id);
-    }
-    
-    if ($member_role !== null){
-      $this->has_member = true;
-      $this->member_role = $member_role;
-      
-      $this->can_edit = self::canEditMember($logon_user_id, $member_user_id, empty($member_role) ? null : (int)$member_role, $project);
-      
-      $select_role = $this->form->addSelect('Role')
-                                ->dropdown()
-                                ->addOption('', '(Default)');
-      
-      foreach((new ProjectPermTable($db, $project))->listRolesAssignableBy($logon_user_id) as $role){
-        $select_role->addOption((string)$role->getId(), $role->getTitle());
-      }
-      
-      $select_role->value($member_role);
-    }
-    
-    $this->form->addButton('submit', 'Edit Member')->icon('pencil');
   }
   
   public function canEdit(): bool{
@@ -80,7 +55,7 @@ class MemberEditModel extends BasicProjectPageModel{
   }
   
   public function hasMember(): bool{
-    return $this->has_member;
+    return $this->member_role !== null;
   }
   
   public function getMemberNameSafe(): string{
@@ -88,11 +63,31 @@ class MemberEditModel extends BasicProjectPageModel{
   }
   
   public function getEditForm(): FormComponent{
-    return $this->form;
+    if (isset($this->edit_form)){
+      return $this->edit_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CONFIRM);
+    
+    $select_role = $form->addSelect('Role')
+                        ->dropdown()
+                        ->addOption('', '(Default)');
+    
+    foreach((new ProjectPermTable(DB::get(), $this->getProject()))->listRolesAssignableBy($this->logon_user_id) as $role){
+      $select_role->addOption((string)$role->getId(), $role->getTitle());
+    }
+    
+    $select_role->value($this->member_role);
+    
+    $form->addButton('submit', 'Edit Member')->icon('pencil');
+    
+    return $this->edit_form = $form;
   }
   
   public function editMember(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getEditForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
@@ -106,8 +101,8 @@ class MemberEditModel extends BasicProjectPageModel{
       $validator->validate();
       
       if ($role_id !== null && !(new ProjectPermTable($db, $project))->isRoleAssignableBy($role_id, $this->logon_user_id)){
-        $this->form->fill(['Role' => $this->member_role]);
-        $this->form->invalidateField('Role', 'Invalid role.');
+        $form->fill(['Role' => $this->member_role]);
+        $form->invalidateField('Role', 'Invalid role.');
         return false;
       }
       
@@ -115,9 +110,9 @@ class MemberEditModel extends BasicProjectPageModel{
       $members->setRole($this->member_user_id, $role_id);
       return true;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

@@ -20,48 +20,53 @@ use Validation\ValidationException;
 class RegisterModel extends BasicMixedPageModel{
   public const ACTION_REGISTER = 'Register';
   
-  private FormComponent $form;
+  private FormComponent $register_form;
   private bool $successful_login;
   
   public function __construct(Request $req, ?ProjectInfo $project, bool $successful_login = false){
     parent::__construct($req, $project);
-    
-    $this->form = new FormComponent(self::ACTION_REGISTER);
-    
-    $this->form->addTextField('Name')
-               ->label('Username')
-               ->type('text')
-               ->autocomplete('username');
-    
-    $this->form->addTextField('Password')
-               ->type('password')
-               ->autocomplete('new-password');
-    
-    $this->form->addTextField('PasswordRepeated')
-               ->label('Confirm Password')
-               ->type('password')
-               ->autocomplete('new-password');
-    
-    $this->form->addTextField('Email')
-               ->type('email')
-               ->autocomplete('email');
-    
-    $this->form->addButton('submit', 'Register')
-               ->icon('pencil');
-    
     $this->successful_login = $successful_login;
-  }
-  
-  public function getForm(): FormComponent{
-    return $this->form;
   }
   
   public function isSuccessfulLogin(): bool{
     return $this->successful_login;
   }
   
+  public function getRegisterForm(): FormComponent{
+    if (isset($this->register_form)){
+      return $this->register_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_REGISTER);
+    
+    $form->addTextField('Name')
+         ->label('Username')
+         ->type('text')
+         ->autocomplete('username');
+    
+    $form->addTextField('Password')
+         ->type('password')
+         ->autocomplete('new-password');
+    
+    $form->addTextField('PasswordRepeated')
+         ->label('Confirm Password')
+         ->type('password')
+         ->autocomplete('new-password');
+    
+    $form->addTextField('Email')
+         ->type('email')
+         ->autocomplete('email');
+    
+    $form->addButton('submit', 'Register')
+         ->icon('pencil');
+    
+    return $this->register_form = $form;
+  }
+  
   public function registerUser(array $data, Session $sess): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getRegisterForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
@@ -74,7 +79,7 @@ class RegisterModel extends BasicMixedPageModel{
     try{
       $validator->validate();
       
-      if (self::checkDuplicateUser($this->form, $name, $email)){
+      if (self::checkDuplicateUser($form, $name, $email)){
         return false;
       }
       
@@ -88,9 +93,9 @@ class RegisterModel extends BasicMixedPageModel{
         throw new LogicException('Could not login a newly registered user.');
       }
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

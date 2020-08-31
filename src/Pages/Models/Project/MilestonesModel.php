@@ -16,7 +16,6 @@ use Pages\Components\Forms\FormComponent;
 use Pages\Components\Forms\IconButtonFormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\Table\TableComponent;
-use Pages\IModel;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Link;
 use Routing\Request;
@@ -34,49 +33,36 @@ class MilestonesModel extends BasicProjectPageModel{
   private const ACTION_MOVE_DOWN = 'Down';
   
   private ProjectPermissions $perms;
-  private TableComponent $table;
-  private ?FormComponent $form;
+  
+  private FormComponent $create_form;
   
   public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms){
     parent::__construct($req, $project);
-    
     $this->perms = $perms;
-    
-    $this->table = new TableComponent();
-    $this->table->ifEmpty('No milestones found.');
-    
-    $this->table->addColumn('Title')->sort('title')->width(65)->wrap()->bold();
-    $this->table->addColumn('Active')->tight()->center();
-    $this->table->addColumn('Issues')->tight()->center();
-    $this->table->addColumn('Progress')->sort('progress')->width(35);
-    $this->table->addColumn('Last Updated')->sort('date_updated')->tight()->right();
-    
-    if ($this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
-      $this->table->addColumn('Actions')->tight()->right();
-      
-      $this->form = new FormComponent(self::ACTION_CREATE);
-      $this->form->startTitledSection('Create Milestone');
-      $this->form->setMessagePlacementHere();
-      $this->form->addTextField('Title')->type('text');
-      $this->form->addButton('submit', 'Create Milestone')->icon('pencil');
-      $this->form->endTitledSection();
-    }
-    else{
-      $this->form = null;
-    }
   }
   
-  public function load(): IModel{
-    parent::load();
-    
+  public function createMilestoneTable(): TableComponent{
     $req = $this->getReq();
+    
+    $table = new TableComponent();
+    $table->ifEmpty('No milestones found.');
+    
+    $table->addColumn('Title')->sort('title')->width(65)->wrap()->bold();
+    $table->addColumn('Active')->tight()->center();
+    $table->addColumn('Issues')->tight()->center();
+    $table->addColumn('Progress')->sort('progress')->width(35);
+    $table->addColumn('Last Updated')->sort('date_updated')->tight()->right();
+    
+    if ($this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
+      $table->addColumn('Actions')->tight()->right();
+    }
     
     $filter = new MilestoneFilter();
     $milestones = new MilestoneTable(DB::get(), $this->getProject());
     $total_count = $milestones->countMilestones($filter);
     
     $pagination = $filter->page($total_count);
-    $sorting = $filter->sort($this->getReq());
+    $sorting = $filter->sort($req);
     
     $active_milestone = $this->getActiveMilestone();
     $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
@@ -125,29 +111,39 @@ class MilestonesModel extends BasicProjectPageModel{
         $row[] = '';
       }
       
-      $row = $this->table->addRow($row);
+      $row = $table->addRow($row);
       
       if ($this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
         $row->link(Link::fromBase($req, 'milestones', $milestone_id_str));
       }
     }
     
-    $this->table->setupColumnSorting($sorting);
-    $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('milestones');
+    $table->setupColumnSorting($sorting);
+    $table->setPaginationFooter($req, $pagination)->elementName('milestones');
     
-    return $this;
-  }
-  
-  public function getMilestoneTable(): TableComponent{
-    return $this->table;
+    return $table;
   }
   
   public function getCreateForm(): ?FormComponent{
-    return $this->form;
+    if (!$this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
+      return null;
+    }
+    
+    if (isset($this->create_form)){
+      return $this->create_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CREATE);
+    $form->addTextField('Title')->type('text');
+    $form->addButton('submit', 'Create Milestone')->icon('pencil');
+    
+    return $this->create_form = $form;
   }
   
   public function createMilestone(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getCreateForm();
+    
+    if ($form === null || !$form->accept($data)){
       return false;
     }
     
@@ -160,9 +156,9 @@ class MilestonesModel extends BasicProjectPageModel{
       $milestones->addMilestone($title);
       return true;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

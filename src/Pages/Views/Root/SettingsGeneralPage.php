@@ -15,7 +15,7 @@ class SettingsGeneralPage extends AbstractSettingsPage{
   }
   
   protected function getSettingsPageColumn(): IViewable{
-    return $this->model->getForm();
+    return $this->model->getSettingsForm();
   }
 }
 

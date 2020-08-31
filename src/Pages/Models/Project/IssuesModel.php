@@ -21,7 +21,6 @@ use Pages\Components\ProgressBarComponent;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
-use Pages\IModel;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Link;
 use Routing\Request;
@@ -40,35 +39,39 @@ class IssuesModel extends BasicProjectPageModel{
   }
   
   private ProjectPermissions $perms;
-  private TableComponent $table;
-  private SidemenuComponent $menu_actions;
   
   public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms){
     parent::__construct($req, $project);
-    
     $this->perms = $perms;
-    
-    $this->table = new TableComponent();
-    $this->table->ifEmpty('No issues found.');
-    
-    $this->table->addColumn('')->tight()->collapsed();
-    $this->table->addColumn('ID')->sort('id')->tight()->collapsed()->right()->bold();
-    $this->table->addColumn('Title')->sort('title')->width(70)->collapsed()->wrap()->bold();
-    $this->table->addColumn('Priority')->sort('priority')->tight();
-    $this->table->addColumn('Scale')->sort('scale')->tight();
-    $this->table->addColumn('Status')->tight();
-    $this->table->addColumn('Progress')->sort('progress')->width(30);
-    $this->table->addColumn('Last Update')->sort('date_updated')->tight()->right();
-    
-    $this->menu_actions = new SidemenuComponent($req);
-    $this->menu_actions->setTitle(Text::plain('Actions'));
   }
   
-  public function load(): IModel{
-    parent::load();
+  public function createMenuAction(): ?SidemenuComponent{
+    $menu = new SidemenuComponent($this->getReq());
+    $menu->setTitle(Text::plain('Actions'));
     
+    if ($this->perms->check(ProjectPermissions::CREATE_ISSUE)){
+      $menu->addLink(Text::withIcon('New Issue', 'pencil'), '/issues/new');
+    }
+    
+    return $menu->getIfNotEmpty();
+  }
+  
+  public function createIssueTable(): TableComponent{
+    $req = $this->getReq();
     $project = $this->getProject();
     $logon_user_id = Session::get()->getLogonUserId();
+    
+    $table = new TableComponent();
+    $table->ifEmpty('No issues found.');
+    
+    $table->addColumn('')->tight()->collapsed();
+    $table->addColumn('ID')->sort('id')->tight()->collapsed()->right()->bold();
+    $table->addColumn('Title')->sort('title')->width(70)->collapsed()->wrap()->bold();
+    $table->addColumn('Priority')->sort('priority')->tight();
+    $table->addColumn('Scale')->sort('scale')->tight();
+    $table->addColumn('Status')->tight();
+    $table->addColumn('Progress')->sort('progress')->width(30);
+    $table->addColumn('Last Update')->sort('date_updated')->tight()->right();
     
     $filter = new IssueFilter();
     $issues = new IssueTable(DB::get(), $project);
@@ -76,27 +79,27 @@ class IssuesModel extends BasicProjectPageModel{
     $filtering = $filter->filter();
     $total_count = $issues->countIssues($filter);
     $pagination = $filter->page($total_count);
-    $sorting = $filter->sort($this->getReq());
+    $sorting = $filter->sort($req);
     
     foreach($issues->listIssues($filter) as $issue){
       $issue_id = $issue->getId();
       
-      $row = $this->table->addRow([$issue->getType()->getViewable(true),
-                                   '<span class="issue-id">#'.$issue_id.'</span>',
-                                   $issue->getTitleSafe(),
-                                   $issue->getPriority(),
-                                   $issue->getScale(),
-                                   $issue->getStatus(),
-                                   new ProgressBarComponent($issue->getProgress()),
-                                   new DateTimeComponent($issue->getLastUpdateDate())]);
+      $row = $table->addRow([$issue->getType()->getViewable(true),
+                             '<span class="issue-id">#'.$issue_id.'</span>',
+                             $issue->getTitleSafe(),
+                             $issue->getPriority(),
+                             $issue->getScale(),
+                             $issue->getStatus(),
+                             new ProgressBarComponent($issue->getProgress()),
+                             new DateTimeComponent($issue->getLastUpdateDate())]);
       
-      $row->link(Link::fromBase($this->getReq(), 'issues', $issue_id));
+      $row->link(Link::fromBase($req, 'issues', $issue_id));
     }
     
-    $this->table->setupColumnSorting($sorting);
-    $this->table->setPaginationFooter($this->getReq(), $pagination)->elementName('issues');
+    $table->setupColumnSorting($sorting);
+    $table->setPaginationFooter($req, $pagination)->elementName('issues');
     
-    $header = $this->table->setFilteringHeader($filtering);
+    $header = $table->setFilteringHeader($filtering);
     $header->addTextField('title')->label('Title');
     self::setupIssueTagOptions($header->addMultiSelect('type')->label('Type'), IssueType::list());
     self::setupIssueTagOptions($header->addMultiSelect('priority')->label('Priority'), IssuePriority::list());
@@ -138,19 +141,7 @@ class IssuesModel extends BasicProjectPageModel{
       }
     }
     
-    if ($this->perms->check(ProjectPermissions::CREATE_ISSUE)){
-      $this->menu_actions->addLink(Text::withIcon('New Issue', 'pencil'), '/issues/new');
-    }
-    
-    return $this;
-  }
-  
-  public function getIssueTable(): TableComponent{
-    return $this->table;
-  }
-  
-  public function getMenuActions(): ?SidemenuComponent{
-    return $this->menu_actions->getIfNotEmpty();
+    return $table;
   }
 }
 

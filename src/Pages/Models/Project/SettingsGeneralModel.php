@@ -4,60 +4,56 @@ declare(strict_types = 1);
 namespace Pages\Models\Project;
 
 use Database\DB;
-use Database\Objects\ProjectInfo;
 use Database\Tables\ProjectTable;
 use Database\Validation\ProjectFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Pages\IModel;
-use Routing\Request;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
 class SettingsGeneralModel extends AbstractSettingsModel{
   public const ACTION_UPDATE = 'Update';
   
-  private FormComponent $form;
-  
-  public function __construct(Request $req, ProjectInfo $project){
-    parent::__construct($req, $project);
-    
-    $this->form = new FormComponent(self::ACTION_UPDATE);
-    $this->form->startTitledSection('Project');
-    $this->form->setMessagePlacementHere();
-    
-    $this->form->startSplitGroup(50);
-    $this->form->addTextField('Name');
-    $this->form->addTextField('Url')->value($project->getUrl())->disable();
-    $this->form->endSplitGroup();
-    
-    $this->form->addCheckBox('Hidden')->label('Hidden From Non-Members');
-    $this->form->addButton('submit', 'Update Settings')->icon('pencil');
-    
-    $this->form->endTitledSection();
-  }
+  private FormComponent $settings_form;
   
   public function load(): IModel{
     parent::load();
     
-    if (!$this->form->isFilled()){
+    $form = $this->getSettingsForm();
+    
+    if (!$form->isFilled()){
       $project = $this->getProject();
       $projects = new ProjectTable(DB::get());
       
-      $this->form->fill(['Name'   => $project->getName(),
-                         'Hidden' => $projects->isHidden($project->getId())]);
+      $form->fill(['Name'   => $project->getName(),
+                   'Hidden' => $projects->isHidden($project->getId())]);
     }
     
     return $this;
   }
   
-  public function getForm(): FormComponent{
-    return $this->form;
+  public function getSettingsForm(): FormComponent{
+    if (isset($this->settings_form)){
+      return $this->settings_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_UPDATE);
+    $form->startSplitGroup(50);
+    $form->addTextField('Name');
+    $form->addTextField('Url')->value($this->getProject()->getUrl())->disable();
+    $form->endSplitGroup();
+    $form->addCheckBox('Hidden')->label('Hidden From Non-Members');
+    $form->addButton('submit', 'Update Settings')->icon('pencil');
+    
+    return $this->settings_form = $form;
   }
   
   public function updateSettings(array $data): bool{
-    if (!$this->form->accept($data)){
+    $form = $this->getSettingsForm();
+    
+    if (!$form->accept($data)){
       return false;
     }
     
@@ -69,12 +65,12 @@ class SettingsGeneralModel extends AbstractSettingsModel{
       $validator->validate();
       $projects = new ProjectTable(DB::get());
       $projects->changeSettings($this->getProject()->getId(), $name, $hidden);
-      $this->form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Project settings were updated.'));
+      $form->addMessage(FormComponent::MESSAGE_SUCCESS, Text::checkmark('Project settings were updated.'));
       return true;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return false;

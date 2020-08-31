@@ -43,7 +43,7 @@ abstract class AbstractSettingsPage extends AbstractPage{
     $split->setLeftWidthLimits(200, 250);
     
     $split->addLeft(new Html('<h3>Menu</h3>'));
-    $split->addLeft($this->model->getMenuLinks());
+    $split->addLeft($this->model->createMenuLinks());
     $split->addRight($this->getSettingsPageColumn());
     
     $split->echoBody();

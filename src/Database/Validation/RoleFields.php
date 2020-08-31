@@ -14,11 +14,11 @@ final class RoleFields{
     return 'Perm-'.str_replace('.', '_', $perm);
   }
   
-  public static function permissions(FormValidator $validator, array $perm_names, array $perm_deps, array $all_perms): array{
+  public static function permissions(FormValidator $validator, array $perm_names, array $perm_deps): array{
     $fields = [];
     $checked_perms = [];
     
-    foreach($all_perms as $perm){
+    foreach(array_keys($perm_names) as $perm){
       $field = $validator->bool(self::permissionFieldName($perm));
       $fields[$perm] = $field;
       

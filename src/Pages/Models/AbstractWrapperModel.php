@@ -5,6 +5,7 @@ namespace Pages\Models;
 
 use Pages\Components\Navigation\NavigationComponent;
 use Pages\IModel;
+use Routing\Request;
 
 abstract class AbstractWrapperModel implements IModel{
   private IModel $model;
@@ -20,6 +21,10 @@ abstract class AbstractWrapperModel implements IModel{
   
   public function ensureLoaded(): void{
     $this->model->ensureLoaded();
+  }
+  
+  public function getReq(): Request{
+    return $this->model->getReq();
   }
   
   public function getNav(): NavigationComponent{

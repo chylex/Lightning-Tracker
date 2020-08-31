@@ -65,106 +65,38 @@ class IssueEditModel extends BasicProjectPageModel{
   
   private ProjectPermissions $perms;
   private UserProfile $editor;
-  private FormComponent $form;
-  
   private ?int $issue_id;
   private ?IssueDetail $issue;
-  private bool $can_edit_all_fields;
+  private int $edit_level;
+  
+  private FormComponent $edit_form;
   
   public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, UserProfile $editor, ?int $issue_id){
     parent::__construct($req, $project);
-    
     $this->perms = $perms;
     $this->editor = $editor;
     $this->issue_id = $issue_id;
     
-    if ($issue_id !== null){
-      $issues = new IssueTable(DB::get(), $this->getProject());
-      $this->issue = $issues->getIssueDetail($this->issue_id);
-      $this->can_edit_all_fields = $this->issue->getEditLevel($editor, $perms) >= IssueDetail::EDIT_ALL_FIELDS;
-    }
-    else{
+    if ($issue_id === null){
       $this->issue = null;
-      $this->can_edit_all_fields = $perms->check(ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS);
-    }
-    
-    $this->form = new FormComponent(self::ACTION_CONFIRM);
-    $this->form->addHTML('<div class="split-wrapper split-collapse-1024 split-collapse-reversed">');
-    
-    if ($this->can_edit_all_fields){
-      $this->form->addHTML('<div class="split-25 min-width-200 max-width-250">');
-      $this->form->startTitledSection('Status');
-      
-      self::setupIssueTagOptions($this->form->addSelect('Status')->optional(), IssueStatus::list());
-      
-      $this->form->addNumberField('Progress', 0, 100)->step(5)->value('0');
-      
-      $select_milestone = $this->form->addSelect('Milestone')->addOption('', '(None)')->dropdown();
-      $select_assignee = $this->form->addSelect('Assignee')->addOption('', '(None)')->dropdown();
-      
-      foreach((new MilestoneTable(DB::get(), $project))->listMilestones() as $milestone){
-        $select_milestone->addOption((string)$milestone->getMilestoneId(), $milestone->getTitle());
-      }
-      
-      $issue_assignee = $this->issue === null ? null : $this->issue->getAssignee();
-      $issue_assignee_id = $issue_assignee === null ? null : $issue_assignee->getId();
-      
-      if ($issue_assignee_id !== null){
-        $select_assignee->addOption($issue_assignee_id->raw(), $issue_assignee->getName());
-      }
-      
-      if ($perms->check(ProjectPermissions::LIST_MEMBERS)){
-        foreach((new ProjectMemberTable(DB::get(), $project))->listMembers() as $member){
-          $id = $member->getUserId();
-          
-          if (!$id->equals($issue_assignee_id)){
-            $select_assignee->addOption($id->raw(), $member->getUserName());
-          }
-        }
-      }
-      else{
-        $select_assignee->disable();
-      }
-      
-      $this->form->endTitledSection();
-      $this->form->addHTML('</div><div class="split-50">');
+      $this->edit_level = $perms->check(ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS) ? IssueDetail::EDIT_ALL_FIELDS : IssueDetail::EDIT_BASIC_FIELDS;
     }
     else{
-      $this->form->addHTML('<div class="split-75">');
+      $this->issue = (new IssueTable(DB::get(), $project))->getIssueDetail($issue_id);
+      $this->edit_level = $this->issue === null ? IssueDetail::EDIT_FORBIDDEN : $this->issue->getEditLevel($editor, $perms);
     }
-    
-    $this->form->startTitledSection('Details');
-    $this->form->addTextField('Title');
-    $this->form->addTextArea('Description')->markdownEditor();
-    $this->form->endTitledSection();
-    
-    $this->form->addHTML('</div><div class="split-25 min-width-200 max-width-250">');
-    $this->form->startTitledSection('General');
-    
-    self::setupIssueTagOptions($this->form->addSelect('Type')->optional(), IssueType::list());
-    
-    if ($this->can_edit_all_fields){
-      self::setupIssueTagOptions($this->form->addSelect('Priority')->optional(), IssuePriority::list());
-      self::setupIssueTagOptions($this->form->addSelect('Scale')->optional(), IssueScale::list());
-    }
-    
-    $this->form->endTitledSection();
-    $this->form->addHTML('</div></div>');
-    
-    $this->form->startTitledSection('Confirm');
-    $this->form->setMessagePlacementHere();
-    $this->form->addButton('submit', $issue_id === null ? 'Add Issue' : 'Edit Issue')->icon('checkmark');
-    $this->form->endTitledSection();
   }
   
   public function load(): IModel{
     parent::load();
     
-    if (!$this->form->isFilled()){
+    $form = $this->getEditForm();
+    
+    if (!$form->isFilled()){
       if ($this->issue_id === null){
-        $this->form->fill(['Priority' => IssuePriority::MEDIUM,
-                           'Scale'    => IssueScale::MEDIUM,
-                           'Status'   => IssueStatus::OPEN]);
+        $form->fill(['Priority' => IssuePriority::MEDIUM,
+                     'Scale'    => IssueScale::MEDIUM,
+                     'Status'   => IssueStatus::OPEN]);
       }
       else{
         $this->fillFormWithCurrentIssue();
@@ -184,15 +116,15 @@ class IssueEditModel extends BasicProjectPageModel{
     $milestone = $issue->getMilestoneId();
     $assignee = $issue->getAssignee();
     
-    $this->form->fill(['Title'       => $issue->getTitle(),
-                       'Description' => $issue->getDescription()->getRawText(),
-                       'Type'        => $issue->getType()->getId(),
-                       'Priority'    => $issue->getPriority()->getId(),
-                       'Scale'       => $issue->getScale()->getId(),
-                       'Status'      => $issue->getStatus()->getId(),
-                       'Progress'    => (string)$issue->getProgress(),
-                       'Milestone'   => $milestone === null ? '' : (string)$milestone,
-                       'Assignee'    => $assignee === null ? '' : $assignee->getId()->raw()]);
+    $this->getEditForm()->fill(['Title'       => $issue->getTitle(),
+                                'Description' => $issue->getDescription()->getRawText(),
+                                'Type'        => $issue->getType()->getId(),
+                                'Priority'    => $issue->getPriority()->getId(),
+                                'Scale'       => $issue->getScale()->getId(),
+                                'Status'      => $issue->getStatus()->getId(),
+                                'Progress'    => (string)$issue->getProgress(),
+                                'Milestone'   => $milestone === null ? '' : (string)$milestone,
+                                'Assignee'    => $assignee === null ? '' : $assignee->getId()->raw()]);
   }
   
   public function isNewIssue(): bool{
@@ -207,25 +139,102 @@ class IssueEditModel extends BasicProjectPageModel{
     return $this->issue_id;
   }
   
-  public function getForm(): FormComponent{
-    return $this->form;
+  public function getEditForm(): FormComponent{
+    if (isset($this->edit_form)){
+      return $this->edit_form;
+    }
+    
+    $form = new FormComponent(self::ACTION_CONFIRM);
+    $form->addHTML('<div class="split-wrapper split-collapse-1024 split-collapse-reversed">');
+    
+    if ($this->edit_level >= IssueDetail::EDIT_ALL_FIELDS){
+      $form->addHTML('<div class="split-25 min-width-200 max-width-250">');
+      $form->startTitledSection('Status');
+      
+      self::setupIssueTagOptions($form->addSelect('Status')->optional(), IssueStatus::list());
+      
+      $form->addNumberField('Progress', 0, 100)->step(5)->value('0');
+      
+      $select_milestone = $form->addSelect('Milestone')->addOption('', '(None)')->dropdown();
+      $select_assignee = $form->addSelect('Assignee')->addOption('', '(None)')->dropdown();
+      
+      foreach((new MilestoneTable(DB::get(), $this->getProject()))->listMilestones() as $milestone){
+        $select_milestone->addOption((string)$milestone->getMilestoneId(), $milestone->getTitle());
+      }
+      
+      $issue_assignee = $this->issue === null ? null : $this->issue->getAssignee();
+      $issue_assignee_id = $issue_assignee === null ? null : $issue_assignee->getId();
+      
+      if ($issue_assignee_id !== null){
+        $select_assignee->addOption($issue_assignee_id->raw(), $issue_assignee->getName());
+      }
+      
+      if ($this->perms->check(ProjectPermissions::LIST_MEMBERS)){
+        foreach((new ProjectMemberTable(DB::get(), $this->getProject()))->listMembers() as $member){
+          $id = $member->getUserId();
+          
+          if (!$id->equals($issue_assignee_id)){
+            $select_assignee->addOption($id->raw(), $member->getUserName());
+          }
+        }
+      }
+      else{
+        $select_assignee->disable();
+      }
+      
+      $form->endTitledSection();
+      $form->addHTML('</div><div class="split-50">');
+    }
+    else{
+      $form->addHTML('<div class="split-75">');
+    }
+    
+    $form->startTitledSection('Details');
+    $form->addTextField('Title');
+    $form->addTextArea('Description')->markdownEditor();
+    $form->endTitledSection();
+    
+    $form->addHTML('</div><div class="split-25 min-width-200 max-width-250">');
+    $form->startTitledSection('General');
+    
+    self::setupIssueTagOptions($form->addSelect('Type')->optional(), IssueType::list());
+    
+    if ($this->edit_level >= IssueDetail::EDIT_ALL_FIELDS){
+      self::setupIssueTagOptions($form->addSelect('Priority')->optional(), IssuePriority::list());
+      self::setupIssueTagOptions($form->addSelect('Scale')->optional(), IssueScale::list());
+    }
+    
+    $form->endTitledSection();
+    $form->addHTML('</div></div>');
+    
+    $form->startTitledSection('Confirm');
+    $form->setMessagePlacementHere();
+    $form->addButton('submit', $this->isNewIssue() ? 'Add Issue' : 'Edit Issue')->icon('checkmark');
+    $form->endTitledSection();
+    
+    return $this->edit_form = $form;
   }
   
   public function createOrEditIssue(array $data): ?int{
-    if (!$this->form->accept($data)){
+    if (!$this->getEditForm()->accept($data)){
       return null;
     }
     
-    if ($this->can_edit_all_fields){
-      return $this->createOrEditIssueFull($data);
-    }
-    else{
-      return $this->createOrEditIssueLimited($data);
+    switch($this->edit_level){
+      case IssueDetail::EDIT_ALL_FIELDS:
+        return $this->createOrEditIssueFull($data);
+      
+      case IssueDetail::EDIT_BASIC_FIELDS:
+        return $this->createOrEditIssueLimited($data);
+      
+      default:
+        return null;
     }
   }
   
   private function createOrEditIssueFull(array $data): ?int{
     $project = $this->getProject();
+    $form = $this->getEditForm();
     
     $data['Type'] ??= '';
     $data['Priority'] ??= '';
@@ -252,8 +261,8 @@ class IssueEditModel extends BasicProjectPageModel{
       $prev_assignee_id = $prev_assignee === null ? null : $prev_assignee->getId();
       
       if ($assignee !== null && $assignee !== $prev_assignee_id && !(new ProjectMemberTable(DB::get(), $project))->checkMembershipExists($assignee)){
-        $this->form->invalidateField('Assignee', 'Assignee must be a member of the project.');
-        $this->form->fill(['Assignee' => $prev_assignee_id === null ? '' : $prev_assignee_id->raw()]);
+        $form->invalidateField('Assignee', 'Assignee must be a member of the project.');
+        $form->fill(['Assignee' => $prev_assignee_id === null ? '' : $prev_assignee_id->raw()]);
         $this->fillFormWithCurrentIssue();
         return null;
       }
@@ -296,9 +305,9 @@ class IssueEditModel extends BasicProjectPageModel{
       
       return $id;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return null;
@@ -306,6 +315,7 @@ class IssueEditModel extends BasicProjectPageModel{
   
   private function createOrEditIssueLimited(array $data): ?int{
     $project = $this->getProject();
+    $form = $this->getEditForm();
     
     $data['Type'] ??= '';
     
@@ -331,9 +341,9 @@ class IssueEditModel extends BasicProjectPageModel{
       
       return $id;
     }catch(ValidationException $e){
-      $this->form->invalidateFields($e->getFields());
+      $form->invalidateFields($e->getFields());
     }catch(Exception $e){
-      $this->form->onGeneralError($e);
+      $form->onGeneralError($e);
     }
     
     return null;

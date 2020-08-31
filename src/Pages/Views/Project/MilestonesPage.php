@@ -8,6 +8,7 @@ use Pages\Components\Forms\FormComponent;
 use Pages\Components\ProgressBarComponent;
 use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
+use Pages\Components\TitledSectionComponent;
 use Pages\Models\Project\MilestonesModel;
 use Pages\Views\AbstractProjectPage;
 
@@ -40,8 +41,8 @@ class MilestonesPage extends AbstractProjectPage{
     $split->collapseAt(1024, true);
     $split->setRightWidthLimits(250, 500);
     
-    $split->addLeft($this->model->getMilestoneTable());
-    $split->addRightIfNotNull($this->model->getCreateForm());
+    $split->addLeft($this->model->createMilestoneTable());
+    $split->addRightIfNotNull(TitledSectionComponent::wrap('Create Milestone', $this->model->getCreateForm()));
     
     $split->echoBody();
   }

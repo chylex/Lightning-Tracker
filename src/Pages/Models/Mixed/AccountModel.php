@@ -7,46 +7,35 @@ use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Text;
-use Pages\IModel;
 use Pages\Models\BasicMixedPageModel;
 use Routing\Request;
 
 class AccountModel extends BasicMixedPageModel{
   public const ACTION_LOGOUT = 'Logout';
   
-  private UserProfile $logon_user;
-  private SidemenuComponent $menu_links;
-  private SidemenuComponent $menu_actions;
+  private UserProfile $user;
   
-  public function __construct(Request $req, UserProfile $logon_user, ?ProjectInfo $project){
+  public function __construct(Request $req, UserProfile $user, ?ProjectInfo $project){
     parent::__construct($req, $project);
-    $this->logon_user = $logon_user;
-    $this->menu_links = new SidemenuComponent($req);
-    $this->menu_actions = new SidemenuComponent($req);
+    $this->user = $user;
   }
   
-  public function load(): IModel{
-    parent::load();
-    
-    $this->menu_links->addLink(Text::withIcon('Profile', 'user'), '/account');
-    $this->menu_links->addLink(Text::withIcon('Appearance', 'eye'), '/account/appearance');
-    $this->menu_links->addLink(Text::withIcon('Security', 'key'), '/account/security');
-    
-    $this->menu_actions->addActionButton(Text::withIcon('Logout', 'switch'), self::ACTION_LOGOUT);
-    
-    return $this;
+  public function getUser(): UserProfile{
+    return $this->user;
   }
   
-  public function getLogonUser(): UserProfile{
-    return $this->logon_user;
+  public final function createMenuLinks(): SidemenuComponent{
+    $menu = new SidemenuComponent($this->getReq());
+    $menu->addLink(Text::withIcon('Profile', 'user'), '/account');
+    $menu->addLink(Text::withIcon('Appearance', 'eye'), '/account/appearance');
+    $menu->addLink(Text::withIcon('Security', 'key'), '/account/security');
+    return $menu;
   }
   
-  public function getMenuLinks(): SidemenuComponent{
-    return $this->menu_links;
-  }
-  
-  public function getMenuActions(): SidemenuComponent{
-    return $this->menu_actions;
+  public final function createMenuActions(): SidemenuComponent{
+    $menu = new SidemenuComponent($this->getReq());
+    $menu->addActionButton(Text::withIcon('Logout', 'switch'), self::ACTION_LOGOUT);
+    return $menu;
   }
 }
 

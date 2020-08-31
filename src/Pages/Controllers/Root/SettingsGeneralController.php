@@ -32,7 +32,7 @@ class SettingsGeneralController extends AbstractHandlerController{
       if (($button === $model::BUTTON_REMOVE_BACKUP && $model->removeBackupFile($data)) ||
           ($button === $model::BUTTON_UPDATE_SETTINGS && $model->updateConfig($data))
       ){
-        return $model->getForm()->reload($req);
+        return $model->getSettingsForm()->reload($req);
       }
     }
     

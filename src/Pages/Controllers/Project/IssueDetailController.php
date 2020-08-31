@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Project;
 
-use Database\Objects\IssueDetail;
 use Database\Objects\ProjectInfo;
 use Generator;
 use Pages\Controllers\AbstractProjectController;
@@ -31,26 +30,22 @@ class IssueDetailController extends AbstractProjectController{
     $model = new IssueDetailModel($req, $project, $perms, $this->issue_id);
     
     if ($action !== null){
-      $issue = $model->getIssue();
+      if (!$model->canEditStatus()){
+        return error($req, 'Permission Error', 'You do not have permission to change the status of this issue.', $project);
+      }
       
-      if ($issue !== null){
-        if ($issue->getEditLevel($sess->getLogonUser(), $perms) < IssueDetail::EDIT_ALL_FIELDS){
-          return error($req, 'Permission Error', 'You do not have permission to change the status of this issue.', $project);
-        }
+      if ($action === $model::ACTION_UPDATE_TASKS){
+        $model->updateCheckboxes($req->getData());
         
-        if ($action === $model::ACTION_UPDATE_TASKS){
-          $model->updateCheckboxes($req->getData());
-          
-          if ($req->isAjax()){
-            return json($model->getProgressUpdate());
-          }
-          else{
-            return reload();
-          }
+        if ($req->isAjax()){
+          return json($model->getProgressUpdate());
         }
-        elseif ($model->tryUseShortcut($action)){
+        else{
           return reload();
         }
+      }
+      elseif ($model->tryUseShortcut($action)){
+        return reload();
       }
     }
     
