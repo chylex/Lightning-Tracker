@@ -78,6 +78,9 @@ define('BASE_URL_ENC', $base_url_protocol.(new UrlString($base_url_domain_path))
 if (TRACKER_MIGRATION_VERSION > MIGRATION_VERSION){
   require_once 'update.php';
 }
+elseif (MIGRATION_TASK !== 0){
+  die('The update process did not finish cleanly. Please check the server logs and finish the update process, or revert back to the previous version.');
+}
 
 // Protection
 
