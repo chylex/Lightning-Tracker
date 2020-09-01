@@ -218,8 +218,7 @@ WHERE role_id = ? AND project_id = ?
   AND special = FALSE
   AND ordering > IFNULL((SELECT ordering
                          FROM project_roles pr2
-                         JOIN project_members pm ON pr2.project_id = pm.project_id AND
-                                                    pr2.role_id = pm.role_id
+                         JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
                          WHERE pm.user_id = ? AND pm.project_id = pr.project_id), ~0)
 SQL
     );
@@ -260,8 +259,7 @@ WHERE project_id = ?
   AND special = FALSE
   AND ordering > IFNULL((SELECT ordering
                          FROM project_roles pr2
-                         JOIN project_members pm ON pr2.project_id = pm.project_id AND
-                                                    pr2.role_id = pm.role_id
+                         JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
                          WHERE pm.user_id = ? AND pm.project_id = pr.project_id), ~0)
 ORDER BY ordering ASC
 SQL
@@ -307,7 +305,7 @@ SQL
     $stmt = $this->db->prepare(<<<SQL
 SELECT prp.permission
 FROM project_role_permissions prp
-JOIN project_members pm ON prp.project_id = pm.project_id AND prp.role_id = pm.role_id
+JOIN project_members pm ON prp.role_id = pm.role_id AND prp.project_id = pm.project_id
 WHERE pm.user_id = ? AND pm.project_id = ?
 SQL
     );

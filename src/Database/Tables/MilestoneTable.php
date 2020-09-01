@@ -152,7 +152,7 @@ SELECT m.milestone_id                                                   AS miles
        FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution))  AS progress,
        MAX(i.date_updated)                                              AS date_updated
 FROM milestones m
-LEFT JOIN issues i ON m.project_id = i.project_id AND m.milestone_id = i.milestone_id
+LEFT JOIN issues i ON m.milestone_id = i.milestone_id AND m.project_id = i.project_id
 LEFT JOIN issue_weights iw ON i.scale = iw.scale
 # WHERE
 GROUP BY m.milestone_id, m.title

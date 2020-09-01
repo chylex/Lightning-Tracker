@@ -29,8 +29,8 @@ SELECT m.milestone_id                                                  AS id,
        m.title                                                         AS title,
        FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution)) AS percentage_done
 FROM project_user_settings tus
-JOIN      milestones m ON tus.project_id = m.project_id AND tus.active_milestone = m.milestone_id
-LEFT JOIN issues i ON m.milestone_id = i.milestone_id
+JOIN      milestones m ON tus.active_milestone = m.milestone_id AND tus.project_id = m.project_id
+LEFT JOIN issues i ON m.milestone_id = i.milestone_id AND m.project_id = i.project_id
 LEFT JOIN issue_weights iw ON i.scale = iw.scale
 WHERE tus.user_id = ? AND tus.project_id = ?
 GROUP BY m.milestone_id

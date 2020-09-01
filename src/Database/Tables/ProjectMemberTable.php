@@ -26,7 +26,7 @@ final class ProjectMemberTable extends AbstractProjectTable{
     $sql = <<<SQL
 SELECT COUNT(*)
 FROM project_members pm
-LEFT JOIN project_roles pr ON pm.project_id = pr.project_id AND pm.role_id = pr.role_id
+LEFT JOIN project_roles pr ON pm.role_id = pr.role_id AND pm.project_id = pr.project_id
 SQL;
     
     $stmt = $filter->prepare($this->db, $sql, AbstractFilter::STMT_COUNT);
@@ -50,7 +50,7 @@ SELECT pm.user_id              AS user_id,
        pr.title                AS role_title,
        IFNULL(pr.ordering, ~0) AS role_order
 FROM project_members pm
-LEFT JOIN project_roles pr ON pm.project_id = pr.project_id AND pm.role_id = pr.role_id
+LEFT JOIN project_roles pr ON pm.role_id = pr.role_id AND pm.project_id = pr.project_id
 JOIN      users u ON pm.user_id = u.id
 SQL;
     

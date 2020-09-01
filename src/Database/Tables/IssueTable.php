@@ -187,7 +187,7 @@ SQL
       $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues i', AbstractFilter::STMT_COUNT);
     }
     else{
-      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues i LEFT JOIN milestones m ON i.project_id = m.project_id AND i.milestone_id = m.milestone_id', AbstractFilter::STMT_COUNT);
+      $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM issues i LEFT JOIN milestones m ON i.milestone_id = m.milestone_id AND i.project_id = m.project_id', AbstractFilter::STMT_COUNT);
     }
     
     $stmt->execute();
@@ -214,7 +214,7 @@ SELECT i.issue_id AS id,
        i.date_created,
        i.date_updated
 FROM issues i
-LEFT JOIN milestones m ON i.project_id = m.project_id AND i.milestone_id = m.milestone_id
+LEFT JOIN milestones m ON i.milestone_id = m.milestone_id AND i.project_id = m.project_id
 SQL
     );
     
@@ -257,7 +257,7 @@ SELECT issues.title        AS title,
 FROM issues
 LEFT JOIN users author ON issues.author_id = author.id
 LEFT JOIN users assignee ON issues.assignee_id = assignee.id
-LEFT JOIN milestones milestone ON issues.project_id = milestone.project_id AND issues.milestone_id = milestone.milestone_id
+LEFT JOIN milestones milestone ON issues.milestone_id = milestone.milestone_id AND issues.project_id = milestone.project_id
 WHERE issues.issue_id = :issue_id AND issues.project_id = :project_id
 SQL
     );
