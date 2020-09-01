@@ -1,17 +1,22 @@
 .lightmark p {
-  margin: 10px 0 25px;
+  margin: 15px 0 18px;
 }
 
 .lightmark h4,
 .lightmark h5,
 .lightmark h6 {
-  margin: 30px 0 15px;
+  margin: 25px 0 15px;
 }
 
 .lightmark h4:first-child,
 .lightmark h5:first-child,
 .lightmark h6:first-child {
   margin-top: 15px;
+}
+
+.lightmark h4 + h5,
+.lightmark h5 + h6 {
+  margin-top: 0;
 }
 
 .lightmark h4 {

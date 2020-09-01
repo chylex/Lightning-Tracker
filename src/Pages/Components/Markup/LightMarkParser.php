@@ -18,11 +18,11 @@ final class LightMarkParser{
   private const TILDE = 126;
   
   private const SINGLE_CHAR_FORMATTING = [
-      self::ASTERISK => 'strong'
+      self::ASTERISK => 'em'
   ];
   
   private const DOUBLED_CHAR_FORMATTING = [
-      self::ASTERISK   => 'em',
+      self::ASTERISK   => 'strong',
       self::UNDERSCORE => 'ins',
       self::TILDE      => 'del'
   ];
