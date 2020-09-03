@@ -36,7 +36,7 @@ final class FieldOneOf implements IWhereCondition{
   
   public function prepareStatement(PDOStatement $stmt): void{
     $field_name = $this->field->getFieldName();
-  
+    
     foreach($this->values as $i => $value){
       bind($stmt, $field_name.'_'.($i + 1), $value);
     }

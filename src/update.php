@@ -11,7 +11,7 @@ function get_migration(int $id): ?AbstractMigrationProcess{
   switch($id){
     case 6:
       return new Migration6();
-      
+    
     default:
       return null;
   }

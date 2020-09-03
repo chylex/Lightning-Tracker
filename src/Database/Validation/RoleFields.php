@@ -31,7 +31,7 @@ final class RoleFields{
     
     foreach($checked_perms as $perm){
       $dependency = $perm_deps[$perm] ?? null;
-    
+      
       if ($dependency !== null && !in_array($dependency, $checked_perms, true)){
         $fields[$perm]->isTrue(fn($ignore): bool => in_array($dependency, $checked_perms, true), 'This permission requires the \''.$perm_names[$dependency].'\' permission.');
       }

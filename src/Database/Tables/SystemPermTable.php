@@ -83,12 +83,12 @@ final class SystemPermTable extends AbstractTable{
     $values = implode(',', array_map(fn($ignore): string => '(?, ?)', $perms));
     
     $stmt = $this->db->prepare(str_replace('()', $values, $sql));
-  
+    
     foreach($perms as $i => $perm){
       $stmt->bindValue(($i * 2) + 1, $id, PDO::PARAM_INT);
       $stmt->bindValue(($i * 2) + 2, $perm);
     }
-  
+    
     $stmt->execute();
   }
   

@@ -12,8 +12,8 @@ use Pages\Models\Project\IssueDetailModel;
 use Pages\Views\Project\IssueDetailPage;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\message;
 use function Pages\Actions\json;
+use function Pages\Actions\message;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
 

@@ -38,7 +38,7 @@ final class Migration6 extends AbstractMigrationProcess{
         new class extends AbstractMigrationTask{
           public function execute(PDO $db): void{
             $stmt = $db->query('SELECT id FROM users');
-  
+            
             while(($res = $stmt->fetchColumn()) !== false){
               /** @noinspection SqlResolve */
               $s2 = $db->prepare('UPDATE users SET public_id = ? WHERE id = ?');
@@ -48,22 +48,22 @@ final class Migration6 extends AbstractMigrationProcess{
             }
           }
         },
-
+        
         self::sql('UPDATE issues SET author_id = (SELECT u.public_id FROM users u WHERE u.id = author_id_old)'),
         self::sql('UPDATE issues SET assignee_id = (SELECT u.public_id FROM users u WHERE u.id = assignee_id_old)'),
         self::sql('UPDATE project_members SET user_id = (SELECT u.public_id FROM users u WHERE u.id = user_id_old)'),
         self::sql('UPDATE projects SET owner_id = (SELECT u.public_id FROM users u WHERE u.id = owner_id_old)'),
         self::sql('UPDATE project_user_settings SET user_id = (SELECT u.public_id FROM users u WHERE u.id = user_id_old)'),
         self::sql('UPDATE user_logins SET id = (SELECT u.public_id FROM users u WHERE u.id = id_old)'),
-
+        
         self::sql('ALTER TABLE users DROP id'),
         self::sql('ALTER TABLE users CHANGE public_id id CHAR(9) NOT NULL'),
         self::sql('ALTER TABLE users ADD PRIMARY KEY (id)'),
-
+        
         self::sql('ALTER TABLE project_members ADD PRIMARY KEY (project_id, user_id)'),
         self::sql('ALTER TABLE project_user_settings ADD PRIMARY KEY (project_id, user_id)'),
         self::sql('ALTER TABLE user_logins ADD PRIMARY KEY (id, token)'),
-
+        
         self::sql('ALTER TABLE issues ADD CONSTRAINT fk__issue__project FOREIGN KEY (`project_id`) REFERENCES `projects` (`id`) ON UPDATE CASCADE ON DELETE CASCADE'),
         self::sql('ALTER TABLE issues ADD CONSTRAINT fk__issue__author FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE SET NULL'),
         self::sql('ALTER TABLE issues ADD CONSTRAINT fk__issue__assignee FOREIGN KEY (`assignee_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE SET NULL'),
@@ -81,7 +81,7 @@ final class Migration6 extends AbstractMigrationProcess{
         self::sql('ALTER TABLE system_role_permissions ADD CONSTRAINT fk__system_role_permission__role FOREIGN KEY (`role_id`) REFERENCES `system_roles` (`id`) ON UPDATE CASCADE ON DELETE CASCADE'),
         self::sql('ALTER TABLE user_logins ADD CONSTRAINT fk__user_login__user FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON UPDATE CASCADE ON DELETE CASCADE'),
         self::sql('ALTER TABLE users ADD CONSTRAINT fk__user__role FOREIGN KEY (`role_id`) REFERENCES `system_roles` (`id`) ON UPDATE CASCADE ON DELETE SET NULL'),
-
+        
         self::sql('ALTER TABLE issues DROP author_id_old'),
         self::sql('ALTER TABLE issues DROP assignee_id_old'),
         self::sql('ALTER TABLE project_members DROP user_id_old'),

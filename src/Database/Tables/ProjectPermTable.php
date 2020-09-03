@@ -114,13 +114,13 @@ SQL
     $values = implode(',', array_map(fn($ignore): string => '(?, ?, ?)', $perms));
     
     $stmt = $this->db->prepare(str_replace('()', $values, $sql));
-  
+    
     foreach($perms as $i => $perm){
       $stmt->bindValue(($i * 3) + 1, $project, PDO::PARAM_INT);
       $stmt->bindValue(($i * 3) + 2, $id, PDO::PARAM_INT);
       $stmt->bindValue(($i * 3) + 3, $perm);
     }
-  
+    
     $stmt->execute();
   }
   

@@ -35,7 +35,7 @@ final class Sorting{
     if (empty($rule_str)){
       return new Sorting($req, $associative_fields, $rules);
     }
-  
+    
     /** @var string $rule */
     foreach(explode(self::RULE_SEPARATOR, $rule_str) as $rule){
       if (empty($rule)){
