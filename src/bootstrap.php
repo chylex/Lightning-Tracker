@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-use Configuration\SystemConfig;
+use Configuration\ConfigFile;
 use Configuration\VersionFile;
 use Logging\Log;
 use Routing\Request;
@@ -47,7 +47,7 @@ require_once CONFIG_FILE;
 if (!file_exists(VERSION_FILE)){
   $version_file = new VersionFile(constant('INSTALLED_MIGRATION_VERSION'), 0);
   $version_file->writeSafe(VERSION_FILE, VERSION_TMP_FILE);
-  SystemConfig::fromCurrentInstallation()->write(CONFIG_FILE);
+  ConfigFile::fromCurrentInstallation()->write(CONFIG_FILE);
 }
 
 /** @noinspection PhpIncludeInspection */

@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Root;
 
-use Configuration\SystemConfig;
+use Configuration\ConfigFile;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Validation\ValidationException;
@@ -109,7 +109,7 @@ HTML;
       $data['DbPassword'] = DB_PASSWORD;
     }
     
-    $config = SystemConfig::fromForm($data);
+    $config = ConfigFile::fromForm($data);
     
     try{
       $config->validate();

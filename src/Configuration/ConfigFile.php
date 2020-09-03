@@ -6,22 +6,22 @@ namespace Configuration;
 use Validation\ValidationException;
 use Validation\Validator;
 
-final class SystemConfig{
+final class ConfigFile{
   private static function validateProtocol(string $url): bool{
     return mb_substr($url, 0, 7) === 'http://' || mb_substr($url, 0, 8) === 'https://';
   }
   
-  public static function fromForm(array $data): SystemConfig{
-    return new SystemConfig((bool)($data['SysEnableRegistration'] ?? false),
-                            rtrim($data['BaseUrl'], '/'),
-                            $data['DbName'],
-                            $data['DbHost'],
-                            $data['DbUser'],
-                            $data['DbPassword']);
+  public static function fromForm(array $data): ConfigFile{
+    return new ConfigFile((bool)($data['SysEnableRegistration'] ?? false),
+                          rtrim($data['BaseUrl'], '/'),
+                          $data['DbName'],
+                          $data['DbHost'],
+                          $data['DbUser'],
+                          $data['DbPassword']);
   }
   
-  public static function fromCurrentInstallation(): SystemConfig{
-    return new SystemConfig(SYS_ENABLE_REGISTRATION, BASE_URL, DB_NAME, DB_HOST, DB_USER, DB_PASSWORD);
+  public static function fromCurrentInstallation(): ConfigFile{
+    return new ConfigFile(SYS_ENABLE_REGISTRATION, BASE_URL, DB_NAME, DB_HOST, DB_USER, DB_PASSWORD);
   }
   
   private bool $sys_enable_registration;

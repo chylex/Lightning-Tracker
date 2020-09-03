@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-use Configuration\SystemConfig;
+use Configuration\ConfigFile;
 use Data\UserId;
 use Data\UserPassword;
 use Database\DB;
@@ -59,7 +59,7 @@ $conflicts = [];
 // Installation
 
 if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
-  $config = SystemConfig::fromForm($_POST);
+  $config = ConfigFile::fromForm($_POST);
   
   try{
     $config->validate();
