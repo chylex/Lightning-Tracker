@@ -12,7 +12,6 @@ use Database\Filters\Types\IssueFilter;
 use Database\Objects\ProjectInfo;
 use Database\Tables\IssueTable;
 use Database\Tables\MilestoneTable;
-use Database\Tables\ProjectMemberTable;
 use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\Elements\FormSelectMultiple;
 use Pages\Components\Html;
@@ -113,9 +112,6 @@ class IssuesModel extends BasicProjectPageModel{
       $filtering_milestone->addOption((string)$milestone->getMilestoneId(), Text::plain($milestone->getTitle()));
     }
     
-    // TODO get rid of IDs and allow filtering by manually typing username (either add a field, or just in the URL & add the options if the user cannot see everyone)
-    // TODO could also have a way of including former members
-    
     $filtering_author = $header->addMultiSelect('author')->label('Author');
     $filtering_author->addOption('', Text::missing('Nobody'));
     
@@ -126,16 +122,17 @@ class IssuesModel extends BasicProjectPageModel{
       $filtering_author->addOption($logon_user_id->raw(), Text::missing('You'));
       $filtering_assignee->addOption($logon_user_id->raw(), Text::missing('You'));
       
-      if ($this->perms->check(ProjectPermissions::LIST_MEMBERS)){
-        foreach((new ProjectMemberTable(DB::get(), $project))->listMembers() as $member){
-          $user_id = $member->getUserId();
+      $groups = [
+          [$filtering_author, $issues->listAuthors()],
+          [$filtering_assignee, $issues->listAssignees()]
+      ];
+      
+      foreach($groups as [$select, $users]){
+        foreach($users as $user){
+          $user_id = $user->getId();
           
           if (!$user_id->equals($logon_user_id)){
-            $user_id_str = $user_id->raw();
-            $user_name = $member->getUserName();
-            
-            $filtering_author->addOption($user_id_str, Text::plain($user_name));
-            $filtering_assignee->addOption($user_id_str, Text::plain($user_name));
+            $select->addOption($user_id->raw(), Text::plain($user->getName()));
           }
         }
       }

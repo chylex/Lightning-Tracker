@@ -295,6 +295,58 @@ SQL
     return $this->fetchOneColumn($stmt);
   }
   
+  /**
+   * @return IssueUser[]
+   */
+  public function listAuthors(): array{
+    $stmt = $this->db->prepare(<<<SQL
+SELECT u.id AS id, u.name AS name
+FROM issues i
+JOIN users u ON u.id = i.author_id
+WHERE project_id = ?
+GROUP BY u.id, u.name
+ORDER BY u.name
+SQL
+    );
+    
+    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $results = [];
+    
+    while(($res = $this->fetchNext($stmt)) !== false){
+      $results[] = new IssueUser(UserId::fromRaw($res['id']), $res['name']);
+    }
+    
+    return $results;
+  }
+  
+  /**
+   * @return IssueUser[]
+   */
+  public function listAssignees(): array{
+    $stmt = $this->db->prepare(<<<SQL
+SELECT u.id AS id, u.name AS name
+FROM issues i
+JOIN users u ON u.id = i.assignee_id
+WHERE project_id = ?
+GROUP BY u.id, u.name
+ORDER BY u.name
+SQL
+    );
+    
+    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
+    $stmt->execute();
+    
+    $results = [];
+    
+    while(($res = $this->fetchNext($stmt)) !== false){
+      $results[] = new IssueUser(UserId::fromRaw($res['id']), $res['name']);
+    }
+    
+    return $results;
+  }
+  
   public function deleteById(int $id): void{
     $stmt = $this->db->prepare('DELETE FROM issues WHERE issue_id = ? AND project_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
