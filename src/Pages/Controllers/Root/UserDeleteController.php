@@ -16,7 +16,7 @@ use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
@@ -34,7 +34,7 @@ class UserDeleteController extends AbstractHandlerController{
     $model = new UserDeleteModel($req, UserId::fromFormatted($this->user_id));
     
     if (!$model->canDelete()){
-      return error($req, 'Permission Error', 'You are not allowed to delete this user.');
+      return message($req, 'Permission Error', 'You are not allowed to delete this user.');
     }
     
     if ($req->getAction() === $model::ACTION_CONFIRM && $model->deleteUser($req->getData())){

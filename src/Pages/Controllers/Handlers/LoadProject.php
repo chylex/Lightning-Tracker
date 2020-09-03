@@ -10,7 +10,7 @@ use Pages\Controllers\IControlHandler;
 use Pages\IAction;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 
 class LoadProject implements IControlHandler{
   private ?ProjectInfo $project_ref;
@@ -34,14 +34,14 @@ class LoadProject implements IControlHandler{
     }
     
     if ($url === null){
-      return error($req, 'Project Error', 'Project is missing in the URL.');
+      return message($req, 'Project Error', 'Project is missing in the URL.');
     }
     
     $projects = new ProjectTable(DB::get());
     $info = $projects->getInfoFromUrl($url, $sess->getLogonUser());
     
     if ($info === null || !$info->isVisible()){
-      return error($req, 'Project Error', 'Project was not found.');
+      return message($req, 'Project Error', 'Project was not found.');
     }
     
     $this->project_ref = $info->getProject();

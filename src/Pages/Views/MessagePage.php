@@ -3,18 +3,18 @@ declare(strict_types = 1);
 
 namespace Pages\Views;
 
-use Pages\Models\ErrorModel;
+use Pages\Models\MessageModel;
 
-final class ErrorPage extends AbstractPage{
-  private ErrorModel $model;
+final class MessagePage extends AbstractPage{
+  private MessageModel $model;
   
-  public function __construct(ErrorModel $model){
+  public function __construct(MessageModel $model){
     parent::__construct($model);
     $this->model = $model;
   }
   
   protected function getHeading(): string{
-    return $this->model->getErrorTitleSafe();
+    return $this->model->getTitleSafe();
   }
   
   protected function getLayout(): string{
@@ -22,7 +22,7 @@ final class ErrorPage extends AbstractPage{
   }
   
   protected function echoPageBody(): void{
-    echo '<p>'.$this->model->getErrorMessageSafe().'</p>';
+    echo '<p>'.$this->model->getMessageSafe().'</p>';
   }
 }
 

@@ -8,7 +8,7 @@ use Pages\Controllers\IControlHandler;
 use Pages\IAction;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 
 class LoadStringId implements IControlHandler{
   private ?string $id_ref;
@@ -37,7 +37,7 @@ class LoadStringId implements IControlHandler{
     }
     
     if ($issue_id === null){
-      return error($req, 'Load Error', 'Invalid '.$this->title.'.', $this->project);
+      return message($req, 'Load Error', 'Invalid '.$this->title.'.', $this->project);
     }
     
     $this->id_ref = $issue_id;

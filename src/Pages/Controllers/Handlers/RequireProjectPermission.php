@@ -8,7 +8,7 @@ use Pages\Controllers\IControlHandler;
 use Pages\IAction;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 
 class RequireProjectPermission implements IControlHandler{
   private ProjectInfo $project;
@@ -23,7 +23,7 @@ class RequireProjectPermission implements IControlHandler{
   
   public function run(Request $req, Session $sess): ?IAction{
     if (!$sess->getPermissions()->project($this->project)->check($this->permission)){
-      return error($req, 'Permission Error', $this->message, $this->project);
+      return message($req, 'Permission Error', $this->message, $this->project);
     }
     
     return null;

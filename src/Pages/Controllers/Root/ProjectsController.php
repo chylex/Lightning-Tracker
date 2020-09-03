@@ -13,7 +13,7 @@ use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
@@ -30,7 +30,7 @@ class ProjectsController extends AbstractHandlerController{
       $logon_user = $sess->getLogonUser();
       
       if ($logon_user === null || !$perms->check(SystemPermissions::LIST_VISIBLE_PROJECTS) || !$perms->check(SystemPermissions::CREATE_PROJECT)){
-        return error($req, 'Permission Error', 'You do not have permission to create a project.');
+        return message($req, 'Permission Error', 'You do not have permission to create a project.');
       }
       
       $url = $model->createProject($req->getData(), $logon_user);

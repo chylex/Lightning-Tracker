@@ -5,7 +5,7 @@ namespace Pages\Models;
 
 use Pages\IModel;
 
-class ErrorModel extends AbstractWrapperModel{
+class MessageModel extends AbstractWrapperModel{
   private string $title;
   private string $message;
   
@@ -15,11 +15,11 @@ class ErrorModel extends AbstractWrapperModel{
     $this->message = $message;
   }
   
-  public function getErrorTitleSafe(): string{
+  public function getTitleSafe(): string{
     return protect($this->title);
   }
   
-  public function getErrorMessageSafe(): string{
+  public function getMessageSafe(): string{
     return protect($this->message);
   }
 }

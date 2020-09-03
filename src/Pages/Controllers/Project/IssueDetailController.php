@@ -12,7 +12,7 @@ use Pages\Models\Project\IssueDetailModel;
 use Pages\Views\Project\IssueDetailPage;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 use function Pages\Actions\json;
 use function Pages\Actions\reload;
 use function Pages\Actions\view;
@@ -31,7 +31,7 @@ class IssueDetailController extends AbstractProjectController{
     
     if ($action !== null){
       if (!$model->canEditStatus()){
-        return error($req, 'Permission Error', 'You do not have permission to change the status of this issue.', $project);
+        return message($req, 'Permission Error', 'You do not have permission to change the status of this issue.', $project);
       }
       
       if ($action === $model::ACTION_UPDATE_TASKS){

@@ -17,7 +17,7 @@ use Routing\Link;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
@@ -37,7 +37,7 @@ class MemberRemoveController extends AbstractProjectController{
     
     if ($model->hasMember()){
       if (!$model->canRemove()){
-        return error($req, 'Permission Error', 'You are not allowed to edit this member.', $project);
+        return message($req, 'Permission Error', 'You are not allowed to edit this member.', $project);
       }
       
       if (($action === null && $model->removeMemberSafely()) ||

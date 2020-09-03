@@ -8,7 +8,7 @@ use Routing\Request;
 use Routing\Router;
 use Routing\RouterException;
 use Routing\UrlString;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 
 define('TRACKER_PUBLIC_VERSION', '0.1');
 define('TRACKER_MIGRATION_VERSION', 7);
@@ -142,7 +142,7 @@ $router->add('&/favicon.ico', 'Root/FaviconController');
 
 function handle_error(int $code, string $title, string $message, ?Request $req = null): void{
   http_response_code($code);
-  error($req ?? Request::empty(), $title, $message)->execute();
+  message($req ?? Request::empty(), $title, $message)->execute();
 }
 
 try{

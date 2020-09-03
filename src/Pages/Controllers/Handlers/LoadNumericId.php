@@ -8,7 +8,7 @@ use Pages\Controllers\IControlHandler;
 use Pages\IAction;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 
 class LoadNumericId implements IControlHandler{
   private ?int $id_ref;
@@ -37,7 +37,7 @@ class LoadNumericId implements IControlHandler{
     }
     
     if ($issue_id === null || !is_numeric($issue_id)){
-      return error($req, 'Load Error', 'Invalid '.$this->title.' ID.', $this->project);
+      return message($req, 'Load Error', 'Invalid '.$this->title.' ID.', $this->project);
     }
     
     $this->id_ref = (int)$issue_id;

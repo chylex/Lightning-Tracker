@@ -16,7 +16,7 @@ use Routing\Link;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
@@ -40,7 +40,7 @@ class IssueEditController extends AbstractProjectController{
       $issue = $model->getIssue();
       
       if ($issue === null || $issue->getEditLevel($logon_user, $perms) === IssueDetail::EDIT_FORBIDDEN){
-        return error($req, 'Permission Error', 'You do not have permission to edit this issue.', $project);
+        return message($req, 'Permission Error', 'You do not have permission to edit this issue.', $project);
       }
     }
     

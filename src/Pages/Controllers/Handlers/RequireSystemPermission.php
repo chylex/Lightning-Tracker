@@ -7,7 +7,7 @@ use Pages\Controllers\IControlHandler;
 use Pages\IAction;
 use Routing\Request;
 use Session\Session;
-use function Pages\Actions\error;
+use function Pages\Actions\message;
 
 class RequireSystemPermission implements IControlHandler{
   private string $permission;
@@ -20,7 +20,7 @@ class RequireSystemPermission implements IControlHandler{
   
   public function run(Request $req, Session $sess): ?IAction{
     if (!$sess->getPermissions()->system()->check($this->permission)){
-      return error($req, 'Permission Error', $this->message);
+      return message($req, 'Permission Error', $this->message);
     }
     
     return null;
