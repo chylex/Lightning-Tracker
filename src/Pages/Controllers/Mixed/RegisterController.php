@@ -26,8 +26,7 @@ class RegisterController extends AbstractHandlerController{
   
   protected function finally(Request $req, Session $sess): IAction{
     if (isset($_GET['success'])){
-      $model = new RegisterModel($req, $this->project, true);
-      return view(new RegisterPage($model->load()));
+      return message($req, 'Register', 'Registration successful, you are now logged in!', $this->project);
     }
     
     if (!SYS_ENABLE_REGISTRATION){

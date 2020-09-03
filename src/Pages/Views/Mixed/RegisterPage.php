@@ -28,12 +28,7 @@ class RegisterPage extends AbstractPage{
   }
   
   protected function echoPageBody(): void{
-    if ($this->model->isSuccessfulLogin()){
-      echo '<p>Registration successful, you are now logged in!</p>';
-    }
-    else{
-      $this->model->getRegisterForm()->echoBody();
-    }
+    $this->model->getRegisterForm()->echoBody();
   }
 }
 

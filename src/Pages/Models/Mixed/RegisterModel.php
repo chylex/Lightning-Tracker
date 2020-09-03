@@ -5,14 +5,12 @@ namespace Pages\Models\Mixed;
 
 use Data\UserId;
 use Database\DB;
-use Database\Objects\ProjectInfo;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
 use Exception;
 use LogicException;
 use Pages\Components\Forms\FormComponent;
 use Pages\Models\BasicMixedPageModel;
-use Routing\Request;
 use Session\Session;
 use Validation\FormValidator;
 use Validation\ValidationException;
@@ -21,16 +19,6 @@ class RegisterModel extends BasicMixedPageModel{
   public const ACTION_REGISTER = 'Register';
   
   private FormComponent $register_form;
-  private bool $successful_login;
-  
-  public function __construct(Request $req, ?ProjectInfo $project, bool $successful_login = false){
-    parent::__construct($req, $project);
-    $this->successful_login = $successful_login;
-  }
-  
-  public function isSuccessfulLogin(): bool{
-    return $this->successful_login;
-  }
   
   public function getRegisterForm(): FormComponent{
     if (isset($this->register_form)){
