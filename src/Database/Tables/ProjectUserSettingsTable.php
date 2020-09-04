@@ -41,7 +41,7 @@ SQL
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     
-    $res = $this->fetchOne($stmt);
+    $res = $this->fetchOneRaw($stmt);
     return $res === false ? null : new MilestoneProgress($res['id'], $res['title'], $res['percentage_done'] === null ? null : (int)$res['percentage_done']);
   }
 }

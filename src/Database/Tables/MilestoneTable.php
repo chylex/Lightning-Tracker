@@ -27,7 +27,7 @@ SQL
       $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
       $stmt->execute();
       
-      $next = $this->fetchOne($stmt);
+      $next = $this->fetchOneRaw($stmt);
       
       if ($next === false){
         $this->db->rollBack();
@@ -97,9 +97,7 @@ SQL
     $stmt = $this->db->prepare('SELECT MAX(ordering) FROM milestones WHERE project_id = ?');
     $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $limit = $this->fetchOneColumn($stmt);
-    return $limit === false ? null : (int)$limit;
+    return $this->fetchOneInt($stmt);
   }
   
   private function swapMilestonesInternal(int $id, int $current_ordering, int $other_ordering): void{
@@ -121,9 +119,7 @@ SQL
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $res = $this->fetchOneColumn($stmt);
-    return $res === false ? null : $res;
+    return $this->fetchOneInt($stmt);
   }
   
   public function countMilestones(?MilestoneFilter $filter = null): ?int{
@@ -131,9 +127,7 @@ SQL
     
     $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM milestones', AbstractFilter::STMT_COUNT);
     $stmt->execute();
-    
-    $count = $this->fetchOneColumn($stmt);
-    return $count === false ? null : (int)$count;
+    return $this->fetchOneInt($stmt);
   }
   
   /**
@@ -162,20 +156,13 @@ SQL;
     
     $stmt = $filter->prepare($this->db, $sql, AbstractFilter::STMT_SELECT_INJECT);
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new MilestoneInfo($res['milestone_id'],
-                                     $res['title'],
-                                     $res['ordering'],
-                                     $res['closed_issues'],
-                                     $res['total_issues'],
-                                     $res['progress'] === null ? null : (int)$res['progress'],
-                                     $res['date_updated']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): MilestoneInfo => new MilestoneInfo($v['milestone_id'],
+                                                                             $v['title'],
+                                                                             $v['ordering'],
+                                                                             $v['closed_issues'],
+                                                                             $v['total_issues'],
+                                                                             $v['progress'] === null ? null : (int)$v['progress'],
+                                                                             $v['date_updated']));
   }
   
   public function setMilestoneTitle(int $id, string $title): void{
@@ -191,9 +178,7 @@ SQL;
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $title = $this->fetchOneColumn($stmt);
-    return $title === false ? null : $title;
+    return $this->fetchOneColumn($stmt);
   }
   
   public function deleteById(int $id, ?int $replacement_id): void{

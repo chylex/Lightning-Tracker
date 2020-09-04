@@ -22,7 +22,7 @@ SQL
     
     $stmt->execute([$token]);
     
-    $res = $this->fetchOne($stmt);
+    $res = $this->fetchOneRaw($stmt);
     return $res === false ? null : new UserProfile(UserId::fromRaw($res['id']), $res['name'], $res['email'], $res['role_id'], (bool)$res['admin']);
   }
   

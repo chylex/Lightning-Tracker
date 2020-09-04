@@ -16,45 +16,40 @@ abstract class AbstractTable{
   protected final function getLastInsertId(): ?int{
     $stmt = $this->db->query('SELECT LAST_INSERT_ID()');
     $stmt->execute();
+    return $this->fetchOneInt($stmt);
+  }
+  
+  /**
+   * Fetches all results, applies a mapping function to each result, and returns an array of the mapped results.
+   *
+   * @param PDOStatement $stmt
+   * @param callable $mapper
+   * @return array
+   */
+  protected function fetchMap(PDOStatement $stmt, callable $mapper): array{
+    $results = [];
     
-    $id = $this->fetchOneColumn($stmt);
-    return $id === false ? null : $id;
+    while(($res = $stmt->fetch()) !== false){
+      $results[] = $mapper($res);
+    }
+    
+    return $results;
   }
   
   /**
-   * Fetches the next result.
+   * Fetches one result and closes the cursor. Returns the raw value from PDOStatement::fetch without any coercion.
    *
    * @param PDOStatement $stmt
    * @return mixed
    */
-  protected function fetchNext(PDOStatement $stmt){
-    return $stmt->fetch();
-  }
-  
-  /**
-   * Fetches the next result.
-   *
-   * @param PDOStatement $stmt
-   * @return mixed
-   */
-  protected function fetchNextColumn(PDOStatement $stmt){
-    return $stmt->fetchColumn();
-  }
-  
-  /**
-   * Fetches one result and closes the cursor.
-   *
-   * @param PDOStatement $stmt
-   * @return mixed
-   */
-  protected function fetchOne(PDOStatement $stmt){
+  protected function fetchOneRaw(PDOStatement $stmt){
     $result = $stmt->fetch();
     $stmt->closeCursor();
     return $result;
   }
   
   /**
-   * Fetches one result and closes the cursor.
+   * Fetches one result and closes the cursor. Coerces 'false' results into 'null'.
    *
    * @param PDOStatement $stmt
    * @return mixed
@@ -62,7 +57,31 @@ abstract class AbstractTable{
   protected function fetchOneColumn(PDOStatement $stmt){
     $result = $stmt->fetchColumn();
     $stmt->closeCursor();
+    return $result === false ? null : $result;
+  }
+  
+  /**
+   * Fetches one result and closes the cursor. Returns the raw value from PDOStatement::fetchColumn without any coercion.
+   *
+   * @param PDOStatement $stmt
+   * @return mixed
+   */
+  protected function fetchOneColumnRaw(PDOStatement $stmt){
+    $result = $stmt->fetchColumn();
+    $stmt->closeCursor();
     return $result;
+  }
+  
+  /**
+   * Fetches one integer result and closes the cursor. Coerces 'false' results into 'null'.
+   *
+   * @param PDOStatement $stmt
+   * @return mixed
+   */
+  protected function fetchOneInt(PDOStatement $stmt): ?int{
+    $result = $stmt->fetchColumn();
+    $stmt->closeCursor();
+    return $result === false || $result === null ? null : (int)$result;
   }
 }
 

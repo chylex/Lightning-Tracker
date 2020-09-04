@@ -37,7 +37,7 @@ final class ProjectTable extends AbstractTable{
       
       $id = $this->getLastInsertId();
       
-      if ($id === false){
+      if ($id === null){
         $this->db->rollBack();
         throw new Exception('Could not retrieve project ID.');
       }
@@ -94,9 +94,7 @@ final class ProjectTable extends AbstractTable{
     
     $stmt = $filter->prepare($this->db, 'SELECT COUNT(*) FROM projects', AbstractFilter::STMT_COUNT);
     $stmt->execute();
-    
-    $count = $this->fetchOneColumn($stmt);
-    return $count === false ? null : (int)$count;
+    return $this->fetchOneInt($stmt);
   }
   
   /**
@@ -108,14 +106,7 @@ final class ProjectTable extends AbstractTable{
     
     $stmt = $filter->prepare($this->db, 'SELECT id, name, url, owner_id FROM projects');
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new ProjectInfo($res['id'], $res['name'], $res['url'], UserId::fromRaw($res['owner_id']));
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): ProjectInfo => new ProjectInfo($v['id'], $v['name'], $v['url'], UserId::fromRaw($v['owner_id'])));
   }
   
   /**
@@ -125,14 +116,7 @@ final class ProjectTable extends AbstractTable{
   public function listProjectsOwnedBy(UserId $user_id): array{
     $stmt = $this->db->prepare('SELECT id, name, url FROM projects WHERE owner_id = ?');
     $stmt->execute([$user_id]);
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new ProjectInfo($res['id'], $res['name'], $res['url'], $user_id);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): ProjectInfo => new ProjectInfo($v['id'], $v['name'], $v['url'], $user_id));
   }
   
   public function getInfoFromUrl(string $url, ?UserProfile $profile): ?ProjectVisibilityInfo{
@@ -146,7 +130,7 @@ final class ProjectTable extends AbstractTable{
     
     $stmt->execute();
     
-    $res = $this->fetchOne($stmt);
+    $res = $this->fetchOneRaw($stmt);
     return $res === false ? null : new ProjectVisibilityInfo(new ProjectInfo($res['id'], $res['name'], $url, UserId::fromRaw($res['owner_id'])), (bool)$res['visible']);
   }
   

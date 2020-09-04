@@ -31,9 +31,7 @@ SQL;
     
     $stmt = $filter->prepare($this->db, $sql, AbstractFilter::STMT_COUNT);
     $stmt->execute();
-    
-    $count = $this->fetchOneColumn($stmt);
-    return $count === false ? null : (int)$count;
+    return $this->fetchOneInt($stmt);
   }
   
   /**
@@ -56,14 +54,7 @@ SQL;
     
     $stmt = $filter->prepare($this->db, $sql);
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new ProjectMember(UserId::fromRaw($res['user_id']), $res['name'], $res['role_id'], $res['role_title']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): ProjectMember => new ProjectMember(UserId::fromRaw($v['user_id']), $v['name'], $v['role_id'], $v['role_title']));
   }
   
   public function setRole(UserId $user_id, ?int $role_id): void{
@@ -80,7 +71,7 @@ SQL;
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     
-    $res = $this->fetchOneColumn($stmt);
+    $res = $this->fetchOneColumnRaw($stmt);
     return $res === false ? null : ($res === null ? '' : (string)(int)$res);
   }
   
@@ -89,7 +80,7 @@ SQL;
     $stmt->bindValue(1, $user_id);
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    return (bool)$this->fetchOneColumn($stmt);
+    return $this->fetchOneColumn($stmt) !== null;
   }
   
   public function removeByUserId(UserId $user_id, bool $reassign_issues, ?UserId $reassign_user_id = null): void{

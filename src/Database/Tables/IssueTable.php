@@ -39,7 +39,7 @@ final class IssueTable extends AbstractProjectTable{
       $stmt->execute();
       $next_id = $this->fetchOneColumn($stmt);
       
-      if ($next_id === false){
+      if ($next_id === null){
         $this->db->rollBack();
         throw new LogicException('Error calculating next issue ID.');
       }
@@ -191,9 +191,7 @@ SQL
     }
     
     $stmt->execute();
-    
-    $count = $this->fetchOneColumn($stmt);
-    return $count === false ? null : (int)$count;
+    return $this->fetchOneInt($stmt);
   }
   
   /**
@@ -219,22 +217,15 @@ SQL
     );
     
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new IssueInfo($res['id'],
-                                 $res['title'],
-                                 IssueType::get($res['type']),
-                                 IssuePriority::get($res['priority']),
-                                 IssueScale::get($res['scale']),
-                                 IssueStatus::get($res['status']),
-                                 $res['progress'],
-                                 $res['date_created'],
-                                 $res['date_updated']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): IssueInfo => new IssueInfo($v['id'],
+                                                                     $v['title'],
+                                                                     IssueType::get($v['type']),
+                                                                     IssuePriority::get($v['priority']),
+                                                                     IssueScale::get($v['scale']),
+                                                                     IssueStatus::get($v['status']),
+                                                                     $v['progress'],
+                                                                     $v['date_created'],
+                                                                     $v['date_updated']));
   }
   
   public function getIssueDetail(int $id): ?IssueDetail{
@@ -265,7 +256,7 @@ SQL
     $stmt->bindValue('project_id', $this->getProjectId(), PDO::PARAM_INT);
     $stmt->bindValue('issue_id', $id, PDO::PARAM_INT);
     $stmt->execute();
-    $res = $this->fetchOne($stmt);
+    $res = $this->fetchOneRaw($stmt);
     
     if ($res === false){
       return null;
@@ -287,7 +278,7 @@ SQL
                            $res['assignee_id'] === null ? null : new IssueUser(UserId::fromRaw($res['assignee_id']), $res['assignee_name']));
   }
   
-  public function getIssueDescription(int $id): string{
+  public function getIssueDescription(int $id): ?string{
     $stmt = $this->db->prepare('SELECT description FROM issues WHERE issue_id = ? AND project_id = ?');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
@@ -311,14 +302,7 @@ SQL
     
     $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new IssueUser(UserId::fromRaw($res['id']), $res['name']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): IssueUser => new IssueUser(UserId::fromRaw($v['id']), $v['name']));
   }
   
   /**
@@ -337,14 +321,7 @@ SQL
     
     $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new IssueUser(UserId::fromRaw($res['id']), $res['name']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): IssueUser => new IssueUser(UserId::fromRaw($v['id']), $v['name']));
   }
   
   public function deleteById(int $id): void{

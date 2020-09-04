@@ -40,7 +40,7 @@ SQL
       $stmt->bindValue(1, $project, PDO::PARAM_INT);
       $stmt->execute();
       
-      $next = $this->fetchOne($stmt);
+      $next = $this->fetchOneRaw($stmt);
       
       if ($next === false){
         $this->db->rollBack();
@@ -173,9 +173,7 @@ SQL
     $stmt = $this->db->prepare('SELECT MAX(ordering) FROM project_roles WHERE project_id = ?');
     $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $limit = $this->fetchOneColumn($stmt);
-    return $limit === false ? null : (int)$limit;
+    return $this->fetchOneInt($stmt);
   }
   
   private function swapRolesInternal(int $id, int $current_ordering, int $other_ordering): void{
@@ -197,9 +195,7 @@ SQL
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $res = $this->fetchOneColumn($stmt);
-    return $res === false ? null : $res;
+    return $this->fetchOneInt($stmt);
   }
   
   private function isRoleSpecialByOrdering(int $ordering): bool{
@@ -227,7 +223,7 @@ SQL
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->bindValue(3, $user_id);
     $stmt->execute();
-    return $this->fetchOneColumn($stmt) !== false;
+    return $this->fetchOneInt($stmt) !== null;
   }
   
   /**
@@ -237,14 +233,7 @@ SQL
     $stmt = $this->db->prepare('SELECT role_id, title, ordering, special FROM project_roles WHERE project_id = ? ORDER BY special DESC, ordering ASC');
     $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new RoleInfo($res['role_id'], $res['title'], (int)$res['ordering'], (bool)$res['special']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
   }
   
   /**
@@ -269,14 +258,7 @@ SQL
     $stmt->bindValue(2, $user_id);
     $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new RoleInfo($res['role_id'], $res['title'], (int)$res['ordering'], (bool)$res['special']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
   }
   
   /**
@@ -323,9 +305,7 @@ SQL
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
-    
-    $title = $this->fetchOneColumn($stmt);
-    return $title === false ? null : $title;
+    return $this->fetchOneColumn($stmt);
   }
   
   public function deleteById(int $id): void{

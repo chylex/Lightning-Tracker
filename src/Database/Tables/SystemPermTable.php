@@ -33,7 +33,7 @@ final class SystemPermTable extends AbstractTable{
       if (!empty($perms)){
         $id = $this->getLastInsertId();
         
-        if ($id === false){
+        if ($id === null){
           $this->db->rollBack();
           throw new Exception('Could not retrieve role ID.');
         }
@@ -97,14 +97,7 @@ final class SystemPermTable extends AbstractTable{
    */
   public function listRoles(): array{
     $stmt = $this->db->query('SELECT id, title, special FROM system_roles ORDER BY special DESC, id ASC');
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new RoleInfo($res['id'], $res['title'], 0, (bool)$res['special']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['id'], $v['title'], 0, (bool)$v['special']));
   }
   
   /**
@@ -145,9 +138,7 @@ final class SystemPermTable extends AbstractTable{
     $stmt = $this->db->prepare('SELECT title FROM system_roles WHERE id = ? AND special = FALSE');
     $stmt->bindValue(1, $id, PDO::PARAM_INT);
     $stmt->execute();
-    
-    $title = $this->fetchOneColumn($stmt);
-    return $title === false ? null : $title;
+    return $this->fetchOneColumn($stmt);
   }
   
   public function deleteById(int $id): void{

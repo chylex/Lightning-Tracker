@@ -130,7 +130,7 @@ class IssueDetailModel extends BasicProjectPageModel{
     }
     
     $issues = new IssueTable(DB::get(), $this->getProject());
-    $description = $issues->getIssueDescription($this->issue_id);
+    $description = $issues->getIssueDescription($this->issue_id) ?? '';
     
     $checked_indices = array_map(fn($i): int => (int)$i, $data[self::CHECKBOX_NAME] ?? []);
     $index = 0;

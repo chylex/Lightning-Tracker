@@ -30,7 +30,7 @@ final class UserTable extends AbstractTable{
       $stmt = $this->db->prepare('SELECT 1 FROM users WHERE id = ?');
       $stmt->execute([$id]);
       
-      if ($this->fetchOne($stmt) === false){
+      if ($this->fetchOneRaw($stmt) === false){
         break;
       }
       else{
@@ -95,9 +95,7 @@ SQL
     }
     
     $stmt->execute();
-    
-    $count = $this->fetchOneColumn($stmt);
-    return $count === false ? null : (int)$count;
+    return $this->fetchOneInt($stmt);
   }
   
   /**
@@ -115,22 +113,19 @@ SQL;
     
     $stmt = $filter->prepare($this->db, $sql);
     $stmt->execute();
-    
-    $results = [];
-    
-    while(($res = $this->fetchNext($stmt)) !== false){
-      $results[] = new UserInfo(UserId::fromRaw($res['id']), $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
-    }
-    
-    return $results;
+    return $this->fetchMap($stmt, fn($v): UserInfo => new UserInfo(UserId::fromRaw($v['id']),
+                                                                   $v['name'],
+                                                                   $v['email'],
+                                                                   $v['role_id'],
+                                                                   $v['role_title'],
+                                                                   (bool)$v['admin'],
+                                                                   $v['date_registered']));
   }
   
   public function getUserName(UserId $id): ?string{
     $stmt = $this->db->prepare('SELECT name FROM users WHERE id = ?');
     $stmt->execute([$id]);
-    
-    $res = $this->fetchOneColumn($stmt);
-    return $res === false ? null : $res;
+    return $this->fetchOneColumn($stmt);
   }
   
   public function getUserInfo(UserId $id): ?UserInfo{
@@ -144,7 +139,7 @@ SQL;
     $stmt = $this->db->prepare($sql);
     $stmt->execute([$id]);
     
-    $res = $this->fetchOne($stmt);
+    $res = $this->fetchOneRaw($stmt);
     return $res === false ? null : new UserInfo(UserId::fromRaw($res['id']), $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
   }
   
@@ -152,7 +147,7 @@ SQL;
     $stmt = $this->db->prepare('SELECT id, password FROM users WHERE name = ?');
     $stmt->execute([$name]);
     
-    $res = $this->fetchOne($stmt);
+    $res = $this->fetchOneRaw($stmt);
     return $res === false ? null : new UserLoginInfo(UserId::fromRaw($res['id']), new UserPassword($res['password']));
   }
   
@@ -164,9 +159,7 @@ SQL;
              'SELECT COUNT(*) FROM issues WHERE assignee_id = ?'] as $sql){
       $stmt = $this->db->prepare($sql);
       $stmt->execute([$id]);
-      
-      $res = $this->fetchOneColumn($stmt);
-      $numbers[] = $res === false ? 0 : (int)$res;
+      $numbers[] = $this->fetchOneInt($stmt) ?? 0;
     }
     
     return new UserStatistics($numbers[0], $numbers[1], $numbers[2]);
@@ -177,7 +170,7 @@ SQL;
     $stmt->execute([$name]);
     
     $id = $this->fetchOneColumn($stmt);
-    return $id === false ? null : UserId::fromRaw($id);
+    return $id === null ? null : UserId::fromRaw($id);
   }
   
   public function findIdByEmail(string $email): ?UserId{
@@ -185,7 +178,7 @@ SQL;
     $stmt->execute([$email]);
     
     $id = $this->fetchOneColumn($stmt);
-    return $id === false ? null : UserId::fromRaw($id);
+    return $id === null ? null : UserId::fromRaw($id);
   }
   
   public function deleteById(UserId $id): void{
