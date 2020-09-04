@@ -125,6 +125,10 @@ document.addEventListener("DOMContentLoaded", function(){
     
     for(/** @type HTMLTextAreaElement */ const editor of document.querySelectorAll("textarea[data-markdown-editor]")){
         const updateHeight = function(){
+            if (editor.hasAttribute("data-height") && editor.getAttribute("data-height") !== editor.style.height){
+                return; // in some browsers, double-clicking the resize dragger resets the height which allows automatic resizing again
+            }
+            
             const prevWindowScroll = window.scrollY;
             
             editor.style.height = "0px";
@@ -137,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function(){
             
             editor.style.height = Math.ceil(1 + padding + Math.max(7, Math.min(30, lineCount)) * lineHeight) + "px";
             editor.style.minHeight = Math.ceil(padding + lineHeight) + "px";
+            editor.setAttribute("data-height", editor.style.height);
             
             window.scroll({ left: window.scrollX, top: prevWindowScroll });
         };
