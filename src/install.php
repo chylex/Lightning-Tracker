@@ -123,10 +123,7 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
   
   if (empty($errors)){
     try{
-      $stmt = $db->query('SHOW ENGINES');
-      $stmt->execute();
-      $engines = $stmt->fetchAll();
-      
+      $engines = $db->query('SHOW ENGINES')->fetchAll();
       $supports_innodb = false;
       
       foreach($engines as $info){
@@ -159,7 +156,6 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     foreach($tests as $table => $data){
       try{
         $stmt = $db->query('SELECT COUNT(*) FROM '.$table);
-        $stmt->execute();
         $count = $stmt->fetchColumn();
         $stmt->closeCursor();
         

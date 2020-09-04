@@ -15,9 +15,7 @@ abstract class AbstractTable{
   }
   
   protected final function getLastInsertId(): ?int{
-    $stmt = $this->db->query('SELECT LAST_INSERT_ID()');
-    $stmt->execute();
-    return $this->fetchOneInt($stmt);
+    return $this->fetchOneInt($this->db->query('SELECT LAST_INSERT_ID()'));
   }
   
   protected final function execute(string $sql, string $types, array $params): PDOStatement{
