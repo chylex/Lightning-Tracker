@@ -29,17 +29,14 @@ final class ProjectPermTable extends AbstractProjectTable{
     }
     
     try{
-      $stmt = $this->db->prepare(<<<SQL
+      $sql = <<<SQL
 SELECT IFNULL(MAX(role_id) + 1, 1)  AS id,
        IFNULL(MAX(ordering) + 1, 1) AS ordering
 FROM project_roles
 WHERE project_id = ?
-SQL
-      );
+SQL;
       
-      $stmt->bindValue(1, $project, PDO::PARAM_INT);
-      $stmt->execute();
-      
+      $stmt = $this->execute($sql, 'I', [$project]);
       $next = $this->fetchOneRaw($stmt);
       
       if ($next === false){
@@ -49,13 +46,8 @@ SQL
       
       $role_id = $next['id'];
       
-      $stmt = $this->db->prepare('INSERT INTO project_roles (project_id, role_id, title, ordering, special) VALUES (?, ?, ?, ?, ?)');
-      $stmt->bindValue(1, $project, PDO::PARAM_INT);
-      $stmt->bindValue(2, $role_id, PDO::PARAM_INT);
-      $stmt->bindValue(3, $title);
-      $stmt->bindValue(4, $special ? 0 : $next['ordering'], PDO::PARAM_INT);
-      $stmt->bindValue(5, $special, PDO::PARAM_BOOL);
-      $stmt->execute();
+      $this->execute('INSERT INTO project_roles (project_id, role_id, title, ordering, special) VALUES (?, ?, ?, ?, ?)',
+                     'IISIB', [$project, $role_id, $title, $special ? 0 : $next['ordering'], $special]);
       
       $this->addRolePermissions($role_id, $perms);
       
@@ -79,16 +71,11 @@ SQL
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare('UPDATE project_roles SET title = ? WHERE role_id = ? AND project_id = ?');
-      $stmt->bindValue(1, $title);
-      $stmt->bindValue(2, $id, PDO::PARAM_INT);
-      $stmt->bindValue(3, $project, PDO::PARAM_INT);
-      $stmt->execute();
+      $this->execute('UPDATE project_roles SET title = ? WHERE role_id = ? AND project_id = ?',
+                     'SII', [$title, $id, $project]);
       
-      $stmt = $this->db->prepare('DELETE FROM project_role_permissions WHERE role_id = ? AND project_id = ?');
-      $stmt->bindValue(1, $id, PDO::PARAM_INT);
-      $stmt->bindValue(2, $project, PDO::PARAM_INT);
-      $stmt->execute();
+      $this->execute('DELETE FROM project_role_permissions WHERE role_id = ? AND project_id = ?',
+                     'II', [$id, $project]);
       
       $this->addRolePermissions($id, $perms);
       
@@ -170,44 +157,36 @@ SQL
   }
   
   public function findMaxOrdering(): ?int{
-    $stmt = $this->db->prepare('SELECT MAX(ordering) FROM project_roles WHERE project_id = ?');
-    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT MAX(ordering) FROM project_roles WHERE project_id = ?',
+                           'I', [$this->getProjectId()]);
+    
     return $this->fetchOneInt($stmt);
   }
   
   private function swapRolesInternal(int $id, int $current_ordering, int $other_ordering): void{
-    $stmt = $this->db->prepare('UPDATE project_roles SET ordering = ? WHERE ordering = ? AND project_id = ?');
-    $stmt->bindValue(1, $current_ordering, PDO::PARAM_INT);
-    $stmt->bindValue(2, $other_ordering, PDO::PARAM_INT);
-    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('UPDATE project_roles SET ordering = ? WHERE ordering = ? AND project_id = ?',
+                   'III', [$current_ordering, $other_ordering, $this->getProjectId()]);
     
-    $stmt = $this->db->prepare('UPDATE project_roles SET ordering = ? WHERE role_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $other_ordering, PDO::PARAM_INT);
-    $stmt->bindValue(2, $id, PDO::PARAM_INT);
-    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('UPDATE project_roles SET ordering = ? WHERE role_id = ? AND project_id = ?',
+                   'III', [$other_ordering, $id, $this->getProjectId()]);
   }
   
   private function getRoleOrderingIfNotSpecial(int $id): ?int{
-    $stmt = $this->db->prepare('SELECT ordering FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT ordering FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
+                           'II', [$id, $this->getProjectId()]);
+    
     return $this->fetchOneInt($stmt);
   }
   
   private function isRoleSpecialByOrdering(int $ordering): bool{
-    $stmt = $this->db->prepare('SELECT special FROM project_roles WHERE ordering = ? AND project_id = ?');
-    $stmt->bindValue(1, $ordering, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT special FROM project_roles WHERE ordering = ? AND project_id = ?',
+                           'II', [$ordering, $this->getProjectId()]);
+    
     return (bool)$this->fetchOneColumn($stmt);
   }
   
   public function isRoleAssignableBy(int $role_id, UserId $user_id): bool{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 SELECT 1
 FROM project_roles pr
 WHERE role_id = ? AND project_id = ?
@@ -216,13 +195,9 @@ WHERE role_id = ? AND project_id = ?
                          FROM project_roles pr2
                          JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
                          WHERE pm.user_id = ? AND pm.project_id = pr.project_id), ~0)
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $role_id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->bindValue(3, $user_id);
-    $stmt->execute();
+    $stmt = $this->execute($sql, 'IIS', [$role_id, $this->getProjectId(), $user_id]);
     return $this->fetchOneInt($stmt) !== null;
   }
   
@@ -230,9 +205,9 @@ SQL
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->db->prepare('SELECT role_id, title, ordering, special FROM project_roles WHERE project_id = ? ORDER BY special DESC, ordering ASC');
-    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT role_id, title, ordering, special FROM project_roles WHERE project_id = ? ORDER BY special DESC, ordering ASC',
+                           'I', [$this->getProjectId()]);
+    
     return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
   }
   
@@ -241,7 +216,7 @@ SQL
    * @return RoleInfo[]
    */
   public function listRolesAssignableBy(UserId $user_id): array{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 SELECT role_id, title, ordering, special
 FROM project_roles pr
 WHERE project_id = ?
@@ -251,13 +226,9 @@ WHERE project_id = ?
                          JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
                          WHERE pm.user_id = ? AND pm.project_id = pr.project_id), ~0)
 ORDER BY ordering ASC
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->bindValue(2, $user_id);
-    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute($sql, 'ISI', [$this->getProjectId(), $user_id]);
     return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
   }
   
@@ -266,10 +237,8 @@ SQL
    * @return string[]
    */
   public function listRolePerms(int $id): array{
-    $stmt = $this->db->prepare('SELECT permission FROM project_role_permissions WHERE role_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT permission FROM project_role_permissions WHERE role_id = ? AND project_id = ?',
+                           'II', [$id, $this->getProjectId()]);
     
     $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
     return $perms === false ? [] : $perms;
@@ -284,27 +253,23 @@ SQL
       return [];
     }
     
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 SELECT prp.permission
 FROM project_role_permissions prp
 JOIN project_members pm ON prp.role_id = pm.role_id AND prp.project_id = pm.project_id
 WHERE pm.user_id = ? AND pm.project_id = ?
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $user->getId());
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute($sql, 'SI', [$user->getId(), $this->getProjectId()]);
     
     $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
     return $perms === false ? [] : $perms;
   }
   
   public function getRoleTitleIfNotSpecial(int $id): ?string{
-    $stmt = $this->db->prepare('SELECT title FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT title FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
+                           'II', [$id, $this->getProjectId()]);
+    
     return $this->fetchOneColumn($stmt);
   }
   
@@ -321,20 +286,14 @@ SQL
         return;
       }
       
-      $stmt = $this->db->prepare('UPDATE project_members SET role_id = NULL WHERE role_id = ? AND project_id = ?');
-      $stmt->bindValue(1, $id, PDO::PARAM_INT);
-      $stmt->bindValue(2, $project, PDO::PARAM_INT);
-      $stmt->execute();
+      $this->execute('UPDATE project_members SET role_id = NULL WHERE role_id = ? AND project_id = ?',
+                     'II', [$id, $project]);
       
-      $stmt = $this->db->prepare('UPDATE project_roles SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ?');
-      $stmt->bindValue(1, $ordering, PDO::PARAM_INT);
-      $stmt->bindValue(2, $project, PDO::PARAM_INT);
-      $stmt->execute();
+      $this->execute('UPDATE project_roles SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ?',
+                     'II', [$ordering, $project]);
       
-      $stmt = $this->db->prepare('DELETE FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE');
-      $stmt->bindValue(1, $id, PDO::PARAM_INT);
-      $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-      $stmt->execute();
+      $this->execute('DELETE FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
+                     'II', [$id, $project]);
       
       $this->db->commit();
     }catch(PDOException $e){

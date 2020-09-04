@@ -8,16 +8,12 @@ use Database\AbstractProjectTable;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Types\ProjectMemberFilter;
 use Database\Objects\ProjectMember;
-use PDO;
 use PDOException;
 
 final class ProjectMemberTable extends AbstractProjectTable{
   public function addMember(UserId $user_id, ?int $role_id): void{
-    $stmt = $this->db->prepare('INSERT INTO project_members (project_id, user_id, role_id) VALUES (?, ?, ?)');
-    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->bindValue(2, $user_id);
-    $stmt->bindValue(3, $role_id, $role_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('INSERT INTO project_members (project_id, user_id, role_id) VALUES (?, ?, ?)',
+                   'ISI', [$this->getProjectId(), $user_id, $role_id]);
   }
   
   public function countMembers(?ProjectMemberFilter $filter = null): ?int{
@@ -58,28 +54,22 @@ SQL;
   }
   
   public function setRole(UserId $user_id, ?int $role_id): void{
-    $stmt = $this->db->prepare('UPDATE project_members SET role_id = ? WHERE user_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $role_id, $role_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-    $stmt->bindValue(2, $user_id);
-    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('UPDATE project_members SET role_id = ? WHERE user_id = ? AND project_id = ?',
+                   'ISI', [$role_id, $user_id, $this->getProjectId()]);
   }
   
   public function getRoleIdStr(UserId $user_id): ?string{
-    $stmt = $this->db->prepare('SELECT role_id FROM project_members WHERE user_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $user_id);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT role_id FROM project_members WHERE user_id = ? AND project_id = ?',
+                           'SI', [$user_id, $this->getProjectId()]);
     
     $res = $this->fetchOneColumnRaw($stmt);
     return $res === false ? null : ($res === null ? '' : (string)(int)$res);
   }
   
   public function checkMembershipExists(UserId $user_id): bool{
-    $stmt = $this->db->prepare('SELECT 1 FROM project_members WHERE user_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $user_id);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT 1 FROM project_members WHERE user_id = ? AND project_id = ?',
+                           'SI', [$user_id, $this->getProjectId()]);
+    
     return $this->fetchOneColumn($stmt) !== null;
   }
   
@@ -88,17 +78,12 @@ SQL;
     
     try{
       if ($reassign_issues){
-        $stmt = $this->db->prepare('UPDATE issues SET assignee_id = ? WHERE assignee_id = ? AND project_id = ?');
-        $stmt->bindValue(1, $reassign_user_id);
-        $stmt->bindValue(2, $user_id);
-        $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
-        $stmt->execute();
+        $this->execute('UPDATE issues SET assignee_id = ? WHERE assignee_id = ? AND project_id = ?',
+                       'SSI', [$reassign_user_id, $user_id, $this->getProjectId()]);
       }
       
-      $stmt = $this->db->prepare('DELETE FROM project_members WHERE user_id = ? AND project_id = ?');
-      $stmt->bindValue(1, $user_id);
-      $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-      $stmt->execute();
+      $this->execute('DELETE FROM project_members WHERE user_id = ? AND project_id = ?',
+                     'SI', [$user_id, $this->getProjectId()]);
       
       $this->db->commit();
     }catch(PDOException $e){

@@ -34,9 +34,9 @@ final class IssueTable extends AbstractProjectTable{
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare('SELECT (1 + IFNULL(MAX(issue_id), 0)) FROM issues WHERE project_id = ?');
-      $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-      $stmt->execute();
+      $stmt = $this->execute('SELECT (1 + IFNULL(MAX(issue_id), 0)) FROM issues WHERE project_id = ?',
+                             'I', [$this->getProjectId()]);
+      
       $next_id = $this->fetchOneColumn($stmt);
       
       if ($next_id === null){
@@ -133,20 +133,15 @@ SQL
   }
   
   public function updateIssueStatus(int $id, IssueStatus $status, ?int $progress = null): void{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 UPDATE issues
 SET status = ?,
     progress = IFNULL(?, progress),
     date_updated = NOW()
 WHERE issue_id = ? AND project_id = ?
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $status->getId());
-    $stmt->bindValue(2, $progress, $progress === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-    $stmt->bindValue(3, $id, PDO::PARAM_INT);
-    $stmt->bindValue(4, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute($sql, 'SIII', [$status->getId(), $progress, $id, $this->getProjectId()]);
   }
   
   public function updateIssueTasks(int $id, string $description, int $progress): void{
@@ -163,21 +158,16 @@ SQL
       $auto_status = IssueStatus::OPEN;
     }
     
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 UPDATE issues
 SET description = ?,
     progress = ?,
     status = IF($condition, '$auto_status', status),
     date_updated = NOW()
 WHERE issue_id = ? AND project_id = ?
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $description);
-    $stmt->bindValue(2, $progress, PDO::PARAM_INT);
-    $stmt->bindValue(3, $id, PDO::PARAM_INT);
-    $stmt->bindValue(4, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute($sql, 'SIII', [$description, $progress, $id, $this->getProjectId()]);
   }
   
   public function countIssues(?IssueFilter $filter = null): ?int{
@@ -229,7 +219,7 @@ SQL
   }
   
   public function getIssueDetail(int $id): ?IssueDetail{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 SELECT issues.title        AS title,
        issues.description  AS description,
        issues.type         AS type,
@@ -249,13 +239,10 @@ FROM issues
 LEFT JOIN users author ON issues.author_id = author.id
 LEFT JOIN users assignee ON issues.assignee_id = assignee.id
 LEFT JOIN milestones milestone ON issues.milestone_id = milestone.milestone_id AND issues.project_id = milestone.project_id
-WHERE issues.issue_id = :issue_id AND issues.project_id = :project_id
-SQL
-    );
+WHERE issues.issue_id = ? AND issues.project_id = ?
+SQL;
     
-    $stmt->bindValue('project_id', $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->bindValue('issue_id', $id, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute($sql, 'II', [$id, $this->getProjectId()]);
     $res = $this->fetchOneRaw($stmt);
     
     if ($res === false){
@@ -279,10 +266,9 @@ SQL
   }
   
   public function getIssueDescription(int $id): ?string{
-    $stmt = $this->db->prepare('SELECT description FROM issues WHERE issue_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT description FROM issues WHERE issue_id = ? AND project_id = ?',
+                           'II', [$id, $this->getProjectId()]);
+    
     return $this->fetchOneColumn($stmt);
   }
   
@@ -290,18 +276,16 @@ SQL
    * @return IssueUser[]
    */
   public function listAuthors(): array{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 SELECT u.id AS id, u.name AS name
 FROM issues i
 JOIN users u ON u.id = i.author_id
 WHERE project_id = ?
 GROUP BY u.id, u.name
 ORDER BY u.name
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute($sql, 'I', [$this->getProjectId()]);
     return $this->fetchMap($stmt, fn($v): IssueUser => new IssueUser(UserId::fromRaw($v['id']), $v['name']));
   }
   
@@ -309,26 +293,22 @@ SQL
    * @return IssueUser[]
    */
   public function listAssignees(): array{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 SELECT u.id AS id, u.name AS name
 FROM issues i
 JOIN users u ON u.id = i.assignee_id
 WHERE project_id = ?
 GROUP BY u.id, u.name
 ORDER BY u.name
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute($sql, 'I', [$this->getProjectId()]);
     return $this->fetchMap($stmt, fn($v): IssueUser => new IssueUser(UserId::fromRaw($v['id']), $v['name']));
   }
   
   public function deleteById(int $id): void{
-    $stmt = $this->db->prepare('DELETE FROM issues WHERE issue_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('DELETE FROM issues WHERE issue_id = ? AND project_id = ?',
+                   'II', [$id, $this->getProjectId()]);
   }
 }
 

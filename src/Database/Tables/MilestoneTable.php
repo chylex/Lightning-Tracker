@@ -8,7 +8,6 @@ use Database\Filters\AbstractFilter;
 use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\MilestoneInfo;
 use LogicException;
-use PDO;
 use PDOException;
 
 final class MilestoneTable extends AbstractProjectTable{
@@ -16,17 +15,14 @@ final class MilestoneTable extends AbstractProjectTable{
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare(<<<SQL
+      $sql = <<<SQL
 SELECT IFNULL(MAX(milestone_id) + 1, 1) AS id,
        IFNULL(MAX(ordering) + 1, 1)     AS ordering
 FROM milestones
 WHERE project_id = ?
-SQL
-      );
+SQL;
       
-      $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-      $stmt->execute();
-      
+      $stmt = $this->execute($sql, 'I', [$this->getProjectId()]);
       $next = $this->fetchOneRaw($stmt);
       
       if ($next === false){
@@ -34,12 +30,8 @@ SQL
         throw new LogicException('Error calculating next milestone ID.');
       }
       
-      $stmt = $this->db->prepare('INSERT INTO milestones (project_id, milestone_id, ordering, title) VALUES (?, ?, ?, ?)');
-      $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-      $stmt->bindValue(2, $next['id'], PDO::PARAM_INT);
-      $stmt->bindValue(3, $next['ordering'], PDO::PARAM_INT);
-      $stmt->bindValue(4, $title);
-      $stmt->execute();
+      $this->execute('INSERT INTO milestones (project_id, milestone_id, ordering, title) VALUES (?, ?, ?, ?)',
+                     'IIIS', [$this->getProjectId(), $next['id'], $next['ordering'], $title]);
       
       $this->db->commit();
     }catch(PDOException $e){
@@ -94,31 +86,24 @@ SQL
   }
   
   public function findMaxOrdering(): ?int{
-    $stmt = $this->db->prepare('SELECT MAX(ordering) FROM milestones WHERE project_id = ?');
-    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT MAX(ordering) FROM milestones WHERE project_id = ?',
+                           'I', [$this->getProjectId()]);
+    
     return $this->fetchOneInt($stmt);
   }
   
   private function swapMilestonesInternal(int $id, int $current_ordering, int $other_ordering): void{
-    $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE ordering = ? AND project_id = ?');
-    $stmt->bindValue(1, $current_ordering, PDO::PARAM_INT);
-    $stmt->bindValue(2, $other_ordering, PDO::PARAM_INT);
-    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('UPDATE milestones SET ordering = ? WHERE ordering = ? AND project_id = ?',
+                   'III', [$current_ordering, $other_ordering, $this->getProjectId()]);
     
-    $stmt = $this->db->prepare('UPDATE milestones SET ordering = ? WHERE milestone_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $other_ordering, PDO::PARAM_INT);
-    $stmt->bindValue(2, $id, PDO::PARAM_INT);
-    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('UPDATE milestones SET ordering = ? WHERE milestone_id = ? AND project_id = ?',
+                   'III', [$other_ordering, $id, $this->getProjectId()]);
   }
   
   private function getMilestoneOrdering(int $id): ?int{
-    $stmt = $this->db->prepare('SELECT ordering FROM milestones WHERE milestone_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT ordering FROM milestones WHERE milestone_id = ? AND project_id = ?',
+                           'II', [$id, $this->getProjectId()]);
+    
     return $this->fetchOneInt($stmt);
   }
   
@@ -166,18 +151,14 @@ SQL;
   }
   
   public function setMilestoneTitle(int $id, string $title): void{
-    $stmt = $this->db->prepare('UPDATE milestones SET title = ? WHERE milestone_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $title);
-    $stmt->bindValue(2, $id, PDO::PARAM_INT);
-    $stmt->bindValue(3, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('UPDATE milestones SET title = ? WHERE milestone_id = ? AND project_id = ?',
+                   'SII', [$title, $id, $this->getProjectId()]);
   }
   
   public function getMilestoneTitle(int $id): ?string{
-    $stmt = $this->db->prepare('SELECT title FROM milestones WHERE milestone_id = ? AND project_id = ?');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT title FROM milestones WHERE milestone_id = ? AND project_id = ?',
+                           'II', [$id, $this->getProjectId()]);
+    
     return $this->fetchOneColumn($stmt);
   }
   
@@ -194,24 +175,16 @@ SQL;
         return;
       }
       
-      $stmt = $this->db->prepare('UPDATE milestones SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ?');
-      $stmt->bindValue(1, $ordering, PDO::PARAM_INT);
-      $stmt->bindValue(2, $project, PDO::PARAM_INT);
-      $stmt->execute();
+      $this->execute('UPDATE milestones SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ?',
+                     'II', [$ordering, $project]);
       
       foreach(['UPDATE issues SET milestone_id = ? WHERE milestone_id = ? AND project_id = ?',
                'UPDATE project_user_settings SET active_milestone = ? WHERE active_milestone = ? AND project_id = ?'] as $sql){
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(1, $replacement_id, $replacement_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
-        $stmt->bindValue(2, $id, PDO::PARAM_INT);
-        $stmt->bindValue(3, $project, PDO::PARAM_INT);
-        $stmt->execute();
+        $this->execute($sql, 'III', [$replacement_id, $id, $project]);
       }
       
-      $stmt = $this->db->prepare('DELETE FROM milestones WHERE milestone_id = ? AND project_id = ?');
-      $stmt->bindValue(1, $id, PDO::PARAM_INT);
-      $stmt->bindValue(2, $project, PDO::PARAM_INT);
-      $stmt->execute();
+      $this->execute('DELETE FROM milestones WHERE milestone_id = ? AND project_id = ?',
+                     'II', [$id, $project]);
       
       $this->db->commit();
     }catch(PDOException $e){

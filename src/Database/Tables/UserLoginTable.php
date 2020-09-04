@@ -6,7 +6,6 @@ namespace Database\Tables;
 use Data\UserId;
 use Database\AbstractTable;
 use Database\Objects\UserProfile;
-use PDO;
 
 final class UserLoginTable extends AbstractTable{
   // TODO periodically delete expired tokens
@@ -27,28 +26,23 @@ SQL
   }
   
   public function addOrRenewToken(UserId $id, string $token, int $expire_in_minutes): void{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 INSERT INTO user_logins (id, token, expires)
 VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))
 ON DUPLICATE KEY UPDATE expires = GREATEST(expires, VALUES(expires))
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $id);
-    $stmt->bindValue(2, $token);
-    $stmt->bindValue(3, $expire_in_minutes, PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute($sql, 'SSI', [$id, $token, $expire_in_minutes]);
   }
   
   public function renewToken(string $token, int $expire_in_minutes): void{
-    $stmt = $this->db->prepare('UPDATE user_logins SET expires = GREATEST(expires, DATE_ADD(NOW(), INTERVAL ? MINUTE)) WHERE token = ?');
-    $stmt->bindValue(1, $expire_in_minutes, PDO::PARAM_INT);
-    $stmt->bindValue(2, $token);
-    $stmt->execute();
+    $this->execute('UPDATE user_logins SET expires = GREATEST(expires, DATE_ADD(NOW(), INTERVAL ? MINUTE)) WHERE token = ?',
+                   'IS', [$expire_in_minutes, $token]);
   }
   
   public function destroyToken(string $token): void{
-    $this->db->prepare('DELETE FROM user_logins WHERE token = ? LIMIT 1')->execute([$token]);
+    $this->execute('DELETE FROM user_logins WHERE token = ? LIMIT 1',
+                   'S', [$token]);
   }
 }
 

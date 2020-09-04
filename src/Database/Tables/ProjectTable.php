@@ -11,7 +11,6 @@ use Database\Objects\ProjectInfo;
 use Database\Objects\ProjectVisibilityInfo;
 use Database\Objects\UserProfile;
 use Exception;
-use PDO;
 use PDOException;
 use Session\Permissions\ProjectPermissions;
 
@@ -27,13 +26,8 @@ final class ProjectTable extends AbstractTable{
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->db->prepare('INSERT INTO projects (name, url, hidden, owner_id) VALUES (:name, :url, :hidden, :owner_id)');
-      
-      $stmt->bindValue('name', $name);
-      $stmt->bindValue('url', $url);
-      $stmt->bindValue('hidden', $hidden, PDO::PARAM_BOOL);
-      $stmt->bindValue('owner_id', $owner->getId());
-      $stmt->execute();
+      $this->execute('INSERT INTO projects (name, url, hidden, owner_id) VALUES (?, ?, ?, ?)',
+                     'SSBS', [$name, $url, $hidden, $owner->getId()]);
       
       $id = $this->getLastInsertId();
       
@@ -82,11 +76,8 @@ final class ProjectTable extends AbstractTable{
   }
   
   public function changeSettings(int $id, string $name, bool $hidden): void{
-    $stmt = $this->db->prepare('UPDATE projects SET name = ?, hidden = ? WHERE id = ?');
-    $stmt->bindValue(1, $name);
-    $stmt->bindValue(2, $hidden, PDO::PARAM_BOOL);
-    $stmt->bindValue(3, $id, PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('UPDATE projects SET name = ?, hidden = ? WHERE id = ?',
+                   'SBI', [$name, $hidden, $id]);
   }
   
   public function countProjects(?ProjectFilter $filter = null): ?int{
@@ -135,22 +126,22 @@ final class ProjectTable extends AbstractTable{
   }
   
   public function checkUrlExists(string $url): bool{
-    $stmt = $this->db->prepare('SELECT 1 FROM projects WHERE url = ?');
-    $stmt->execute([$url]);
+    $stmt = $this->execute('SELECT 1 FROM projects WHERE url = ?',
+                           'S', [$url]);
+    
     return (bool)$this->fetchOneColumn($stmt);
   }
   
   public function isHidden(int $id): bool{
-    $stmt = $this->db->prepare('SELECT hidden FROM projects WHERE id = ?');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt = $this->execute('SELECT hidden FROM projects WHERE id = ?',
+                           'I', [$id]);
+    
     return (bool)$this->fetchOneColumn($stmt);
   }
   
   public function deleteById(int $id): void{
-    $stmt = $this->db->prepare('DELETE FROM projects WHERE id = ?');
-    $stmt->bindValue(1, $id, PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute('DELETE FROM projects WHERE id = ?',
+                   'I', [$id]);
   }
 }
 

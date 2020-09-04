@@ -6,25 +6,20 @@ namespace Database\Tables;
 use Database\AbstractProjectTable;
 use Database\Objects\MilestoneProgress;
 use Database\Objects\UserProfile;
-use PDO;
 
 final class ProjectUserSettingsTable extends AbstractProjectTable{
   public function toggleActiveMilestone(UserProfile $user, int $milestone_id): void{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 INSERT INTO project_user_settings (project_id, user_id, active_milestone)
 VALUES (?, ?, ?)
 ON DUPLICATE KEY UPDATE active_milestone = IF(active_milestone = VALUES(active_milestone), NULL, VALUES(active_milestone))
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->bindValue(2, $user->getId());
-    $stmt->bindValue(3, $milestone_id, PDO::PARAM_INT);
-    $stmt->execute();
+    $this->execute($sql, 'ISI', [$this->getProjectId(), $user->getId(), $milestone_id]);
   }
   
   public function getActiveMilestoneProgress(UserProfile $user): ?MilestoneProgress{
-    $stmt = $this->db->prepare(<<<SQL
+    $sql = <<<SQL
 SELECT m.milestone_id                                                  AS id,
        m.title                                                         AS title,
        FLOOR(SUM(i.progress * iw.contribution) / SUM(iw.contribution)) AS percentage_done
@@ -34,13 +29,9 @@ LEFT JOIN issues i ON m.milestone_id = i.milestone_id AND m.project_id = i.proje
 LEFT JOIN issue_weights iw ON i.scale = iw.scale
 WHERE tus.user_id = ? AND tus.project_id = ?
 GROUP BY m.milestone_id
-SQL
-    );
+SQL;
     
-    $stmt->bindValue(1, $user->getId());
-    $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
-    $stmt->execute();
-    
+    $stmt = $this->execute($sql, 'SI', [$user->getId(), $this->getProjectId()]);
     $res = $this->fetchOneRaw($stmt);
     return $res === false ? null : new MilestoneProgress($res['id'], $res['title'], $res['percentage_done'] === null ? null : (int)$res['percentage_done']);
   }

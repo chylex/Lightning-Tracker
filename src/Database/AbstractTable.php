@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Database;
 
+use LogicException;
 use PDO;
 use PDOStatement;
 
@@ -17,6 +18,46 @@ abstract class AbstractTable{
     $stmt = $this->db->query('SELECT LAST_INSERT_ID()');
     $stmt->execute();
     return $this->fetchOneInt($stmt);
+  }
+  
+  protected final function execute(string $sql, string $types, array $params): PDOStatement{
+    $stmt = $this->db->prepare($sql);
+    
+    foreach($params as $i => $param){
+      if ($param === null){
+        $stmt->bindValue($i + 1, null, PDO::PARAM_NULL);
+        continue;
+      }
+      
+      switch($types[$i] ?? null){
+        case 'S':
+          $type = PDO::PARAM_STR;
+          $valid = true;
+          break;
+        
+        case 'I':
+          $type = PDO::PARAM_INT;
+          $valid = is_int($param);
+          break;
+        
+        case 'B':
+          $type = PDO::PARAM_BOOL;
+          $valid = is_bool($param);
+          break;
+        
+        default:
+          throw new LogicException('Invalid parameter type hint in PDO statement.');
+      }
+      
+      if (!$valid){
+        throw new LogicException('Mismatched parameter type in PDO statement.');
+      }
+      
+      $stmt->bindValue($i + 1, $param, $type);
+    }
+    
+    $stmt->execute();
+    return $stmt;
   }
   
   /**
