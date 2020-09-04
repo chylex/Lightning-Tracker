@@ -147,8 +147,32 @@ class IssueEditModel extends BasicProjectPageModel{
     $form = new FormComponent(self::ACTION_CONFIRM);
     $form->addHTML('<div class="split-wrapper split-collapse-1024 split-collapse-reversed">');
     
+    $form->addHTML('<div class="split-25 min-width-200 max-width-250">');
+    $form->startTitledSection('General');
+    
+    self::setupIssueTagOptions($form->addSelect('Type')->optional(), IssueType::list());
+    
     if ($this->edit_level >= IssueDetail::EDIT_ALL_FIELDS){
-      $form->addHTML('<div class="split-25 min-width-200 max-width-250">');
+      self::setupIssueTagOptions($form->addSelect('Priority')->optional(), IssuePriority::list());
+      self::setupIssueTagOptions($form->addSelect('Scale')->optional(), IssueScale::list());
+    }
+    
+    $form->endTitledSection();
+    
+    if ($this->edit_level >= IssueDetail::EDIT_ALL_FIELDS){
+      $form->addHTML('</div><div class="split-50">');
+    }
+    else{
+      $form->addHTML('</div><div class="split-75">');
+    }
+    
+    $form->startTitledSection('Details');
+    $form->addTextField('Title');
+    $form->addTextArea('Description')->markdownEditor();
+    $form->endTitledSection();
+    
+    if ($this->edit_level >= IssueDetail::EDIT_ALL_FIELDS){
+      $form->addHTML('</div><div class="split-25 min-width-200 max-width-250">');
       $form->startTitledSection('Status');
       
       self::setupIssueTagOptions($form->addSelect('Status')->optional(), IssueStatus::list());
@@ -183,28 +207,8 @@ class IssueEditModel extends BasicProjectPageModel{
       }
       
       $form->endTitledSection();
-      $form->addHTML('</div><div class="split-50">');
-    }
-    else{
-      $form->addHTML('<div class="split-75">');
     }
     
-    $form->startTitledSection('Details');
-    $form->addTextField('Title');
-    $form->addTextArea('Description')->markdownEditor();
-    $form->endTitledSection();
-    
-    $form->addHTML('</div><div class="split-25 min-width-200 max-width-250">');
-    $form->startTitledSection('General');
-    
-    self::setupIssueTagOptions($form->addSelect('Type')->optional(), IssueType::list());
-    
-    if ($this->edit_level >= IssueDetail::EDIT_ALL_FIELDS){
-      self::setupIssueTagOptions($form->addSelect('Priority')->optional(), IssuePriority::list());
-      self::setupIssueTagOptions($form->addSelect('Scale')->optional(), IssueScale::list());
-    }
-    
-    $form->endTitledSection();
     $form->addHTML('</div></div>');
     
     $form->startTitledSection('Confirm');
