@@ -292,7 +292,7 @@ WHERE pm.user_id = ? AND pm.project_id = ?
 SQL
     );
     
-    $stmt->bindValue(1, $user->getId(), PDO::PARAM_INT);
+    $stmt->bindValue(1, $user->getId());
     $stmt->bindValue(2, $this->getProjectId(), PDO::PARAM_INT);
     $stmt->execute();
     
