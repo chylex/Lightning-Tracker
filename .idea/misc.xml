@@ -9,5 +9,12 @@
   </component>
   <component name="PhpEntryPointsManager">
     <pattern value="\Pages\Controllers\*" />
+    <pattern value="\AcceptanceTester" />
+    <pattern value="\FunctionalTester" />
+    <pattern value="\UnitTester" />
+    <pattern value="\acceptance\*" />
+    <pattern value="\acceptance\*" member="*" />
+    <pattern value="\Helper\*" />
+    <pattern value="\Helper\*" member="*" />
   </component>
 </project>

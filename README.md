@@ -43,3 +43,31 @@ You should be able to install Lightning Tracker on other server software, such a
 * If the installation page appears without any styles, you may need to edit your Apache settings (or `.htaccess` if you do not have access to the server configuration) to include a path to the tracker installation folder. For example, if you place the tracker into a folder called `tracker`, you may need to change:
    * This line: `RewriteCond %{REQUEST_URI} !^/~resources/`
    * To this: `RewriteCond %{REQUEST_URI} !^/tracker/~resources/`
+
+### Source Code
+
+#### Test Server
+
+The project is setup so that `http://localhost` maps to `/server/www/` in the repository root folder. If you use PhpStorm, it should automatically upload modified files to this folder.
+
+To enable debug mode, which bypasses manual installation, caching, and required minification of resources, copy all files from `/dev/` to `/server/www/`. You will also need a MySQL server with the following credentials:
+
+* **Host:** `localhost`
+* **User:** `lt`
+* **Password:** `test`
+* **Database:** `tracker`
+ 
+#### Automated Testing
+
+The project uses the [Codeception](https://codeception.com/) test framework. Before you proceed, make sure you have `php`, `composer`, and `gulp` installed in your PATH.
+
+1. Run `composer install` in the repository root folder to install dependencies
+2. Setup a web server as outlined in the **Test Server** section above
+3. Create a MySQL database named `tracker_test` and grant the `lt` user all privileges:
+    * `GRANT ALL PRIVILEGES ON tracker_test.* to 'lt'@'localhost';`
+4. Run the `gulp prepareTests` task in the `/build/` folder
+5. Run the tests by running the following command in the repository root folder:
+   * Windows: `codecept run`
+   * (Otherwise): `php vendor/codeception/codeception/codecept run`
+
+If you use PhpStorm, steps 4 and 5 are included under the provided `Test` run configuration. You may also use the `Test (Debug)` configuration which runs in debug mode.

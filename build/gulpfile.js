@@ -9,6 +9,7 @@ const merge = require("merge-stream");
 
 const crypto = require("crypto");
 const fs = require("fs");
+const fse = require("fs-extra");
 
 const php = "../src";
 const res = "../res";
@@ -90,4 +91,22 @@ function taskHash(){
         .pipe(dest(out));
 }
 
+function taskPrepareTests(cb){
+    const www = "../server/www";
+    const backup = "../server/www-backup";
+    
+    if (!fs.existsSync(backup)){
+        fs.renameSync(www, backup);
+    }
+    else{
+        fs.rmdirSync(www, { recursive: true, maxRetries: 10 });
+    }
+    
+    fs.mkdirSync(www);
+    fse.copySync(out, www);
+    cb();
+}
+
 exports.default = series(taskClean, taskCopy, taskCSS, taskHash);
+// noinspection JSUnusedGlobalSymbols
+exports.prepareTests = series(taskClean, taskCopy, taskCSS, taskHash, taskPrepareTests);

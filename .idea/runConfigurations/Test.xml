@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Test" type="CodeceptionConfigurationType" factoryName="Codeception">
+    <CommandLine workingDirectory="$PROJECT_DIR$" />
+    <PhpTestRunnerSettings method="" scope="ConfigurationFile" options="--fail-fast" />
+    <method v="2">
+      <option name="GulpBeforeRunTask" enabled="true">
+        <node-interpreter>project</node-interpreter>
+        <node-options />
+        <gulpfile>$PROJECT_DIR$/build/gulpfile.js</gulpfile>
+        <tasks>
+          <task>prepareTests</task>
+        </tasks>
+        <arguments />
+        <envs />
+      </option>
+    </method>
+  </configuration>
+</component>
