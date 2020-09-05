@@ -193,18 +193,18 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     }
     
     $tables = [
-        'SystemRole'          => 'system_roles',
-        'SystemRolePerm'      => 'system_role_perms',
-        'User'                => 'users',
-        'UserLogin'           => 'user_logins',
-        'Project'             => 'projects',
-        'ProjectRole'         => 'project_roles',
-        'ProjectRolePerm'     => 'project_role_perms',
-        'ProjectMember'       => 'project_members',
-        'Milestone'           => 'milestones',
-        'IssueWeight'         => 'issue_weights',
-        'Issue'               => 'issues',
-        'ProjectUserSettings' => 'project_user_settings',
+        'SystemRole'            => 'system_roles',
+        'SystemRolePermission'  => 'system_role_permissions',
+        'User'                  => 'users',
+        'UserLogin'             => 'user_logins',
+        'Project'               => 'projects',
+        'ProjectRole'           => 'project_roles',
+        'ProjectRolePermission' => 'project_role_permissions',
+        'ProjectMember'         => 'project_members',
+        'Milestone'             => 'milestones',
+        'IssueWeight'           => 'issue_weights',
+        'Issue'                 => 'issues',
+        'ProjectUserSettings'   => 'project_user_settings',
     ];
     
     $values = [

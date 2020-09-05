@@ -45,7 +45,7 @@ if (!file_exists(CONFIG_FILE)){
 require_once CONFIG_FILE;
 
 if (!file_exists(VERSION_FILE)){
-  $version_file = new VersionFile(constant('INSTALLED_MIGRATION_VERSION'), 0);
+  $version_file = new VersionFile(defined('INSTALLED_MIGRATION_VERSION') ? constant('INSTALLED_MIGRATION_VERSION') : TRACKER_MIGRATION_VERSION, 0);
   $version_file->writeSafe(VERSION_FILE, VERSION_TMP_FILE);
   ConfigFile::fromCurrentInstallation()->write(CONFIG_FILE);
 }
