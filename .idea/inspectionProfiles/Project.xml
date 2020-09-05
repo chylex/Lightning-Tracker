@@ -423,7 +423,13 @@
     <inspection_tool class="PhpConstantReassignmentInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="PhpDivisionByZeroInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpDocMissingThrowsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="Tests" level="INFORMATION" enabled="true">
+        <option name="SKIP_ON_EMPTY_PHPDOC" value="false" />
+      </scope>
       <option name="SKIP_ON_EMPTY_PHPDOC" value="false" />
+    </inspection_tool>
+    <inspection_tool class="PhpDocSignatureInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="Tests" level="INFORMATION" enabled="true" />
     </inspection_tool>
     <inspection_tool class="PhpFunctionNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_minLength" value="0" />
@@ -482,6 +488,9 @@
       <option name="DOWNGRADE_SEVERITY" value="true" />
     </inspection_tool>
     <inspection_tool class="PhpUnhandledExceptionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="Tests" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnitTestsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <scope name="Tests" level="INFORMATION" enabled="true" />
     </inspection_tool>
     <inspection_tool class="PhpUnused" enabled="true" level="WEAK WARNING" enabled_by_default="true">

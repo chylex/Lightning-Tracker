@@ -22,7 +22,18 @@ use Codeception\Actor;
 class AcceptanceTester extends Actor{
   use _generated\AcceptanceTesterActions;
   
-  /**
-   * Define custom actions here
-   */
+  private static array $tokens = [];
+  
+  public function saveLoginToken(string $user): void{
+    self::$tokens[$user] = $this->grabCookie('logon');
+  }
+  
+  public function amLoggedIn(string $user): void{
+    $this->setCookie('logon', self::$tokens[$user], [
+        'path'     => '/',
+        'domain'   => 'localhost',
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+  }
 }

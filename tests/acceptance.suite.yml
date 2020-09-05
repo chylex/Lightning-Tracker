@@ -9,5 +9,10 @@ modules:
   enabled:
     - PhpBrowser:
         url: http://localhost/
+    - Db:
+        dsn: 'mysql:host=localhost;dbname=tracker_test;charset=utf8mb4'
+        user: 'lt'
+        password: 'test'
+    - Asserts
     - \Helper\Acceptance
 step_decorators: ~        
