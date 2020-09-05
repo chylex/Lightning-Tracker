@@ -22,7 +22,7 @@ final class SidemenuActionButton implements IViewable{
     
     echo <<<HTML
 <li>
-  <form action="" method="post">
+  <form id="$this->action" action="" method="post">
     <input type="hidden" name="$action_key" value="$this->action">
     <button>
 HTML;
