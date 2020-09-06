@@ -10,6 +10,10 @@ class T001_Install_Cest{
     $I->amOnPage('/');
   }
   
+  public function _failed(AcceptanceTester $I): void{
+    $I->terminate();
+  }
+  
   private function fill(AcceptanceTester $I, string $email): void{
     $I->fillField('BaseUrl', 'http://localhost');
     $I->fillField('AdminName', 'Admin');

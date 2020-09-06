@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Test" type="CodeceptionConfigurationType" factoryName="Codeception">
     <CommandLine workingDirectory="$PROJECT_DIR$" />
-    <PhpTestRunnerSettings method="" scope="ConfigurationFile" options="--fail-fast" />
+    <PhpTestRunnerSettings method="" scope="ConfigurationFile" />
     <method v="2">
       <option name="GulpBeforeRunTask" enabled="true">
         <node-interpreter>project</node-interpreter>

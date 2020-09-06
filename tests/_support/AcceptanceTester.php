@@ -2,6 +2,8 @@
 declare(strict_types = 1);
 
 use Codeception\Actor;
+use Codeception\Test\Test;
+use PHPUnit\Framework\TestResult;
 
 
 /**
@@ -26,6 +28,17 @@ class AcceptanceTester extends Actor{
   
   private static array $tokens = [];
   private string $page;
+  
+  public function terminate(): void{
+    $scenario = (array)$this->getScenario();
+    
+    /** @var Test $test */
+    $test = $scenario["\x00*\x00test"];
+    
+    /** @var TestResult $result */
+    $result = $test->getTestResultObject();
+    $result->stop();
+  }
   
   public function saveLoginToken(string $user): void{
     $this->seeCookie('logon', [
