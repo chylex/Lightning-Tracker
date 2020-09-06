@@ -20,9 +20,12 @@ use Codeception\Actor;
  * @SuppressWarnings(PHPMD)
  */
 class AcceptanceTester extends Actor{
-  use _generated\AcceptanceTesterActions;
+  use _generated\AcceptanceTesterActions {
+    amOnPage as private amOnPageInternal;
+  }
   
   private static array $tokens = [];
+  private string $page;
   
   public function saveLoginToken(string $user): void{
     $this->seeCookie('logon', [
@@ -31,7 +34,7 @@ class AcceptanceTester extends Actor{
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
-  
+    
     $token = $this->grabCookie('logon');
     
     $this->assertNotEmpty($token);
@@ -49,5 +52,14 @@ class AcceptanceTester extends Actor{
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
+    
+    if (isset($this->page)){
+      $this->amOnPage($this->page);
+    }
+  }
+  
+  public function amOnPage(string $page): void{
+    $this->amOnPageInternal($page);
+    $this->page = $page;
   }
 }

@@ -25,16 +25,16 @@ class T001_Install_Cest{
   private function reinstall(AcceptanceTester $I, string $conflict_resolution, string $input_email, string $result_email): void{
     $I->assertTrue(unlink(__DIR__.'/../../server/www/config.php'));
     $I->amOnPage('/');
-  
+    
     $this->fill($I, $input_email);
     $I->click('button[value=""]');
-  
+    
     $I->seeElement('#form-install-section[style="display:none"]');
     $I->seeElement('#form-conflict-section:not([style])');
-  
+    
     $I->fillField('_Resolution', $conflict_resolution);
     $I->click('button[value="ConflictConfirm"]');
-  
+    
     $I->see('Register', 'a[href="http://localhost/register"]');
     $I->seeInDatabase('users', [
         'name'  => 'Admin',

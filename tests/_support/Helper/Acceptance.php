@@ -9,11 +9,18 @@ namespace Helper;
 use Codeception\Module;
 use Database\DB;
 use FilesystemIterator;
+use PDO;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
 class Acceptance extends Module{
-  public function _beforeSuite($settings = []): void{
+  private static PDO $db;
+  
+  public static function getDB(): PDO{
+    if (isset(self::$db)){
+      return self::$db;
+    }
+    
     define('DB_DRIVER', 'mysql');
     define('DB_NAME', 'tracker_test');
     define('DB_HOST', 'localhost');
@@ -21,7 +28,11 @@ class Acceptance extends Module{
     define('DB_PASSWORD', 'test');
     
     require __DIR__.'/../../../src/Database/DB.php';
-    $db = DB::get();
+    return self::$db = DB::get();
+  }
+  
+  public function _beforeSuite($settings = []): void{
+    $db = self::getDB();
     
     $tables = [
         'system_roles',
