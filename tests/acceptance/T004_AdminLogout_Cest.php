@@ -38,7 +38,6 @@ class T004_AdminLogout_Cest{
     $login = new T003_AdminLogin_Cest();
     $login->_before($I);
     $login->login($I);
-    $I->saveLoginToken('Admin');
   }
 }
 

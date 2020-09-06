@@ -28,15 +28,6 @@ class T003_AdminLogin_Cest{
     $I->fillField('Name', 'Admin');
     $I->fillField('Password', '123456789');
     $I->click('button[type="submit"]');
-    
-    $I->seeCookie('logon', [
-        'path'     => '/',
-        'domain'   => 'localhost',
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
-    
-    $I->assertNotEmpty($I->grabCookie('logon'));
     $I->seeCurrentUrlEquals('/');
     $I->saveLoginToken('Admin');
   }

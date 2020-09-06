@@ -25,7 +25,21 @@ class AcceptanceTester extends Actor{
   private static array $tokens = [];
   
   public function saveLoginToken(string $user): void{
-    self::$tokens[$user] = $this->grabCookie('logon');
+    $this->seeCookie('logon', [
+        'path'     => '/',
+        'domain'   => 'localhost',
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+  
+    $token = $this->grabCookie('logon');
+    
+    $this->assertNotEmpty($token);
+    self::$tokens[$user] = $token;
+  }
+  
+  public function amNotLoggedIn(): void{
+    $this->resetCookie('logon');
   }
   
   public function amLoggedIn(string $user): void{
