@@ -87,7 +87,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
         ->nonLastChild();
     
     self::addPermissionBox($form, SystemPermissions::MANAGE_PROJECTS)
-        ->description('Delete projects.')
+        ->description('Full control over projects visible to the user. Includes project deletion.')
         ->lastChild();
     
     self::addPermissionBox($form, SystemPermissions::LIST_USERS)

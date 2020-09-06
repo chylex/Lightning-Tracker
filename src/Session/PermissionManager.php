@@ -47,7 +47,7 @@ final class PermissionManager{
     $id = $project->getId();
     
     if (!isset($this->project[$id])){
-      if ($this->user !== null && ($this->user->isAdmin() || $project->getOwnerId()->equals($this->user->getId()))){
+      if (($this->user !== null && $project->getOwnerId()->equals($this->user->getId())) || $this->system()->check(SystemPermissions::MANAGE_PROJECTS)){
         $this->project[$id] = ProjectPermissions::permitAll();
       }
       else{
