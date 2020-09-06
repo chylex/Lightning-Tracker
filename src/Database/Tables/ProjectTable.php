@@ -13,6 +13,7 @@ use Database\Objects\UserProfile;
 use Exception;
 use PDOException;
 use Session\Permissions\ProjectPermissions;
+use Session\Permissions\SystemPermissions;
 
 final class ProjectTable extends AbstractTable{
   /**
@@ -110,7 +111,7 @@ final class ProjectTable extends AbstractTable{
     return $this->fetchMap($stmt, fn($v): ProjectInfo => new ProjectInfo($v['id'], $v['name'], $v['url'], $user_id));
   }
   
-  public function getInfoFromUrl(string $url, ?UserProfile $profile): ?ProjectVisibilityInfo{
+  public function getInfoFromUrl(string $url, ?UserProfile $profile, SystemPermissions $perms): ?ProjectVisibilityInfo{
     $user_visibility_clause = $profile === null ? '' : ProjectFilter::getUserVisibilityClause();
     $stmt = $this->db->prepare('SELECT id, name, owner_id, (hidden = FALSE'.$user_visibility_clause.') AS visible FROM projects WHERE url = :url');
     $stmt->bindValue('url', $url);
@@ -120,9 +121,16 @@ final class ProjectTable extends AbstractTable{
     }
     
     $stmt->execute();
-    
     $res = $this->fetchOneRaw($stmt);
-    return $res === false ? null : new ProjectVisibilityInfo(new ProjectInfo($res['id'], $res['name'], $url, UserId::fromRaw($res['owner_id'])), (bool)$res['visible']);
+    
+    if ($res === false){
+      return null;
+    }
+    
+    $project = new ProjectInfo($res['id'], $res['name'], $url, UserId::fromRaw($res['owner_id']));
+    $visible = (bool)$res['visible'] || $perms->check(SystemPermissions::LIST_ALL_PROJECTS);
+    
+    return new ProjectVisibilityInfo($project, $visible);
   }
   
   public function checkUrlExists(string $url): bool{
