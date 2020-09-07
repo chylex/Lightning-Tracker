@@ -11,13 +11,13 @@ use Pages\Components\Forms\Elements\FormCheckBox;
 use Pages\Components\Forms\Elements\FormCheckBoxHierarchyItem;
 use Pages\Components\Forms\Elements\FormHiddenValue;
 use Pages\Components\Forms\Elements\FormIconButton;
+use Pages\Components\Forms\Elements\FormLightMarkEditor;
 use Pages\Components\Forms\Elements\FormMessageList;
 use Pages\Components\Forms\Elements\FormNumberField;
 use Pages\Components\Forms\Elements\FormSelect;
 use Pages\Components\Forms\Elements\FormSelectMultiple;
 use Pages\Components\Forms\Elements\FormSplitGroupEnd;
 use Pages\Components\Forms\Elements\FormSplitGroupStart;
-use Pages\Components\Forms\Elements\FormTextArea;
 use Pages\Components\Forms\Elements\FormTextField;
 use Pages\Components\Html;
 use Pages\Components\Text;
@@ -125,13 +125,6 @@ final class FormComponent implements IViewable{
     return $field;
   }
   
-  public function addTextArea(string $name): FormTextArea{
-    $field = new FormTextArea($this->id.'-'.$name, $name);
-    $this->elements[] = $field;
-    $this->fields[$name] = $field;
-    return $field;
-  }
-  
   public function addNumberField(string $name, int $min, int $max): FormNumberField{
     $field = new FormNumberField($this->id.'-'.$name, $name, $min, $max);
     $this->elements[] = $field;
@@ -155,6 +148,13 @@ final class FormComponent implements IViewable{
   
   public function addSelectMultiple(string $name): FormSelectMultiple{
     $field = new FormSelectMultiple($this->id.'-'.$name, $name);
+    $this->elements[] = $field;
+    $this->fields[$name] = $field;
+    return $field;
+  }
+  
+  public function addLightMarkEditor(string $name): FormLightMarkEditor{
+    $field = new FormLightMarkEditor($this->id.'-'.$name, $name);
     $this->elements[] = $field;
     $this->fields[$name] = $field;
     return $field;

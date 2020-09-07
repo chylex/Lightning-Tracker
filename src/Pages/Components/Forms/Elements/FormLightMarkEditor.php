@@ -5,19 +5,21 @@ namespace Pages\Components\Forms\Elements;
 
 use Pages\Components\Forms\AbstractFormField;
 
-final class FormTextArea extends AbstractFormField{
+final class FormLightMarkEditor extends AbstractFormField{
   private const CONTROL_WHOLELINE_TOGGLE = 'wholeline-toggle';
   
+  public static function echoHead(): void{
+    if (DEBUG){
+      echo '<link rel="stylesheet" type="text/css" href="~resources/css/editor.css?v='.TRACKER_RESOURCE_VERSION.'">';
+    }
+    
+    echo '<script type="text/javascript" src="~resources/js/editor.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
+  }
+  
   private ?string $label;
-  private bool $markdown_editor = false;
   
   public function label(string $label): self{
     $this->label = $label;
-    return $this;
-  }
-  
-  public function markdownEditor(): self{
-    $this->markdown_editor = true;
     return $this;
   }
   
@@ -27,28 +29,25 @@ final class FormTextArea extends AbstractFormField{
     $label = $this->label ?? $name;
     $value = protect($this->value);
     
-    $markdown_editor_attr = $this->markdown_editor ? ' data-markdown-editor' : '';
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
     
     echo '<div class="field-group">';
     $this->echoLabel($label);
     
-    if ($this->markdown_editor){
-      echo '<div data-markdown-editor-controls>';
-      
-      self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-1', '<span class="text-heading">H</span><sub>1</sub>');
-      self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-2', '<span class="text-heading">H</span><sub>2</sub>');
-      self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-3', '<span class="text-heading">H</span><sub>3</sub>');
-      
-      echo '<div class="separator"></div>';
-      
-      self::editorButtonIcon(self::CONTROL_WHOLELINE_TOGGLE, 'task-unchecked', 'checkbox-unchecked');
-      self::editorButtonIcon(self::CONTROL_WHOLELINE_TOGGLE, 'task-checked', 'checkbox-checked');
-      
-      echo '</div>';
-    }
+    echo '<div data-markdown-editor-controls>';
     
-    echo '<textarea id="'.$id.'" name="'.$name.'" '.$markdown_editor_attr.$disabled_attr.'>'.$value.'</textarea>';
+    self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-1', '<span class="text-heading">H</span><sub>1</sub>');
+    self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-2', '<span class="text-heading">H</span><sub>2</sub>');
+    self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-3', '<span class="text-heading">H</span><sub>3</sub>');
+    
+    echo '<div class="separator"></div>';
+    
+    self::editorButtonIcon(self::CONTROL_WHOLELINE_TOGGLE, 'task-unchecked', 'checkbox-unchecked');
+    self::editorButtonIcon(self::CONTROL_WHOLELINE_TOGGLE, 'task-checked', 'checkbox-checked');
+    
+    echo '</div>';
+    
+    echo '<textarea id="'.$id.'" name="'.$name.'" data-markdown-editor'.$disabled_attr.'>'.$value.'</textarea>';
     
     $this->echoErrors();
     echo '</div>';

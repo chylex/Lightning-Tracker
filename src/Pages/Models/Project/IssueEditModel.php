@@ -168,7 +168,7 @@ class IssueEditModel extends BasicProjectPageModel{
     
     $form->startTitledSection('Details');
     $form->addTextField('Title');
-    $form->addTextArea('Description')->markdownEditor();
+    $form->addLightMarkEditor('Description');
     $form->endTitledSection();
     
     if ($this->edit_level >= IssueDetail::EDIT_ALL_FIELDS){

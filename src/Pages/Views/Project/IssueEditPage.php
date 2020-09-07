@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Views\Project;
 
+use Pages\Components\Forms\Elements\FormLightMarkEditor;
 use Pages\Models\Project\IssueEditModel;
 use Pages\Views\AbstractProjectIssuePage;
 
@@ -41,12 +42,7 @@ class IssueEditPage extends AbstractProjectIssuePage{
   
   protected function echoPageHead(): void{
     parent::echoPageHead();
-    
-    if (DEBUG){
-      echo '<link rel="stylesheet" type="text/css" href="~resources/css/editor.css?v='.TRACKER_RESOURCE_VERSION.'">';
-    }
-    
-    echo '<script type="text/javascript" src="~resources/js/editor.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
+    FormLightMarkEditor::echoHead();
   }
   
   protected function echoPageBody(): void{
