@@ -266,6 +266,13 @@ SQL;
     return $perms === false ? [] : $perms;
   }
   
+  public function getRoleIdByTitle(string $title): ?int{
+    $stmt = $this->execute('SELECT role_id FROM project_roles WHERE title = ? AND project_id = ?',
+                           'SI', [$title, $this->getProjectId()]);
+    
+    return $this->fetchOneColumn($stmt);
+  }
+  
   public function getRoleTitleIfNotSpecial(int $id): ?string{
     $stmt = $this->execute('SELECT title FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
                            'II', [$id, $this->getProjectId()]);

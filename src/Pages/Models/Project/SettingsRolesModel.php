@@ -124,6 +124,12 @@ class SettingsRolesModel extends AbstractSettingsModel{
     try{
       $validator->validate();
       $perms = new ProjectPermTable(DB::get(), $this->getProject());
+      
+      if ($perms->getRoleIdByTitle($title) !== null){
+        $form->invalidateField('Title', 'A role with this title already exists.');
+        return false;
+      }
+      
       $perms->addRole($title, []);
       return true;
     }catch(ValidationException $e){

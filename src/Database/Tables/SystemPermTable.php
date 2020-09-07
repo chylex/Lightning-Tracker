@@ -127,6 +127,13 @@ final class SystemPermTable extends AbstractTable{
     return $perms === false ? [] : $perms;
   }
   
+  public function getRoleIdByTitle(string $title): ?int{
+    $stmt = $this->execute('SELECT id FROM system_roles WHERE title = ?',
+                           'S', [$title]);
+    
+    return $this->fetchOneColumn($stmt);
+  }
+  
   public function getRoleTitleIfNotSpecial(int $id): ?string{
     $stmt = $this->execute('SELECT title FROM system_roles WHERE id = ? AND special = FALSE',
                            'I', [$id]);

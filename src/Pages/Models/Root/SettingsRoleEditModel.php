@@ -127,8 +127,13 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
       $validator->validate();
       $perms = new SystemPermTable(DB::get());
       
-      if ($perms->getRoleTitleIfNotSpecial($this->role_id) === null){
+      if (!$this->hasRole()){
         $form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid role.'));
+        return false;
+      }
+      
+      if ($perms->getRoleIdByTitle($title) !== $this->role_id){
+        $form->invalidateField('Title', 'A role with this title already exists.');
         return false;
       }
       

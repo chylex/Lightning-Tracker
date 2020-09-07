@@ -124,6 +124,11 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
         return false;
       }
       
+      if ($perms->getRoleIdByTitle($title) !== $this->role_id){
+        $form->invalidateField('Title', 'A role with this title already exists.');
+        return false;
+      }
+      
       $perms->editRole($this->role_id, $title, $checked_perms);
       return true;
     }catch(ValidationException $e){
