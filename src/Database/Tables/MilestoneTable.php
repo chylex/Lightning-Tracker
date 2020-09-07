@@ -40,69 +40,20 @@ SQL;
     }
   }
   
-  public function moveMilestoneUp(int $id): void{
-    $this->db->beginTransaction();
+  public function swapMilestones(int $ordering1, int $ordering2): void{
+    $sql = <<<SQL
+UPDATE milestones m1 INNER JOIN milestones m2 ON m1.ordering = ? AND m2.ordering = ? AND m1.project_id = m2.project_id
+SET m1.ordering = m2.ordering,
+    m2.ordering = m1.ordering
+WHERE m1.project_id = ?
+SQL;
     
-    try{
-      $ordering = $this->getMilestoneOrdering($id);
-      
-      if ($ordering === null || $ordering <= 1){
-        $this->db->rollBack();
-        return;
-      }
-      
-      $this->swapMilestonesInternal($id, $ordering, $ordering - 1);
-      $this->db->commit();
-    }catch(PDOException $e){
-      $this->db->rollBack();
-      throw $e;
-    }
-  }
-  
-  public function moveMilestoneDown(int $id): void{
-    $this->db->beginTransaction();
-    
-    try{
-      $limit = $this->findMaxOrdering();
-      
-      if ($limit === false){
-        $this->db->rollBack();
-        return;
-      }
-      
-      $ordering = $this->getMilestoneOrdering($id);
-      
-      if ($ordering === null || $ordering >= $limit){
-        $this->db->rollBack();
-        return;
-      }
-      
-      $this->swapMilestonesInternal($id, $ordering, $ordering + 1);
-      $this->db->commit();
-    }catch(PDOException $e){
-      $this->db->rollBack();
-      throw $e;
-    }
+    $this->execute($sql, 'III', [$ordering1, $ordering2, $this->getProjectId()]);
   }
   
   public function findMaxOrdering(): ?int{
     $stmt = $this->execute('SELECT MAX(ordering) FROM milestones WHERE project_id = ?',
                            'I', [$this->getProjectId()]);
-    
-    return $this->fetchOneInt($stmt);
-  }
-  
-  private function swapMilestonesInternal(int $id, int $current_ordering, int $other_ordering): void{
-    $this->execute('UPDATE milestones SET ordering = ? WHERE ordering = ? AND project_id = ?',
-                   'III', [$current_ordering, $other_ordering, $this->getProjectId()]);
-    
-    $this->execute('UPDATE milestones SET ordering = ? WHERE milestone_id = ? AND project_id = ?',
-                   'III', [$other_ordering, $id, $this->getProjectId()]);
-  }
-  
-  private function getMilestoneOrdering(int $id): ?int{
-    $stmt = $this->execute('SELECT ordering FROM milestones WHERE milestone_id = ? AND project_id = ?',
-                           'II', [$id, $this->getProjectId()]);
     
     return $this->fetchOneInt($stmt);
   }
@@ -168,7 +119,10 @@ SQL;
     $this->db->beginTransaction();
     
     try{
-      $ordering = $this->getMilestoneOrdering($id);
+      $stmt = $this->execute('SELECT ordering FROM milestones WHERE milestone_id = ? AND project_id = ?',
+                             'II', [$id, $project]);
+      
+      $ordering = $this->fetchOneInt($stmt);
       
       if ($ordering === null){
         $this->db->rollBack();

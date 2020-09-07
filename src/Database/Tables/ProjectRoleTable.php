@@ -65,49 +65,15 @@ SQL;
                    'SII', [$title, $id, $this->getProjectId()]);
   }
   
-  public function moveRoleUp(int $id): void{
-    $this->db->beginTransaction();
+  public function swapRolesIfNotSpecial(int $ordering1, int $ordering2): void{
+    $sql = <<<SQL
+UPDATE project_roles pr1 INNER JOIN project_roles pr2 ON pr1.ordering = ? AND pr2.ordering = ? AND pr1.project_id = pr2.project_id
+SET pr1.ordering = pr2.ordering,
+    pr2.ordering = pr1.ordering
+WHERE pr1.project_id = ? AND pr1.special = FALSE AND pr2.special = FALSE
+SQL;
     
-    try{
-      $ordering = $this->getRoleOrderingIfNotSpecial($id);
-      
-      if ($ordering === null || $ordering <= 1 || $this->isRoleSpecialByOrdering($ordering - 1)){
-        $this->db->rollBack();
-        return;
-      }
-      
-      $this->swapRolesInternal($id, $ordering, $ordering - 1);
-      $this->db->commit();
-    }catch(PDOException $e){
-      $this->db->rollBack();
-      throw $e;
-    }
-  }
-  
-  public function moveRoleDown(int $id): void{
-    $this->db->beginTransaction();
-    
-    try{
-      $limit = $this->findMaxOrdering();
-      
-      if ($limit === false){
-        $this->db->rollBack();
-        return;
-      }
-      
-      $ordering = $this->getRoleOrderingIfNotSpecial($id);
-      
-      if ($ordering === null || $ordering >= $limit || $this->isRoleSpecialByOrdering($ordering + 1)){
-        $this->db->rollBack();
-        return;
-      }
-      
-      $this->swapRolesInternal($id, $ordering, $ordering + 1);
-      $this->db->commit();
-    }catch(PDOException $e){
-      $this->db->rollBack();
-      throw $e;
-    }
+    $this->execute($sql, 'III', [$ordering1, $ordering2, $this->getProjectId()]);
   }
   
   public function findMaxOrdering(): ?int{
@@ -115,28 +81,6 @@ SQL;
                            'I', [$this->getProjectId()]);
     
     return $this->fetchOneInt($stmt);
-  }
-  
-  private function swapRolesInternal(int $id, int $current_ordering, int $other_ordering): void{
-    $this->execute('UPDATE project_roles SET ordering = ? WHERE ordering = ? AND project_id = ?',
-                   'III', [$current_ordering, $other_ordering, $this->getProjectId()]);
-    
-    $this->execute('UPDATE project_roles SET ordering = ? WHERE role_id = ? AND project_id = ?',
-                   'III', [$other_ordering, $id, $this->getProjectId()]);
-  }
-  
-  private function getRoleOrderingIfNotSpecial(int $id): ?int{
-    $stmt = $this->execute('SELECT ordering FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
-                           'II', [$id, $this->getProjectId()]);
-    
-    return $this->fetchOneInt($stmt);
-  }
-  
-  private function isRoleSpecialByOrdering(int $ordering): bool{
-    $stmt = $this->execute('SELECT special FROM project_roles WHERE ordering = ? AND project_id = ?',
-                           'II', [$ordering, $this->getProjectId()]);
-    
-    return (bool)$this->fetchOneColumn($stmt);
   }
   
   public function isRoleAssignableBy(int $role_id, UserId $user_id): bool{
@@ -182,7 +126,7 @@ WHERE project_id = ?
 ORDER BY ordering ASC
 SQL;
     
-    $stmt = $this->execute($sql, 'ISI', [$this->getProjectId(), $user_id]);
+    $stmt = $this->execute($sql, 'IS', [$this->getProjectId(), $user_id]);
     return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
   }
   
@@ -206,7 +150,10 @@ SQL;
     $this->db->beginTransaction();
     
     try{
-      $ordering = $this->getRoleOrderingIfNotSpecial($id);
+      $stmt = $this->execute('SELECT ordering FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
+                             'II', [$id, $this->getProjectId()]);
+      
+      $ordering = $this->fetchOneInt($stmt);
       
       if ($ordering === null){
         $this->db->rollBack();
@@ -216,7 +163,7 @@ SQL;
       $this->execute('UPDATE project_members SET role_id = NULL WHERE role_id = ? AND project_id = ?',
                      'II', [$id, $project]);
       
-      $this->execute('UPDATE project_roles SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ?',
+      $this->execute('UPDATE project_roles SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ? AND special = FALSE',
                      'II', [$ordering, $project]);
       
       $this->execute('DELETE FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',

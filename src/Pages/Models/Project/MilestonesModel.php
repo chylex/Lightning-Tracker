@@ -86,7 +86,7 @@ class MilestonesModel extends BasicProjectPageModel{
       
       if ($this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
         $form_move = new FormComponent(self::ACTION_MOVE);
-        $form_move->addHidden('Milestone', $milestone_id_str);
+        $form_move->addHidden('Ordering', (string)$milestone->getOrdering());
         
         $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
         $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
@@ -166,20 +166,20 @@ class MilestonesModel extends BasicProjectPageModel{
   
   public function moveMilestone(array $data): bool{
     $button = $data[FormComponent::BUTTON_KEY] ?? null;
-    $milestone = get_int($data, 'Milestone');
+    $ordering = get_int($data, 'Ordering');
     
-    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $milestone === null){
+    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $ordering === null){
       return false;
     }
     
     $milestones = new MilestoneTable(DB::get(), $this->getProject());
     
     if ($button === self::ACTION_MOVE_UP){
-      $milestones->moveMilestoneUp($milestone);
+      $milestones->swapMilestones($ordering, $ordering - 1);
       return true;
     }
     elseif ($button === self::ACTION_MOVE_DOWN){
-      $milestones->moveMilestoneDown($milestone);
+      $milestones->swapMilestones($ordering, $ordering + 1);
       return true;
     }
     

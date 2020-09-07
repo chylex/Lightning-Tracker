@@ -68,7 +68,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       }
       else{
         $form_move = new FormComponent(self::ACTION_MOVE);
-        $form_move->addHidden('Role', $role_id_str);
+        $form_move->addHidden('Ordering', (string)$role->getOrdering());
         
         $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
         $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
@@ -145,20 +145,20 @@ class SettingsRolesModel extends AbstractSettingsModel{
   
   public function moveRole(array $data): bool{
     $button = $data[FormComponent::BUTTON_KEY] ?? null;
-    $role = get_int($data, 'Role');
+    $ordering = get_int($data, 'Ordering');
     
-    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $role === null){
+    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $ordering === null){
       return false;
     }
     
     $roles = new ProjectRoleTable(DB::get(), $this->getProject());
     
     if ($button === self::ACTION_MOVE_UP){
-      $roles->moveRoleUp($role);
+      $roles->swapRolesIfNotSpecial($ordering, $ordering - 1);
       return true;
     }
     elseif ($button === self::ACTION_MOVE_DOWN){
-      $roles->moveRoleDown($role);
+      $roles->swapRolesIfNotSpecial($ordering, $ordering + 1);
       return true;
     }
     
