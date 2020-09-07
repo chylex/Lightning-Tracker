@@ -38,7 +38,8 @@ final class ProjectTable extends AbstractTable{
       }
       
       $project = new ProjectInfo($id, $name, $url, $owner->getId());
-      $perms = new ProjectPermTable($this->db, $project);
+      $roles = new ProjectRoleTable($this->db, $project);
+      $perms = new ProjectRolePermTable($this->db, $project);
       $members = new ProjectMemberTable($this->db, $project);
       
       $perms_reporter = [
@@ -61,11 +62,16 @@ final class ProjectTable extends AbstractTable{
           ProjectPermissions::MANAGE_SETTINGS
       ]);
       
-      $owner_role_id = $perms->addRole('Owner', [], true);
-      $perms->addRole('Administrator', $perms_admin);
-      $perms->addRole('Moderator', $perms_moderator);
-      $perms->addRole('Developer', $perms_developer);
-      $perms->addRole('Reporter', $perms_reporter);
+      $owner_role_id = $roles->addRole('Owner', true);
+      $administrator_role_id = $roles->addRole('Administrator');
+      $moderator_role_id = $roles->addRole('Moderator');
+      $developer_role_id = $roles->addRole('Developer');
+      $reporter_role_id = $roles->addRole('Reporter');
+      
+      $perms->addRolePermissions($administrator_role_id, $perms_admin);
+      $perms->addRolePermissions($moderator_role_id, $perms_moderator);
+      $perms->addRolePermissions($developer_role_id, $perms_developer);
+      $perms->addRolePermissions($reporter_role_id, $perms_reporter);
       
       $members->addMember($owner->getId(), $owner_role_id);
       

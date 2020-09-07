@@ -6,21 +6,18 @@ namespace Database\Tables;
 use Data\UserId;
 use Database\AbstractProjectTable;
 use Database\Objects\RoleInfo;
-use Database\Objects\UserProfile;
 use Exception;
 use LogicException;
-use PDO;
 use PDOException;
 
-final class ProjectPermTable extends AbstractProjectTable{
+final class ProjectRoleTable extends AbstractProjectTable{
   /**
    * @param string $title
-   * @param array $perms
    * @param bool $special
    * @return int
    * @throws Exception
    */
-  public function addRole(string $title, array $perms, bool $special = false): int{
+  public function addRole(string $title, bool $special = false): int{
     $owned_transaction = !$this->db->inTransaction();
     $project = $this->getProjectId();
     
@@ -49,8 +46,6 @@ SQL;
       $this->execute('INSERT INTO project_roles (project_id, role_id, title, ordering, special) VALUES (?, ?, ?, ?, ?)',
                      'IISIB', [$project, $role_id, $title, $special ? 0 : $next['ordering'], $special]);
       
-      $this->addRolePermissions($role_id, $perms);
-      
       if ($owned_transaction){
         $this->db->commit();
       }
@@ -65,50 +60,9 @@ SQL;
     }
   }
   
-  public function editRole(int $id, string $title, array $perms): void{
-    $project = $this->getProjectId();
-    
-    $this->db->beginTransaction();
-    
-    try{
-      $this->execute('UPDATE project_roles SET title = ? WHERE role_id = ? AND project_id = ?',
-                     'SII', [$title, $id, $project]);
-      
-      $this->execute('DELETE FROM project_role_permissions WHERE role_id = ? AND project_id = ?',
-                     'II', [$id, $project]);
-      
-      $this->addRolePermissions($id, $perms);
-      
-      $this->db->commit();
-    }catch(PDOException $e){
-      $this->db->rollBack();
-      throw $e;
-    }
-  }
-  
-  /**
-   * @param int $id
-   * @param array $perms
-   */
-  private function addRolePermissions(int $id, array $perms): void{
-    if (empty($perms)){
-      return;
-    }
-    
-    $project = $this->getProjectId();
-    
-    $sql = 'INSERT INTO project_role_permissions (project_id, role_id, permission) VALUES ()';
-    $values = implode(',', array_map(fn($ignore): string => '(?, ?, ?)', $perms));
-    
-    $stmt = $this->db->prepare(str_replace('()', $values, $sql));
-    
-    foreach($perms as $i => $perm){
-      $stmt->bindValue(($i * 3) + 1, $project, PDO::PARAM_INT);
-      $stmt->bindValue(($i * 3) + 2, $id, PDO::PARAM_INT);
-      $stmt->bindValue(($i * 3) + 3, $perm);
-    }
-    
-    $stmt->execute();
+  public function editRole(int $id, string $title): void{
+    $this->execute('UPDATE project_roles SET title = ? WHERE role_id = ? AND project_id = ?',
+                   'SII', [$title, $id, $this->getProjectId()]);
   }
   
   public function moveRoleUp(int $id): void{
@@ -230,40 +184,6 @@ SQL;
     
     $stmt = $this->execute($sql, 'ISI', [$this->getProjectId(), $user_id]);
     return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
-  }
-  
-  /**
-   * @param int $id
-   * @return string[]
-   */
-  public function listRolePerms(int $id): array{
-    $stmt = $this->execute('SELECT permission FROM project_role_permissions WHERE role_id = ? AND project_id = ?',
-                           'II', [$id, $this->getProjectId()]);
-    
-    $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    return $perms === false ? [] : $perms;
-  }
-  
-  /**
-   * @param ?UserProfile $user
-   * @return string[]
-   */
-  public function listUserPerms(?UserProfile $user): array{
-    if ($user === null){
-      return [];
-    }
-    
-    $sql = <<<SQL
-SELECT prp.permission
-FROM project_role_permissions prp
-JOIN project_members pm ON prp.role_id = pm.role_id AND prp.project_id = pm.project_id
-WHERE pm.user_id = ? AND pm.project_id = ?
-SQL;
-    
-    $stmt = $this->execute($sql, 'SI', [$user->getId(), $this->getProjectId()]);
-    
-    $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    return $perms === false ? [] : $perms;
   }
   
   public function getRoleIdByTitle(string $title): ?int{

@@ -7,7 +7,7 @@ use Data\UserId;
 use Database\DB;
 use Database\Objects\ProjectInfo;
 use Database\Tables\ProjectMemberTable;
-use Database\Tables\ProjectPermTable;
+use Database\Tables\ProjectRoleTable;
 use Database\Tables\UserTable;
 use Exception;
 use Pages\Components\Forms\FormComponent;
@@ -23,7 +23,7 @@ class MemberEditModel extends BasicProjectPageModel{
     return (
         !$target_id->equals($editor_id) &&
         !$target_id->equals($project->getOwnerId()) &&
-        ($target_role === null || (new ProjectPermTable(DB::get(), $project))->isRoleAssignableBy($target_role, $editor_id))
+        ($target_role === null || (new ProjectRoleTable(DB::get(), $project))->isRoleAssignableBy($target_role, $editor_id))
     );
   }
   
@@ -73,7 +73,7 @@ class MemberEditModel extends BasicProjectPageModel{
                         ->dropdown()
                         ->addOption('', '(Default)');
     
-    foreach((new ProjectPermTable(DB::get(), $this->getProject()))->listRolesAssignableBy($this->logon_user_id) as $role){
+    foreach((new ProjectRoleTable(DB::get(), $this->getProject()))->listRolesAssignableBy($this->logon_user_id) as $role){
       $select_role->addOption((string)$role->getId(), $role->getTitle());
     }
     
@@ -100,7 +100,7 @@ class MemberEditModel extends BasicProjectPageModel{
     try{
       $validator->validate();
       
-      if ($role_id !== null && !(new ProjectPermTable($db, $project))->isRoleAssignableBy($role_id, $this->logon_user_id)){
+      if ($role_id !== null && !(new ProjectRoleTable($db, $project))->isRoleAssignableBy($role_id, $this->logon_user_id)){
         $form->fill(['Role' => $this->member_role]);
         $form->invalidateField('Role', 'Invalid role.');
         return false;

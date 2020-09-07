@@ -4,7 +4,8 @@ declare(strict_types = 1);
 namespace Pages\Models\Root;
 
 use Database\DB;
-use Database\Tables\SystemPermTable;
+use Database\Tables\SystemRolePermTable;
+use Database\Tables\SystemRoleTable;
 use Database\Validation\RoleFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
@@ -50,9 +51,10 @@ class SettingsRolesModel extends AbstractSettingsModel{
     $table->addColumn('Permissions')->width(80)->wrap();
     $table->addColumn('Actions')->tight()->right();
     
-    $perms = new SystemPermTable(DB::get());
+    $roles = new SystemRoleTable(DB::get());
+    $perms = new SystemRolePermTable(DB::get());
     
-    foreach($perms->listRoles() as $role){
+    foreach($roles->listRoles() as $role){
       $role_id = $role->getId();
       $role_id_str = (string)$role_id;
       
@@ -106,14 +108,14 @@ class SettingsRolesModel extends AbstractSettingsModel{
     
     try{
       $validator->validate();
-      $perms = new SystemPermTable(DB::get());
+      $roles = new SystemRoleTable(DB::get());
       
-      if ($perms->getRoleIdByTitle($title) !== null){
+      if ($roles->getRoleIdByTitle($title) !== null){
         $form->invalidateField('Title', 'A role with this title already exists.');
         return false;
       }
       
-      $perms->addRole($title, []);
+      $roles->addRole($title);
       return true;
     }catch(ValidationException $e){
       $form->invalidateFields($e->getFields());
@@ -131,8 +133,8 @@ class SettingsRolesModel extends AbstractSettingsModel{
       return false;
     }
     
-    $perms = new SystemPermTable(DB::get());
-    $perms->deleteById($role);
+    $roles = new SystemRoleTable(DB::get());
+    $roles->deleteById($role);
     return true;
   }
 }

@@ -6,7 +6,7 @@ namespace Pages\Models\Root;
 use Data\UserId;
 use Database\DB;
 use Database\Objects\UserInfo;
-use Database\Tables\SystemPermTable;
+use Database\Tables\SystemRoleTable;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
 use Exception;
@@ -96,7 +96,7 @@ class UserEditModel extends BasicRootPageModel{
                         ->addOption('', '(None)')
                         ->dropdown();
     
-    foreach((new SystemPermTable(DB::get()))->listRoles() as $role){
+    foreach((new SystemRoleTable(DB::get()))->listRoles() as $role){
       $select_role->addOption((string)$role->getId(), $role->getTitle());
     }
     

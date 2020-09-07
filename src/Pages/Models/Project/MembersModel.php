@@ -7,7 +7,7 @@ use Database\DB;
 use Database\Filters\Types\ProjectMemberFilter;
 use Database\Objects\ProjectInfo;
 use Database\Tables\ProjectMemberTable;
-use Database\Tables\ProjectPermTable;
+use Database\Tables\ProjectRoleTable;
 use Database\Tables\UserTable;
 use Exception;
 use Pages\Components\Forms\FormComponent;
@@ -40,7 +40,7 @@ class MembersModel extends BasicProjectPageModel{
       $logon_user_id = Session::get()->getLogonUserId();
       
       if ($logon_user_id !== null){
-        foreach((new ProjectPermTable(DB::get(), $project))->listRolesAssignableBy($logon_user_id) as $role){
+        foreach((new ProjectRoleTable(DB::get(), $project))->listRolesAssignableBy($logon_user_id) as $role){
           $this->editable_roles[$role->getId()] = $role->getTitle();
         }
       }
@@ -115,7 +115,7 @@ class MembersModel extends BasicProjectPageModel{
     $filtering_role = $header->addMultiSelect('role')->label('Role');
     $filtering_role->addOption('', Text::missing('Default'));
     
-    foreach((new ProjectPermTable(DB::get(), $project))->listRoles() as $role){
+    foreach((new ProjectRoleTable(DB::get(), $project))->listRoles() as $role){
       $title = $role->getTitle();
       $filtering_role->addOption($title, Text::plain($title));
     }
@@ -192,7 +192,7 @@ class MembersModel extends BasicProjectPageModel{
         return false;
       }
       
-      if ($role_id !== null && !(new ProjectPermTable($db, $project))->isRoleAssignableBy($role_id, Session::get()->getLogonUserIdOrThrow())){
+      if ($role_id !== null && !(new ProjectRoleTable($db, $project))->isRoleAssignableBy($role_id, Session::get()->getLogonUserIdOrThrow())){
         $form->invalidateField('Role', 'Invalid role.');
         return false;
       }

@@ -5,7 +5,7 @@ namespace Pages\Models\Root;
 
 use Database\DB;
 use Database\Filters\Types\UserFilter;
-use Database\Tables\SystemPermTable;
+use Database\Tables\SystemRoleTable;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
 use Exception;
@@ -113,7 +113,7 @@ class UsersModel extends BasicRootPageModel{
     $filtering_role = $header->addMultiSelect('role')->label('Role');
     $filtering_role->addOption('', Text::missing('Default'));
     
-    foreach((new SystemPermTable(DB::get()))->listRoles() as $role){
+    foreach((new SystemRoleTable(DB::get()))->listRoles() as $role){
       $title = $role->getTitle();
       $filtering_role->addOption($title, Text::plain($title));
     }

@@ -6,8 +6,8 @@ namespace Session;
 use Database\DB;
 use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
-use Database\Tables\ProjectPermTable;
-use Database\Tables\SystemPermTable;
+use Database\Tables\ProjectRolePermTable;
+use Database\Tables\SystemRolePermTable;
 use Exception;
 use Logging\Log;
 use Session\Permissions\ProjectPermissions;
@@ -31,8 +31,7 @@ final class PermissionManager{
       }
       else{
         try{
-          $perms = new SystemPermTable(DB::get());
-          $this->system = SystemPermissions::permitList($perms->listUserPerms($this->user));
+          $this->system = SystemPermissions::permitList((new SystemRolePermTable(DB::get()))->listUserPerms($this->user));
         }catch(Exception $e){
           Log::critical($e);
           $this->system = SystemPermissions::permitList([]);
@@ -52,8 +51,7 @@ final class PermissionManager{
       }
       else{
         try{
-          $perms = new ProjectPermTable(DB::get(), $project);
-          $this->project[$id] = ProjectPermissions::permitList($perms->listUserPerms($this->user));
+          $this->project[$id] = ProjectPermissions::permitList((new ProjectRolePermTable(DB::get(), $project))->listUserPerms($this->user));
         }catch(Exception $e){
           Log::critical($e);
           $this->project[$id] = ProjectPermissions::permitList([]);

@@ -5,7 +5,8 @@ namespace Pages\Models\Project;
 
 use Database\DB;
 use Database\Objects\ProjectInfo;
-use Database\Tables\ProjectPermTable;
+use Database\Tables\ProjectRolePermTable;
+use Database\Tables\ProjectRoleTable;
 use Database\Validation\RoleFields;
 use Exception;
 use Pages\Components\Forms\Elements\FormCheckBoxHierarchyItem;
@@ -32,7 +33,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
   public function __construct(Request $req, ProjectInfo $project, int $role_id){
     parent::__construct($req, $project);
     $this->role_id = $role_id;
-    $this->role_title = (new ProjectPermTable(DB::get(), $project))->getRoleTitleIfNotSpecial($role_id);
+    $this->role_title = (new ProjectRoleTable(DB::get(), $project))->getRoleTitleIfNotSpecial($role_id);
   }
   
   public function load(): IModel{
@@ -44,7 +45,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
       if (!$form->isFilled()){
         $fill = ['Title' => $this->role_title];
         
-        foreach((new ProjectPermTable(DB::get(), $this->getProject()))->listRolePerms($this->role_id) as $perm){
+        foreach((new ProjectRolePermTable(DB::get(), $this->getProject()))->listRolePerms($this->role_id) as $perm){
           $fill[RoleFields::permissionFieldName($perm)] = true;
         }
         
@@ -117,19 +118,21 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
     
     try{
       $validator->validate();
-      $perms = new ProjectPermTable(DB::get(), $this->getProject());
+      $roles = new ProjectRoleTable(DB::get(), $this->getProject());
+      $perms = new ProjectRolePermTable(DB::get(), $this->getProject());
       
-      if ($perms->getRoleTitleIfNotSpecial($this->role_id) === null){
+      if (!$this->hasRole()){
         $form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid role.'));
         return false;
       }
       
-      if ($perms->getRoleIdByTitle($title) !== $this->role_id){
+      if (($roles->getRoleIdByTitle($title) ?? $this->role_id) !== $this->role_id){
         $form->invalidateField('Title', 'A role with this title already exists.');
         return false;
       }
       
-      $perms->editRole($this->role_id, $title, $checked_perms);
+      $roles->editRole($this->role_id, $title);
+      $perms->replaceRolePermissions($this->role_id, $checked_perms);
       return true;
     }catch(ValidationException $e){
       $form->invalidateFields($e->getFields());

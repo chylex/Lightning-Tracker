@@ -4,7 +4,8 @@ declare(strict_types = 1);
 namespace Pages\Models\Root;
 
 use Database\DB;
-use Database\Tables\SystemPermTable;
+use Database\Tables\SystemRolePermTable;
+use Database\Tables\SystemRoleTable;
 use Database\Validation\RoleFields;
 use Exception;
 use Pages\Components\Forms\Elements\FormCheckBoxHierarchyItem;
@@ -31,7 +32,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
   public function __construct(Request $req, int $role_id){
     parent::__construct($req);
     $this->role_id = $role_id;
-    $this->role_title = (new SystemPermTable(DB::get()))->getRoleTitleIfNotSpecial($role_id);
+    $this->role_title = (new SystemRoleTable(DB::get()))->getRoleTitleIfNotSpecial($role_id);
   }
   
   public function load(): IModel{
@@ -43,7 +44,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
       if (!$form->isFilled()){
         $fill = ['Title' => $this->role_title];
         
-        foreach((new SystemPermTable(DB::get()))->listRolePerms($this->role_id) as $perm){
+        foreach((new SystemRolePermTable(DB::get()))->listRolePerms($this->role_id) as $perm){
           $fill[RoleFields::permissionFieldName($perm)] = true;
         }
         
@@ -125,19 +126,21 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
     
     try{
       $validator->validate();
-      $perms = new SystemPermTable(DB::get());
+      $roles = new SystemRoleTable(DB::get());
+      $perms = new SystemRolePermTable(DB::get());
       
       if (!$this->hasRole()){
         $form->addMessage(FormComponent::MESSAGE_ERROR, Text::blocked('Invalid role.'));
         return false;
       }
       
-      if ($perms->getRoleIdByTitle($title) !== $this->role_id){
+      if (($roles->getRoleIdByTitle($title) ?? $this->role_id) !== $this->role_id){
         $form->invalidateField('Title', 'A role with this title already exists.');
         return false;
       }
       
-      $perms->editRole($this->role_id, $title, $checked_perms);
+      $roles->editRole($this->role_id, $title);
+      $perms->replaceRolePermissions($this->role_id, $checked_perms);
       return true;
     }catch(ValidationException $e){
       $form->invalidateFields($e->getFields());

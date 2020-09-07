@@ -4,7 +4,8 @@ declare(strict_types = 1);
 namespace Pages\Models\Project;
 
 use Database\DB;
-use Database\Tables\ProjectPermTable;
+use Database\Tables\ProjectRolePermTable;
+use Database\Tables\ProjectRoleTable;
 use Database\Validation\RoleFields;
 use Exception;
 use Pages\Components\CompositeComponent;
@@ -49,10 +50,11 @@ class SettingsRolesModel extends AbstractSettingsModel{
     $table->addColumn('Permissions')->width(80)->wrap();
     $table->addColumn('Actions')->tight()->right();
     
-    $perms = new ProjectPermTable(DB::get(), $this->getProject());
-    $ordering_limit = $perms->findMaxOrdering();
+    $roles = new ProjectRoleTable(DB::get(), $this->getProject());
+    $perms = new ProjectRolePermTable(DB::get(), $this->getProject());
+    $ordering_limit = $roles->findMaxOrdering();
     
-    foreach($perms->listRoles() as $role){
+    foreach($roles->listRoles() as $role){
       $role_id = $role->getId();
       $role_id_str = (string)$role_id;
       
@@ -123,14 +125,14 @@ class SettingsRolesModel extends AbstractSettingsModel{
     
     try{
       $validator->validate();
-      $perms = new ProjectPermTable(DB::get(), $this->getProject());
+      $roles = new ProjectRoleTable(DB::get(), $this->getProject());
       
-      if ($perms->getRoleIdByTitle($title) !== null){
+      if ($roles->getRoleIdByTitle($title) !== null){
         $form->invalidateField('Title', 'A role with this title already exists.');
         return false;
       }
       
-      $perms->addRole($title, []);
+      $roles->addRole($title);
       return true;
     }catch(ValidationException $e){
       $form->invalidateFields($e->getFields());
@@ -149,14 +151,14 @@ class SettingsRolesModel extends AbstractSettingsModel{
       return false;
     }
     
-    $perms = new ProjectPermTable(DB::get(), $this->getProject());
+    $roles = new ProjectRoleTable(DB::get(), $this->getProject());
     
     if ($button === self::ACTION_MOVE_UP){
-      $perms->moveRoleUp($role);
+      $roles->moveRoleUp($role);
       return true;
     }
     elseif ($button === self::ACTION_MOVE_DOWN){
-      $perms->moveRoleDown($role);
+      $roles->moveRoleDown($role);
       return true;
     }
     
@@ -170,8 +172,8 @@ class SettingsRolesModel extends AbstractSettingsModel{
       return false;
     }
     
-    $perms = new ProjectPermTable(DB::get(), $this->getProject());
-    $perms->deleteById($role);
+    $roles = new ProjectRoleTable(DB::get(), $this->getProject());
+    $roles->deleteById($role);
     return true;
   }
 }
