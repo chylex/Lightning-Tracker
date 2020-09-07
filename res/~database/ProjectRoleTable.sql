@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `project_roles` (
 	`project_id` INT NOT NULL,
-	`role_id`    INT NOT NULL,
+	`role_id`    SMALLINT NOT NULL,
 	`title`      VARCHAR(32) NOT NULL,
-	`ordering`   MEDIUMINT NOT NULL,
+	`ordering`   SMALLINT NOT NULL,
 	`special`    BOOL NOT NULL DEFAULT FALSE,
 	PRIMARY KEY (`project_id`, `role_id`),
 	UNIQUE KEY (`project_id`, `title`),

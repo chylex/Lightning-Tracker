@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `project_role_permissions` (
 	`project_id` INT NOT NULL,
-	`role_id`    INT NOT NULL,
+	`role_id`    SMALLINT NOT NULL,
 	`permission` ENUM (
 		'settings',
 		'members.list',

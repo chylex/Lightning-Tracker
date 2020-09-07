@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `project_members` (
 	`project_id` INT NOT NULL,
 	`user_id`    CHAR(9) NOT NULL,
-	`role_id`    INT NULL,
+	`role_id`    SMALLINT NULL,
 	PRIMARY KEY (`project_id`, `user_id`),
 	CONSTRAINT fk__project_member__project FOREIGN KEY (`project_id`)
 		REFERENCES `projects` (`id`)
