@@ -8,6 +8,7 @@ use Database\Tables\SystemRolePermTable;
 use Database\Tables\SystemRoleTable;
 use Database\Validation\RoleFields;
 use Exception;
+use Pages\Components\CompositeComponent;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
@@ -18,7 +19,11 @@ use Validation\ValidationException;
 
 class SettingsRolesModel extends AbstractSettingsModel{
   public const ACTION_CREATE = 'Create';
+  public const ACTION_MOVE = 'Move';
   public const ACTION_DELETE = 'Delete';
+  
+  private const ACTION_MOVE_UP = 'Up';
+  private const ACTION_MOVE_DOWN = 'Down';
   
   public const PERM_NAMES = [
       SystemPermissions::MANAGE_SETTINGS       => 'Manage Settings',
@@ -53,6 +58,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
     
     $roles = new SystemRoleTable(DB::get());
     $perms = new SystemRolePermTable(DB::get());
+    $ordering_limit = $roles->findMaxOrdering();
     
     foreach($roles->listRoles() as $role){
       $role_id = $role->getId();
@@ -67,11 +73,28 @@ class SettingsRolesModel extends AbstractSettingsModel{
         $row[] = '';
       }
       else{
+        $form_move = new FormComponent(self::ACTION_MOVE);
+        $form_move->addHidden('Ordering', (string)$role->getOrdering());
+        
+        $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
+        $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
+        
+        $ordering = $role->getOrdering();
+        
+        if ($ordering === 0 || $ordering === 1){
+          $btn_move_up->disabled();
+        }
+        
+        if ($ordering === 0 || $ordering === $ordering_limit){
+          $btn_move_down->disabled();
+        }
+        
         $form_delete = new FormComponent(self::ACTION_DELETE);
         $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
         $form_delete->addHidden('Role', $role_id_str);
         $form_delete->addIconButton('submit', 'circle-cross')->color('red');
-        $row[] = $form_delete;
+        
+        $row[] = new CompositeComponent($form_move, $form_delete);
       }
       
       $row = $table->addRow($row);
@@ -121,6 +144,28 @@ class SettingsRolesModel extends AbstractSettingsModel{
       $form->invalidateFields($e->getFields());
     }catch(Exception $e){
       $form->onGeneralError($e);
+    }
+    
+    return false;
+  }
+  
+  public function moveRole(array $data): bool{
+    $button = $data[FormComponent::BUTTON_KEY] ?? null;
+    $ordering = get_int($data, 'Ordering');
+    
+    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $ordering === null){
+      return false;
+    }
+    
+    $roles = new SystemRoleTable(DB::get());
+    
+    if ($button === self::ACTION_MOVE_UP){
+      $roles->swapRolesIfNotSpecial($ordering, $ordering - 1);
+      return true;
+    }
+    elseif ($button === self::ACTION_MOVE_DOWN){
+      $roles->swapRolesIfNotSpecial($ordering, $ordering + 1);
+      return true;
     }
     
     return false;

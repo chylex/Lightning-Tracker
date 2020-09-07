@@ -19,21 +19,26 @@ class UserDeleteModel extends BasicRootPageModel{
   
   private UserId $user_id;
   private ?UserInfo $user;
+  private bool $can_delete = false;
   
   private FormComponent $delete_form;
   
-  public function __construct(Request $req, UserId $user_id){
+  public function __construct(Request $req, UserId $user_id, UserId $logon_user_id){
     parent::__construct($req);
     $this->user_id = $user_id;
     $this->user = (new UserTable(DB::get()))->getUserInfo($user_id);
+    
+    if ($this->user !== null){
+      $this->can_delete = UserEditModel::canEditUser($logon_user_id, $this->user);
+    }
+  }
+  
+  public function canDelete(): bool{
+    return $this->can_delete;
   }
   
   public function getUser(): ?UserInfo{
     return $this->user;
-  }
-  
-  public function canDelete(): bool{
-    return $this->user === null || !$this->user->isAdmin(); // null allows page to be shown instead of error message
   }
   
   /**

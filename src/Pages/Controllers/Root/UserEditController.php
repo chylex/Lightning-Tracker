@@ -16,6 +16,7 @@ use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
 use Session\Session;
+use function Pages\Actions\message;
 use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
@@ -30,10 +31,16 @@ class UserEditController extends AbstractHandlerController{
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new UserEditModel($req, $sess->getPermissions()->system(), UserId::fromFormatted($this->user_id));
+    $model = new UserEditModel($req, $sess->getPermissions()->system(), UserId::fromFormatted($this->user_id), $sess->getLogonUserIdOrThrow());
     
-    if ($req->getAction() === $model::ACTION_CONFIRM && $model->editUser($req->getData())){
-      return redirect(Link::fromBase($req, 'users'));
+    if ($model->getUser() !== null){
+      if (!$model->canEdit()){
+        return message($req, 'Permission Error', 'You are not allowed to edit this user.');
+      }
+      
+      if ($req->getAction() === $model::ACTION_CONFIRM && $model->editUser($req->getData())){
+        return redirect(Link::fromBase($req, 'users'));
+      }
     }
     
     return view(new UserEditPage($model->load()));

@@ -22,17 +22,32 @@ use Validation\ValidationException;
 class UserEditModel extends BasicRootPageModel{
   public const ACTION_CONFIRM = 'Confirm';
   
+  public static function canEditUser(UserId $editor_id, UserInfo $target): bool{
+    return (
+        !$target->getId()->equals($editor_id) &&
+        !$target->isAdmin() &&
+        ($target->getRoleId() === null || (new SystemRoleTable(DB::get()))->isRoleAssignableBy($target->getRoleId(), $editor_id))
+    );
+  }
+  
   private SystemPermissions $perms;
   private UserId $user_id;
   private ?UserInfo $user;
+  private UserId $logon_user_id;
+  private bool $can_edit = false;
   
   private FormComponent $edit_form;
   
-  public function __construct(Request $req, SystemPermissions $perms, UserId $user_id){
+  public function __construct(Request $req, SystemPermissions $perms, UserId $user_id, UserId $logon_user_id){
     parent::__construct($req);
     $this->perms = $perms;
     $this->user_id = $user_id;
     $this->user = (new UserTable(DB::get()))->getUserInfo($user_id);
+    $this->logon_user_id = $logon_user_id;
+    
+    if ($this->user !== null){
+      $this->can_edit = self::canEditUser($logon_user_id, $this->user);
+    }
   }
   
   public function load(): IModel{
@@ -51,6 +66,10 @@ class UserEditModel extends BasicRootPageModel{
     }
     
     return $this;
+  }
+  
+  public function canEdit(): bool{
+    return $this->can_edit;
   }
   
   public function getUser(): ?UserInfo{
@@ -96,7 +115,7 @@ class UserEditModel extends BasicRootPageModel{
                         ->addOption('', '(None)')
                         ->dropdown();
     
-    foreach((new SystemRoleTable(DB::get()))->listRoles() as $role){
+    foreach((new SystemRoleTable(DB::get()))->listRolesAssignableBy($this->logon_user_id) as $role){
       $select_role->addOption((string)$role->getId(), $role->getTitle());
     }
     

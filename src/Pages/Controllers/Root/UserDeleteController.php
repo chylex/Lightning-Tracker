@@ -31,14 +31,16 @@ class UserDeleteController extends AbstractHandlerController{
   }
   
   protected function finally(Request $req, Session $sess): IAction{
-    $model = new UserDeleteModel($req, UserId::fromFormatted($this->user_id));
+    $model = new UserDeleteModel($req, UserId::fromFormatted($this->user_id), $sess->getLogonUserIdOrThrow());
     
-    if (!$model->canDelete()){
-      return message($req, 'Permission Error', 'You are not allowed to delete this user.');
-    }
-    
-    if ($req->getAction() === $model::ACTION_CONFIRM && $model->deleteUser($req->getData())){
-      return redirect(Link::fromBase($req, 'users'));
+    if ($model->getUser() !== null){
+      if (!$model->canDelete()){
+        return message($req, 'Permission Error', 'You are not allowed to delete this user.');
+      }
+      
+      if ($req->getAction() === $model::ACTION_CONFIRM && $model->deleteUser($req->getData())){
+        return redirect(Link::fromBase($req, 'users'));
+      }
     }
     
     return view(new UserDeletePage($model->load()));

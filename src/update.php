@@ -6,11 +6,15 @@ use Logging\Log;
 use Update\AbstractMigrationProcess;
 use Update\MigrationManager;
 use Update\Migrations\Migration6;
+use Update\Migrations\Migration7;
 
 function get_migration(int $id): ?AbstractMigrationProcess{
   switch($id){
     case 6:
       return new Migration6();
+    
+    case 7:
+      return new Migration7();
     
     default:
       return null;

@@ -30,9 +30,24 @@ class UsersModel extends BasicRootPageModel{
   
   private FormComponent $create_form;
   
+  /**
+   * @var string[]
+   */
+  private array $editable_roles = [];
+  
   public function __construct(Request $req, SystemPermissions $perms){
     parent::__construct($req);
     $this->perms = $perms;
+    
+    if ($perms->check(SystemPermissions::MANAGE_USERS)){
+      $logon_user_id = Session::get()->getLogonUserId();
+      
+      if ($logon_user_id !== null){
+        foreach((new SystemRoleTable(DB::get()))->listRolesAssignableBy($logon_user_id) as $role){
+          $this->editable_roles[$role->getId()] = $role->getTitle();
+        }
+      }
+    }
   }
   
   public function createUserTable(): TableComponent{
@@ -81,21 +96,28 @@ class UsersModel extends BasicRootPageModel{
       $row[] = $user->getRoleTitleSafe() ?? Text::missing('Default');
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
+      $can_edit = (
+          $this->perms->check(SystemPermissions::MANAGE_USERS) &&
+          !$user_id->equals($logon_user_id) &&
+          !$user->isAdmin() &&
+          ($user->getRoleId() === null || array_key_exists($user->getRoleId(), $this->editable_roles))
+      );
+      
       if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
-        if ($user_id->equals($logon_user_id) || $user->isAdmin()){
-          $row[] = '';
-        }
-        else{
+        if ($can_edit){
           $link_delete = Link::fromBase($req, 'users', $user_id_formatted, 'delete');
           $btn_delete = new IconButtonFormComponent($link_delete, 'circle-cross');
           $btn_delete->color('red');
           $row[] = $btn_delete;
         }
+        else{
+          $row[] = '';
+        }
       }
       
       $row = $table->addRow($row);
       
-      if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
+      if ($can_edit){
         $row->link(Link::fromBase($req, 'users', $user_id_formatted));
       }
     }

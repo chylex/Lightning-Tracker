@@ -27,6 +27,7 @@ class SettingsRolesController extends AbstractHandlerController{
     $model = new SettingsRolesModel($req);
     
     if (($action === $model::ACTION_CREATE && $model->createRole($req->getData())) ||
+        ($action === $model::ACTION_MOVE && $model->moveRole($req->getData())) ||
         ($action === $model::ACTION_DELETE && $model->deleteRole($req->getData()))
     ){
       return reload();

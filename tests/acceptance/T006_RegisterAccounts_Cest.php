@@ -65,8 +65,8 @@ class T006_RegisterAccounts_Cest{
   public function setupRoles(): void{
     $db = Acceptance::getDB();
     
-    $db->exec('INSERT INTO system_roles (id, title, special) VALUES (1, \'User\', FALSE)');
-    $db->exec('INSERT INTO system_roles (id, title, special) VALUES (2, \'Moderator\', FALSE)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (1, \'User\', 2, FALSE)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (2, \'Moderator\', 1, FALSE)');
     
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (1, \'projects.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (1, \'projects.create\')');
