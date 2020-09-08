@@ -1,5 +1,10 @@
-form .field-group {
+.field-group {
   margin-bottom: 12px;
+}
+
+.field-group.flex {
+  display: flex;
+  align-items: start;
 }
 
 form .message {
@@ -190,7 +195,7 @@ details.multiselect > article .icon {
 
 details.multiselect > article .issue-tag {
   opacity: 0.3;
-  margin-left: -20px;
+  margin-left: -17px;
 }
 
 details.multiselect > article .issue-tag:before {
@@ -208,6 +213,10 @@ label:empty {
   display: none;
 }
 
+input[type=checkbox] {
+  margin: 3px 4px 8px 4px;
+}
+
 input[type=checkbox]:not(:disabled),
 label:not(.disabled) {
   cursor: pointer;
@@ -218,9 +227,10 @@ div.checkbox-multiline-label > label {
   font-size: 15px;
   font-weight: normal;
   vertical-align: 5%;
+  margin-top: 1px;
   /* extends clickable label area to cover space between it and the checkbox */
-  margin-left: -7px;
-  padding-left: 7px;
+  margin-left: -17px;
+  padding-left: 17px;
 }
 
 div.checkbox-multiline {

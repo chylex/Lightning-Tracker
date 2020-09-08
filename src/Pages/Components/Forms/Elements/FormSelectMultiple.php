@@ -74,8 +74,7 @@ HTML;
       
       echo <<<HTML
     <div class="field-group">
-      <input id="$option_id" name="$name_as_array" type="checkbox" value="$value_safe" $checked_attr$disabled_attr>
-      <label for="$option_id" $disabled_class>
+      <input id="$option_id" name="$name_as_array" type="checkbox" value="$value_safe" $checked_attr$disabled_attr><label for="$option_id" $disabled_class>
 HTML;
       
       $option_label->echoBody();

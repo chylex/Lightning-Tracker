@@ -52,7 +52,7 @@ class FormCheckBox extends AbstractFormField{
     $disabled_attr = $this->disabled === false ? '' : ' disabled';
     
     echo <<<HTML
-<div class="field-group">
+<div class="field-group flex">
   <input id="$id" name="$name" type="checkbox" value="$checked_value" $checked_attr$disabled_attr>
 HTML;
     
