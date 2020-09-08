@@ -201,6 +201,12 @@ final class FormComponent implements IViewable{
     }
   }
   
+  public function disableAllFields(): void{
+    foreach($this->fields as $field){
+      $field->disable();
+    }
+  }
+  
   /**
    * Refills form fields using the provided data, given that the form ID matches.
    *
