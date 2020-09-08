@@ -20,7 +20,7 @@ form .message.error {
   color: #8c1b1b;
 }
 
-input, select {
+input, select, textarea {
   display: inline-block;
   margin-bottom: 8px;
   color: #000000;

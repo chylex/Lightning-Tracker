@@ -211,17 +211,18 @@ details.filtering > article > div {
 details.filtering > article > div.buttons {
   flex: 0 0 auto;
   align-self: flex-end;
-  margin: 15px 8px 0;
+  margin: 15px 8px -2px;
 }
 
 details.filtering > article > div.buttons button.styled {
   margin: 0 3px 0 0;
-  padding: 3px 7px 4px 8px;
+  padding: 4px 7px 4px 8px;
   font-size: 16px;
 }
 
 details.filtering > article > div.buttons button.styled .icon {
   margin: 0;
+  vertical-align: -10%;
 }
 
 details.filtering > article label {
