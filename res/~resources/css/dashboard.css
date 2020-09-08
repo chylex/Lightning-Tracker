@@ -1,0 +1,31 @@
+.dashboard-panels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-right: -24px;
+}
+
+.dashboard-panel {
+  margin: 0 24px 36px 0;
+  overflow: hidden;
+}
+
+.dashboard-panel > article {
+  margin-bottom: 0 !important;
+}
+
+.dashboard-panel-1x {
+  flex: 0 1 440px;
+  max-width: 440px;
+}
+
+.dashboard-panel-2x {
+  flex: 0 1 904px;
+  max-width: 904px;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-panel {
+    flex: 1 1 100%;
+  }
+}
