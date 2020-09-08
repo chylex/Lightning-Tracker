@@ -47,7 +47,7 @@ class BasicProjectPageModel extends AbstractPageModel{
       $nav->addLeft(Text::withIcon('Members', 'users'), '/members');
     }
     
-    if ($perms->check(ProjectPermissions::MANAGE_SETTINGS)){
+    if ($perms->check(ProjectPermissions::VIEW_SETTINGS)){
       $nav->addLeft(Text::withIcon('Settings', 'wrench'), '/settings');
     }
   }

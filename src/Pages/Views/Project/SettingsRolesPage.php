@@ -36,7 +36,7 @@ class SettingsRolesPage extends AbstractSettingsPage{
     $split->setRightWidthLimits(250, 500);
     
     $split->addLeft($this->model->createRoleTable());
-    $split->addRight(TitledSectionComponent::wrap('Create Role', $this->model->getCreateForm()));
+    $split->addRightIfNotNull(TitledSectionComponent::wrap('Create Role', $this->model->getCreateForm()));
     
     return $split;
   }

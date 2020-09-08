@@ -4,19 +4,29 @@ declare(strict_types = 1);
 namespace Pages\Models\Project;
 
 use Database\DB;
+use Database\Objects\ProjectInfo;
 use Database\Tables\ProjectTable;
 use Database\Validation\ProjectFields;
 use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Text;
 use Pages\IModel;
+use Routing\Request;
+use Session\Permissions\ProjectPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
 class SettingsDescriptionModel extends AbstractSettingsModel{
   public const ACTION_UPDATE = 'Update';
   
+  private ProjectPermissions $perms;
+  
   private FormComponent $settings_form;
+  
+  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms){
+    parent::__construct($req, $project);
+    $this->perms = $perms;
+  }
   
   public function load(): IModel{
     parent::load();
@@ -37,7 +47,13 @@ class SettingsDescriptionModel extends AbstractSettingsModel{
     
     $form = new FormComponent(self::ACTION_UPDATE);
     $form->addLightMarkEditor('Description')->label('');
-    $form->addButton('submit', 'Update Description')->icon('pencil');
+    
+    if ($this->perms->check(ProjectPermissions::MANAGE_SETTINGS_DESCRIPTION)){
+      $form->addButton('submit', 'Update Description')->icon('pencil');
+    }
+    else{
+      $form->disableAllFields();
+    }
     
     return $this->settings_form = $form;
   }

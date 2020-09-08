@@ -73,8 +73,21 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
     $form->addTextField('Title')->type('text');
     $form->startCheckBoxHierarchy('Permissions');
     
-    self::addPerm($form, ProjectPermissions::MANAGE_SETTINGS)
-        ->description('Full control over the project Settings, including editing all roles.');
+    self::addPerm($form, ProjectPermissions::VIEW_SETTINGS)
+        ->description('View project settings.')
+        ->parent();
+    
+    self::addPerm($form, ProjectPermissions::MANAGE_SETTINGS_GENERAL)
+        ->description('Edit project name and visibility.')
+        ->nonLastChild();
+    
+    self::addPerm($form, ProjectPermissions::MANAGE_SETTINGS_DESCRIPTION)
+        ->description('Edit project description.')
+        ->nonLastChild();
+    
+    self::addPerm($form, ProjectPermissions::MANAGE_SETTINGS_ROLES)
+        ->description('Edit roles. Note this allows a member to edit all roles, including their own role and roles above theirs!') // TODO figure out a better system
+        ->lastChild();
     
     self::addPerm($form, ProjectPermissions::LIST_MEMBERS)
         ->description('View all members of the project and their roles. Assign issues to members.')

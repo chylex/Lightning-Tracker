@@ -6,7 +6,10 @@ namespace Session\Permissions;
 use Session\AbstractPermissionList;
 
 final class ProjectPermissions extends AbstractPermissionList{
-  public const MANAGE_SETTINGS = 'settings';
+  public const VIEW_SETTINGS = 'settings.view';
+  public const MANAGE_SETTINGS_GENERAL = 'settings.manage.general';
+  public const MANAGE_SETTINGS_DESCRIPTION = 'settings.manage.description';
+  public const MANAGE_SETTINGS_ROLES = 'settings.manage.roles';
   
   public const LIST_MEMBERS = 'members.list';
   public const MANAGE_MEMBERS = 'members.manage';

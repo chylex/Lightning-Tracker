@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Project;
 
 use Database\DB;
+use Database\Objects\ProjectInfo;
 use Database\Tables\ProjectRolePermTable;
 use Database\Tables\ProjectRoleTable;
 use Database\Validation\RoleFields;
@@ -13,6 +14,7 @@ use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Routing\Link;
+use Routing\Request;
 use Session\Permissions\ProjectPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
@@ -26,21 +28,34 @@ class SettingsRolesModel extends AbstractSettingsModel{
   private const ACTION_MOVE_DOWN = 'Down';
   
   public const PERM_NAMES = [
-      ProjectPermissions::MANAGE_SETTINGS         => 'Manage Settings',
-      ProjectPermissions::LIST_MEMBERS            => 'View Members',
-      ProjectPermissions::MANAGE_MEMBERS          => 'Manage Members',
-      ProjectPermissions::MANAGE_MILESTONES       => 'Manage Milestones',
-      ProjectPermissions::CREATE_ISSUE            => 'Create Issues',
-      ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS => 'Modify All Issue Fields',
-      ProjectPermissions::EDIT_ALL_ISSUES         => 'Edit All Issues',
-      ProjectPermissions::DELETE_ALL_ISSUES       => 'Delete All Issues'
+      ProjectPermissions::VIEW_SETTINGS               => 'View Settings',
+      ProjectPermissions::MANAGE_SETTINGS_GENERAL     => 'Manage General Settings',
+      ProjectPermissions::MANAGE_SETTINGS_DESCRIPTION => 'Manage Description',
+      ProjectPermissions::MANAGE_SETTINGS_ROLES       => 'Manage Roles',
+      ProjectPermissions::LIST_MEMBERS                => 'View Members',
+      ProjectPermissions::MANAGE_MEMBERS              => 'Manage Members',
+      ProjectPermissions::MANAGE_MILESTONES           => 'Manage Milestones',
+      ProjectPermissions::CREATE_ISSUE                => 'Create Issues',
+      ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS     => 'Modify All Issue Fields',
+      ProjectPermissions::EDIT_ALL_ISSUES             => 'Edit All Issues',
+      ProjectPermissions::DELETE_ALL_ISSUES           => 'Delete All Issues'
   ];
   
   public const PERM_DEPENDENCIES = [
-      ProjectPermissions::MANAGE_MEMBERS => ProjectPermissions::LIST_MEMBERS
+      ProjectPermissions::MANAGE_SETTINGS_GENERAL     => ProjectPermissions::VIEW_SETTINGS,
+      ProjectPermissions::MANAGE_SETTINGS_DESCRIPTION => ProjectPermissions::VIEW_SETTINGS,
+      ProjectPermissions::MANAGE_SETTINGS_ROLES       => ProjectPermissions::VIEW_SETTINGS,
+      ProjectPermissions::MANAGE_MEMBERS              => ProjectPermissions::LIST_MEMBERS
   ];
   
+  private ProjectPermissions $perms;
+  
   private FormComponent $create_form;
+  
+  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms){
+    parent::__construct($req, $project);
+    $this->perms = $perms;
+  }
   
   public function createRoleTable(): TableComponent{
     $table = new TableComponent();
@@ -48,7 +63,10 @@ class SettingsRolesModel extends AbstractSettingsModel{
     
     $table->addColumn('Title')->width(20)->bold();
     $table->addColumn('Permissions')->width(80)->wrap();
-    $table->addColumn('Actions')->tight()->right();
+    
+    if ($this->perms->check(ProjectPermissions::MANAGE_SETTINGS_ROLES)){
+      $table->addColumn('Actions')->tight()->right();
+    }
     
     $roles = new ProjectRoleTable(DB::get(), $this->getProject());
     $perms = new ProjectRolePermTable(DB::get(), $this->getProject());
@@ -63,37 +81,41 @@ class SettingsRolesModel extends AbstractSettingsModel{
       
       $row = [$role->getTitleSafe(), $perm_list_str];
       
-      if ($role->isSpecial()){
-        $row[] = '';
-      }
-      else{
-        $form_move = new FormComponent(self::ACTION_MOVE);
-        $form_move->addHidden('Ordering', (string)$role->getOrdering());
-        
-        $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
-        $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
-        
-        $ordering = $role->getOrdering();
-        
-        if ($ordering === 0 || $ordering === 1){
-          $btn_move_up->disabled();
+      $can_edit = $this->perms->check(ProjectPermissions::MANAGE_SETTINGS_ROLES) && !$role->isSpecial();
+      
+      if ($this->perms->check(ProjectPermissions::MANAGE_SETTINGS_ROLES)){
+        if ($can_edit){
+          $form_move = new FormComponent(self::ACTION_MOVE);
+          $form_move->addHidden('Ordering', (string)$role->getOrdering());
+          
+          $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
+          $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
+          
+          $ordering = $role->getOrdering();
+          
+          if ($ordering === 0 || $ordering === 1){
+            $btn_move_up->disabled();
+          }
+          
+          if ($ordering === 0 || $ordering === $ordering_limit){
+            $btn_move_down->disabled();
+          }
+          
+          $form_delete = new FormComponent(self::ACTION_DELETE);
+          $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
+          $form_delete->addHidden('Role', $role_id_str);
+          $form_delete->addIconButton('submit', 'circle-cross')->color('red');
+          
+          $row[] = new CompositeComponent($form_move, $form_delete);
         }
-        
-        if ($ordering === 0 || $ordering === $ordering_limit){
-          $btn_move_down->disabled();
+        else{
+          $row[] = '';
         }
-        
-        $form_delete = new FormComponent(self::ACTION_DELETE);
-        $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
-        $form_delete->addHidden('Role', $role_id_str);
-        $form_delete->addIconButton('submit', 'circle-cross')->color('red');
-        
-        $row[] = new CompositeComponent($form_move, $form_delete);
       }
       
       $row = $table->addRow($row);
       
-      if (!$role->isSpecial()){
+      if ($can_edit){
         $row->link(Link::fromBase($this->getReq(), 'settings', 'roles', $role_id_str));
       }
     }
@@ -101,7 +123,11 @@ class SettingsRolesModel extends AbstractSettingsModel{
     return $table;
   }
   
-  public function getCreateForm(): FormComponent{
+  public function getCreateForm(): ?FormComponent{
+    if (!$this->perms->check(ProjectPermissions::MANAGE_SETTINGS_ROLES)){
+      return null;
+    }
+    
     if (isset($this->create_form)){
       return $this->create_form;
     }
@@ -116,7 +142,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
   public function createRole(array $data): bool{
     $form = $this->getCreateForm();
     
-    if (!$form->accept($data)){
+    if ($form === null || !$form->accept($data)){
       return false;
     }
     

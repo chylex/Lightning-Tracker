@@ -19,13 +19,14 @@ use function Pages\Actions\view;
 class SettingsDescriptionController extends AbstractProjectController{
   protected function projectPrerequisites(ProjectInfo $project): Generator{
     yield new RequireLoginState(true);
-    yield new RequireProjectPermission($project, ProjectPermissions::MANAGE_SETTINGS);
+    yield new RequireProjectPermission($project, ProjectPermissions::VIEW_SETTINGS);
   }
   
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
-    $model = new SettingsDescriptionModel($req, $project);
+    $perms = $sess->getPermissions()->project($project);
+    $model = new SettingsDescriptionModel($req, $project, $perms);
     
-    if ($req->getAction() === $model::ACTION_UPDATE && $model->updateDescription($req->getData())){
+    if ($req->getAction() === $model::ACTION_UPDATE && $perms->require(ProjectPermissions::MANAGE_SETTINGS_DESCRIPTION) && $model->updateDescription($req->getData())){
       return $model->getEditDescriptionForm()->reload($req);
     }
     

@@ -24,7 +24,8 @@ class SettingsRoleEditController extends AbstractProjectController{
   
   protected function projectPrerequisites(ProjectInfo $project): Generator{
     yield new RequireLoginState(true);
-    yield new RequireProjectPermission($project, ProjectPermissions::MANAGE_SETTINGS);
+    yield new RequireProjectPermission($project, ProjectPermissions::VIEW_SETTINGS);
+    yield new RequireProjectPermission($project, ProjectPermissions::MANAGE_SETTINGS_ROLES);
     yield new LoadNumericId($this->role_id, 'role', $project);
   }
   

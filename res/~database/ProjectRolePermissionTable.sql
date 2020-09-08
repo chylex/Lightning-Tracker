@@ -2,7 +2,10 @@ CREATE TABLE IF NOT EXISTS `project_role_permissions` (
 	`project_id` INT NOT NULL,
 	`role_id`    SMALLINT NOT NULL,
 	`permission` ENUM (
-		'settings',
+		'settings.view',
+		'settings.manage.general',
+		'settings.manage.description',
+		'settings.manage.roles',
 		'members.list',
 		'members.manage',
 		'milestones.manage',

@@ -136,7 +136,7 @@ SQL;
                              'I', [$id]);
       
       $ordering = $this->fetchOneInt($stmt);
-  
+      
       if ($ordering === null){
         $this->db->rollBack();
         return;

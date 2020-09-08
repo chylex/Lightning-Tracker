@@ -55,11 +55,14 @@ final class ProjectTable extends AbstractTable{
       
       $perms_moderator = array_merge($perms_developer, [
           ProjectPermissions::DELETE_ALL_ISSUES,
-          ProjectPermissions::MANAGE_MEMBERS
+          ProjectPermissions::MANAGE_MEMBERS,
+          ProjectPermissions::VIEW_SETTINGS
       ]);
       
       $perms_admin = array_merge($perms_moderator, [
-          ProjectPermissions::MANAGE_SETTINGS
+          ProjectPermissions::MANAGE_SETTINGS_GENERAL,
+          ProjectPermissions::MANAGE_SETTINGS_DESCRIPTION,
+          ProjectPermissions::MANAGE_SETTINGS_ROLES,
       ]);
       
       $owner_role_id = $roles->addRole('Owner', true);
