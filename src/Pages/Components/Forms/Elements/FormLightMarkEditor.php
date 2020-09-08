@@ -36,36 +36,39 @@ final class FormLightMarkEditor extends AbstractFormField{
     
     echo '<div data-markdown-editor-controls>';
     
-    self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-1', '<span class="text-heading">H</span><sub>1</sub>');
-    self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-2', '<span class="text-heading">H</span><sub>2</sub>');
-    self::editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-3', '<span class="text-heading">H</span><sub>3</sub>');
+    $this->editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-1', '<span class="text-heading">H</span><sub>1</sub>');
+    $this->editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-2', '<span class="text-heading">H</span><sub>2</sub>');
+    $this->editorButtonHtml(self::CONTROL_WHOLELINE_TOGGLE, 'heading-3', '<span class="text-heading">H</span><sub>3</sub>');
     
     echo '<div class="separator"></div>';
     
-    self::editorButtonIcon(self::CONTROL_WHOLELINE_TOGGLE, 'task-unchecked', 'checkbox-unchecked');
-    self::editorButtonIcon(self::CONTROL_WHOLELINE_TOGGLE, 'task-checked', 'checkbox-checked');
+    $this->editorButtonIcon(self::CONTROL_WHOLELINE_TOGGLE, 'task-unchecked', 'checkbox-unchecked');
+    $this->editorButtonIcon(self::CONTROL_WHOLELINE_TOGGLE, 'task-checked', 'checkbox-checked');
     
     echo '</div>';
-    
     echo '<textarea id="'.$id.'" name="'.$name.'" data-markdown-editor'.$disabled_attr.'>'.$value.'</textarea>';
     
     $this->echoErrors();
     echo '</div>';
   }
   
-  private static function editorButtonIcon(string $attr_name, string $attr_value, string $icon = null): void{
+  private function editorButtonIcon(string $attr_name, string $attr_value, string $icon = null): void{
     $icon ??= $attr_value;
     
+    $disabled_attr = $this->disabled === false ? '' : ' disabled';
+    
     echo <<<HTML
-<button type="button" data-editor-action-type="$attr_name" data-editor-action-value="$attr_value">
+<button type="button" data-editor-action-type="$attr_name" data-editor-action-value="$attr_value" $disabled_attr>
   <span class="icon icon-$icon"></span>
 </button>
 HTML;
   }
   
-  private static function editorButtonHtml(string $attr_name, string $attr_value, string $html): void{
+  private function editorButtonHtml(string $attr_name, string $attr_value, string $html): void{
+    $disabled_attr = $this->disabled === false ? '' : ' disabled';
+    
     echo <<<HTML
-<button type="button" data-editor-action-type="$attr_name" data-editor-action-value="$attr_value">
+<button type="button" data-editor-action-type="$attr_name" data-editor-action-value="$attr_value" $disabled_attr>
   $html
 </button>
 HTML;
