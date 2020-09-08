@@ -204,6 +204,10 @@ label {
   font-weight: bold;
 }
 
+label:empty {
+  display: none;
+}
+
 input[type=checkbox]:not(:disabled),
 label:not(.disabled) {
   cursor: pointer;
