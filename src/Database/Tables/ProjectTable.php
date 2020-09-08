@@ -27,7 +27,7 @@ final class ProjectTable extends AbstractTable{
     $this->db->beginTransaction();
     
     try{
-      $this->execute('INSERT INTO projects (name, url, hidden, owner_id) VALUES (?, ?, ?, ?)',
+      $this->execute('INSERT INTO projects (name, url, description, hidden, owner_id) VALUES (?, ?, \'\', ?, ?)',
                      'SSBS', [$name, $url, $hidden, $owner->getId()]);
       
       $id = $this->getLastInsertId();
@@ -137,6 +137,18 @@ final class ProjectTable extends AbstractTable{
     $visible = (bool)$res['visible'] || $perms->check(SystemPermissions::LIST_ALL_PROJECTS);
     
     return new ProjectVisibilityInfo($project, $visible);
+  }
+  
+  public function setDescription(int $id, string $description): void{
+    $this->execute('UPDATE projects SET description = ? WHERE id = ?',
+                   'SI', [$description, $id]);
+  }
+  
+  public function getDescription(int $id): ?string{
+    $stmt = $this->execute('SELECT description FROM projects WHERE id = ?',
+                           'I', [$id]);
+    
+    return $this->fetchOneColumn($stmt);
   }
   
   public function checkUrlExists(string $url): bool{

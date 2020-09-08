@@ -126,6 +126,7 @@ $router->add('project/:project/&/members', 'Project/MembersController');
 $router->add('project/:project/&/members/:id', 'Project/MemberEditController');
 $router->add('project/:project/&/members/:id/remove', 'Project/MemberRemoveController');
 $router->add('project/:project/&/settings', 'Project/SettingsGeneralController');
+$router->add('project/:project/&/settings/description', 'Project/SettingsDescriptionController');
 $router->add('project/:project/&/settings/roles', 'Project/SettingsRolesController');
 $router->add('project/:project/&/settings/roles/:id', 'Project/SettingsRoleEditController');
 $router->add('project/:project/&/delete', 'Root/ProjectDeleteController');

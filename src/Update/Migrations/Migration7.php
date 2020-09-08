@@ -22,6 +22,8 @@ final class Migration7 extends AbstractMigrationProcess{
         
         self::sql('ALTER TABLE project_members ADD CONSTRAINT fk__project_member__role FOREIGN KEY (`role_id`, `project_id`) REFERENCES `project_roles` (`role_id`, `project_id`) ON UPDATE CASCADE ON DELETE RESTRICT'),
         self::sql('ALTER TABLE project_role_permissions ADD CONSTRAINT fk__project_role_permission__role FOREIGN KEY (`role_id`, `project_id`) REFERENCES `project_roles` (`role_id`, `project_id`) ON UPDATE CASCADE ON DELETE CASCADE'),
+        
+        self::sql('ALTER TABLE projects ADD description TEXT NOT NULL AFTER url')
     ];
   }
 }

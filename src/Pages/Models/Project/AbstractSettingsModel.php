@@ -11,6 +11,7 @@ class AbstractSettingsModel extends BasicProjectPageModel{
   public function createMenuLinks(): SidemenuComponent{
     $menu = new SidemenuComponent($this->getReq());
     $menu->addLink(Text::withIcon('General', 'cog'), '/settings');
+    $menu->addLink(Text::withIcon('Description', 'pencil'), '/settings/description');
     $menu->addLink(Text::withIcon('Roles', 'gavel'), '/settings/roles');
     return $menu;
   }

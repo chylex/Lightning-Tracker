@@ -14,6 +14,10 @@ final class ProjectFields{
     return $validator->str('Url')->notEmpty()->maxLength(32)->notContains('/')->notContains('\\')->val();
   }
   
+  public static function description(FormValidator $validator): string{
+    return $validator->str('Description')->maxLength(65000)->val();
+  }
+  
   public static function hidden(FormValidator $validator): bool{
     return $validator->bool('Hidden')->val();
   }
