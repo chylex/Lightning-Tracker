@@ -54,11 +54,15 @@ class AcceptanceTester extends Actor{
     self::$tokens[$user] = $token;
   }
   
-  public function amNotLoggedIn(): void{
+  public function amNotLoggedIn(bool $reload = false): void{
     $this->resetCookie('logon');
+  
+    if ($reload && isset($this->page)){
+      $this->amOnPage($this->page);
+    }
   }
   
-  public function amLoggedIn(string $user): void{
+  public function amLoggedIn(string $user, bool $reload = false): void{
     $this->setCookie('logon', self::$tokens[$user], [
         'path'     => '/',
         'domain'   => 'localhost',
@@ -66,7 +70,7 @@ class AcceptanceTester extends Actor{
         'samesite' => 'Lax'
     ]);
     
-    if (isset($this->page)){
+    if ($reload && isset($this->page)){
       $this->amOnPage($this->page);
     }
   }
