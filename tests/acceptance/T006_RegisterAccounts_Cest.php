@@ -9,7 +9,6 @@ use Helper\Acceptance;
 class T006_RegisterAccounts_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amOnPage('/register');
-    $I->amNotLoggedIn();
   }
   
   public function _failed(AcceptanceTester $I): void{
@@ -34,6 +33,12 @@ class T006_RegisterAccounts_Cest{
     $I->seeElement('input[name="Email"] + .error');
   }
   
+  public function userAndEmailAreCaseInsensitive(AcceptanceTester $I): void{
+    $this->submit($I, 'ADMIN', '123456789', '123456789', 'Admin@Example.Com');
+    $I->seeElement('input[name="Name"] + .error');
+    $I->seeElement('input[name="Email"] + .error');
+  }
+  
   public function passwordNotLongEnough(AcceptanceTester $I): void{
     $this->submit($I, 'User', '123456', '123456', 'user@example.com');
     $I->seeElement('input[name="Password"] + .error');
@@ -44,24 +49,41 @@ class T006_RegisterAccounts_Cest{
     $I->seeElement('input[name="PasswordRepeated"] + .error');
   }
   
+  /**
+   * @depends userAlreadyExists
+   * @depends emailAlreadyExists
+   */
   public function registerModeratorWithLogin(AcceptanceTester $I): void{
     $this->submit($I, 'Moderator', '123456789', '123456789', 'moderator@example.com');
     $I->seeCurrentUrlEquals('/register?success');
     $I->saveLoginToken('Moderator');
   }
   
+  /**
+   * @depends userAlreadyExists
+   * @depends emailAlreadyExists
+   */
   public function registerUser1WithLogin(AcceptanceTester $I): void{
     $this->submit($I, 'User1', '123456789', '123456789', 'user1@example.com');
     $I->seeCurrentUrlEquals('/register?success');
     $I->saveLoginToken('User1');
   }
   
+  /**
+   * @depends userAlreadyExists
+   * @depends emailAlreadyExists
+   */
   public function registerUser2WithLogin(AcceptanceTester $I): void{
     $this->submit($I, 'User2', '987654321', '987654321', 'user2@example.com');
     $I->seeCurrentUrlEquals('/register?success');
     $I->saveLoginToken('User2');
   }
   
+  /**
+   * @depends registerModeratorWithLogin
+   * @depends registerUser1WithLogin
+   * @depends registerUser2WithLogin
+   */
   public function setupRoles(): void{
     $db = Acceptance::getDB();
     

@@ -56,7 +56,7 @@ class AcceptanceTester extends Actor{
   
   public function amNotLoggedIn(bool $reload = false): void{
     $this->resetCookie('logon');
-  
+    
     if ($reload && isset($this->page)){
       $this->amOnPage($this->page);
     }

@@ -10,6 +10,10 @@ class T003_AdminLogin_Cest{
     $I->amOnPage('/login');
   }
   
+  public function _failed(AcceptanceTester $I): void{
+    $I->terminate();
+  }
+  
   public function invalidUsername(AcceptanceTester $I): void{
     $I->fillField('Name', 'InvalidUser');
     $I->fillField('Password', '123456789');
