@@ -65,11 +65,13 @@ final class ConfigFile{
     $db_user = addcslashes($this->db_user, '\'\\');
     $db_password = addcslashes($this->db_password, '\'\\');
     
+    $debug = defined('DEBUG') ? "\ndefine('DEBUG', ".(DEBUG ? 'true' : 'false').");\n" : '';
+    
     /** @noinspection ALL */
     $contents = <<<PHP
 <?php
 declare(strict_types = 1);
-
+$debug
 define('SYS_ENABLE_REGISTRATION', $sys_enable_registration);
 define('BASE_URL', '$base_url');
 
