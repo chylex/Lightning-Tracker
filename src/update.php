@@ -7,6 +7,7 @@ use Update\AbstractMigrationProcess;
 use Update\MigrationManager;
 use Update\Migrations\Migration6;
 use Update\Migrations\Migration7;
+use Update\Migrations\Migration8;
 
 function get_migration(int $id): ?AbstractMigrationProcess{
   switch($id){
@@ -15,6 +16,9 @@ function get_migration(int $id): ?AbstractMigrationProcess{
     
     case 7:
       return new Migration7();
+    
+    case 8:
+      return new Migration8();
     
     default:
       return null;

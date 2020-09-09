@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `system_role_permissions` (
 		'projects.create',
 		'projects.manage',
 		'users.list',
-		'users.view.emails',
+		'users.see.emails',
 		'users.create',
 		'users.manage') NOT NULL,
 	PRIMARY KEY (`role_id`, `permission`),
