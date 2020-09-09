@@ -34,7 +34,7 @@ final class FormComponent implements IViewable{
   public const MESSAGE_SUCCESS = 'success';
   public const MESSAGE_ERROR = 'error';
   
-  private static $global_counter = 0;
+  private static array $global_counters = [];
   
   public static function echoHead(): void{
     if (DEBUG){
@@ -62,7 +62,10 @@ final class FormComponent implements IViewable{
   private array $fields = [];
   
   public function __construct(string $action){
-    $this->id = $action.'-'.(++self::$global_counter);
+    $counter = (self::$global_counters[$action] ?? 0) + 1;
+    self::$global_counters[$action] = $counter;
+    
+    $this->id = $action.'-'.$counter;
     $this->action = $action;
     
     $this->message_list = new FormMessageList();
