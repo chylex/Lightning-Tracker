@@ -53,7 +53,7 @@ class BasicProjectPageModel extends AbstractPageModel{
   }
   
   protected function getLoginReturnQuery(): string{
-    return LoginController::getReturnQuery($this->getReq());
+    return LoginController::generateReturnQuery($this->getReq());
   }
   
   public function getProject(): ProjectInfo{

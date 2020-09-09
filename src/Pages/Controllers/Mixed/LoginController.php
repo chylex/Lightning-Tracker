@@ -18,7 +18,7 @@ use function Pages\Actions\redirect;
 use function Pages\Actions\view;
 
 class LoginController extends AbstractHandlerController{
-  public static function getReturnQuery(Request $req, bool $force_full_path = false): string{
+  public static function generateReturnQuery(Request $req, bool $force_full_path = false): string{
     $base_path_components = [BASE_PATH, $force_full_path ? '' : $req->getBasePath()->raw()];
     $base_path = implode('/', array_filter(array_map(fn($v): string => ltrim($v, '/'), $base_path_components), fn($v): bool => !empty($v)));
     $base_path_len = mb_strlen($base_path);
@@ -39,6 +39,11 @@ class LoginController extends AbstractHandlerController{
     return empty($return) ? '' : '?return='.$return;
   }
   
+  public static function readReturnQuery(): string{
+    $return = $_GET['return'] ?? '';
+    return strpos($return, '://') === false ? ltrim($return, '/') : '';
+  }
+  
   private ?ProjectInfo $project;
   
   protected function prerequisites(): Generator{
@@ -50,9 +55,7 @@ class LoginController extends AbstractHandlerController{
     $model = new LoginModel($req, $this->project);
     
     if ($req->getAction() === $model::ACTION_LOGIN && $model->loginUser($req->getData(), $sess)){
-      $return = $_GET['return'] ?? '';
-      $return = strpos($return, '://') === false ? ltrim($return, '/') : '';
-      return redirect(Link::fromBase($req, $return));
+      return redirect(Link::fromBase($req, self::readReturnQuery()));
     }
     
     return view(new LoginPage($model->load()));

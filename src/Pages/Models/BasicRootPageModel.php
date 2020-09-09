@@ -32,7 +32,7 @@ class BasicRootPageModel extends AbstractPageModel{
   }
   
   protected function getLoginReturnQuery(): string{
-    return LoginController::getReturnQuery($this->getReq(), true);
+    return LoginController::generateReturnQuery($this->getReq(), true);
   }
 }
 

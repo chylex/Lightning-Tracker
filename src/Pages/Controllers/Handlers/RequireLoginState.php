@@ -23,10 +23,10 @@ class RequireLoginState implements IControlHandler{
     
     if ($this->should_be_logged_in !== $is_logged_on){
       if ($this->should_be_logged_in){
-        return redirect(Link::fromBase($req, 'login'.LoginController::getReturnQuery($req)));
+        return redirect(Link::fromBase($req, 'login'.LoginController::generateReturnQuery($req)));
       }
       else{
-        return redirect(Link::fromBase($req));
+        return redirect(Link::fromBase($req, LoginController::readReturnQuery()));
       }
     }
     
