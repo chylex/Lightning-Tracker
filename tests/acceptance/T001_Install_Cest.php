@@ -47,15 +47,17 @@ class T001_Install_Cest{
     ]);
   }
   
-  public function install(AcceptanceTester $I): void{
-    $this->fill($I, 'firstadmin@example.com');
+  public function install(AcceptanceTester $I, bool $skipReinstall = false): void{
+    $email = $skipReinstall ? 'admin@example.com' : 'firstadmin@example.com';
+    
+    $this->fill($I, $email);
     $I->click('button[value=""]');
     
     $I->see('Register', 'a[href="http://localhost/register"]');
     $I->dontSeeCookie('logon');
     $I->seeInDatabase('users', [
         'name'  => 'Admin',
-        'email' => 'firstadmin@example.com',
+        'email' => $email,
         'admin' => true
     ]);
   }

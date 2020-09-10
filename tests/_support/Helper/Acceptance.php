@@ -31,6 +31,17 @@ class Acceptance extends Module{
     return self::$db = DB::get();
   }
   
+  public static function isInGroup(string $group): bool{
+    $argv = $_SERVER['argv'];
+    $k = array_search('-g', $argv, true);
+    
+    if ($k === false){
+      array_search('--group', $argv, true);
+    }
+    
+    return $k !== false && $argv[$k + 1] === $group;
+  }
+  
   public function _beforeSuite($settings = []): void{
     $db = self::getDB();
     

@@ -21,24 +21,5 @@ groups:
   # You can use this group to speed up test development by temporarily adding new tests to the group,
   # and thus avoiding repeatedly running less important tests in the full suite.
   core:
-    - tests/acceptance/T001_Install_Cest.php:install
-    - tests/acceptance/T001_Install_Cest.php:reinstallReuse
-    - tests/acceptance/T001_Install_Cest.php:reinstallDelete
-    - tests/acceptance/T003_AdminLogin_Cest.php:login
-    - tests/acceptance/T006_RegisterAccounts_Cest.php:userAlreadyExists
-    - tests/acceptance/T006_RegisterAccounts_Cest.php:emailAlreadyExists
-    - tests/acceptance/T006_RegisterAccounts_Cest.php:registerModeratorWithLogin
-    - tests/acceptance/T006_RegisterAccounts_Cest.php:registerUser1WithLogin
-    - tests/acceptance/T006_RegisterAccounts_Cest.php:registerUser2WithLogin
-    - tests/acceptance/T006_RegisterAccounts_Cest.php:setupRoles
-    - tests/acceptance/T007_CreateProjects_Cest.php:createProjectsAsAdmin
-    - tests/acceptance/T007_CreateProjects_Cest.php:createProjectsAsUser1
-    - tests/acceptance/T007_CreateProjects_Cest.php:createProjectsAsUser2
-    - tests/acceptance/T011_SystemSettingsRoles_Cest.php:seeInitialRoles
-    - tests/acceptance/T011_SystemSettingsRoles_Cest.php:createAdditionalRoles
-    - tests/acceptance/T012_SystemSettingsRolesSpecial_Cest.php:createSpecialRoles
-    - tests/acceptance/T013_SystemSettingsRoleEditing_Cest.php:verifyNoPermissionsChecked
-    - tests/acceptance/T013_SystemSettingsRoleEditing_Cest.php:verifyPermissionDependencies
-    - tests/acceptance/T013_SystemSettingsRoleEditing_Cest.php:setAllPermissionsForRole1
-    - tests/acceptance/T013_SystemSettingsRoleEditing_Cest.php:setAllPermissionsForRole2
+    - tests/acceptance/T000_Setup_Cest.php
 step_decorators: ~
