@@ -79,4 +79,10 @@ class AcceptanceTester extends Actor{
     $this->amOnPageInternal($page);
     $this->page = $page;
   }
+  
+  public function seeTableRowOrder(array $texts): void{
+    foreach($texts as $i => $user){
+      $this->see($user, 'tbody tr:nth-child('.($i + 1).')');
+    }
+  }
 }

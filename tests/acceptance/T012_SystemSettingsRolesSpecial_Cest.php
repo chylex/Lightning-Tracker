@@ -16,12 +16,6 @@ class T012_SystemSettingsRolesSpecial_Cest{
     $I->terminate();
   }
   
-  private function verifyRoleOrder(AcceptanceTester $I, array $roles): void{
-    foreach($roles as $i => $role){
-      $I->see($role, 'tbody tr:nth-child('.($i + 1).')');
-    }
-  }
-  
   public function createSpecialRoles(AcceptanceTester $I): void{
     $db = Acceptance::getDB();
     $db->exec('INSERT INTO system_roles (title, ordering, special) VALUES (\'Special1\', 0, TRUE)');
@@ -29,14 +23,12 @@ class T012_SystemSettingsRolesSpecial_Cest{
     
     $I->amOnPage('/settings/roles');
     
-    $this->verifyRoleOrder($I, [
-        'Special1',
-        'Special2',
-        'Moderator',
-        'User',
-        'ManageUsers1',
-        'ManageUsers2'
-    ]);
+    $I->seeTableRowOrder(['Special1',
+                          'Special2',
+                          'Moderator',
+                          'User',
+                          'ManageUsers1',
+                          'ManageUsers2']);
   }
   
   /**
@@ -45,14 +37,12 @@ class T012_SystemSettingsRolesSpecial_Cest{
   public function cannotMoveRolesAboveSpecialRoles(AcceptanceTester $I): void{
     $I->click('#Move-1 button[value="Up"]');
     
-    $this->verifyRoleOrder($I, [
-        'Special1',
-        'Special2',
-        'Moderator',
-        'User',
-        'ManageUsers1',
-        'ManageUsers2'
-    ]);
+    $I->seeTableRowOrder(['Special1',
+                          'Special2',
+                          'Moderator',
+                          'User',
+                          'ManageUsers1',
+                          'ManageUsers2']);
   }
   
   /**
@@ -68,14 +58,12 @@ class T012_SystemSettingsRolesSpecial_Cest{
     $I->fillField('#Delete-1 input[type="hidden"][name="Role"]', $id);
     $I->click('#Delete-1 button[type="submit"]');
     
-    $this->verifyRoleOrder($I, [
-        'Special1',
-        'Special2',
-        'Moderator',
-        'User',
-        'ManageUsers1',
-        'ManageUsers2'
-    ]);
+    $I->seeTableRowOrder(['Special1',
+                          'Special2',
+                          'Moderator',
+                          'User',
+                          'ManageUsers1',
+                          'ManageUsers2']);
   }
 }
 
