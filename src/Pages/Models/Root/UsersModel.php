@@ -67,7 +67,7 @@ class UsersModel extends BasicRootPageModel{
       $table->addColumn('Username')->sort('name')->width(80)->wrap()->bold();
     }
     
-    $table->addColumn('Role')->sort('role_title')->width(20);
+    $table->addColumn('Role')->sort('role_order')->width(20);
     $table->addColumn('Registration Time')->sort('date_registered')->tight()->right();
     
     if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
@@ -93,7 +93,7 @@ class UsersModel extends BasicRootPageModel{
       }
       
       /** @noinspection ProperNullCoalescingOperatorUsageInspection */
-      $row[] = $user->getRoleTitleSafe() ?? Text::missing('Default');
+      $row[] = $user->isAdmin() ? Text::missing('Admin') : ($user->getRoleTitleSafe() ?? Text::missing('Default'));
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
       $can_edit = (

@@ -95,7 +95,7 @@ SQL;
     $filter ??= UserFilter::empty();
     
     $sql = <<<SQL
-SELECT u.id, u.name, u.email, sr.id AS role_id, sr.title AS role_title, u.admin, u.date_registered
+SELECT u.id, u.name, u.email, sr.id AS role_id, sr.title AS role_title, IF(u.admin, 0, IFNULL(sr.ordering, ~0)) AS role_order, u.admin, u.date_registered
 FROM users u
 LEFT JOIN system_roles sr ON u.role_id = sr.id
 SQL;

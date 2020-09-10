@@ -47,7 +47,7 @@ final class UserFilter extends AbstractFilter{
   protected function getSortingFields(): array{
     return [
         new Field('name', 'u'),
-        new Field('role_title'),
+        new Field('role_order'),
         new Field('date_registered', 'u')
     ];
   }
