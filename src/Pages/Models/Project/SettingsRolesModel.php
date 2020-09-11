@@ -5,6 +5,7 @@ namespace Pages\Models\Project;
 
 use Database\DB;
 use Database\Objects\ProjectInfo;
+use Database\Objects\RoleInfo;
 use Database\Tables\ProjectRolePermTable;
 use Database\Tables\ProjectRoleTable;
 use Database\Validation\RoleFields;
@@ -77,11 +78,20 @@ class SettingsRolesModel extends AbstractSettingsModel{
       $role_id_str = (string)$role_id;
       
       $perm_list = implode(', ', array_map(fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
-      $perm_list_str = $role->isSpecial() ? '<div class="center-text">-</div>' : (empty($perm_list) ? Text::missing('None') : $perm_list);
+      
+      switch($role->getType()){
+        case RoleInfo::PROJECT_OWNER:
+          $perm_list_str = Text::missing('All');
+          break;
+        
+        default:
+          $perm_list_str = empty($perm_list) ? Text::missing('None') : $perm_list;
+          break;
+      }
       
       $row = [$role->getTitleSafe(), $perm_list_str];
       
-      $can_edit = $this->perms->check(ProjectPermissions::MANAGE_SETTINGS_ROLES) && !$role->isSpecial();
+      $can_edit = $this->perms->check(ProjectPermissions::MANAGE_SETTINGS_ROLES) && $role->getType() === RoleInfo::PROJECT_NORMAL;
       
       if ($this->perms->check(ProjectPermissions::MANAGE_SETTINGS_ROLES)){
         if ($can_edit){
@@ -180,11 +190,11 @@ class SettingsRolesModel extends AbstractSettingsModel{
     $roles = new ProjectRoleTable(DB::get(), $this->getProject());
     
     if ($button === self::ACTION_MOVE_UP){
-      $roles->swapRolesIfNotSpecial($ordering, $ordering - 1);
+      $roles->swapRolesIfNormal($ordering, $ordering - 1);
       return true;
     }
     elseif ($button === self::ACTION_MOVE_DOWN){
-      $roles->swapRolesIfNotSpecial($ordering, $ordering + 1);
+      $roles->swapRolesIfNormal($ordering, $ordering + 1);
       return true;
     }
     

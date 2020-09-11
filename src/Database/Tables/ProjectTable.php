@@ -9,6 +9,7 @@ use Database\Filters\AbstractFilter;
 use Database\Filters\Types\ProjectFilter;
 use Database\Objects\ProjectInfo;
 use Database\Objects\ProjectVisibilityInfo;
+use Database\Objects\RoleInfo;
 use Database\Objects\UserProfile;
 use Exception;
 use PDOException;
@@ -65,7 +66,7 @@ final class ProjectTable extends AbstractTable{
           ProjectPermissions::MANAGE_SETTINGS_ROLES,
       ]);
       
-      $owner_role_id = $roles->addRole('Owner', true);
+      $owner_role_id = $roles->addRole('Owner', RoleInfo::PROJECT_OWNER);
       $administrator_role_id = $roles->addRole('Administrator');
       $moderator_role_id = $roles->addRole('Moderator');
       $developer_role_id = $roles->addRole('Developer');

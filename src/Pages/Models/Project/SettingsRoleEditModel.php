@@ -33,7 +33,7 @@ class SettingsRoleEditModel extends AbstractSettingsModel{
   public function __construct(Request $req, ProjectInfo $project, int $role_id){
     parent::__construct($req, $project);
     $this->role_id = $role_id;
-    $this->role_title = (new ProjectRoleTable(DB::get(), $project))->getRoleTitleIfNotSpecial($role_id);
+    $this->role_title = (new ProjectRoleTable(DB::get(), $project))->getRoleTitleIfNormal($role_id);
   }
   
   public function load(): IModel{

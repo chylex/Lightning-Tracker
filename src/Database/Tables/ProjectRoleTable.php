@@ -6,18 +6,16 @@ namespace Database\Tables;
 use Data\UserId;
 use Database\AbstractProjectTable;
 use Database\Objects\RoleInfo;
-use Exception;
 use LogicException;
 use PDOException;
 
 final class ProjectRoleTable extends AbstractProjectTable{
   /**
    * @param string $title
-   * @param bool $special
+   * @param string $type
    * @return int
-   * @throws Exception
    */
-  public function addRole(string $title, bool $special = false): int{
+  public function addRole(string $title, string $type = RoleInfo::PROJECT_NORMAL): int{
     $owned_transaction = !$this->db->inTransaction();
     $project = $this->getProjectId();
     
@@ -43,8 +41,8 @@ SQL;
       
       $role_id = $next['id'];
       
-      $this->execute('INSERT INTO project_roles (project_id, role_id, title, ordering, special) VALUES (?, ?, ?, ?, ?)',
-                     'IISIB', [$project, $role_id, $title, $special ? 0 : $next['ordering'], $special]);
+      $this->execute('INSERT INTO project_roles (project_id, role_id, type, title, ordering) VALUES (?, ?, ?, ?, ?)',
+                     'IISSI', [$project, $role_id, $type, $title, $type === RoleInfo::PROJECT_NORMAL ? $next['ordering'] : 0]);
       
       if ($owned_transaction){
         $this->db->commit();
@@ -65,12 +63,12 @@ SQL;
                    'SII', [$title, $id, $this->getProjectId()]);
   }
   
-  public function swapRolesIfNotSpecial(int $ordering1, int $ordering2): void{
+  public function swapRolesIfNormal(int $ordering1, int $ordering2): void{
     $sql = <<<SQL
 UPDATE project_roles pr1 INNER JOIN project_roles pr2 ON pr1.ordering = ? AND pr2.ordering = ? AND pr1.project_id = pr2.project_id
 SET pr1.ordering = pr2.ordering,
     pr2.ordering = pr1.ordering
-WHERE pr1.project_id = ? AND pr1.special = FALSE AND pr2.special = FALSE
+WHERE pr1.project_id = ? AND pr1.type = 'normal' AND pr2.type = 'normal'
 SQL;
     
     $this->execute($sql, 'III', [$ordering1, $ordering2, $this->getProjectId()]);
@@ -88,7 +86,7 @@ SQL;
 SELECT 1
 FROM project_roles pr
 WHERE role_id = ? AND project_id = ?
-  AND special = FALSE
+  AND type = 'normal'
   AND ordering > IFNULL((SELECT ordering
                          FROM project_roles pr2
                          JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
@@ -103,10 +101,10 @@ SQL;
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->execute('SELECT role_id, title, ordering, special FROM project_roles WHERE project_id = ? ORDER BY special DESC, ordering ASC',
+    $stmt = $this->execute('SELECT role_id, type, title, ordering FROM project_roles WHERE project_id = ? ORDER BY ordering ASC',
                            'I', [$this->getProjectId()]);
     
-    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
+    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['type'], $v['title'], (int)$v['ordering']));
   }
   
   /**
@@ -115,10 +113,10 @@ SQL;
    */
   public function listRolesAssignableBy(UserId $user_id): array{
     $sql = <<<SQL
-SELECT role_id, title, ordering, special
+SELECT role_id, type, title, ordering
 FROM project_roles pr
 WHERE project_id = ?
-  AND special = FALSE
+  AND type = 'normal'
   AND ordering > IFNULL((SELECT ordering
                          FROM project_roles pr2
                          JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
@@ -127,7 +125,7 @@ ORDER BY ordering ASC
 SQL;
     
     $stmt = $this->execute($sql, 'IS', [$this->getProjectId(), $user_id]);
-    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
+    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['type'], $v['title'], (int)$v['ordering']));
   }
   
   public function getRoleIdByTitle(string $title): ?int{
@@ -137,8 +135,8 @@ SQL;
     return $this->fetchOneColumn($stmt);
   }
   
-  public function getRoleTitleIfNotSpecial(int $id): ?string{
-    $stmt = $this->execute('SELECT title FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
+  public function getRoleTitleIfNormal(int $id): ?string{
+    $stmt = $this->execute('SELECT title FROM project_roles WHERE role_id = ? AND project_id = ? AND type = \'normal\'',
                            'II', [$id, $this->getProjectId()]);
     
     return $this->fetchOneColumn($stmt);
@@ -150,7 +148,7 @@ SQL;
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->execute('SELECT ordering FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
+      $stmt = $this->execute('SELECT ordering FROM project_roles WHERE role_id = ? AND project_id = ? AND type = \'normal\'',
                              'II', [$id, $this->getProjectId()]);
       
       $ordering = $this->fetchOneInt($stmt);
@@ -163,10 +161,10 @@ SQL;
       $this->execute('UPDATE project_members SET role_id = NULL WHERE role_id = ? AND project_id = ?',
                      'II', [$id, $project]);
       
-      $this->execute('UPDATE project_roles SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ? AND special = FALSE',
+      $this->execute('UPDATE project_roles SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ? AND type = \'normal\'',
                      'II', [$ordering, $project]);
       
-      $this->execute('DELETE FROM project_roles WHERE role_id = ? AND project_id = ? AND special = FALSE',
+      $this->execute('DELETE FROM project_roles WHERE role_id = ? AND project_id = ? AND type = \'normal\'',
                      'II', [$id, $project]);
       
       $this->db->commit();

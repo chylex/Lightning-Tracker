@@ -103,10 +103,10 @@ class T006_RegisterAccounts_Cest{
   public function setupRoles(): void{
     $db = Acceptance::getDB();
     
-    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (1, \'User\', 4, FALSE)');
-    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (2, \'ManageUsers2\', 3, FALSE)');
-    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (3, \'ManageUsers1\', 2, FALSE)');
-    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (4, \'Moderator\', 1, FALSE)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (1, \'User\', 4)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (2, \'ManageUsers2\', 3)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (3, \'ManageUsers1\', 2)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (4, \'Moderator\', 1)');
     
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (1, \'projects.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (1, \'projects.create\')');

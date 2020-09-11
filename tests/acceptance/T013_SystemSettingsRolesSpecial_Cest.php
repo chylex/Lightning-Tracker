@@ -16,10 +16,10 @@ class T013_SystemSettingsRolesSpecial_Cest{
     $I->terminate();
   }
   
-  public function createSpecialRoles(AcceptanceTester $I): void{
+  public function createAdminRoles(AcceptanceTester $I): void{
     $db = Acceptance::getDB();
-    $db->exec('INSERT INTO system_roles (title, ordering, special) VALUES (\'Special1\', 0, TRUE)');
-    $db->exec('INSERT INTO system_roles (title, ordering, special) VALUES (\'Special2\', 0, TRUE)');
+    $db->exec('INSERT INTO system_roles (type, title, ordering) VALUES (\'admin\', \'Special1\', 0)');
+    $db->exec('INSERT INTO system_roles (type, title, ordering) VALUES (\'admin\', \'Special2\', 0)');
     
     $I->amOnPage('/settings/roles');
     
@@ -32,9 +32,9 @@ class T013_SystemSettingsRolesSpecial_Cest{
   }
   
   /**
-   * @depends createSpecialRoles
+   * @depends createAdminRoles
    */
-  public function cannotMoveRolesAboveSpecialRoles(AcceptanceTester $I): void{
+  public function cannotMoveRolesAboveAdminRoles(AcceptanceTester $I): void{
     $I->click('#Move-1 button[value="Up"]');
     
     $I->seeTableRowOrder(['Special1',
@@ -46,11 +46,11 @@ class T013_SystemSettingsRolesSpecial_Cest{
   }
   
   /**
-   * @depends createSpecialRoles
+   * @depends createAdminRoles
    */
-  public function cannotDeleteSpecialRole(AcceptanceTester $I): void{
+  public function cannotDeleteAdminRole(AcceptanceTester $I): void{
     $db = Acceptance::getDB();
-    $id = $db->query('SELECT id FROM system_roles WHERE special = TRUE LIMIT 1')->fetchColumn();
+    $id = $db->query('SELECT id FROM system_roles WHERE type = \'admin\' LIMIT 1')->fetchColumn();
     
     $I->assertNotFalse($id);
     $I->assertIsNumeric($id);

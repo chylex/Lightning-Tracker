@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Root;
 
 use Database\DB;
+use Database\Objects\RoleInfo;
 use Database\Tables\SystemRolePermTable;
 use Database\Tables\SystemRoleTable;
 use Database\Validation\RoleFields;
@@ -65,41 +66,50 @@ class SettingsRolesModel extends AbstractSettingsModel{
       $role_id_str = (string)$role_id;
       
       $perm_list = implode(', ', array_map(fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
-      $perm_list_str = $role->isSpecial() ? '<div class="center-text">-</div>' : (empty($perm_list) ? Text::missing('None') : $perm_list);
+      
+      switch($role->getType()){
+        case RoleInfo::SYSTEM_ADMIN:
+          $perm_list_str = Text::missing('All');
+          break;
+        
+        default:
+          $perm_list_str = empty($perm_list) ? Text::missing('None') : $perm_list;
+          break;
+      }
       
       $row = [$role->getTitleSafe(), $perm_list_str];
       
-      if ($role->isSpecial()){
-        $row[] = '';
-      }
-      else{
+      if ($role->getType() === RoleInfo::SYSTEM_NORMAL){
         $form_move = new FormComponent(self::ACTION_MOVE);
         $form_move->addHidden('Ordering', (string)$role->getOrdering());
-        
+  
         $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
         $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
-        
+  
         $ordering = $role->getOrdering();
-        
+  
         if ($ordering === 0 || $ordering === 1){
           $btn_move_up->disabled();
         }
-        
+  
         if ($ordering === 0 || $ordering === $ordering_limit){
           $btn_move_down->disabled();
         }
-        
+  
         $form_delete = new FormComponent(self::ACTION_DELETE);
         $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
         $form_delete->addHidden('Role', $role_id_str);
         $form_delete->addIconButton('submit', 'circle-cross')->color('red');
-        
+  
         $row[] = new CompositeComponent($form_move, $form_delete);
+      }
+      else{
+        $row[] = '';
       }
       
       $row = $table->addRow($row);
       
-      if (!$role->isSpecial()){
+      if ($role->getType() === RoleInfo::SYSTEM_NORMAL){
         $row->link(Link::fromBase($this->getReq(), 'settings', 'roles', $role_id_str));
       }
     }
@@ -160,11 +170,11 @@ class SettingsRolesModel extends AbstractSettingsModel{
     $roles = new SystemRoleTable(DB::get());
     
     if ($button === self::ACTION_MOVE_UP){
-      $roles->swapRolesIfNotSpecial($ordering, $ordering - 1);
+      $roles->swapRolesIfNormal($ordering, $ordering - 1);
       return true;
     }
     elseif ($button === self::ACTION_MOVE_DOWN){
-      $roles->swapRolesIfNotSpecial($ordering, $ordering + 1);
+      $roles->swapRolesIfNormal($ordering, $ordering + 1);
       return true;
     }
     

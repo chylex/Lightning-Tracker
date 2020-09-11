@@ -6,18 +6,16 @@ namespace Database\Tables;
 use Data\UserId;
 use Database\AbstractTable;
 use Database\Objects\RoleInfo;
-use Exception;
 use LogicException;
 use PDOException;
 
 final class SystemRoleTable extends AbstractTable{
   /**
    * @param string $title
-   * @param bool $special
+   * @param string $type
    * @return int
-   * @throws Exception
    */
-  public function addRole(string $title, bool $special = false): int{
+  public function addRole(string $title, string $type = RoleInfo::SYSTEM_NORMAL): int{
     $this->db->beginTransaction();
     
     try{
@@ -37,8 +35,8 @@ SQL;
       
       $role_id = $next['id'];
       
-      $this->execute('INSERT INTO system_roles (id, title, ordering, special) VALUES (?, ?, ?, ?)',
-                     'ISIB', [$role_id, $title, $special ? 0 : $next['ordering'], $special]);
+      $this->execute('INSERT INTO system_roles (id, type, title, ordering) VALUES (?, ?, ?, ?)',
+                     'ISSI', [$role_id, $type, $title, $type === RoleInfo::SYSTEM_NORMAL ? $next['ordering'] : 0]);
       
       $this->db->commit();
       return $role_id;
@@ -53,12 +51,12 @@ SQL;
                    'SI', [$title, $id]);
   }
   
-  public function swapRolesIfNotSpecial(int $ordering1, int $ordering2): void{
+  public function swapRolesIfNormal(int $ordering1, int $ordering2): void{
     $sql = <<<SQL
 UPDATE system_roles sr1 INNER JOIN system_roles sr2 ON sr1.ordering = ? AND sr2.ordering = ?
 SET sr1.ordering = sr2.ordering,
     sr2.ordering = sr1.ordering
-WHERE sr1.special = FALSE AND sr2.special = FALSE
+WHERE sr1.type = 'normal' AND sr2.type = 'normal'
 SQL;
     
     $this->execute($sql, 'II', [$ordering1, $ordering2]);
@@ -74,7 +72,7 @@ SQL;
 SELECT 1
 FROM system_roles sr
 WHERE id = ?
-  AND special = FALSE
+  AND type = 'normal'
   AND ((SELECT u.admin FROM users u WHERE u.id = ?) OR
        (ordering > IFNULL((SELECT ordering
                          FROM system_roles sr2
@@ -90,8 +88,8 @@ SQL;
    * @return RoleInfo[]
    */
   public function listRoles(): array{
-    $stmt = $this->db->query('SELECT id, title, ordering, special FROM system_roles ORDER BY special DESC, ordering ASC');
-    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['id'], $v['title'], $v['ordering'], (bool)$v['special']));
+    $stmt = $this->db->query('SELECT id, type, title, ordering FROM system_roles ORDER BY ordering ASC');
+    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['id'], $v['type'], $v['title'], $v['ordering']));
   }
   
   /**
@@ -100,9 +98,9 @@ SQL;
    */
   public function listRolesAssignableBy(UserId $user_id): array{
     $sql = <<<SQL
-SELECT id, title, ordering, special
+SELECT id, type, title, ordering
 FROM system_roles sr
-WHERE special = FALSE
+WHERE type = 'normal'
   AND ((SELECT u.admin FROM users u WHERE u.id = ?) OR
        (ordering > IFNULL((SELECT ordering
                            FROM system_roles sr2
@@ -112,7 +110,7 @@ ORDER BY ordering ASC
 SQL;
     
     $stmt = $this->execute($sql, 'SS', [$user_id, $user_id]);
-    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['id'], $v['title'], (int)$v['ordering'], (bool)$v['special']));
+    return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['id'], $v['type'], $v['title'], (int)$v['ordering']));
   }
   
   public function getRoleIdByTitle(string $title): ?int{
@@ -122,8 +120,8 @@ SQL;
     return $this->fetchOneColumn($stmt);
   }
   
-  public function getRoleTitleIfNotSpecial(int $id): ?string{
-    $stmt = $this->execute('SELECT title FROM system_roles WHERE id = ? AND special = FALSE',
+  public function getRoleTitleIfNormal(int $id): ?string{
+    $stmt = $this->execute('SELECT title FROM system_roles WHERE id = ? AND type = \'normal\'',
                            'I', [$id]);
     
     return $this->fetchOneColumn($stmt);
@@ -133,7 +131,7 @@ SQL;
     $this->db->beginTransaction();
     
     try{
-      $stmt = $this->execute('SELECT ordering FROM system_roles WHERE id = ? AND special = FALSE',
+      $stmt = $this->execute('SELECT ordering FROM system_roles WHERE id = ? AND type = \'normal\'',
                              'I', [$id]);
       
       $ordering = $this->fetchOneInt($stmt);
@@ -143,10 +141,10 @@ SQL;
         return;
       }
       
-      $this->execute('UPDATE system_roles SET ordering = ordering - 1 WHERE ordering > ? AND special = FALSE',
+      $this->execute('UPDATE system_roles SET ordering = ordering - 1 WHERE ordering > ? AND type = \'normal\'',
                      'I', [$ordering]);
       
-      $this->execute('DELETE FROM system_roles WHERE id = ? AND special = FALSE',
+      $this->execute('DELETE FROM system_roles WHERE id = ? AND type = \'normal\'',
                      'I', [$id]);
       
       $this->db->commit();

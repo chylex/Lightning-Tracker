@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS `system_roles` (
 	`id`       SMALLINT NOT NULL AUTO_INCREMENT,
+	`type`     ENUM ('normal', 'admin') NOT NULL DEFAULT 'normal',
 	`title`    VARCHAR(32) NOT NULL,
 	`ordering` SMALLINT NOT NULL,
-	`special`  BOOL NOT NULL DEFAULT FALSE,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY (`title`)
 ) ENGINE = InnoDB
