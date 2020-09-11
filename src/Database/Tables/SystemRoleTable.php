@@ -75,13 +75,14 @@ SELECT 1
 FROM system_roles sr
 WHERE id = ?
   AND special = FALSE
-  AND ordering > IFNULL((SELECT ordering
+  AND ((SELECT u.admin FROM users u WHERE u.id = ?) OR
+       (ordering > IFNULL((SELECT ordering
                          FROM system_roles sr2
                          JOIN users u ON sr2.id = u.role_id
-                         WHERE u.id = ?), ~0)
+                         WHERE u.id = ?), ~0)))
 SQL;
     
-    $stmt = $this->execute($sql, 'IS', [$role_id, $user_id]);
+    $stmt = $this->execute($sql, 'ISS', [$role_id, $user_id, $user_id]);
     return $this->fetchOneInt($stmt) !== null;
   }
   
