@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T012_SystemSettingsRolesSpecial_Cest{
+class T013_SystemSettingsRolesSpecial_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amLoggedIn('Admin');
     $I->amOnPage('/settings/roles');
@@ -26,9 +26,9 @@ class T012_SystemSettingsRolesSpecial_Cest{
     $I->seeTableRowOrder(['Special1',
                           'Special2',
                           'Moderator',
-                          'User',
                           'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User']);
   }
   
   /**
@@ -40,9 +40,9 @@ class T012_SystemSettingsRolesSpecial_Cest{
     $I->seeTableRowOrder(['Special1',
                           'Special2',
                           'Moderator',
-                          'User',
                           'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User']);
   }
   
   /**
@@ -61,9 +61,9 @@ class T012_SystemSettingsRolesSpecial_Cest{
     $I->seeTableRowOrder(['Special1',
                           'Special2',
                           'Moderator',
-                          'User',
                           'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User']);
   }
 }
 

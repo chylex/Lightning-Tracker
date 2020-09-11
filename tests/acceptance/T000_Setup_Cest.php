@@ -37,6 +37,8 @@ class T000_Setup_Cest{
     
     $t = new T006_RegisterAccounts_Cest();
     self::t($I, $t, fn() => $t->registerModeratorWithLogin($I));
+    self::t($I, $t, fn() => $t->registerManager1WithLogin($I));
+    self::t($I, $t, fn() => $t->registerManager2WithLogin($I));
     self::t($I, $t, fn() => $t->registerUser1WithLogin($I));
     self::t($I, $t, fn() => $t->registerUser2WithLogin($I));
     self::t($I, $t, fn() => $t->setupRoles());
@@ -46,15 +48,11 @@ class T000_Setup_Cest{
     self::t($I, $t, fn() => $t->createProjectsAsUser1($I));
     self::t($I, $t, fn() => $t->createProjectsAsUser2($I));
     
-    $t = new T011_SystemSettingsRoles_Cest();
-    self::t($I, $t, fn() => $t->createAdditionalRoles($I));
-    
-    $t = new T012_SystemSettingsRolesSpecial_Cest();
+    $t = new T013_SystemSettingsRolesSpecial_Cest();
     self::t($I, $t, fn() => $t->createSpecialRoles($I));
     
-    $t = new T013_SystemSettingsRoleEditing_Cest();
-    self::t($I, $t, fn() => $t->setAllPermissionsForRole1($I));
-    self::t($I, $t, fn() => $t->setSomePermissionsForRole2($I));
+    $t = new T014_UserList_Cest();
+    self::t($I, $t, fn() => $t->registerNewUser($I));
   }
 }
 

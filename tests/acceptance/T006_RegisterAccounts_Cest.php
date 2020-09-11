@@ -23,6 +23,12 @@ class T006_RegisterAccounts_Cest{
     $I->click('button[type="submit"]');
   }
   
+  private function register(AcceptanceTester $I, string $name, string $password, string $email): void{
+    $this->submit($I, $name, $password, $password, $email);
+    $I->seeCurrentUrlEquals('/register?success');
+    $I->saveLoginToken($name);
+  }
+  
   public function userAlreadyExists(AcceptanceTester $I): void{
     $this->submit($I, 'Admin', '123456789', '123456789', 'user@example.com');
     $I->seeElement('input[name="Name"] + .error');
@@ -54,9 +60,23 @@ class T006_RegisterAccounts_Cest{
    * @depends emailAlreadyExists
    */
   public function registerModeratorWithLogin(AcceptanceTester $I): void{
-    $this->submit($I, 'Moderator', '123456789', '123456789', 'moderator@example.com');
-    $I->seeCurrentUrlEquals('/register?success');
-    $I->saveLoginToken('Moderator');
+    $this->register($I, 'Moderator', '123456789', 'moderator@example.com');
+  }
+  
+  /**
+   * @depends userAlreadyExists
+   * @depends emailAlreadyExists
+   */
+  public function registerManager1WithLogin(AcceptanceTester $I): void{
+    $this->register($I, 'Manager1', '123456789', 'manager1@example.com');
+  }
+  
+  /**
+   * @depends userAlreadyExists
+   * @depends emailAlreadyExists
+   */
+  public function registerManager2WithLogin(AcceptanceTester $I): void{
+    $this->register($I, 'Manager2', '123456789', 'manager2@example.com');
   }
   
   /**
@@ -64,9 +84,7 @@ class T006_RegisterAccounts_Cest{
    * @depends emailAlreadyExists
    */
   public function registerUser1WithLogin(AcceptanceTester $I): void{
-    $this->submit($I, 'User1', '123456789', '123456789', 'user1@example.com');
-    $I->seeCurrentUrlEquals('/register?success');
-    $I->saveLoginToken('User1');
+    $this->register($I, 'User1', '123456789', 'user1@example.com');
   }
   
   /**
@@ -74,9 +92,7 @@ class T006_RegisterAccounts_Cest{
    * @depends emailAlreadyExists
    */
   public function registerUser2WithLogin(AcceptanceTester $I): void{
-    $this->submit($I, 'User2', '987654321', '987654321', 'user2@example.com');
-    $I->seeCurrentUrlEquals('/register?success');
-    $I->saveLoginToken('User2');
+    $this->register($I, 'User2', '987654321', 'user2@example.com');
   }
   
   /**
@@ -87,18 +103,28 @@ class T006_RegisterAccounts_Cest{
   public function setupRoles(): void{
     $db = Acceptance::getDB();
     
-    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (1, \'User\', 2, FALSE)');
-    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (2, \'Moderator\', 1, FALSE)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (1, \'User\', 4, FALSE)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (2, \'ManageUsers2\', 3, FALSE)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (3, \'ManageUsers1\', 2, FALSE)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering, special) VALUES (4, \'Moderator\', 1, FALSE)');
     
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (1, \'projects.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (1, \'projects.create\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'projects.list\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'projects.list.all\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'projects.create\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'projects.manage\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'users.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'users.manage\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (3, \'users.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (3, \'users.manage\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.list.all\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.create\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.manage\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.manage\')');
     
     $db->exec('UPDATE users SET role_id = 1 WHERE name = \'User1\' OR name = \'User2\'');
-    $db->exec('UPDATE users SET role_id = 2 WHERE name = \'Moderator\'');
+    $db->exec('UPDATE users SET role_id = 2 WHERE name = \'Manager2\'');
+    $db->exec('UPDATE users SET role_id = 3 WHERE name = \'Manager1\'');
+    $db->exec('UPDATE users SET role_id = 4 WHERE name = \'Moderator\'');
   }
 }
 

@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T013_SystemSettingsRoleEditing_Cest{
+class T012_SystemSettingsRoleEditing_Cest{
   private const PERMS_ALL = [
       'settings',
       'projects.list',
@@ -28,7 +28,7 @@ class T013_SystemSettingsRoleEditing_Cest{
       'users.manage'
   ];
   
-  private const PERMS_FOR_ROLE_2 = [
+  private const PERMS_SOME = [
       'users.list',
       'users.manage'
   ];
@@ -80,24 +80,24 @@ class T013_SystemSettingsRoleEditing_Cest{
   }
   
   public function renameAlreadyExists(AcceptanceTester $I): void{
-    $this->startEditing($I, 'ManageUsers1');
-    $I->fillField('#Confirm-1-Title', 'ManageUsers2');
+    $this->startEditing($I, 'Test1');
+    $I->fillField('#Confirm-1-Title', 'Test2');
     $I->click('button[type="submit"]');
     $I->seeElement('#Confirm-1-Title + .error');
   }
   
   public function renameAndRevert(AcceptanceTester $I): void{
-    $this->startEditing($I, 'ManageUsers1');
-    $I->fillField('#Confirm-1-Title', 'ManageUsers3');
+    $this->startEditing($I, 'Test1');
+    $I->fillField('#Confirm-1-Title', 'Test3');
     $I->click('button[type="submit"]');
     
-    $this->startEditing($I, 'ManageUsers3');
-    $I->fillField('#Confirm-1-Title', 'ManageUsers1');
+    $this->startEditing($I, 'Test3');
+    $I->fillField('#Confirm-1-Title', 'Test1');
     $I->click('button[type="submit"]');
   }
   
   public function verifyNoPermissionsChecked(AcceptanceTester $I): void{
-    $this->startEditing($I, 'ManageUsers1');
+    $this->startEditing($I, 'Test1');
     
     foreach($this->getCheckboxes(self::PERMS_ALL) as $cb){
       $I->dontSeeCheckboxIsChecked($cb);
@@ -105,7 +105,7 @@ class T013_SystemSettingsRoleEditing_Cest{
   }
   
   public function verifyPermissionDependencies(AcceptanceTester $I): void{
-    $checkboxes = $this->assignPermissions($I, 'ManageUsers1', self::PERMS_CHILD, false);
+    $checkboxes = $this->assignPermissions($I, 'Test1', self::PERMS_CHILD, false);
     
     foreach($checkboxes as $cb){
       $I->seeElement($cb.' + div > .error');
@@ -117,7 +117,7 @@ class T013_SystemSettingsRoleEditing_Cest{
    * @depends verifyPermissionDependencies
    */
   public function setAllPermissionsForRole1(AcceptanceTester $I): void{
-    $checkboxes = $this->assignPermissions($I, 'ManageUsers1', self::PERMS_ALL, true);
+    $checkboxes = $this->assignPermissions($I, 'Test1', self::PERMS_ALL, true);
     
     foreach($checkboxes as $cb){
       $I->seeCheckboxIsChecked($cb);
@@ -129,7 +129,7 @@ class T013_SystemSettingsRoleEditing_Cest{
    * @depends verifyPermissionDependencies
    */
   public function setSomePermissionsForRole2(AcceptanceTester $I): void{
-    $checkboxes = $this->assignPermissions($I, 'ManageUsers2', self::PERMS_FOR_ROLE_2, true);
+    $checkboxes = $this->assignPermissions($I, 'Test2', self::PERMS_SOME, true);
     
     foreach($checkboxes as $cb){
       $I->seeCheckboxIsChecked($cb);
@@ -138,6 +138,15 @@ class T013_SystemSettingsRoleEditing_Cest{
     foreach(array_diff($this->getCheckboxes(self::PERMS_ALL), $checkboxes) as $cb){
       $I->dontSeeCheckboxIsChecked($cb);
     }
+  }
+  
+  /**
+   * @depends setAllPermissionsForRole1
+   * @depends setSomePermissionsForRole2
+   */
+  public function cleanupTestRoles(): void{
+    $db = Acceptance::getDB();
+    $db->exec('DELETE FROM system_roles WHERE title = \'Test1\' OR title = \'Test2\'');
   }
 }
 

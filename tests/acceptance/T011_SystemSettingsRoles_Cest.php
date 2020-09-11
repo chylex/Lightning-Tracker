@@ -17,6 +17,8 @@ class T011_SystemSettingsRoles_Cest{
   
   public function seeInitialRoles(AcceptanceTester $I): void{
     $I->seeTableRowOrder(['Moderator',
+                          'ManageUsers1',
+                          'ManageUsers2',
                           'User']);
   }
   
@@ -44,65 +46,97 @@ class T011_SystemSettingsRoles_Cest{
   /**
    * @depends seeInitialRoles
    */
-  public function createAdditionalRoles(AcceptanceTester $I): void{
-    $this->createRole($I, 'ManageUsers1');
-    $this->createRole($I, 'ManageUsers2');
+  public function createTestRoles(AcceptanceTester $I): void{
+    $this->createRole($I, 'Test1');
+    $this->createRole($I, 'Test2');
     
     $I->seeTableRowOrder(['Moderator',
-                          'User',
                           'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User',
+                          'Test1',
+                          'Test2']);
   }
   
   /**
-   * @depends createAdditionalRoles
+   * @depends createTestRoles
    */
   public function moveTopRoleAround(AcceptanceTester $I): void{
     $I->click('#Move-1 button[value="Down"]');
     
-    $I->seeTableRowOrder(['User',
+    $I->seeTableRowOrder(['ManageUsers1',
                           'Moderator',
-                          'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User',
+                          'Test1',
+                          'Test2']);
     
+    $I->click('#Move-2 button[value="Down"]');
+    
+    $I->seeTableRowOrder(['ManageUsers1',
+                          'ManageUsers2',
+                          'Moderator',
+                          'User',
+                          'Test1',
+                          'Test2']);
+    
+    $I->click('#Move-3 button[value="Up"]');
     $I->click('#Move-2 button[value="Up"]');
     
     $I->seeTableRowOrder(['Moderator',
-                          'User',
                           'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User',
+                          'Test1',
+                          'Test2']);
   }
   
   /**
-   * @depends createAdditionalRoles
+   * @depends createTestRoles
    */
   public function moveBottomRoleAround(AcceptanceTester $I): void{
-    $I->click('#Move-4 button[value="Up"]');
+    $I->click('#Move-6 button[value="Up"]');
     
     $I->seeTableRowOrder(['Moderator',
-                          'User',
-                          'ManageUsers2',
-                          'ManageUsers1']);
-    
-    $I->click('#Move-3 button[value="Down"]');
-    
-    $I->seeTableRowOrder(['Moderator',
-                          'User',
                           'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User',
+                          'Test2',
+                          'Test1']);
+    
+    $I->click('#Move-5 button[value="Up"]');
+    
+    $I->seeTableRowOrder(['Moderator',
+                          'ManageUsers1',
+                          'ManageUsers2',
+                          'Test2',
+                          'User',
+                          'Test1']);
+    
+    $I->click('#Move-4 button[value="Down"]');
+    $I->click('#Move-5 button[value="Down"]');
+    
+    $I->seeTableRowOrder(['Moderator',
+                          'ManageUsers1',
+                          'ManageUsers2',
+                          'User',
+                          'Test1',
+                          'Test2']);
   }
   
   /**
-   * @depends createAdditionalRoles
+   * @depends createTestRoles
    */
   public function cannotMoveOutOfBounds(AcceptanceTester $I): void{
     $I->click('#Move-1 button[value="Up"]');
-    $I->click('#Move-4 button[value="Down"]');
+    $I->click('#Move-6 button[value="Down"]');
     
     $I->seeTableRowOrder(['Moderator',
-                          'User',
                           'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User',
+                          'Test1',
+                          'Test2']);
   }
   
   /**
@@ -111,24 +145,27 @@ class T011_SystemSettingsRoles_Cest{
    * @depends cannotMoveOutOfBounds
    */
   public function deleteRole(AcceptanceTester $I): void{
-    $I->click('#Delete-3 button[type="submit"]');
+    $I->click('#Delete-5 button[type="submit"]');
     
     $I->seeTableRowOrder(['Moderator',
+                          'ManageUsers1',
+                          'ManageUsers2',
                           'User',
-                          'ManageUsers2']);
+                          'Test2']);
   }
   
   /**
    * @depends deleteRole
    */
   public function readdRole(AcceptanceTester $I): void{
-    $this->createRole($I, 'ManageUsers1');
-    $I->click('#Move-4 button[value="Up"]');
+    $this->createRole($I, 'Test1');
     
     $I->seeTableRowOrder(['Moderator',
-                          'User',
                           'ManageUsers1',
-                          'ManageUsers2']);
+                          'ManageUsers2',
+                          'User',
+                          'Test2',
+                          'Test1']);
   }
 }
 
