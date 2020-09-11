@@ -119,6 +119,7 @@ class T006_RegisterAccounts_Cest{
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.create\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.manage\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.see.emails\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.manage\')');
     
     $db->exec('UPDATE users SET role_id = 1 WHERE name = \'User1\' OR name = \'User2\'');
