@@ -16,7 +16,7 @@ class T012_SystemSettingsRoleEditing_Cest{
       'users.list',
       'users.see.emails',
       'users.create',
-      'users.manage'
+      'users.manage',
   ];
   
   private const PERMS_CHILD = [
@@ -25,12 +25,12 @@ class T012_SystemSettingsRoleEditing_Cest{
       'projects.manage',
       'users.see.emails',
       'users.create',
-      'users.manage'
+      'users.manage',
   ];
   
   private const PERMS_SOME = [
       'users.list',
-      'users.manage'
+      'users.manage',
   ];
   
   public function _before(AcceptanceTester $I): void{

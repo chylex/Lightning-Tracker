@@ -74,13 +74,13 @@ abstract class AbstractFilter{
   
   public final function prepare(PDO $db, string $sql, int $type = self::STMT_SELECT_APPEND): PDOStatement{
     $conditions = $this->generateWhereConditions();
-    $where = implode(' AND ', array_map(fn($condition): string => $condition->getSql(), $conditions));
+    $where = implode(' AND ', array_map(static fn($condition): string => $condition->getSql(), $conditions));
     
     if ($type === self::STMT_SELECT_INJECT){
       $clauses = [
           '# WHERE' => ['WHERE', $where],
           '# ORDER' => ['ORDER BY', $this->generateOrderByClause()],
-          '# LIMIT' => ['LIMIT', $this->generateLimitClause()]
+          '# LIMIT' => ['LIMIT', $this->generateLimitClause()],
       ];
       
       $sql = str_replace("\r", '', $sql);
@@ -98,11 +98,11 @@ abstract class AbstractFilter{
     }
     else{
       $clauses = $type === self::STMT_COUNT ? [
-          'WHERE' => $where
+          'WHERE' => $where,
       ] : [
           'WHERE'    => $where,
           'ORDER BY' => $this->generateOrderByClause(),
-          'LIMIT'    => $this->generateLimitClause()
+          'LIMIT'    => $this->generateLimitClause(),
       ];
       
       foreach($clauses as $name => $contents){

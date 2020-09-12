@@ -87,7 +87,7 @@ final class Migration6 extends AbstractMigrationProcess{
         self::sql('ALTER TABLE project_members DROP user_id_old'),
         self::sql('ALTER TABLE projects DROP owner_id_old'),
         self::sql('ALTER TABLE project_user_settings DROP user_id_old'),
-        self::sql('ALTER TABLE user_logins DROP id_old')
+        self::sql('ALTER TABLE user_logins DROP id_old'),
     ];
   }
 }

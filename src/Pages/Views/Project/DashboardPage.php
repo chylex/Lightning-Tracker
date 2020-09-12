@@ -37,7 +37,7 @@ class DashboardPage extends AbstractProjectPage{
   protected function echoPageBody(): void{
     /** @var DashboardWidgetComponent[] $widgets */
     $widgets = [$this->model->getProjectDescription()];
-    $widgets = array_filter($widgets, fn($v): bool => $v !== null);
+    $widgets = array_filter($widgets, static fn($v): bool => $v !== null);
     
     echo '<div class="dashboard-panels">';
     

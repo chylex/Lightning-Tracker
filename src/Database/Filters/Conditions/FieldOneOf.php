@@ -28,7 +28,7 @@ final class FieldOneOf implements IWhereCondition{
     $field_name = $this->field->getFieldName();
     
     $indices = empty($this->values) ? [] : range(1, count($this->values));
-    $param_list = array_map(fn($index): string => ':'.$field_name.'_'.$index, $indices);
+    $param_list = array_map(static fn($index): string => ':'.$field_name.'_'.$index, $indices);
     $param_str = implode(', ', $param_list);
     
     return $this->getFieldSql().' IN ('.$param_str.')';

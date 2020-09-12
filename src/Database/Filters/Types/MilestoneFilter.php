@@ -16,13 +16,13 @@ final class MilestoneFilter extends AbstractProjectIdFilter{
     return [
         new Field('title', 'm'),
         new Field('progress'),
-        new Field('date_updated')
+        new Field('date_updated'),
     ];
   }
   
   protected function getDefaultSortingRuleList(): array{
     return [
-        (new Field('ordering', 'm'))->sortRule(Sorting::SQL_ASC)
+        (new Field('ordering', 'm'))->sortRule(Sorting::SQL_ASC),
     ];
   }
 }

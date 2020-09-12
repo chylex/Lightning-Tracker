@@ -45,7 +45,7 @@ class AcceptanceTester extends Actor{
         'path'     => '/',
         'domain'   => 'localhost',
         'httponly' => true,
-        'samesite' => 'Lax'
+        'samesite' => 'Lax',
     ]);
     
     $token = $this->grabCookie('logon');
@@ -67,7 +67,7 @@ class AcceptanceTester extends Actor{
         'path'     => '/',
         'domain'   => 'localhost',
         'httponly' => true,
-        'samesite' => 'Lax'
+        'samesite' => 'Lax',
     ]);
     
     if ($reload && isset($this->page)){

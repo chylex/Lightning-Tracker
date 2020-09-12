@@ -39,14 +39,14 @@ class SettingsRolesModel extends AbstractSettingsModel{
       ProjectPermissions::CREATE_ISSUE                => 'Create Issues',
       ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS     => 'Modify All Issue Fields',
       ProjectPermissions::EDIT_ALL_ISSUES             => 'Edit All Issues',
-      ProjectPermissions::DELETE_ALL_ISSUES           => 'Delete All Issues'
+      ProjectPermissions::DELETE_ALL_ISSUES           => 'Delete All Issues',
   ];
   
   public const PERM_DEPENDENCIES = [
       ProjectPermissions::MANAGE_SETTINGS_GENERAL     => ProjectPermissions::VIEW_SETTINGS,
       ProjectPermissions::MANAGE_SETTINGS_DESCRIPTION => ProjectPermissions::VIEW_SETTINGS,
       ProjectPermissions::MANAGE_SETTINGS_ROLES       => ProjectPermissions::VIEW_SETTINGS,
-      ProjectPermissions::MANAGE_MEMBERS              => ProjectPermissions::LIST_MEMBERS
+      ProjectPermissions::MANAGE_MEMBERS              => ProjectPermissions::LIST_MEMBERS,
   ];
   
   private ProjectPermissions $perms;
@@ -77,7 +77,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       $role_id = $role->getId();
       $role_id_str = (string)$role_id;
       
-      $perm_list = implode(', ', array_map(fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
+      $perm_list = implode(', ', array_map(static fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
       
       switch($role->getType()){
         case RoleInfo::PROJECT_OWNER:

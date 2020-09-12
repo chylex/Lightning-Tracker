@@ -26,7 +26,7 @@ final class IssueFilter extends AbstractProjectIdFilter{
         'status'    => Filtering::TYPE_MULTISELECT,
         'milestone' => Filtering::TYPE_MULTISELECT,
         'author'    => Filtering::TYPE_MULTISELECT,
-        'assignee'  => Filtering::TYPE_MULTISELECT
+        'assignee'  => Filtering::TYPE_MULTISELECT,
     ];
   }
   
@@ -60,13 +60,13 @@ final class IssueFilter extends AbstractProjectIdFilter{
         new Field('priority', 'i'),
         new Field('scale', 'i'),
         new Field('progress', 'i'),
-        new Field('date_updated', 'i')
+        new Field('date_updated', 'i'),
     ];
   }
   
   protected function getDefaultSortingRuleList(): array{
     return [
-        (new Field('id'))->sortRule(Sorting::SQL_DESC)
+        (new Field('id'))->sortRule(Sorting::SQL_DESC),
     ];
   }
 }

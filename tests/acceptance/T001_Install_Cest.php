@@ -43,7 +43,7 @@ class T001_Install_Cest{
     $I->seeInDatabase('users', [
         'name'  => 'Admin',
         'email' => $result_email,
-        'admin' => true
+        'admin' => true,
     ]);
   }
   
@@ -58,7 +58,7 @@ class T001_Install_Cest{
     $I->seeInDatabase('users', [
         'name'  => 'Admin',
         'email' => $email,
-        'admin' => true
+        'admin' => true,
     ]);
   }
   

@@ -157,7 +157,7 @@ SQL;
         $this->db->rollBack();
         return;
       }
-  
+      
       $this->execute('DELETE FROM system_roles WHERE id = ? AND type = \'normal\'',
                      'I', [$id]);
       

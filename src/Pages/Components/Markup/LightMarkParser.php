@@ -18,13 +18,13 @@ final class LightMarkParser{
   private const TILDE = 126;
   
   private const SINGLE_CHAR_FORMATTING = [
-      self::ASTERISK => 'em'
+      self::ASTERISK => 'em',
   ];
   
   private const DOUBLED_CHAR_FORMATTING = [
       self::ASTERISK   => 'strong',
       self::UNDERSCORE => 'ins',
-      self::TILDE      => 'del'
+      self::TILDE      => 'del',
   ];
   
   // TODO implement: inline code, block formatting
@@ -160,7 +160,7 @@ final class LightMarkParser{
     $next = $iter->move();
     $checked = false;
     
-    if (in_array($next, array_map(fn($checked_char): int => ord($checked_char), IssueEditModel::TASK_CHECKED_CHARS), true)){
+    if (in_array($next, array_map(static fn($checked_char): int => ord($checked_char), IssueEditModel::TASK_CHECKED_CHARS), true)){
       $checked = true;
       $next = $iter->move();
     }

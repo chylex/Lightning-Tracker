@@ -15,7 +15,7 @@ final class UrlString{
   }
   
   public function encoded(): string{
-    return implode('/', array_map(fn($v): string => rawurlencode($v), explode('/', $this->url)));
+    return implode('/', array_map(static fn($v): string => rawurlencode($v), explode('/', $this->url)));
   }
 }
 

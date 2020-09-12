@@ -20,7 +20,7 @@ use function Pages\Actions\view;
 class LoginController extends AbstractHandlerController{
   public static function generateReturnQuery(Request $req, bool $force_full_path = false): string{
     $base_path_components = [BASE_PATH, $force_full_path ? '' : $req->getBasePath()->raw()];
-    $base_path = implode('/', array_filter(array_map(fn($v): string => ltrim($v, '/'), $base_path_components), fn($v): bool => !empty($v)));
+    $base_path = implode('/', array_filter(array_map(static fn($v): string => ltrim($v, '/'), $base_path_components), static fn($v): bool => !empty($v)));
     $base_path_len = mb_strlen($base_path);
     
     $request_uri = ltrim($_SERVER['REQUEST_URI'], '/');

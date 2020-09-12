@@ -132,7 +132,7 @@ class IssueDetailModel extends BasicProjectPageModel{
     $issues = new IssueTable(DB::get(), $this->getProject());
     $description = $issues->getIssueDescription($this->issue_id) ?? '';
     
-    $checked_indices = array_map(fn($i): int => (int)$i, $data[self::CHECKBOX_NAME] ?? []);
+    $checked_indices = array_map(static fn($i): int => (int)$i, $data[self::CHECKBOX_NAME] ?? []);
     $index = 0;
     
     $description = preg_replace_callback(IssueEditModel::TASK_REGEX, static function(array $matches) use ($checked_indices, &$index): string{
@@ -160,7 +160,7 @@ class IssueDetailModel extends BasicProjectPageModel{
     return [
         'issue_status'     => '<span class="'.$status->getTagClass().'"> '.$status->getTitle().'</span>',
         'issue_progress'   => $issue->getProgress(),
-        'active_milestone' => $active_milestone_progress
+        'active_milestone' => $active_milestone_progress,
     ];
   }
 }

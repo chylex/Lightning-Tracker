@@ -21,7 +21,7 @@ final class ProjectRolePermTable extends AbstractProjectTable{
     $project = $this->getProjectId();
     
     $sql = 'INSERT INTO project_role_permissions (project_id, role_id, permission) VALUES ()';
-    $values = implode(',', array_map(fn($ignore): string => '(?, ?, ?)', $perms));
+    $values = implode(',', array_map(static fn($ignore): string => '(?, ?, ?)', $perms));
     
     $stmt = $this->db->prepare(str_replace('()', $values, $sql));
     

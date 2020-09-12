@@ -20,7 +20,7 @@ function get_migration(int $id): ?AbstractMigrationProcess{
     
     case 8:
       return new Migration8();
-      
+    
     case 9:
       return new Migration9();
     

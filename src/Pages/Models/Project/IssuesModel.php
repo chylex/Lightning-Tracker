@@ -124,7 +124,7 @@ class IssuesModel extends BasicProjectPageModel{
       
       $groups = [
           [$filtering_author, $issues->listAuthors()],
-          [$filtering_assignee, $issues->listAssignees()]
+          [$filtering_assignee, $issues->listAssignees()],
       ];
       
       foreach($groups as [$select, $users]){

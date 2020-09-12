@@ -26,7 +26,7 @@ final class UserFilter extends AbstractFilter{
     return [
         'name'  => Filtering::TYPE_TEXT,
         'email' => $this->allow_filtering_email ? Filtering::TYPE_TEXT : Filtering::TYPE_PROHIBITED,
-        'role'  => Filtering::TYPE_MULTISELECT
+        'role'  => Filtering::TYPE_MULTISELECT,
     ];
   }
   
@@ -48,13 +48,13 @@ final class UserFilter extends AbstractFilter{
     return [
         new Field('name', 'u'),
         new Field('role_order'),
-        new Field('date_registered', 'u')
+        new Field('date_registered', 'u'),
     ];
   }
   
   protected function getDefaultSortingRuleList(): array{
     return [
-        (new Field('date_registered', 'u'))->sortRule(Sorting::SQL_ASC)
+        (new Field('date_registered', 'u'))->sortRule(Sorting::SQL_ASC),
     ];
   }
 }

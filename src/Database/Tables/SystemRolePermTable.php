@@ -23,7 +23,7 @@ class SystemRolePermTable extends AbstractTable{
     }
     
     $sql = 'INSERT INTO system_role_permissions (role_id, permission) VALUES ()';
-    $values = implode(',', array_map(fn($ignore): string => '(?, ?)', $perms));
+    $values = implode(',', array_map(static fn($ignore): string => '(?, ?)', $perms));
     
     $stmt = $this->db->prepare(str_replace('()', $values, $sql));
     

@@ -17,7 +17,7 @@ class T015_UserManageability_Cest{
       'Test'       => 7,
       'Admin2'     => 8,
       'Moderator2' => 9,
-      'Special1'   => 10
+      'Special1'   => 10,
   ];
   
   private function startManagingAs(AcceptanceTester $I, string $user): void{

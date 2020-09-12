@@ -38,7 +38,7 @@ class T008_ProjectVisibility_Cest{
     $this->ensureCanSee($I, [
         'AdminVisible', 'AdminHidden',
         'User1Visible', 'User1Hidden',
-        'User2Visible', 'User2Hidden'
+        'User2Visible', 'User2Hidden',
     ]);
   }
   
@@ -48,7 +48,7 @@ class T008_ProjectVisibility_Cest{
     $this->ensureCanSee($I, [
         'AdminVisible', 'AdminHidden',
         'User1Visible', 'User1Hidden',
-        'User2Visible', 'User2Hidden'
+        'User2Visible', 'User2Hidden',
     ]);
   }
   
@@ -58,12 +58,12 @@ class T008_ProjectVisibility_Cest{
     $this->ensureCanSee($I, [
         'AdminVisible',
         'User1Visible', 'User1Hidden',
-        'User2Visible'
+        'User2Visible',
     ]);
     
     $this->ensureCannotSee($I, [
         'AdminHidden',
-        'User2Hidden'
+        'User2Hidden',
     ]);
   }
   
@@ -73,12 +73,12 @@ class T008_ProjectVisibility_Cest{
     $this->ensureCanSee($I, [
         'AdminVisible',
         'User1Visible',
-        'User2Visible', 'User2Hidden'
+        'User2Visible', 'User2Hidden',
     ]);
     
     $this->ensureCannotSee($I, [
         'AdminHidden',
-        'User1Hidden'
+        'User1Hidden',
     ]);
   }
 }

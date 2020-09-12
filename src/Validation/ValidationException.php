@@ -18,7 +18,7 @@ final class ValidationException extends Exception{
   }
   
   public function __toString(): string{
-    return implode("\n", array_map(fn($field): string => $field->getMessage(), $this->fields));
+    return implode("\n", array_map(static fn($field): string => $field->getMessage(), $this->fields));
   }
   
   /**

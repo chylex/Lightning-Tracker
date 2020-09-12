@@ -150,7 +150,7 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
         'users'      => ['user', 'users'],
         'projects'   => ['project', 'projects'],
         'milestones' => ['milestone', 'milestones'],
-        'issues'     => ['issue', 'issues']
+        'issues'     => ['issue', 'issues'],
     ];
     
     foreach($tests as $table => $data){
@@ -208,7 +208,7 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
     ];
     
     $values = [
-        'IssueWeight'
+        'IssueWeight',
     ];
     
     try{
@@ -272,8 +272,8 @@ $value_db_password = protect($value_db_password);
 
 $sys_enable_registration_checked_attr = $value_sys_enable_registration ? ' checked' : '';
 
-$error_str = implode('', array_map(fn($v): string => '<p class="message error">'.$v.'</p>', $errors));
-$conflict_str = implode('', array_map(fn($v): string => '<li>'.$v[0].' '.($v[0] === 1 ? $v[1] : $v[2]).'</li>', $conflicts));
+$error_str = implode('', array_map(static fn($v): string => '<p class="message error">'.$v.'</p>', $errors));
+$conflict_str = implode('', array_map(static fn($v): string => '<li>'.$v[0].' '.($v[0] === 1 ? $v[1] : $v[2]).'</li>', $conflicts));
 
 $form_section_install_style = $form_section_install ? '' : ' style="display:none"';
 $form_section_conflict_style = $form_section_conflict ? '' : ' style="display:none"';

@@ -59,7 +59,7 @@ final class Filtering{
           break;
         
         case self::TYPE_MULTISELECT:
-          $rules[$key] = array_map(fn($v): string => self::decode($v), explode(self::MULTISELECT_SEPARATOR, $value_raw));
+          $rules[$key] = array_map(static fn($v): string => self::decode($v), explode(self::MULTISELECT_SEPARATOR, $value_raw));
           break;
       }
     }

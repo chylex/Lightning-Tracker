@@ -44,7 +44,7 @@ class ProjectDeleteModel extends BasicRootPageModel{
     return [
         [(new IssueTable($db, $this->project))->countIssues(), 'issue', 'issues'],
         [(new MilestoneTable($db, $this->project))->countMilestones(), 'milestone', 'milestones'],
-        [(new ProjectMemberTable($db, $this->project))->countMembers(), 'member', 'members']
+        [(new ProjectMemberTable($db, $this->project))->countMembers(), 'member', 'members'],
     ];
   }
   

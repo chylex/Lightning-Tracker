@@ -13,7 +13,7 @@ class T016_UserEditing_Cest{
       'ManageUsers1',
       'ManageUsers2',
       'User',
-      'Admin'
+      'Admin',
   ];
   
   private function startEditingAs(AcceptanceTester $I, string $editor, string $user): void{
@@ -113,7 +113,7 @@ class T016_UserEditing_Cest{
     $I->fillField('Password', $example[3]);
     $I->selectOption('Role', $example[4]);
     $I->click('button[type="submit"]');
-  
+    
     $this->startEditingAs($I, 'Admin', $example[1]);
     $I->seeInField('Name', $example[1]);
     $I->seeInField('Email', $example[2]);

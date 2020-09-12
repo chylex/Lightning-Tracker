@@ -17,7 +17,7 @@ class T004_AdminLogout_Cest{
     
     $I->seeCookie('logon', [
         'value'   => '',
-        'expires' => null
+        'expires' => null,
     ]);
     
     $I->seeCurrentUrlEquals('/');

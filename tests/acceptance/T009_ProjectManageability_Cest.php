@@ -31,7 +31,7 @@ class T009_ProjectManageability_Cest{
     $this->ensureCanManage($I, [
         'AdminVisible', 'AdminHidden',
         'User1Visible', 'User1Hidden',
-        'User2Visible', 'User2Hidden'
+        'User2Visible', 'User2Hidden',
     ]);
   }
   
@@ -41,7 +41,7 @@ class T009_ProjectManageability_Cest{
     $this->ensureCanManage($I, [
         'AdminVisible', 'AdminHidden',
         'User1Visible', 'User1Hidden',
-        'User2Visible', 'User2Hidden'
+        'User2Visible', 'User2Hidden',
     ]);
   }
   
@@ -54,7 +54,7 @@ class T009_ProjectManageability_Cest{
     
     $this->ensureCannotManage($I, [
         'AdminVisible',
-        'User2Visible'
+        'User2Visible',
     ]);
   }
   
@@ -67,7 +67,7 @@ class T009_ProjectManageability_Cest{
     
     $this->ensureCannotManage($I, [
         'AdminVisible',
-        'User1Visible'
+        'User1Visible',
     ]);
   }
 }

@@ -61,7 +61,7 @@ SQL;
           }
         },
         
-        self::sql('ALTER TABLE project_role_permissions MODIFY permission ENUM (\'settings.view\', \'settings.manage.general\', \'settings.manage.description\', \'settings.manage.roles\', \'members.list\', \'members.manage\', \'milestones.manage\', \'issues.create\', \'issues.fields.all\', \'issues.edit.all\', \'issues.delete.all\') NOT NULL')
+        self::sql('ALTER TABLE project_role_permissions MODIFY permission ENUM (\'settings.view\', \'settings.manage.general\', \'settings.manage.description\', \'settings.manage.roles\', \'members.list\', \'members.manage\', \'milestones.manage\', \'issues.create\', \'issues.fields.all\', \'issues.edit.all\', \'issues.delete.all\') NOT NULL'),
     ];
   }
 }

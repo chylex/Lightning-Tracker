@@ -19,7 +19,7 @@ final class ProjectMemberFilter extends AbstractProjectIdFilter{
   protected function getFilteringColumns(): array{
     return [
         'name' => Filtering::TYPE_TEXT,
-        'role' => Filtering::TYPE_MULTISELECT
+        'role' => Filtering::TYPE_MULTISELECT,
     ];
   }
   
@@ -39,7 +39,7 @@ final class ProjectMemberFilter extends AbstractProjectIdFilter{
   protected function getSortingFields(): array{
     return [
         new Field('name', 'u'),
-        new Field('role_order')
+        new Field('role_order'),
     ];
   }
   
@@ -47,7 +47,7 @@ final class ProjectMemberFilter extends AbstractProjectIdFilter{
     return [
         (new Field('special', 'pr'))->sortRule(Sorting::SQL_DESC),
         (new Field('role_order'))->sortRule(Sorting::SQL_ASC),
-        (new Field('user_id', 'pm'))->sortRule(Sorting::SQL_DESC)
+        (new Field('user_id', 'pm'))->sortRule(Sorting::SQL_DESC),
     ];
   }
 }

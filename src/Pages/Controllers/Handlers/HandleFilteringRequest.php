@@ -34,7 +34,7 @@ class HandleFilteringRequest implements IControlHandler{
         $pre = Filtering::encode($key).Filtering::KEY_VALUE_SEPARATOR;
         
         if (is_array($value)){
-          $rules[] = $pre.implode(Filtering::MULTISELECT_SEPARATOR, array_map(fn($v): string => Filtering::encode($v), $value));
+          $rules[] = $pre.implode(Filtering::MULTISELECT_SEPARATOR, array_map(static fn($v): string => Filtering::encode($v), $value));
         }
         elseif (!empty($value)){
           $rules[] = $pre.Filtering::encode($value);

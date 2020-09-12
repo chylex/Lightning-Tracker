@@ -48,7 +48,7 @@ final class Router{
         else{
           $route[':'] = [
               'name' => $name,
-              'next' => []
+              'next' => [],
           ];
         }
         
@@ -73,7 +73,7 @@ final class Router{
     
     $route['/'] = [
         'ctrl' => $controller_name,
-        'base' => $base_url_components
+        'base' => $base_url_components,
     ];
   }
   
@@ -82,7 +82,7 @@ final class Router{
    * @throws RouterException
    */
   public function route(string $path): void{
-    $components = array_filter(explode('/', $path), fn($component): bool => !empty($component));
+    $components = array_filter(explode('/', $path), static fn($component): bool => !empty($component));
     $path = implode('/', $components);
     
     $route = &$this->routes;

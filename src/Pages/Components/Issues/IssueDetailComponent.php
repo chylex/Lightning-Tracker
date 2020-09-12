@@ -46,7 +46,7 @@ HTML;
         'Author'    => $author === null ? Text::missing('Nobody') : Text::plain($author->getName()),
         'Assignee'  => $assignee === null ? Text::missing('Nobody') : Text::plain($assignee->getName()),
         'Created'   => new DateTimeComponent($issue->getCreationDate()),
-        'Updated'   => new DateTimeComponent($issue->getLastUpdateDate())
+        'Updated'   => new DateTimeComponent($issue->getLastUpdateDate()),
     ];
     
     /** @var IViewable $component */

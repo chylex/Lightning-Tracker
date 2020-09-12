@@ -44,20 +44,20 @@ final class ProjectTable extends AbstractTable{
       $members = new ProjectMemberTable($this->db, $project);
       
       $perms_reporter = [
-          ProjectPermissions::CREATE_ISSUE
+          ProjectPermissions::CREATE_ISSUE,
       ];
       
       $perms_developer = array_merge($perms_reporter, [
           ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS,
           ProjectPermissions::EDIT_ALL_ISSUES,
           ProjectPermissions::MANAGE_MILESTONES,
-          ProjectPermissions::LIST_MEMBERS
+          ProjectPermissions::LIST_MEMBERS,
       ]);
       
       $perms_moderator = array_merge($perms_developer, [
           ProjectPermissions::DELETE_ALL_ISSUES,
           ProjectPermissions::MANAGE_MEMBERS,
-          ProjectPermissions::VIEW_SETTINGS
+          ProjectPermissions::VIEW_SETTINGS,
       ]);
       
       $perms_admin = array_merge($perms_moderator, [

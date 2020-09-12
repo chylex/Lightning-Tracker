@@ -72,7 +72,7 @@ final class ProjectFilter extends AbstractFilter{
   protected function getFilteringColumns(): array{
     return [
         'name' => Filtering::TYPE_TEXT,
-        'url'  => Filtering::TYPE_TEXT
+        'url'  => Filtering::TYPE_TEXT,
     ];
   }
   
@@ -89,13 +89,13 @@ final class ProjectFilter extends AbstractFilter{
   
   protected function getSortingFields(): array{
     return [
-        new Field('name')
+        new Field('name'),
     ];
   }
   
   protected function getDefaultSortingRuleList(): array{
     return [
-        (new Field('name'))->sortRule(Sorting::SQL_ASC)
+        (new Field('name'))->sortRule(Sorting::SQL_ASC),
     ];
   }
 }

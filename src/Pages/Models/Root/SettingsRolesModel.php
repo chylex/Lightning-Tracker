@@ -35,7 +35,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       SystemPermissions::LIST_USERS            => 'View Users',
       SystemPermissions::SEE_USER_EMAILS       => 'View User Emails',
       SystemPermissions::CREATE_USER           => 'Create Users',
-      SystemPermissions::MANAGE_USERS          => 'Manage Users'
+      SystemPermissions::MANAGE_USERS          => 'Manage Users',
   ];
   
   public const PERM_DEPENDENCIES = [
@@ -44,7 +44,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       SystemPermissions::MANAGE_PROJECTS   => SystemPermissions::LIST_VISIBLE_PROJECTS,
       SystemPermissions::SEE_USER_EMAILS   => SystemPermissions::LIST_USERS,
       SystemPermissions::CREATE_USER       => SystemPermissions::LIST_USERS,
-      SystemPermissions::MANAGE_USERS      => SystemPermissions::LIST_USERS
+      SystemPermissions::MANAGE_USERS      => SystemPermissions::LIST_USERS,
   ];
   
   private FormComponent $create_form;
@@ -65,7 +65,7 @@ class SettingsRolesModel extends AbstractSettingsModel{
       $role_id = $role->getId();
       $role_id_str = (string)$role_id;
       
-      $perm_list = implode(', ', array_map(fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
+      $perm_list = implode(', ', array_map(static fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
       
       switch($role->getType()){
         case RoleInfo::SYSTEM_ADMIN:
@@ -82,25 +82,25 @@ class SettingsRolesModel extends AbstractSettingsModel{
       if ($role->getType() === RoleInfo::SYSTEM_NORMAL){
         $form_move = new FormComponent(self::ACTION_MOVE);
         $form_move->addHidden('Ordering', (string)$role->getOrdering());
-  
+        
         $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
         $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
-  
+        
         $ordering = $role->getOrdering();
-  
+        
         if ($ordering === 0 || $ordering === 1){
           $btn_move_up->disabled();
         }
-  
+        
         if ($ordering === 0 || $ordering === $ordering_limit){
           $btn_move_down->disabled();
         }
-  
+        
         $form_delete = new FormComponent(self::ACTION_DELETE);
         $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
         $form_delete->addHidden('Role', $role_id_str);
         $form_delete->addIconButton('submit', 'circle-cross')->color('red');
-  
+        
         $row[] = new CompositeComponent($form_move, $form_delete);
       }
       else{
