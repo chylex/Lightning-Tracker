@@ -48,9 +48,6 @@ class T000_Setup_Cest{
     self::t($I, $t, fn() => $t->createProjectsAsUser1($I));
     self::t($I, $t, fn() => $t->createProjectsAsUser2($I));
     
-    $t = new T013_SystemSettingsRolesSpecial_Cest();
-    self::t($I, $t, fn() => $t->createAdminRoles($I));
-    
     $t = new T014_UserList_Cest();
     self::t($I, $t, fn() => $t->registerNewUser($I));
   }

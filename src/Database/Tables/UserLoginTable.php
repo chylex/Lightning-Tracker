@@ -12,9 +12,10 @@ final class UserLoginTable extends AbstractTable{
   
   public function checkLogin(string $token): ?UserProfile{
     $stmt = $this->db->prepare(<<<SQL
-SELECT u.id, u.name, u.email, u.role_id, u.admin
+SELECT u.id, u.name, u.email, u.role_id, IF(sr.type = 'admin', TRUE, FALSE) AS admin
 FROM users u
 JOIN user_logins ul ON u.id = ul.id
+LEFT JOIN system_roles sr ON u.role_id = sr.id
 WHERE token = ? AND NOW() < ul.expires
 SQL
     );

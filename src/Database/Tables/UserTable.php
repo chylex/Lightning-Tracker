@@ -95,7 +95,7 @@ SQL;
     $filter ??= UserFilter::empty();
     
     $sql = <<<SQL
-SELECT u.id, u.name, u.email, sr.id AS role_id, sr.title AS role_title, IF(u.admin, 0, IFNULL(sr.ordering, ~0)) AS role_order, u.admin, u.date_registered
+SELECT u.id, u.name, u.email, sr.id AS role_id, sr.type AS role_type, sr.title AS role_title, IFNULL(sr.ordering, ~0) AS role_order, u.date_registered
 FROM users u
 LEFT JOIN system_roles sr ON u.role_id = sr.id
 SQL;
@@ -106,8 +106,8 @@ SQL;
                                                                    $v['name'],
                                                                    $v['email'],
                                                                    $v['role_id'],
+                                                                   $v['role_type'],
                                                                    $v['role_title'],
-                                                                   (bool)$v['admin'],
                                                                    $v['date_registered']));
   }
   
@@ -120,7 +120,7 @@ SQL;
   
   public function getUserInfo(UserId $id): ?UserInfo{
     $sql = <<<SQL
-SELECT u.id, u.name, u.email, sr.id AS role_id, sr.title AS role_title, u.admin, u.date_registered
+SELECT u.id, u.name, u.email, sr.id AS role_id, sr.type AS role_type, sr.title AS role_title, u.date_registered
 FROM users u
 LEFT JOIN system_roles sr ON u.role_id = sr.id
 WHERE u.id = ?
@@ -129,7 +129,13 @@ SQL;
     $stmt = $this->execute($sql, 'S', [$id]);
     
     $res = $this->fetchOneRaw($stmt);
-    return $res === false ? null : new UserInfo(UserId::fromRaw($res['id']), $res['name'], $res['email'], $res['role_id'], $res['role_title'], (bool)$res['admin'], $res['date_registered']);
+    return $res === false ? null : new UserInfo(UserId::fromRaw($res['id']),
+                                                $res['name'],
+                                                $res['email'],
+                                                $res['role_id'],
+                                                $res['role_type'],
+                                                $res['role_title'],
+                                                $res['date_registered']);
   }
   
   public function getLoginInfo(string $name): ?UserLoginInfo{
@@ -170,7 +176,7 @@ SQL;
   }
   
   public function deleteById(UserId $id): void{
-    $this->execute('DELETE FROM users WHERE id = ? AND admin = FALSE',
+    $this->execute('DELETE FROM users u WHERE u.id = ? AND NOT EXISTS(SELECT 1 FROM system_roles sr WHERE sr.id = u.role_id AND sr.type != \'normal\')',
                    'S', [$id]);
   }
 }

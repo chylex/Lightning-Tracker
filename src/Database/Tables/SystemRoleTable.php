@@ -88,16 +88,16 @@ SQL;
     $sql = <<<SQL
 SELECT 1
 FROM system_roles sr
-WHERE id = ?
-  AND type = 'normal'
-  AND ((SELECT u.admin FROM users u WHERE u.id = ?) OR
-       (ordering > IFNULL((SELECT ordering
-                         FROM system_roles sr2
-                         JOIN users u ON sr2.id = u.role_id
-                         WHERE u.id = ?), ~0)))
+CROSS JOIN (SELECT ur.type, ur.ordering
+            FROM system_roles ur
+            JOIN users u ON ur.id = u.role_id
+            WHERE u.id = ?) ur
+WHERE sr.id = ?
+  AND sr.type = 'normal'
+  AND (sr.ordering > ur.ordering OR ur.type = 'admin')
 SQL;
     
-    $stmt = $this->execute($sql, 'ISS', [$role_id, $user_id, $user_id]);
+    $stmt = $this->execute($sql, 'SI', [$user_id, $role_id]);
     return $this->fetchOneInt($stmt) !== null;
   }
   
@@ -115,18 +115,18 @@ SQL;
    */
   public function listRolesAssignableBy(UserId $user_id): array{
     $sql = <<<SQL
-SELECT id, type, title, ordering
+SELECT sr.id, sr.type, sr.title, sr.ordering
 FROM system_roles sr
-WHERE type = 'normal'
-  AND ((SELECT u.admin FROM users u WHERE u.id = ?) OR
-       (ordering > IFNULL((SELECT ordering
-                           FROM system_roles sr2
-                           JOIN users u ON sr2.id = u.role_id
-                           WHERE u.id = ?), ~0)))
-ORDER BY ordering ASC
+CROSS JOIN (SELECT ur.type, ur.ordering
+            FROM system_roles ur
+            JOIN users u ON ur.id = u.role_id
+            WHERE u.id = ?) ur
+WHERE sr.type = 'normal'
+  AND (sr.ordering > ur.ordering OR ur.type = 'admin')
+ORDER BY sr.ordering ASC
 SQL;
     
-    $stmt = $this->execute($sql, 'SS', [$user_id, $user_id]);
+    $stmt = $this->execute($sql, 'S', [$user_id]);
     return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['id'], $v['type'], $v['title'], (int)$v['ordering']));
   }
   

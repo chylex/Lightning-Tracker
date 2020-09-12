@@ -5,6 +5,7 @@ namespace Pages\Models\Root;
 
 use Database\DB;
 use Database\Filters\Types\UserFilter;
+use Database\Objects\RoleInfo;
 use Database\Tables\SystemRoleTable;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
@@ -92,14 +93,22 @@ class UsersModel extends BasicRootPageModel{
         $row[] = $user->getEmailSafe();
       }
       
-      /** @noinspection ProperNullCoalescingOperatorUsageInspection */
-      $row[] = $user->isAdmin() ? Text::missing('Admin') : ($user->getRoleTitleSafe() ?? Text::missing('Default'));
+      switch($user->getRoleType()){
+        case RoleInfo::SYSTEM_ADMIN:
+          $row[] = Text::missing('Admin');
+          break;
+        
+        default:
+          /** @noinspection ProperNullCoalescingOperatorUsageInspection */
+          $row[] = $user->getRoleTitleSafe() ?? Text::missing('Default');
+          break;
+      }
+      
       $row[] = new DateTimeComponent($user->getRegistrationDate());
       
       $can_edit = (
           $this->perms->check(SystemPermissions::MANAGE_USERS) &&
           !$user_id->equals($logon_user_id) &&
-          !$user->isAdmin() &&
           ($user->getRoleId() === null || array_key_exists($user->getRoleId(), $this->editable_roles))
       );
       

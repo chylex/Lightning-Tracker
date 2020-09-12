@@ -17,7 +17,6 @@ class T015_UserManageability_Cest{
       'Test'       => 7,
       'Admin2'     => 8,
       'Moderator2' => 9,
-      'Special1'   => 10,
   ];
   
   private function startManagingAs(AcceptanceTester $I, string $user): void{
@@ -40,14 +39,13 @@ class T015_UserManageability_Cest{
   public function prepareTemporaryUsers(): void{
     $db = Acceptance::getDB();
     
+    $admin = $db->query('SELECT id FROM system_roles WHERE title = \'Admin\'')->fetchColumn();
     $moderator = $db->query('SELECT id FROM system_roles WHERE title = \'Moderator\'')->fetchColumn();
-    $special = $db->query('SELECT id FROM system_roles WHERE title = \'Admin\'')->fetchColumn();
     
     $db->exec(<<<SQL
-INSERT INTO users (id, name, email, password, role_id, admin, date_registered)
-VALUES ('aaaaaaaaa', 'Admin2', 'a', '', NULL, TRUE, DATE_ADD(NOW(), INTERVAL 1 SECOND)),
-       ('bbbbbbbbb', 'Moderator2', 'b', '', $moderator, FALSE, DATE_ADD(NOW(), INTERVAL 2 SECOND)),
-       ('ccccccccc', 'Special1', 'c', '', $special, FALSE, DATE_ADD(NOW(), INTERVAL 3 SECOND))
+INSERT INTO users (id, name, email, password, role_id, date_registered)
+VALUES ('aaaaaaaaa', 'Admin2', 'a', '', $admin, DATE_ADD(NOW(), INTERVAL 1 SECOND)),
+       ('bbbbbbbbb', 'Moderator2', 'b', '', $moderator, DATE_ADD(NOW(), INTERVAL 2 SECOND))
 SQL
     );
   }
@@ -111,7 +109,7 @@ SQL
    */
   public function removeTemporaryUsers(): void{
     $db = Acceptance::getDB();
-    $db->exec('DELETE FROM users WHERE email IN (\'a\', \'b\', \'c\')');
+    $db->exec('DELETE FROM users WHERE email IN (\'a\', \'b\')');
   }
 }
 

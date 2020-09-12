@@ -25,7 +25,6 @@ class UserEditModel extends BasicRootPageModel{
   public static function canEditUser(UserId $editor_id, UserInfo $target): bool{
     return (
         !$target->getId()->equals($editor_id) &&
-        !$target->isAdmin() &&
         ($target->getRoleId() === null || (new SystemRoleTable(DB::get()))->isRoleAssignableBy($target->getRoleId(), $editor_id))
     );
   }

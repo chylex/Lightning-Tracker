@@ -103,29 +103,29 @@ class T006_RegisterAccounts_Cest{
   public function setupRoles(): void{
     $db = Acceptance::getDB();
     
-    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (1, \'User\', 4)');
-    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (2, \'ManageUsers2\', 3)');
-    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (3, \'ManageUsers1\', 2)');
-    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (4, \'Moderator\', 1)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (2, \'User\', 4)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (3, \'ManageUsers2\', 3)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (4, \'ManageUsers1\', 2)');
+    $db->exec('INSERT INTO system_roles (id, title, ordering) VALUES (5, \'Moderator\', 1)');
     
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (1, \'projects.list\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (1, \'projects.create\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'users.list\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'users.manage\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'projects.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'projects.create\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (3, \'users.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (3, \'users.manage\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.list\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.list.all\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.create\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.manage\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.list\')');
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.see.emails\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.manage\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.list.all\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.create\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.manage\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'users.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'users.see.emails\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'users.manage\')');
     
-    $db->exec('UPDATE users SET role_id = 1 WHERE name = \'User1\' OR name = \'User2\'');
-    $db->exec('UPDATE users SET role_id = 2 WHERE name = \'Manager2\'');
-    $db->exec('UPDATE users SET role_id = 3 WHERE name = \'Manager1\'');
-    $db->exec('UPDATE users SET role_id = 4 WHERE name = \'Moderator\'');
+    $db->exec('UPDATE users SET role_id = 2 WHERE name = \'User1\' OR name = \'User2\'');
+    $db->exec('UPDATE users SET role_id = 3 WHERE name = \'Manager2\'');
+    $db->exec('UPDATE users SET role_id = 4 WHERE name = \'Manager1\'');
+    $db->exec('UPDATE users SET role_id = 5 WHERE name = \'Moderator\'');
   }
 }
 

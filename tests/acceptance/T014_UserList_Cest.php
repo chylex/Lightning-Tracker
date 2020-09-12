@@ -37,7 +37,6 @@ class T014_UserList_Cest{
         'name'    => 'Test',
         'email'   => 'test@example.com',
         'role_id' => null,
-        'admin'   => false,
     ]);
     
     $I->amNotLoggedIn();

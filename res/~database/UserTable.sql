@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`email`           VARCHAR(191) NOT NULL, # Size limit needed due to low key size limits in older versions of MySQL.
 	`password`        VARCHAR(255) NOT NULL,
 	`role_id`         SMALLINT DEFAULT NULL,
-	`admin`           BOOL NOT NULL DEFAULT FALSE,
 	`date_registered` DATETIME NOT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `name` (`name`),

@@ -16,7 +16,8 @@ class T011_SystemSettingsRoles_Cest{
   }
   
   public function seeInitialRoles(AcceptanceTester $I): void{
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'User']);
@@ -50,7 +51,8 @@ class T011_SystemSettingsRoles_Cest{
     $this->createRole($I, 'Test1');
     $this->createRole($I, 'Test2');
     
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'User',
@@ -64,7 +66,8 @@ class T011_SystemSettingsRoles_Cest{
   public function moveTopRoleAround(AcceptanceTester $I): void{
     $I->click('#Move-1 button[value="Down"]');
     
-    $I->seeTableRowOrder(['ManageUsers1',
+    $I->seeTableRowOrder(['Admin',
+                          'ManageUsers1',
                           'Moderator',
                           'ManageUsers2',
                           'User',
@@ -73,7 +76,8 @@ class T011_SystemSettingsRoles_Cest{
     
     $I->click('#Move-2 button[value="Down"]');
     
-    $I->seeTableRowOrder(['ManageUsers1',
+    $I->seeTableRowOrder(['Admin',
+                          'ManageUsers1',
                           'ManageUsers2',
                           'Moderator',
                           'User',
@@ -83,7 +87,8 @@ class T011_SystemSettingsRoles_Cest{
     $I->click('#Move-3 button[value="Up"]');
     $I->click('#Move-2 button[value="Up"]');
     
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'User',
@@ -97,7 +102,8 @@ class T011_SystemSettingsRoles_Cest{
   public function moveBottomRoleAround(AcceptanceTester $I): void{
     $I->click('#Move-6 button[value="Up"]');
     
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'User',
@@ -106,7 +112,8 @@ class T011_SystemSettingsRoles_Cest{
     
     $I->click('#Move-5 button[value="Up"]');
     
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'Test2',
@@ -116,7 +123,8 @@ class T011_SystemSettingsRoles_Cest{
     $I->click('#Move-4 button[value="Down"]');
     $I->click('#Move-5 button[value="Down"]');
     
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'User',
@@ -131,7 +139,8 @@ class T011_SystemSettingsRoles_Cest{
     $I->click('#Move-1 button[value="Up"]');
     $I->click('#Move-6 button[value="Down"]');
     
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'User',
@@ -147,7 +156,8 @@ class T011_SystemSettingsRoles_Cest{
   public function deleteRole(AcceptanceTester $I): void{
     $I->click('#Delete-5 button[type="submit"]');
     
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'User',
@@ -160,7 +170,8 @@ class T011_SystemSettingsRoles_Cest{
   public function readdRole(AcceptanceTester $I): void{
     $this->createRole($I, 'Test1');
     
-    $I->seeTableRowOrder(['Moderator',
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
                           'User',

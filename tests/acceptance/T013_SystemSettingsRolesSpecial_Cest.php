@@ -16,35 +16,6 @@ class T013_SystemSettingsRolesSpecial_Cest{
     $I->terminate();
   }
   
-  public function createAdminRoles(AcceptanceTester $I): void{
-    $db = Acceptance::getDB();
-    $db->exec('INSERT INTO system_roles (type, title, ordering) VALUES (\'admin\', \'Admin\', 0)');
-    
-    $I->amOnPage('/settings/roles');
-    
-    $I->seeTableRowOrder(['Admin',
-                          'Moderator',
-                          'ManageUsers1',
-                          'ManageUsers2',
-                          'User']);
-  }
-  
-  /**
-   * @depends createAdminRoles
-   */
-  public function cannotMoveRolesAboveAdminRoles(AcceptanceTester $I): void{
-    $I->click('#Move-1 button[value="Up"]');
-    
-    $I->seeTableRowOrder(['Admin',
-                          'Moderator',
-                          'ManageUsers1',
-                          'ManageUsers2',
-                          'User']);
-  }
-  
-  /**
-   * @depends createAdminRoles
-   */
   public function cannotDeleteAdminRole(AcceptanceTester $I): void{
     $db = Acceptance::getDB();
     $id = $db->query('SELECT id FROM system_roles WHERE type = \'admin\' LIMIT 1')->fetchColumn();

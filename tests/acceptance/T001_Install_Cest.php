@@ -41,9 +41,9 @@ class T001_Install_Cest{
     
     $I->see('Register', 'a[href="http://localhost/register"]');
     $I->seeInDatabase('users', [
-        'name'  => 'Admin',
-        'email' => $result_email,
-        'admin' => true,
+        'name'    => 'Admin',
+        'email'   => $result_email,
+        'role_id' => 1,
     ]);
   }
   
@@ -56,9 +56,9 @@ class T001_Install_Cest{
     $I->see('Register', 'a[href="http://localhost/register"]');
     $I->dontSeeCookie('logon');
     $I->seeInDatabase('users', [
-        'name'  => 'Admin',
-        'email' => $email,
-        'admin' => true,
+        'name'    => 'Admin',
+        'email'   => $email,
+        'role_id' => 1,
     ]);
   }
   
