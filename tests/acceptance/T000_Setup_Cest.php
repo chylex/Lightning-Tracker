@@ -35,21 +35,19 @@ class T000_Setup_Cest{
     $t = new T003_AdminLogin_Cest();
     self::t($I, $t, fn() => $t->login($I));
     
-    $t = new T006_RegisterAccounts_Cest();
+    $t = new T005_RegisterAccounts_Cest();
     self::t($I, $t, fn() => $t->registerModeratorWithLogin($I));
     self::t($I, $t, fn() => $t->registerManager1WithLogin($I));
     self::t($I, $t, fn() => $t->registerManager2WithLogin($I));
     self::t($I, $t, fn() => $t->registerUser1WithLogin($I));
     self::t($I, $t, fn() => $t->registerUser2WithLogin($I));
+    self::t($I, $t, fn() => $t->registerRoleLessWithLogin($I));
     self::t($I, $t, fn() => $t->setupRoles());
     
     $t = new T007_CreateProjects_Cest();
     self::t($I, $t, fn() => $t->createProjectsAsAdmin($I));
     self::t($I, $t, fn() => $t->createProjectsAsUser1($I));
     self::t($I, $t, fn() => $t->createProjectsAsUser2($I));
-    
-    $t = new T014_UserList_Cest();
-    self::t($I, $t, fn() => $t->registerNewUser($I));
   }
 }
 

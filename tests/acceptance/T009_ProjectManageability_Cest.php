@@ -70,6 +70,16 @@ class T009_ProjectManageability_Cest{
         'User1Visible',
     ]);
   }
+  
+  public function cannotManageAnyProjectsAsRoleLess(AcceptanceTester $I): void{
+    $I->amLoggedIn('RoleLess');
+    
+    $this->ensureCannotManage($I, [
+        'AdminVisible',
+        'User1Visible',
+        'User2Visible',
+    ]);
+  }
 }
 
 ?>

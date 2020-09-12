@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T006_RegisterAccounts_Cest{
+class T005_RegisterAccounts_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amOnPage('/register');
   }
@@ -96,9 +96,20 @@ class T006_RegisterAccounts_Cest{
   }
   
   /**
+   * @depends userAlreadyExists
+   * @depends emailAlreadyExists
+   */
+  public function registerRoleLessWithLogin(AcceptanceTester $I): void{
+    $this->register($I, 'RoleLess', '123456789', 'role-less@example.com');
+  }
+  
+  /**
    * @depends registerModeratorWithLogin
+   * @depends registerManager1WithLogin
+   * @depends registerManager2WithLogin
    * @depends registerUser1WithLogin
    * @depends registerUser2WithLogin
+   * @depends registerRoleLessWithLogin
    */
   public function setupRoles(): void{
     $db = Acceptance::getDB();
@@ -110,10 +121,14 @@ class T006_RegisterAccounts_Cest{
     
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'projects.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (2, \'projects.create\')');
+    
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (3, \'users.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (3, \'users.manage\')');
+    
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'settings\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.manage\')');
+    
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.list.all\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.create\')');

@@ -30,7 +30,7 @@ class T014_UserList_Cest{
     $I->seeElement('input[name="Password"] + .error');
   }
   
-  public function registerNewUser(AcceptanceTester $I): void{
+  public function registerTestUser(AcceptanceTester $I): void{
     $this->createUser($I, 'Test', '123456789', 'test@example.com');
     
     $I->seeInDatabase('users', [
@@ -48,16 +48,17 @@ class T014_UserList_Cest{
   }
   
   /**
-   * @depends registerNewUser
+   * @depends registerTestUser
    */
   public function ensureRegistrationOrder(): void{
     $db = Acceptance::getDB();
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 7 SECOND) WHERE name = \'Admin\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 6 SECOND) WHERE name = \'Moderator\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 5 SECOND) WHERE name = \'Manager1\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 4 SECOND) WHERE name = \'Manager2\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 3 SECOND) WHERE name = \'User1\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 2 SECOND) WHERE name = \'User2\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 8 SECOND) WHERE name = \'Admin\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 7 SECOND) WHERE name = \'Moderator\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 6 SECOND) WHERE name = \'Manager1\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 5 SECOND) WHERE name = \'Manager2\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 4 SECOND) WHERE name = \'User1\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 3 SECOND) WHERE name = \'User2\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 2 SECOND) WHERE name = \'RoleLess\'');
     $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 1 SECOND) WHERE name = \'Test\'');
   }
   
@@ -71,6 +72,7 @@ class T014_UserList_Cest{
                           'Manager2',
                           'User1',
                           'User2',
+                          'RoleLess',
                           'Test']);
   }
   
@@ -83,6 +85,7 @@ class T014_UserList_Cest{
         'Manager1',
         'Manager2',
         'Moderator',
+        'RoleLess',
         'Test',
         'User1',
         'User2',
@@ -107,11 +110,13 @@ class T014_UserList_Cest{
                           'Manager2',  // role 3
                           'User1',     // role 4, registered first
                           'User2',     // role 4, registered last
-                          'Test']);    // no role
+                          'RoleLess',  // no role, registered first
+                          'Test']);    // no role, registered last
     
     $I->click('thead tr:first-child th:nth-child(3) > a');
     
-    $I->seeTableRowOrder(['Test',      // no role
+    $I->seeTableRowOrder(['RoleLess',  // no role, registered first
+                          'Test',      // no role, registered last
                           'User1',     // role 4, registered first
                           'User2',     // role 4, registered last
                           'Manager2',  // role 3
@@ -131,6 +136,7 @@ class T014_UserList_Cest{
         'Manager2',
         'User1',
         'User2',
+        'RoleLess',
         'Test',
     ];
     
@@ -139,6 +145,17 @@ class T014_UserList_Cest{
     
     $I->click('thead tr:first-child th:nth-child(4) > a');
     $I->seeTableRowOrder(array_reverse($order));
+  }
+  
+  /**
+   * @depends testUsersOrderedByRegistrationDateAscIsDefault
+   * @depends testUsersOrderedByName
+   * @depends testUsersOrderedByRole
+   * @depends testUsersOrderedByRegistrationDate
+   */
+  public function removeTestUser(): void{
+    $db = Acceptance::getDB();
+    $db->exec('DELETE FROM users WHERE name = \'Test\'');
   }
 }
 

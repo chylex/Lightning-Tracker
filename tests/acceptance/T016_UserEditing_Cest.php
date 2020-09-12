@@ -41,7 +41,7 @@ class T016_UserEditing_Cest{
   /**
    * @example ["Admin", "User1", "user1@example.com", "User"]
    * @example ["Admin", "User2", "user2@example.com", "User"]
-   * @example ["Admin", "Test", "test@example.com", "(None)"]
+   * @example ["Admin", "RoleLess", "role-less@example.com", "(None)"]
    * @example ["Moderator", "User1", "user1@example.com", "User"]
    * @example ["Manager1", "User1", "", "User"]
    * @example ["Manager2", "User1", "", "User"]
@@ -55,7 +55,7 @@ class T016_UserEditing_Cest{
   }
   
   public function adminCanSetAllButSpecialRoles(AcceptanceTester $I): void{
-    $this->startEditingAs($I, 'Admin', 'Test');
+    $this->startEditingAs($I, 'Admin', 'RoleLess');
     
     $this->ensureCanOnlySetRoles($I, ['Moderator',
                                       'ManageUsers1',
@@ -64,7 +64,7 @@ class T016_UserEditing_Cest{
   }
   
   public function moderatorCanOnlySetLowerRoles(AcceptanceTester $I): void{
-    $this->startEditingAs($I, 'Moderator', 'Test');
+    $this->startEditingAs($I, 'Moderator', 'RoleLess');
     
     $this->ensureCanOnlySetRoles($I, ['ManageUsers1',
                                       'ManageUsers2',
@@ -72,14 +72,14 @@ class T016_UserEditing_Cest{
   }
   
   public function manager1CanOnlySetLowerRoles(AcceptanceTester $I): void{
-    $this->startEditingAs($I, 'Manager1', 'Test');
+    $this->startEditingAs($I, 'Manager1', 'RoleLess');
     
     $this->ensureCanOnlySetRoles($I, ['ManageUsers2',
                                       'User']);
   }
   
   public function manager2CanOnlySetLowerRoles(AcceptanceTester $I): void{
-    $this->startEditingAs($I, 'Manager2', 'Test');
+    $this->startEditingAs($I, 'Manager2', 'RoleLess');
     $this->ensureCanOnlySetRoles($I, ['User']);
   }
   
@@ -91,7 +91,7 @@ class T016_UserEditing_Cest{
    * @depends manager2CanOnlySetLowerRoles
    */
   public function userAndEmailAlreadyExists(AcceptanceTester $I): void{
-    $this->startEditingAs($I, 'Admin', 'Test');
+    $this->startEditingAs($I, 'Admin', 'RoleLess');
     $I->fillField('Name', 'Moderator');
     $I->fillField('Email', 'admin@example.com');
     $I->fillField('Password', '111222333');
@@ -102,8 +102,8 @@ class T016_UserEditing_Cest{
   }
   
   /**
-   * @example ["Test", "Test2", "test2@example.com", "abcdefghi", "Moderator"]
-   * @example ["Test2", "Test", "test@example.com", "123456789", "(None)"]
+   * @example ["RoleLess", "RoleLess2", "role-less-2@example.com", "abcdefghi", "Moderator"]
+   * @example ["RoleLess2", "RoleLess", "role-less@example.com", "123456789", "(None)"]
    * @depends userAndEmailAlreadyExists
    */
   public function editTestUser(AcceptanceTester $I, Example $example): void{

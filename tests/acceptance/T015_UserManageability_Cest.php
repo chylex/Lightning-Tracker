@@ -14,7 +14,7 @@ class T015_UserManageability_Cest{
       'Manager2'   => 4,
       'User1'      => 5,
       'User2'      => 6,
-      'Test'       => 7,
+      'RoleLess'   => 7,
       'Admin2'     => 8,
       'Moderator2' => 9,
   ];
@@ -56,13 +56,15 @@ SQL
   public function adminCanManageAllButAdminsOrSpecials(AcceptanceTester $I): void{
     $this->startManagingAs($I, 'Admin');
     
-    $this->ensureCanOnlyManage($I, ['Moderator',
-                                    'User1',
-                                    'User2',
-                                    'Test',
-                                    'Moderator2',
-                                    'Manager1',
-                                    'Manager2']);
+    $this->ensureCanOnlyManage($I, [
+        'Manager1',
+        'Manager2',
+        'Moderator',
+        'Moderator2',
+        'RoleLess',
+        'User1',
+        'User2',
+    ]);
   }
   
   /**
@@ -71,11 +73,13 @@ SQL
   public function moderatorCanOnlyManageLowerRoles(AcceptanceTester $I): void{
     $this->startManagingAs($I, 'Moderator');
     
-    $this->ensureCanOnlyManage($I, ['User1',
-                                    'User2',
-                                    'Test',
-                                    'Manager1',
-                                    'Manager2']);
+    $this->ensureCanOnlyManage($I, [
+        'Manager1',
+        'Manager2',
+        'RoleLess',
+        'User1',
+        'User2',
+    ]);
   }
   
   /**
@@ -84,10 +88,12 @@ SQL
   public function manager1CanOnlyManageLowerRoles(AcceptanceTester $I): void{
     $this->startManagingAs($I, 'Manager1');
     
-    $this->ensureCanOnlyManage($I, ['User1',
-                                    'User2',
-                                    'Test',
-                                    'Manager2']);
+    $this->ensureCanOnlyManage($I, [
+        'Manager2',
+        'RoleLess',
+        'User1',
+        'User2',
+    ]);
   }
   
   /**
@@ -96,9 +102,11 @@ SQL
   public function manager2CanOnlyManageLowerRoles(AcceptanceTester $I): void{
     $this->startManagingAs($I, 'Manager2');
     
-    $this->ensureCanOnlyManage($I, ['User1',
-                                    'User2',
-                                    'Test']);
+    $this->ensureCanOnlyManage($I, [
+        'RoleLess',
+        'User1',
+        'User2',
+    ]);
   }
   
   /**

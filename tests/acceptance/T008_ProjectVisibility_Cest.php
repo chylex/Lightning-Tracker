@@ -81,6 +81,22 @@ class T008_ProjectVisibility_Cest{
         'User1Hidden',
     ]);
   }
+  
+  public function canSeeSomeProjectsAsRoleLess(AcceptanceTester $I): void{
+    $I->amLoggedIn('RoleLess');
+    
+    $this->ensureCanSee($I, [
+        'AdminVisible',
+        'User1Visible',
+        'User2Visible',
+    ]);
+    
+    $this->ensureCannotSee($I, [
+        'AdminHidden',
+        'User1Hidden',
+        'User2Hidden',
+    ]);
+  }
 }
 
 ?>
