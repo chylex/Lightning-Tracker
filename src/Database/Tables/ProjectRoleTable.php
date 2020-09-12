@@ -64,14 +64,31 @@ SQL;
   }
   
   public function swapRolesIfNormal(int $ordering1, int $ordering2): void{
-    $sql = <<<SQL
+    $this->db->beginTransaction();
+    
+    try{
+      $sql = <<<SQL
 UPDATE project_roles pr1 INNER JOIN project_roles pr2 ON pr1.ordering = ? AND pr2.ordering = ? AND pr1.project_id = pr2.project_id
-SET pr1.ordering = pr2.ordering,
-    pr2.ordering = pr1.ordering
+SET pr1.ordering = -pr2.ordering,
+    pr2.ordering = -pr1.ordering
 WHERE pr1.project_id = ? AND pr1.type = 'normal' AND pr2.type = 'normal'
 SQL;
-    
-    $this->execute($sql, 'III', [$ordering1, $ordering2, $this->getProjectId()]);
+      
+      $this->execute($sql, 'III', [$ordering1, $ordering2, $this->getProjectId()]);
+      
+      $sql = <<<SQL
+UPDATE project_roles
+SET ordering = -ordering
+WHERE project_id = ? AND ordering IN (-?, -?) AND type = 'normal'
+SQL;
+      
+      $this->execute($sql, 'III', [$this->getProjectId(), $ordering1, $ordering2]);
+      
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+      throw $e;
+    }
   }
   
   public function findMaxOrdering(): ?int{
@@ -161,11 +178,11 @@ SQL;
       $this->execute('UPDATE project_members SET role_id = NULL WHERE role_id = ? AND project_id = ?',
                      'II', [$id, $project]);
       
-      $this->execute('UPDATE project_roles SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ? AND type = \'normal\'',
-                     'II', [$ordering, $project]);
-      
       $this->execute('DELETE FROM project_roles WHERE role_id = ? AND project_id = ? AND type = \'normal\'',
                      'II', [$id, $project]);
+      
+      $this->execute('UPDATE project_roles SET ordering = ordering - 1 WHERE ordering > ? AND project_id = ? AND type = \'normal\'',
+                     'II', [$ordering, $project]);
       
       $this->db->commit();
     }catch(PDOException $e){

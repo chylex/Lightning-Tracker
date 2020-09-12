@@ -13,8 +13,7 @@ class T016_UserEditing_Cest{
       'ManageUsers1',
       'ManageUsers2',
       'User',
-      'Special1',
-      'Special2'
+      'Admin'
   ];
   
   private function startEditingAs(AcceptanceTester $I, string $editor, string $user): void{

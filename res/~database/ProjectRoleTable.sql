@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `project_roles` (
 	`ordering`   SMALLINT NOT NULL,
 	PRIMARY KEY (`project_id`, `role_id`),
 	UNIQUE KEY (`project_id`, `title`),
+	UNIQUE KEY (`project_id`, `type`, `ordering`),
 	KEY (`role_id`, `project_id`), # Needed for role-project pair checks.
 	CONSTRAINT fk__project_role__project FOREIGN KEY (`project_id`)
 		REFERENCES `projects` (`id`)

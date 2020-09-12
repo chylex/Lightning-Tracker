@@ -41,7 +41,7 @@ class T015_UserManageability_Cest{
     $db = Acceptance::getDB();
     
     $moderator = $db->query('SELECT id FROM system_roles WHERE title = \'Moderator\'')->fetchColumn();
-    $special = $db->query('SELECT id FROM system_roles WHERE title = \'Special1\'')->fetchColumn();
+    $special = $db->query('SELECT id FROM system_roles WHERE title = \'Admin\'')->fetchColumn();
     
     $db->exec(<<<SQL
 INSERT INTO users (id, name, email, password, role_id, admin, date_registered)

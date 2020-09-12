@@ -52,14 +52,31 @@ SQL;
   }
   
   public function swapRolesIfNormal(int $ordering1, int $ordering2): void{
-    $sql = <<<SQL
+    $this->db->beginTransaction();
+    
+    try{
+      $sql = <<<SQL
 UPDATE system_roles sr1 INNER JOIN system_roles sr2 ON sr1.ordering = ? AND sr2.ordering = ?
-SET sr1.ordering = sr2.ordering,
-    sr2.ordering = sr1.ordering
+SET sr1.ordering = -sr2.ordering,
+    sr2.ordering = -sr1.ordering
 WHERE sr1.type = 'normal' AND sr2.type = 'normal'
 SQL;
-    
-    $this->execute($sql, 'II', [$ordering1, $ordering2]);
+      
+      $this->execute($sql, 'II', [$ordering1, $ordering2]);
+      
+      $sql = <<<SQL
+UPDATE system_roles
+SET ordering = -ordering
+WHERE ordering IN (-?, -?) AND type = 'normal'
+SQL;
+      
+      $this->execute($sql, 'II', [$ordering1, $ordering2]);
+      
+      $this->db->commit();
+    }catch(PDOException $e){
+      $this->db->rollBack();
+      throw $e;
+    }
   }
   
   public function findMaxOrdering(): ?int{
@@ -140,12 +157,12 @@ SQL;
         $this->db->rollBack();
         return;
       }
+  
+      $this->execute('DELETE FROM system_roles WHERE id = ? AND type = \'normal\'',
+                     'I', [$id]);
       
       $this->execute('UPDATE system_roles SET ordering = ordering - 1 WHERE ordering > ? AND type = \'normal\'',
                      'I', [$ordering]);
-      
-      $this->execute('DELETE FROM system_roles WHERE id = ? AND type = \'normal\'',
-                     'I', [$id]);
       
       $this->db->commit();
     }catch(PDOException $e){

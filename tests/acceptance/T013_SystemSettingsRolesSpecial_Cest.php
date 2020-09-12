@@ -18,13 +18,11 @@ class T013_SystemSettingsRolesSpecial_Cest{
   
   public function createAdminRoles(AcceptanceTester $I): void{
     $db = Acceptance::getDB();
-    $db->exec('INSERT INTO system_roles (type, title, ordering) VALUES (\'admin\', \'Special1\', 0)');
-    $db->exec('INSERT INTO system_roles (type, title, ordering) VALUES (\'admin\', \'Special2\', 0)');
+    $db->exec('INSERT INTO system_roles (type, title, ordering) VALUES (\'admin\', \'Admin\', 0)');
     
     $I->amOnPage('/settings/roles');
     
-    $I->seeTableRowOrder(['Special1',
-                          'Special2',
+    $I->seeTableRowOrder(['Admin',
                           'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
@@ -37,8 +35,7 @@ class T013_SystemSettingsRolesSpecial_Cest{
   public function cannotMoveRolesAboveAdminRoles(AcceptanceTester $I): void{
     $I->click('#Move-1 button[value="Up"]');
     
-    $I->seeTableRowOrder(['Special1',
-                          'Special2',
+    $I->seeTableRowOrder(['Admin',
                           'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
@@ -58,8 +55,7 @@ class T013_SystemSettingsRolesSpecial_Cest{
     $I->fillField('#Delete-1 input[type="hidden"][name="Role"]', $id);
     $I->click('#Delete-1 button[type="submit"]');
     
-    $I->seeTableRowOrder(['Special1',
-                          'Special2',
+    $I->seeTableRowOrder(['Admin',
                           'Moderator',
                           'ManageUsers1',
                           'ManageUsers2',
