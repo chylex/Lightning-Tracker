@@ -5,7 +5,7 @@ namespace acceptance;
 
 use AcceptanceTester;
 
-class T004_AdminLogout_Cest{
+class T003_AdminLogout_Cest{
   private function tryUseToken(AcceptanceTester $I): void{
     $I->amLoggedIn('Admin');
     $I->amOnPage('/account');
@@ -35,7 +35,7 @@ class T004_AdminLogout_Cest{
    * @depends cannotReuseToken
    */
   public function loginAgain(AcceptanceTester $I): void{
-    $login = new T003_AdminLogin_Cest();
+    $login = new T002_AdminLogin_Cest();
     $login->_before($I);
     $login->login($I);
   }

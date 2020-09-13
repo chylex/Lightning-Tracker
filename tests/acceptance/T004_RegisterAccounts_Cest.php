@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T005_RegisterAccounts_Cest{
+class T004_RegisterAccounts_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amOnPage('/register');
   }

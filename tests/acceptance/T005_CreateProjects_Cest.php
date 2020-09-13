@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T007_CreateProjects_Cest{
+class T005_CreateProjects_Cest{
   public function _failed(AcceptanceTester $I): void{
     $I->terminate();
   }

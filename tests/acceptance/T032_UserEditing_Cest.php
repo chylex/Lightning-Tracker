@@ -7,7 +7,7 @@ use AcceptanceTester;
 use Codeception\Example;
 use Helper\Acceptance;
 
-class T016_UserEditing_Cest{
+class T032_UserEditing_Cest{
   private const ROLES = [
       'Moderator',
       'ManageUsers1',

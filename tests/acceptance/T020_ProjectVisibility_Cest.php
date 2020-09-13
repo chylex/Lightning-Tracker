@@ -5,7 +5,7 @@ namespace acceptance;
 
 use AcceptanceTester;
 
-class T008_ProjectVisibility_Cest{
+class T020_ProjectVisibility_Cest{
   private function ensureCanSee(AcceptanceTester $I, array $projects): void{
     $I->amOnPage('/');
     

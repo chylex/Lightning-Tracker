@@ -5,7 +5,7 @@ namespace acceptance;
 
 use AcceptanceTester;
 
-class T011_SystemSettingsRoles_Cest{
+class T041_SystemSettingsRoles_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amLoggedIn('Admin');
     $I->amOnPage('/settings/roles');

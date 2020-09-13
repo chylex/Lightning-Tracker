@@ -5,7 +5,7 @@ namespace acceptance;
 
 use AcceptanceTester;
 
-class T009_ProjectManageability_Cest{
+class T021_ProjectManageability_Cest{
   private function ensureCanManage(AcceptanceTester $I, array $projects): void{
     $I->amOnPage('/');
     

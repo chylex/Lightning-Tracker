@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T015_UserManageability_Cest{
+class T031_UserManageability_Cest{
   private const ROWS = [
       'Admin'      => 1,
       'Moderator'  => 2,

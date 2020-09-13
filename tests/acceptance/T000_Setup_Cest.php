@@ -32,10 +32,10 @@ class T000_Setup_Cest{
     $t = new T001_Install_Cest();
     self::t($I, $t, fn() => $t->install($I, true));
     
-    $t = new T003_AdminLogin_Cest();
+    $t = new T002_AdminLogin_Cest();
     self::t($I, $t, fn() => $t->login($I));
     
-    $t = new T005_RegisterAccounts_Cest();
+    $t = new T004_RegisterAccounts_Cest();
     self::t($I, $t, fn() => $t->registerModeratorWithLogin($I));
     self::t($I, $t, fn() => $t->registerManager1WithLogin($I));
     self::t($I, $t, fn() => $t->registerManager2WithLogin($I));
@@ -44,7 +44,7 @@ class T000_Setup_Cest{
     self::t($I, $t, fn() => $t->registerRoleLessWithLogin($I));
     self::t($I, $t, fn() => $t->setupRoles());
     
-    $t = new T007_CreateProjects_Cest();
+    $t = new T005_CreateProjects_Cest();
     self::t($I, $t, fn() => $t->createProjectsAsAdmin($I));
     self::t($I, $t, fn() => $t->createProjectsAsUser1($I));
     self::t($I, $t, fn() => $t->createProjectsAsUser2($I));

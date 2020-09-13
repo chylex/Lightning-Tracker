@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Codeception\Example;
 
-class T010_SystemSettingsGeneral_Cest{
+class T040_SystemSettingsGeneral_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amLoggedIn('Admin');
     $I->amOnPage('/settings');

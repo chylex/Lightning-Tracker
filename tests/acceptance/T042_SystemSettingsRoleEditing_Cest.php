@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T012_SystemSettingsRoleEditing_Cest{
+class T042_SystemSettingsRoleEditing_Cest{
   private const PERMS_ALL = [
       'settings',
       'projects.list',

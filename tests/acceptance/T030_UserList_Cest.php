@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T014_UserList_Cest{
+class T030_UserList_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amLoggedIn('Admin');
     $I->amOnPage('/users');

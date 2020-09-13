@@ -5,7 +5,7 @@ namespace acceptance;
 
 use AcceptanceTester;
 
-class T003_AdminLogin_Cest{
+class T002_AdminLogin_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amOnPage('/login');
   }

@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Codeception\Example;
 
-class T006_PageLoginRedirect_Cest{
+class T010_PageLoginRedirect_Cest{
   private function ensureCanAccessPageAs(AcceptanceTester $I, ?string $user, string $page): void{
     if ($user === null){
       $I->amNotLoggedIn();
