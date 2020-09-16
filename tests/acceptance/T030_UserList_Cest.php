@@ -126,6 +126,85 @@ class T030_UserList_Cest{
   }
   
   /**
+   * @depends testUsersOrderedByRole
+   */
+  public function testUsersOrderedByRoleThenName(AcceptanceTester $I): void{
+    $I->click('thead tr:first-child th:nth-child(3) > a');
+    $I->click('thead tr:first-child th:nth-child(1) > a');
+    
+    $I->seeTableRowOrder(['Admin',     // implied admin role
+                          'Moderator', // role 1
+                          'Manager1',  // role 2
+                          'Manager2',  // role 3
+                          'User1',     // role 4, alphabetically first
+                          'User2',     // role 4, alphabetically last
+                          'RoleLess',  // no role, alphabetically first
+                          'Test']);    // no role, alphabetically last
+    
+    $I->click('thead tr:first-child th:nth-child(1) > a');
+    
+    $I->seeTableRowOrder(['Admin',      // implied admin role
+                          'Moderator',  // role 1
+                          'Manager1',   // role 2
+                          'Manager2',   // role 3
+                          'User2',      // role 4, alphabetically last
+                          'User1',      // role 4, alphabetically first
+                          'Test',       // no role, alphabetically last
+                          'RoleLess']); // no role, alphabetically first
+    
+    $I->click('thead tr:first-child th:nth-child(1) > a');
+    $I->click('thead tr:first-child th:nth-child(3) > a');
+    $I->click('thead tr:first-child th:nth-child(1) > a');
+    
+    $I->seeTableRowOrder(['RoleLess',  // no role, alphabetically first
+                          'Test',      // no role, alphabetically last
+                          'User1',     // role 4, alphabetically first
+                          'User2',     // role 4, alphabetically last
+                          'Manager2',  // role 3
+                          'Manager1',  // role 2
+                          'Moderator', // role 1
+                          'Admin']);   // implied admin role
+    
+    $I->click('thead tr:first-child th:nth-child(1) > a');
+    
+    $I->seeTableRowOrder(['Test',      // no role, alphabetically last
+                          'RoleLess',  // no role, alphabetically first
+                          'User2',     // role 4, alphabetically last
+                          'User1',     // role 4, alphabetically first
+                          'Manager2',  // role 3
+                          'Manager1',  // role 2
+                          'Moderator', // role 1
+                          'Admin']);   // implied admin role
+  }
+  
+  /**
+   * @depends testUsersOrderedByRole
+   */
+  public function testUsersOrderedByRoleThenRegistrationDate(AcceptanceTester $I): void{
+    $I->click('thead tr:first-child th:nth-child(3) > a');
+    
+    $I->seeTableRowOrder(['Admin',     // implied admin role
+                          'Moderator', // role 1
+                          'Manager1',  // role 2
+                          'Manager2',  // role 3
+                          'User1',     // role 4, registered first
+                          'User2',     // role 4, registered last
+                          'RoleLess',  // no role, registered first
+                          'Test']);    // no role, registered last
+    
+    $I->click('thead tr:first-child th:nth-child(3) > a');
+    
+    $I->seeTableRowOrder(['RoleLess',  // no role, registered first
+                          'Test',      // no role, registered last
+                          'User1',     // role 4, registered first
+                          'User2',     // role 4, registered last
+                          'Manager2',  // role 3
+                          'Manager1',  // role 2
+                          'Moderator', // role 1
+                          'Admin']);   // implied admin role
+  }
+  
+  /**
    * @depends ensureRegistrationOrder
    */
   public function testUsersOrderedByRegistrationDate(AcceptanceTester $I): void{
@@ -151,6 +230,8 @@ class T030_UserList_Cest{
    * @depends testUsersOrderedByRegistrationDateAscIsDefault
    * @depends testUsersOrderedByName
    * @depends testUsersOrderedByRole
+   * @depends testUsersOrderedByRoleThenName
+   * @depends testUsersOrderedByRoleThenRegistrationDate
    * @depends testUsersOrderedByRegistrationDate
    */
   public function removeTestUser(): void{
