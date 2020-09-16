@@ -46,7 +46,7 @@ final class ProjectMemberFilter extends AbstractProjectIdFilter{
   protected function getDefaultSortingRuleList(): array{
     return [
         (new Field('role_order'))->sortRule(Sorting::SQL_ASC),
-        (new Field('user_id', 'pm'))->sortRule(Sorting::SQL_DESC),
+        (new Field('name', 'u'))->sortRule(Sorting::SQL_ASC),
     ];
   }
 }
