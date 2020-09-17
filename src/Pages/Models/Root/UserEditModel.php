@@ -32,6 +32,7 @@ class UserEditModel extends BasicRootPageModel{
   private SystemPermissions $perms;
   private UserId $user_id;
   private ?UserInfo $user;
+  private ?int $user_role_id = null;
   private UserId $logon_user_id;
   private bool $can_edit = false;
   
@@ -45,6 +46,7 @@ class UserEditModel extends BasicRootPageModel{
     $this->logon_user_id = $logon_user_id;
     
     if ($this->user !== null){
+      $this->user_role_id = $this->user->getRoleId();
       $this->can_edit = self::canEditUser($logon_user_id, $this->user);
     }
   }
@@ -56,11 +58,9 @@ class UserEditModel extends BasicRootPageModel{
       $form = $this->getEditForm();
       
       if (!$form->isFilled()){
-        $role_id = $this->user->getRoleId();
-        
         $form->fill(['Name'  => $this->user->getName(),
                      'Email' => $this->perms->check(SystemPermissions::SEE_USER_EMAILS) ? $this->user->getEmail() : '',
-                     'Role'  => $role_id === null ? '' : (string)$role_id]);
+                     'Role'  => $this->user_role_id === null ? '' : (string)$this->user_role_id]);
       }
     }
     
@@ -136,7 +136,7 @@ class UserEditModel extends BasicRootPageModel{
     $name = UserFields::name($validator);
     $email = empty($data['Email']) ? null : UserFields::email($validator);
     $password = empty($data['Password']) ? null : UserFields::password($validator);
-    $role = empty($data['Role']) ? null : (int)$data['Role'];
+    $role_id = empty($data['Role']) ? null : (int)$data['Role'];
     
     try{
       $validator->validate();
@@ -145,8 +145,14 @@ class UserEditModel extends BasicRootPageModel{
         return false;
       }
       
+      if ($role_id !== null && !(new SystemRoleTable(DB::get()))->isRoleAssignableBy($role_id, $this->logon_user_id)){
+        $form->fill(['Role' => $this->user_role_id === null ? '' : (string)$this->user_role_id]);
+        $form->invalidateField('Role', 'Invalid role.');
+        return false;
+      }
+      
       $users = new UserTable(DB::get());
-      $users->editUser($this->user_id, $name, $email, $password, $role);
+      $users->editUser($this->user_id, $name, $email, $password, $role_id);
       return true;
     }catch(ValidationException $e){
       $form->invalidateFields($e->getFields());
