@@ -153,6 +153,24 @@ class T041_SystemSettingsRoles_Cest{
    * @depends moveBottomRoleAround
    * @depends cannotMoveOutOfBounds
    */
+  public function cannotDeleteAdminRole(AcceptanceTester $I): void{
+    $I->fillField('#Delete-1 input[type="hidden"][name="Role"]', 1);
+    $I->click('#Delete-1 button[type="submit"]');
+    
+    $I->seeTableRowOrder(['Admin',
+                          'Moderator',
+                          'ManageUsers1',
+                          'ManageUsers2',
+                          'User',
+                          'Test1',
+                          'Test2']);
+  }
+  
+  /**
+   * @depends moveTopRoleAround
+   * @depends moveBottomRoleAround
+   * @depends cannotMoveOutOfBounds
+   */
   public function deleteRole(AcceptanceTester $I): void{
     $I->click('#Delete-5 button[type="submit"]');
     

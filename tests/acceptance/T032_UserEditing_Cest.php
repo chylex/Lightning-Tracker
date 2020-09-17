@@ -9,11 +9,11 @@ use Helper\Acceptance;
 
 class T032_UserEditing_Cest{
   private const ROLES = [
-      'Moderator',
-      'ManageUsers1',
-      'ManageUsers2',
-      'User',
-      'Admin',
+      'Admin'        => 1,
+      'User'         => 2,
+      'ManageUsers2' => 3,
+      'ManageUsers1' => 4,
+      'Moderator'    => 5,
   ];
   
   private function startEditingAs(AcceptanceTester $I, string $editor, string $user): void{
@@ -34,8 +34,22 @@ class T032_UserEditing_Cest{
       $I->see($role, '#Confirm-1-Role');
     }
     
-    foreach(array_diff(self::ROLES, $roles) as $role){
+    $missing = array_diff(array_keys(self::ROLES), $roles);
+    
+    foreach($missing as $role){
       $I->dontSee($role, '#Confirm-1-Role');
+    }
+    
+    foreach($missing as $role){
+      $I->submitForm('#Confirm-1', [
+          'Name'     => 'RoleLess',
+          'Email'    => 'role-less@example.com',
+          'Password' => '',
+          'Role'     => self::ROLES[$role],
+      ]);
+      
+      $I->dontSeeCurrentUrlEquals('/users');
+      $I->seeElement('#Confirm-1-Role + .error');
     }
   }
   

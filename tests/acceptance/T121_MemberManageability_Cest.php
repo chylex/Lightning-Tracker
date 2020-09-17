@@ -5,6 +5,7 @@ namespace acceptance;
 
 use AcceptanceTester;
 use Helper\Acceptance;
+use PDO;
 
 class T121_MemberManageability_Cest{
   private const ROWS_USER3_ROLELESS = [
@@ -54,14 +55,33 @@ class T121_MemberManageability_Cest{
   }
   
   private function ensureCanOnlyManage(AcceptanceTester $I, array $rows, array $users): void{
+    $db = Acceptance::getDB();
+    $user_ids = $db->query('SELECT name, id FROM users')->fetchAll(PDO::FETCH_KEY_PAIR);
+    
     foreach($users as $user){
       $I->seeElement('tbody tr:nth-child('.$rows[$user].') a[href^="http://localhost/project/p1/members/"]');
       $I->seeElement('tbody tr:nth-child('.$rows[$user].') form[action$="/remove"]');
     }
     
-    foreach(array_diff(array_keys($rows), $users) as $user){
+    $missing = array_diff(array_keys($rows), $users);
+    
+    foreach($missing as $user){
       $I->dontSeeElement('tbody tr:nth-child('.$rows[$user].') a[href^="http://localhost/project/p1/members/"]');
       $I->dontSeeElement('tbody tr:nth-child('.$rows[$user].') form[action$="/remove"]');
+    }
+    
+    foreach($users as $user){
+      $I->amOnPage('/project/p1/members/'.$user_ids[$user]);
+      $I->dontSee('Permission Error', 'h2');
+    }
+    
+    foreach($missing as $user){
+      $id = $user_ids[$user];
+      
+      foreach([$id, $id.'/remove'] as $suffix){
+        $I->amOnPage('/project/p1/members/'.$suffix);
+        $I->see('Permission Error', 'h2');
+      }
     }
   }
   

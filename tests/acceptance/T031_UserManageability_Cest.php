@@ -5,6 +5,7 @@ namespace acceptance;
 
 use AcceptanceTester;
 use Helper\Acceptance;
+use PDO;
 
 class T031_UserManageability_Cest{
   private const ROWS = [
@@ -27,14 +28,38 @@ class T031_UserManageability_Cest{
   }
   
   private function ensureCanOnlyManage(AcceptanceTester $I, array $users): void{
+    $db = Acceptance::getDB();
+    $user_ids = $db->query('SELECT name, id FROM users')->fetchAll(PDO::FETCH_KEY_PAIR);
+    
     foreach($users as $user){
       $I->seeElement('tbody tr:nth-child('.self::ROWS[$user].') a[href^="http://localhost/users/"]');
       $I->seeElement('tbody tr:nth-child('.self::ROWS[$user].') form[action$="/delete"]');
     }
     
-    foreach(array_diff(array_keys(self::ROWS), $users) as $user){
-      $I->dontSeeElement('tbody tr:nth-child('.self::ROWS[$user].') a[href^="http://localhost/users/"]');
-      $I->dontSeeElement('tbody tr:nth-child('.self::ROWS[$user].') form[action$="/delete"]');
+    $missing = array_diff(array_keys(self::ROWS), $users);
+    
+    foreach($missing as $user){
+      $tr = 'tbody tr:nth-child('.self::ROWS[$user].')';
+      $I->dontSeeElement($tr.' a[href^="http://localhost/users/"]');
+      $I->dontSeeElement($tr.' form[action$="/delete"]');
+    }
+    
+    foreach($users as $user){
+      $id = $user_ids[$user];
+      
+      foreach([$id, $id.'/delete'] as $suffix){
+        $I->amOnPage('/users/'.$suffix);
+        $I->dontSee('Permission Error', 'h2');
+      }
+    }
+    
+    foreach($missing as $user){
+      $id = $user_ids[$user];
+      
+      foreach([$id, $id.'/delete'] as $suffix){
+        $I->amOnPage('/users/'.$suffix);
+        $I->see('Permission Error', 'h2');
+      }
     }
   }
   
