@@ -99,6 +99,14 @@ class T004_RegisterAccounts_Cest{
    * @depends userAlreadyExists
    * @depends emailAlreadyExists
    */
+  public function registerUser3WithLogin(AcceptanceTester $I): void{
+    $this->register($I, 'User3', '123123123', 'user3@example.com');
+  }
+  
+  /**
+   * @depends userAlreadyExists
+   * @depends emailAlreadyExists
+   */
   public function registerRoleLessWithLogin(AcceptanceTester $I): void{
     $this->register($I, 'RoleLess', '123456789', 'role-less@example.com');
   }
@@ -109,6 +117,7 @@ class T004_RegisterAccounts_Cest{
    * @depends registerManager2WithLogin
    * @depends registerUser1WithLogin
    * @depends registerUser2WithLogin
+   * @depends registerUser3WithLogin
    * @depends registerRoleLessWithLogin
    */
   public function setupRoles(): void{
@@ -137,7 +146,11 @@ class T004_RegisterAccounts_Cest{
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'users.see.emails\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'users.manage\')');
     
-    $db->exec('UPDATE users SET role_id = 2 WHERE name = \'User1\' OR name = \'User2\'');
+    $db->exec('UPDATE users SET id = \'user1test\' WHERE name = \'User1\'');
+    $db->exec('UPDATE users SET id = \'user2test\' WHERE name = \'User2\'');
+    $db->exec('UPDATE users SET id = \'user3test\' WHERE name = \'User3\'');
+    
+    $db->exec('UPDATE users SET role_id = 2 WHERE name = \'User1\' OR name = \'User2\' OR name = \'User3\'');
     $db->exec('UPDATE users SET role_id = 3 WHERE name = \'Manager2\'');
     $db->exec('UPDATE users SET role_id = 4 WHERE name = \'Manager1\'');
     $db->exec('UPDATE users SET role_id = 5 WHERE name = \'Moderator\'');

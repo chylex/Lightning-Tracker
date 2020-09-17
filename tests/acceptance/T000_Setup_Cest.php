@@ -41,6 +41,7 @@ class T000_Setup_Cest{
     self::t($I, $t, fn() => $t->registerManager2WithLogin($I));
     self::t($I, $t, fn() => $t->registerUser1WithLogin($I));
     self::t($I, $t, fn() => $t->registerUser2WithLogin($I));
+    self::t($I, $t, fn() => $t->registerUser3WithLogin($I));
     self::t($I, $t, fn() => $t->registerRoleLessWithLogin($I));
     self::t($I, $t, fn() => $t->setupRoles());
     

@@ -13,15 +13,17 @@ class T031_UserManageability_Cest{
       'Manager1'   => 3,
       'Manager2'   => 4,
       'User1'      => 5,
-      'User2'      => 6,
-      'RoleLess'   => 7,
-      'Admin2'     => 8,
-      'Moderator2' => 9,
+      'User3'      => 6,
+      'User2'      => 7,
+      'RoleLess'   => 8,
+      'Admin2'     => 9,
+      'Moderator2' => 10,
   ];
   
   private function startManagingAs(AcceptanceTester $I, string $user): void{
     $I->amLoggedIn($user);
     $I->amOnPage('/users');
+    $I->dontSee('Permission Error', 'h2');
   }
   
   private function ensureCanOnlyManage(AcceptanceTester $I, array $users): void{
@@ -63,6 +65,7 @@ SQL
         'Moderator2',
         'RoleLess',
         'User1',
+        'User3',
         'User2',
     ]);
   }
@@ -78,6 +81,7 @@ SQL
         'Manager2',
         'RoleLess',
         'User1',
+        'User3',
         'User2',
     ]);
   }
@@ -92,6 +96,7 @@ SQL
         'Manager2',
         'RoleLess',
         'User1',
+        'User3',
         'User2',
     ]);
   }
@@ -105,6 +110,7 @@ SQL
     $this->ensureCanOnlyManage($I, [
         'RoleLess',
         'User1',
+        'User3',
         'User2',
     ]);
   }

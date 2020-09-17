@@ -26,6 +26,7 @@ class T032_UserEditing_Cest{
     
     $I->amLoggedIn($editor);
     $I->amOnPage('/users/'.$id);
+    $I->dontSee('Permission Error', 'h2');
   }
   
   private function ensureCanOnlySetRoles(AcceptanceTester $I, array $roles): void{

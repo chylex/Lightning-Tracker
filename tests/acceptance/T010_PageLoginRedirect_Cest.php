@@ -38,7 +38,6 @@ class T010_PageLoginRedirect_Cest{
    * @example [null]
    * @example ["RoleLess"]
    * @example ["User1"]
-   * @example ["User2"]
    * @example ["Manager1"]
    * @example ["Manager2"]
    * @example ["Moderator"]
@@ -52,7 +51,6 @@ class T010_PageLoginRedirect_Cest{
    * @example [null]
    * @example ["RoleLess"]
    * @example ["User1"]
-   * @example ["User2"]
    * @example ["Manager1"]
    * @example ["Manager2"]
    * @example ["Moderator"]
@@ -65,7 +63,6 @@ class T010_PageLoginRedirect_Cest{
   /**
    * @example ["RoleLess"]
    * @example ["User1"]
-   * @example ["User2"]
    * @example ["Manager1"]
    * @example ["Manager2"]
    * @example ["Moderator"]
@@ -96,7 +93,6 @@ class T010_PageLoginRedirect_Cest{
    * @example [null]
    * @example ["RoleLess"]
    * @example ["User1"]
-   * @example ["User2"]
    */
   public function notPrivilegedCannotAccessUsers(AcceptanceTester $I, Example $example): void{
     $this->ensureCannotAccessPageAs($I, $example[0], 'users');
@@ -114,7 +110,6 @@ class T010_PageLoginRedirect_Cest{
    * @example [null]
    * @example ["RoleLess"]
    * @example ["User1"]
-   * @example ["User2"]
    * @example ["Manager2"]
    * @example ["Moderator"]
    */

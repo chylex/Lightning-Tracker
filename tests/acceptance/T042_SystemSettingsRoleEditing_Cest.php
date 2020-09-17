@@ -55,6 +55,7 @@ class T042_SystemSettingsRoleEditing_Cest{
     $I->assertNotFalse($id);
     $I->assertIsNumeric($id);
     $I->amOnPage('/settings/roles/'.$id);
+    $I->dontSee('Permission Error', 'h2');
   }
   
   private function assignPermissions(AcceptanceTester $I, string $title, array $perms, bool $should_be_successful): array{

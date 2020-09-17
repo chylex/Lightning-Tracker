@@ -52,11 +52,12 @@ class T030_UserList_Cest{
    */
   public function ensureRegistrationOrder(): void{
     $db = Acceptance::getDB();
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 8 SECOND) WHERE name = \'Admin\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 7 SECOND) WHERE name = \'Moderator\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 6 SECOND) WHERE name = \'Manager1\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 5 SECOND) WHERE name = \'Manager2\'');
-    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 4 SECOND) WHERE name = \'User1\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 9 SECOND) WHERE name = \'Admin\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 8 SECOND) WHERE name = \'Moderator\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 7 SECOND) WHERE name = \'Manager1\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 6 SECOND) WHERE name = \'Manager2\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 5 SECOND) WHERE name = \'User1\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 4 SECOND) WHERE name = \'User3\'');
     $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 3 SECOND) WHERE name = \'User2\'');
     $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 2 SECOND) WHERE name = \'RoleLess\'');
     $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 1 SECOND) WHERE name = \'Test\'');
@@ -71,6 +72,7 @@ class T030_UserList_Cest{
                           'Manager1',
                           'Manager2',
                           'User1',
+                          'User3',
                           'User2',
                           'RoleLess',
                           'Test']);
@@ -89,6 +91,7 @@ class T030_UserList_Cest{
         'Test',
         'User1',
         'User2',
+        'User3',
     ];
     
     $I->click('thead tr:first-child th:nth-child(1) > a');
@@ -109,6 +112,7 @@ class T030_UserList_Cest{
                           'Manager1',  // role 2
                           'Manager2',  // role 3
                           'User1',     // role 4, registered first
+                          'User3',     // role 4, registered second
                           'User2',     // role 4, registered last
                           'RoleLess',  // no role, registered first
                           'Test']);    // no role, registered last
@@ -118,6 +122,7 @@ class T030_UserList_Cest{
     $I->seeTableRowOrder(['RoleLess',  // no role, registered first
                           'Test',      // no role, registered last
                           'User1',     // role 4, registered first
+                          'User3',     // role 4, registered second
                           'User2',     // role 4, registered last
                           'Manager2',  // role 3
                           'Manager1',  // role 2
@@ -137,7 +142,8 @@ class T030_UserList_Cest{
                           'Manager1',  // role 2
                           'Manager2',  // role 3
                           'User1',     // role 4, alphabetically first
-                          'User2',     // role 4, alphabetically last
+                          'User2',     // role 4, alphabetically second
+                          'User3',     // role 4, alphabetically last
                           'RoleLess',  // no role, alphabetically first
                           'Test']);    // no role, alphabetically last
     
@@ -147,7 +153,8 @@ class T030_UserList_Cest{
                           'Moderator',  // role 1
                           'Manager1',   // role 2
                           'Manager2',   // role 3
-                          'User2',      // role 4, alphabetically last
+                          'User3',      // role 4, alphabetically last
+                          'User2',      // role 4, alphabetically second
                           'User1',      // role 4, alphabetically first
                           'Test',       // no role, alphabetically last
                           'RoleLess']); // no role, alphabetically first
@@ -159,7 +166,8 @@ class T030_UserList_Cest{
     $I->seeTableRowOrder(['RoleLess',  // no role, alphabetically first
                           'Test',      // no role, alphabetically last
                           'User1',     // role 4, alphabetically first
-                          'User2',     // role 4, alphabetically last
+                          'User2',     // role 4, alphabetically second
+                          'User3',     // role 4, alphabetically last
                           'Manager2',  // role 3
                           'Manager1',  // role 2
                           'Moderator', // role 1
@@ -169,7 +177,8 @@ class T030_UserList_Cest{
     
     $I->seeTableRowOrder(['Test',      // no role, alphabetically last
                           'RoleLess',  // no role, alphabetically first
-                          'User2',     // role 4, alphabetically last
+                          'User3',     // role 4, alphabetically last
+                          'User2',     // role 4, alphabetically second
                           'User1',     // role 4, alphabetically first
                           'Manager2',  // role 3
                           'Manager1',  // role 2
@@ -188,6 +197,7 @@ class T030_UserList_Cest{
                           'Manager1',  // role 2
                           'Manager2',  // role 3
                           'User1',     // role 4, registered first
+                          'User3',     // role 4, registered second
                           'User2',     // role 4, registered last
                           'RoleLess',  // no role, registered first
                           'Test']);    // no role, registered last
@@ -197,6 +207,7 @@ class T030_UserList_Cest{
     $I->seeTableRowOrder(['RoleLess',  // no role, registered first
                           'Test',      // no role, registered last
                           'User1',     // role 4, registered first
+                          'User3',     // role 4, registered second
                           'User2',     // role 4, registered last
                           'Manager2',  // role 3
                           'Manager1',  // role 2
@@ -214,6 +225,7 @@ class T030_UserList_Cest{
         'Manager1',
         'Manager2',
         'User1',
+        'User3',
         'User2',
         'RoleLess',
         'Test',
