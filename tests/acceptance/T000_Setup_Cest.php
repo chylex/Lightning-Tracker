@@ -49,6 +49,13 @@ class T000_Setup_Cest{
     self::t($I, $t, fn() => $t->createProjectsAsAdmin($I));
     self::t($I, $t, fn() => $t->createProjectsAsUser1($I));
     self::t($I, $t, fn() => $t->createProjectsAsUser2($I));
+    
+    $t = new T100_SetupProjects_Cest();
+    self::t($I, $t, fn() => $t->run($I));
+    
+    $t = new T101_InviteMembers_Cest();
+    self::t($I, $t, fn() => $t->inviteMembersInProject1($I));
+    self::t($I, $t, fn() => $t->inviteMembersInProject2($I));
   }
 }
 
