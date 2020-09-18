@@ -9,11 +9,13 @@ use Pages\IViewable;
 final class SidemenuItem implements IViewable{
   private Text $title;
   private string $url;
+  private ?string $id;
   private bool $active = false;
   
-  public function __construct(Text $title, string $url){
+  public function __construct(Text $title, string $url, ?string $id){
     $this->title = $title;
     $this->url = $url;
+    $this->id = $id;
   }
   
   public function active(): self{
@@ -22,9 +24,10 @@ final class SidemenuItem implements IViewable{
   }
   
   public function echoBody(): void{
-    $class = $this->active ? ' class="active"' : '';
+    $class_attr = $this->active ? ' class="active"' : '';
+    $id_attr = $this->id !== null ? ' id="'.$this->id.'"' : '';
     
-    echo '<li'.$class.'><a href="'.$this->url.'">';
+    echo '<li'.$class_attr.'><a'.$id_attr.' href="'.$this->url.'">';
     $this->title->echoBody();
     echo '</a></li>';
   }

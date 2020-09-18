@@ -36,8 +36,8 @@ final class SidemenuComponent implements IViewable{
     return $this;
   }
   
-  public function addLink(Text $title, string $url): void{
-    $item = new SidemenuItem($title, $this->base_url.$url);
+  public function addLink(Text $title, string $url, ?string $id = null): void{
+    $item = new SidemenuItem($title, $this->base_url.$url, $id);
     
     $url_trim = ltrim($url, '/');
     
