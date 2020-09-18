@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Controllers\Project;
 
+use Data\CreateOrEditIssue;
 use Database\Objects\IssueDetail;
 use Database\Objects\ProjectInfo;
 use Generator;
@@ -31,12 +32,13 @@ class IssueEditController extends AbstractProjectController{
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
     $perms = $sess->getPermissions()->project($project);
     $logon_user = $sess->getLogonUser();
-    $model = new IssueEditModel($req, $project, $perms, $logon_user, $this->issue_id);
     
-    if ($model->isNewIssue()){
+    if ($this->issue_id === null){
       $perms->require(ProjectPermissions::CREATE_ISSUE);
+      $model = new IssueEditModel($req, $project, $perms, $logon_user, CreateOrEditIssue::create($req->getParam('type')));
     }
     else{
+      $model = new IssueEditModel($req, $project, $perms, $logon_user, CreateOrEditIssue::edit($this->issue_id));
       $issue = $model->getIssue();
       
       if ($issue === null || $issue->getEditLevel($logon_user, $perms) === IssueDetail::EDIT_FORBIDDEN){

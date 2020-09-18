@@ -95,3 +95,90 @@ option.issue-tag:before {
 .issue-details .icon {
   margin-right: 2px;
 }
+
+#New-Issue-Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.4);
+  transition: opacity 0.275s ease;
+}
+
+#New-Issue-Inner {
+  width: 100%;
+  max-width: 1050px;
+  max-height: 100%;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.33);
+}
+
+#New-Issue-Title {
+  display: flex;
+  align-items: baseline;
+  margin: 25px 25px 1px;
+}
+
+#New-Issue-Title h2 {
+  flex: 1 0 auto;
+  margin: 0 10px 0 0;
+}
+
+#New-Issue-Title span.icon {
+  margin-left: 10px;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+#New-Issue-Types {
+  display: flex;
+  padding-top: 25px;
+  padding-right: 21px;
+}
+
+#New-Issue-Types > a {
+  flex: 1 1 0;
+  margin: 0 4px 25px 25px;
+  padding: 18px 16px 15px 15px;
+  border-radius: 8px;
+  color: #1c1c1c;
+  font-size: 22px;
+  text-decoration: none;
+  transition: background-color 0.125s ease;
+}
+
+:root {
+  --issue-type-hover-color: #ffffff;
+}
+
+#New-Issue-Types > a:hover {
+  background-color: var(--issue-type-hover-color);
+}
+
+#New-Issue-Types span.icon {
+  display: block;
+  font-size: 30px;
+  text-align: center;
+}
+
+#New-Issue-Types p {
+  text-align: center;
+  margin: 16px 0 0;
+}
+
+@media (max-width: 1024px) {
+  #New-Issue-Types {
+    flex-wrap: wrap;
+  }
+
+  #New-Issue-Types > a {
+    flex: 0 0 175px;
+  }
+}

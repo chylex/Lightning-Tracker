@@ -39,6 +39,8 @@ class IssuesPage extends AbstractProjectPage{
     if (DEBUG){
       echo '<link rel="stylesheet" type="text/css" href="~resources/css/issues.css?v='.TRACKER_RESOURCE_VERSION.'">';
     }
+    
+    echo '<script type="text/javascript" src="~resources/js/issues.js?v='.TRACKER_RESOURCE_VERSION.'"></script>';
   }
   
   protected function echoPageBody(): void{

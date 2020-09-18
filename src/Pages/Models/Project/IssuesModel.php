@@ -49,7 +49,7 @@ class IssuesModel extends BasicProjectPageModel{
     $menu->setTitle(Text::plain('Actions'));
     
     if ($this->perms->check(ProjectPermissions::CREATE_ISSUE)){
-      $menu->addLink(Text::withIcon('New Issue', 'pencil'), '/issues/new');
+      $menu->addLink(Text::withIcon('New Issue', 'pencil'), '/issues/new', 'New-Issue');
     }
     
     return $menu->getIfNotEmpty();

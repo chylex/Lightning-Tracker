@@ -41,6 +41,9 @@ span.icon {
 .icon-color-purple {
   color: #710288;
 }
+.icon-color-gray {
+  color: #555555;
+}
 
 .icon-pencil:before {
   content: "\e905";

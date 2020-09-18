@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\CreateOrEditIssue;
 use Data\IssuePriority;
 use Data\IssueScale;
 use Data\IssueStatus;
@@ -65,24 +66,25 @@ class IssueEditModel extends BasicProjectPageModel{
   
   private ProjectPermissions $perms;
   private UserProfile $editor;
-  private ?int $issue_id;
-  private ?IssueDetail $issue;
+  private ?string $new_issue_type = null;
+  private ?int $issue_id = null;
+  private ?IssueDetail $issue = null;
   private int $edit_level;
   
   private FormComponent $edit_form;
   
-  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, UserProfile $editor, ?int $issue_id){
+  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, UserProfile $editor, CreateOrEditIssue $edit_request){
     parent::__construct($req, $project);
     $this->perms = $perms;
     $this->editor = $editor;
-    $this->issue_id = $issue_id;
     
-    if ($issue_id === null){
-      $this->issue = null;
+    if ($edit_request->isNewIssue()){
+      $this->new_issue_type = $edit_request->getNewIssueType();
       $this->edit_level = $perms->check(ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS) ? IssueDetail::EDIT_ALL_FIELDS : IssueDetail::EDIT_BASIC_FIELDS;
     }
     else{
-      $this->issue = (new IssueTable(DB::get(), $project))->getIssueDetail($issue_id);
+      $this->issue_id = $edit_request->getIssueId();
+      $this->issue = (new IssueTable(DB::get(), $project))->getIssueDetail($this->issue_id);
       $this->edit_level = $this->issue === null ? IssueDetail::EDIT_FORBIDDEN : $this->issue->getEditLevel($editor, $perms);
     }
   }
@@ -94,7 +96,10 @@ class IssueEditModel extends BasicProjectPageModel{
     
     if (!$form->isFilled()){
       if ($this->issue_id === null){
-        $form->fill(['Priority' => IssuePriority::MEDIUM,
+        $type = $this->new_issue_type === null || IssueType::get($this->new_issue_type) === null ? null : $this->new_issue_type;
+        
+        $form->fill(['Type'     => $type,
+                     'Priority' => IssuePriority::MEDIUM,
                      'Scale'    => IssueScale::MEDIUM,
                      'Status'   => IssueStatus::OPEN]);
       }

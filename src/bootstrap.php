@@ -116,6 +116,7 @@ $router->add('&/settings/roles/:id', 'Root/SettingsRoleEditController');
 $router->add('project/:project/&', 'Project/DashboardController');
 $router->add('project/:project/&/issues', 'Project/IssuesController');
 $router->add('project/:project/&/issues/new', 'Project/IssueEditController');
+$router->add('project/:project/&/issues/new/:type', 'Project/IssueEditController');
 $router->add('project/:project/&/issues/:id', 'Project/IssueDetailController');
 $router->add('project/:project/&/issues/:id/edit', 'Project/IssueEditController');
 $router->add('project/:project/&/issues/:id/delete', 'Project/IssueDeleteController');
