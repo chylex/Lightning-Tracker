@@ -56,6 +56,15 @@ class T000_Setup_Cest{
     $t = new T101_InviteMembers_Cest();
     self::t($I, $t, fn() => $t->inviteMembersInProject1($I));
     self::t($I, $t, fn() => $t->inviteMembersInProject2($I));
+    
+    $t = new T102_CreateMilestones_Cest();
+    self::t($I, $t, fn() => $t->createMilestonesInProject1($I));
+    self::t($I, $t, fn() => $t->createMilestonesInProject2($I));
+    
+    $t = new T103_CreateIssues_Cest();
+    self::t($I, $t, fn() => $t->createIssuesInProject1($I));
+    self::t($I, $t, fn() => $t->createIssuesInProject2($I));
+    self::t($I, $t, fn() => $t->setupCreationDateOrder());
   }
 }
 
