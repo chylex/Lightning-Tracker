@@ -43,6 +43,7 @@ class T000_Setup_Cest{
     self::t($I, $t, fn() => $t->registerUser2WithLogin($I));
     self::t($I, $t, fn() => $t->registerUser3WithLogin($I));
     self::t($I, $t, fn() => $t->registerRoleLessWithLogin($I));
+    self::t($I, $t, fn() => $t->setupUserDatabaseHelpers());
     self::t($I, $t, fn() => $t->setupRoles());
     
     $t = new T005_CreateProjects_Cest();

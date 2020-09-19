@@ -7,7 +7,7 @@ use AcceptanceTester;
 use Helper\Acceptance;
 use PDO;
 
-class T031_UserManageability_Cest{
+class T032_UserManageability_Cest{
   private const ROWS = [
       'Admin'      => 1,
       'Moderator'  => 2,

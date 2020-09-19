@@ -5,35 +5,10 @@ namespace acceptance;
 
 use AcceptanceTester;
 
-class T120_MemberList_Cest{
+class T121_MemberSorting_Cest{
   private function viewProject(AcceptanceTester $I, int $project): void{
     $I->amLoggedIn('User'.$project);
     $I->amOnPage('/project/p'.$project.'/members');
-  }
-  
-  private function inviteUser(AcceptanceTester $I, string $name, string $role): void{
-    $this->viewProject($I, 1);
-    $I->fillField('#Invite-1-Name', $name);
-    $I->selectOption('#Invite-1-Role', $role);
-    $I->click('#Invite-1 button[type="submit"]');
-  }
-  
-  public function userDoesNotExist(AcceptanceTester $I): void{
-    $this->viewProject($I, 1);
-    $this->inviteUser($I, 'InvalidUser', '(Default)');
-    $I->see('not found', '#Invite-1-Name + .error');
-  }
-  
-  public function userIsTheOwner(AcceptanceTester $I): void{
-    $this->viewProject($I, 1);
-    $this->inviteUser($I, 'User1', '(Default)');
-    $I->see('is the owner', '#Invite-1-Name + .error');
-  }
-  
-  public function userIsAlreadyAMember(AcceptanceTester $I): void{
-    $this->viewProject($I, 1);
-    $this->inviteUser($I, 'User2', '(Default)');
-    $I->see('is already a member', '#Invite-1-Name + .error');
   }
   
   public function testMembersOrderedByRoleAscThenNameAscIsDefaultInProject1(AcceptanceTester $I): void{

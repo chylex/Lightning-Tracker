@@ -120,6 +120,32 @@ class T004_RegisterAccounts_Cest{
    * @depends registerUser3WithLogin
    * @depends registerRoleLessWithLogin
    */
+  public function setupUserDatabaseHelpers(): void{
+    $db = Acceptance::getDB();
+    
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 8 SECOND) WHERE name = \'Admin\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 7 SECOND) WHERE name = \'Moderator\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 6 SECOND) WHERE name = \'Manager1\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 5 SECOND) WHERE name = \'Manager2\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 4 SECOND) WHERE name = \'User1\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 3 SECOND) WHERE name = \'User3\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 2 SECOND) WHERE name = \'User2\'');
+    $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 1 SECOND) WHERE name = \'RoleLess\'');
+    
+    $db->exec('UPDATE users SET id = \'user1test\' WHERE name = \'User1\'');
+    $db->exec('UPDATE users SET id = \'user2test\' WHERE name = \'User2\'');
+    $db->exec('UPDATE users SET id = \'user3test\' WHERE name = \'User3\'');
+  }
+  
+  /**
+   * @depends registerModeratorWithLogin
+   * @depends registerManager1WithLogin
+   * @depends registerManager2WithLogin
+   * @depends registerUser1WithLogin
+   * @depends registerUser2WithLogin
+   * @depends registerUser3WithLogin
+   * @depends registerRoleLessWithLogin
+   */
   public function setupRoles(): void{
     $db = Acceptance::getDB();
     
@@ -145,10 +171,6 @@ class T004_RegisterAccounts_Cest{
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'users.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'users.see.emails\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'users.manage\')');
-    
-    $db->exec('UPDATE users SET id = \'user1test\' WHERE name = \'User1\'');
-    $db->exec('UPDATE users SET id = \'user2test\' WHERE name = \'User2\'');
-    $db->exec('UPDATE users SET id = \'user3test\' WHERE name = \'User3\'');
     
     $db->exec('UPDATE users SET role_id = 2 WHERE name = \'User1\' OR name = \'User2\' OR name = \'User3\'');
     $db->exec('UPDATE users SET role_id = 3 WHERE name = \'Manager2\'');

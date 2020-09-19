@@ -7,7 +7,7 @@ use AcceptanceTester;
 use Helper\Acceptance;
 use PDO;
 
-class T121_MemberManageability_Cest{
+class T122_MemberManageability_Cest{
   private const ROWS_USER3_ROLELESS = [
       'User1'    => 1,
       'Manager1' => 2,
