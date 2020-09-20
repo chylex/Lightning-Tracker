@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 
 use Configuration\ConfigFile;
+use Configuration\VersionFile;
 use Data\UserId;
 use Data\UserPassword;
 use Database\DB;
@@ -250,6 +251,10 @@ if (!empty($_POST) && $submit_action !== $action_value_conflict_cancel){
   }
   
   // Configuration File
+  
+  if (empty($errors) && !(new VersionFile(TRACKER_MIGRATION_VERSION, 0))->writeSafe(VERSION_FILE, VERSION_TMP_FILE)){
+    $errors[] = 'Error creating \'version.php\'.';
+  }
   
   if (empty($errors) && !$config->write(CONFIG_FILE)){
     $errors[] = 'Error creating \'config.php\'.';
