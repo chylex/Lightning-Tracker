@@ -35,17 +35,25 @@ class T122_MemberManageability_Cest{
       'RoleLess' => 6,
   ];
   
-  private const ROLES = [
-      'Owner'         => 1,
-      'Administrator' => 2,
-      'Moderator'     => 3,
-      'Developer'     => 4,
-      'Reporter'      => 5,
-  ];
-  
   private function assignUser3Role(?string $role): void{
     $db = Acceptance::getDB();
-    $db->exec('UPDATE project_members SET role_id = '.($role === null ? 'NULL' : self::ROLES[$role]).' WHERE user_id = \'user3test\' AND project_id = (SELECT id FROM projects WHERE url = \'p1\')');
+    
+    if ($role === null){
+      $db->exec(<<<SQL
+UPDATE project_members
+SET role_id = NULL
+WHERE user_id = 'user3test' AND project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1')
+SQL
+      );
+    }
+    else{
+      $db->exec(<<<SQL
+UPDATE project_members
+SET role_id = (SELECT pr.role_id FROM project_roles pr WHERE pr.title = '$role' AND pr.project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1'))
+WHERE user_id = 'user3test' AND project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1')
+SQL
+      );
+    }
   }
   
   private function startManagingAs(AcceptanceTester $I, string $user): void{
