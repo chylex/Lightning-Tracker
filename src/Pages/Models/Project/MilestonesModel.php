@@ -5,19 +5,16 @@ namespace Pages\Models\Project;
 
 use Database\DB;
 use Database\Filters\Types\MilestoneFilter;
+use Database\Objects\MilestoneInfo;
+use Database\Objects\MilestoneManagementInfo;
 use Database\Objects\ProjectInfo;
 use Database\Tables\MilestoneTable;
 use Database\Tables\ProjectUserSettingsTable;
 use Database\Validation\MilestoneFields;
 use Exception;
-use Pages\Components\CompositeComponent;
-use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
-use Pages\Components\Forms\IconButtonFormComponent;
-use Pages\Components\ProgressBarComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Models\BasicProjectPageModel;
-use Routing\Link;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
 use Session\Session;
@@ -29,8 +26,8 @@ class MilestonesModel extends BasicProjectPageModel{
   public const ACTION_MOVE = 'Move';
   public const ACTION_TOGGLE_ACTIVE = 'ToggleActive';
   
-  private const ACTION_MOVE_UP = 'Up';
-  private const ACTION_MOVE_DOWN = 'Down';
+  private const BUTTON_MOVE_UP = 'Up';
+  private const BUTTON_MOVE_DOWN = 'Down';
   
   private ProjectPermissions $perms;
   
@@ -41,21 +38,12 @@ class MilestonesModel extends BasicProjectPageModel{
     $this->perms = $perms;
   }
   
-  public function createMilestoneTable(): TableComponent{
+  public function canManageMilestones(): bool{
+    return $this->perms->check(ProjectPermissions::MANAGE_MILESTONES);
+  }
+  
+  public function prepareMilestoneTableFilter(TableComponent $table): MilestoneFilter{
     $req = $this->getReq();
-    
-    $table = new TableComponent();
-    $table->ifEmpty('No milestones found.');
-    
-    $table->addColumn('Title')->sort('title')->width(65)->wrap()->bold();
-    $table->addColumn('Active')->tight()->center();
-    $table->addColumn('Issues')->tight()->center();
-    $table->addColumn('Progress')->sort('progress')->width(35);
-    $table->addColumn('Last Updated')->sort('date_updated')->tight()->right();
-    
-    if ($this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
-      $table->addColumn('Actions')->tight()->right();
-    }
     
     $filter = new MilestoneFilter();
     $milestones = new MilestoneTable(DB::get(), $this->getProject());
@@ -64,68 +52,24 @@ class MilestonesModel extends BasicProjectPageModel{
     $pagination = $filter->page($total_count);
     $sorting = $filter->sort($req);
     
-    $active_milestone = $this->getActiveMilestone();
-    $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
-    
-    $ordering_limit = $milestones->findMaxOrdering();
-    
-    foreach($milestones->listMilestones($filter) as $milestone){
-      $milestone_id = $milestone->getMilestoneId();
-      $milestone_id_str = (string)$milestone_id;
-      $update_date = $milestone->getLastUpdateDate();
-      
-      $form_toggle_active = new FormComponent(self::ACTION_TOGGLE_ACTIVE);
-      $form_toggle_active->addHidden('Milestone', $milestone_id_str);
-      $form_toggle_active->addIconButton('submit', $milestone_id === $active_milestone_id ? 'radio-checked' : 'radio-unchecked')->color('purple');
-      
-      $row = [$milestone->getTitleSafe(),
-              $form_toggle_active,
-              $milestone->getClosedIssues().' / '.$milestone->getTotalIssues(),
-              new ProgressBarComponent($milestone->getPercentageDone()),
-              $update_date === null ? '<div class="center-text">-</div>' : new DateTimeComponent($update_date, true)];
-      
-      if ($this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
-        $form_move = new FormComponent(self::ACTION_MOVE);
-        $form_move->addHidden('Ordering', (string)$milestone->getOrdering());
-        
-        $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
-        $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
-        
-        $ordering = $milestone->getOrdering();
-        
-        if ($ordering === 1){
-          $btn_move_up->disabled();
-        }
-        
-        if ($ordering === $ordering_limit){
-          $btn_move_down->disabled();
-        }
-        
-        $link_delete = Link::fromBase($req, 'milestones', $milestone_id_str, 'delete');
-        $btn_delete = new IconButtonFormComponent($link_delete, 'circle-cross');
-        $btn_delete->color('red');
-        
-        $row[] = new CompositeComponent($form_move, $btn_delete);
-      }
-      else{
-        $row[] = '';
-      }
-      
-      $row = $table->addRow($row);
-      
-      if ($this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
-        $row->link(Link::fromBase($req, 'milestones', $milestone_id_str));
-      }
-    }
-    
     $table->setupColumnSorting($sorting);
     $table->setPaginationFooter($req, $pagination)->elementName('milestones');
     
-    return $table;
+    return $filter;
+  }
+  
+  /**
+   * @param MilestoneFilter $filter
+   * @return MilestoneManagementInfo[]
+   */
+  public function getMilestones(MilestoneFilter $filter): array{
+    $milestones = new MilestoneTable(DB::get(), $this->getProject());
+    $ordering_limit = $milestones->findMaxOrdering();
+    return array_map(fn(MilestoneInfo $v): MilestoneManagementInfo => new MilestoneManagementInfo($v, $ordering_limit), $milestones->listMilestones($filter));
   }
   
   public function getCreateForm(): ?FormComponent{
-    if (!$this->perms->check(ProjectPermissions::MANAGE_MILESTONES)){
+    if (!$this->canManageMilestones()){
       return null;
     }
     
@@ -138,6 +82,40 @@ class MilestonesModel extends BasicProjectPageModel{
     $form->addButton('submit', 'Create Milestone')->icon('pencil');
     
     return $this->create_form = $form;
+  }
+  
+  public function createToggleActiveForm(MilestoneInfo $milestone): FormComponent{
+    $milestone_id = $milestone->getMilestoneId();
+    $active_milestone = $this->getActiveMilestone();
+    $active_milestone_id = $active_milestone === null ? null : $active_milestone->getId();
+    
+    $form = new FormComponent(MilestonesModel::ACTION_TOGGLE_ACTIVE);
+    $form->addHidden('Milestone', (string)$milestone_id);
+    $form->addIconButton('submit', $milestone_id === $active_milestone_id ? 'radio-checked' : 'radio-unchecked')->color('purple');
+    
+    return $form;
+  }
+  
+  public function createMoveForm(MilestoneManagementInfo $info): ?FormComponent{
+    if (!$this->canManageMilestones()){
+      return null;
+    }
+    
+    $form = new FormComponent(self::ACTION_MOVE);
+    $form->addHidden('Ordering', (string)$info->getMilestone()->getOrdering());
+    
+    $btn_move_up = $form->addIconButton('submit', 'circle-up')->color('blue')->value(self::BUTTON_MOVE_UP);
+    $btn_move_down = $form->addIconButton('submit', 'circle-down')->color('blue')->value(self::BUTTON_MOVE_DOWN);
+    
+    if (!$info->canMoveUp()){
+      $btn_move_up->disabled();
+    }
+    
+    if (!$info->canMoveDown()){
+      $btn_move_down->disabled();
+    }
+    
+    return $form;
   }
   
   public function createMilestone(array $data): bool{
@@ -168,17 +146,17 @@ class MilestonesModel extends BasicProjectPageModel{
     $button = $data[FormComponent::BUTTON_KEY] ?? null;
     $ordering = get_int($data, 'Ordering');
     
-    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $ordering === null){
+    if (($button !== self::BUTTON_MOVE_UP && $button !== self::BUTTON_MOVE_DOWN) || $ordering === null){
       return false;
     }
     
     $milestones = new MilestoneTable(DB::get(), $this->getProject());
     
-    if ($button === self::ACTION_MOVE_UP){
+    if ($button === self::BUTTON_MOVE_UP){
       $milestones->swapMilestones($ordering, $ordering - 1);
       return true;
     }
-    elseif ($button === self::ACTION_MOVE_DOWN){
+    elseif ($button === self::BUTTON_MOVE_DOWN){
       $milestones->swapMilestones($ordering, $ordering + 1);
       return true;
     }

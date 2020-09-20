@@ -11,6 +11,7 @@ use Pages\Components\SplitComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Models\Project\IssuesModel;
 use Pages\Views\AbstractProjectPage;
+use Routing\Link;
 
 class IssuesPage extends AbstractProjectPage{
   private IssuesModel $model;
@@ -48,11 +49,46 @@ class IssuesPage extends AbstractProjectPage{
     $split->collapseAt(1024, true);
     $split->setRightWidthLimits(250, 400);
     
-    $split->addLeft($this->model->createIssueTable());
+    $split->addLeft($this->createIssueTable());
     $split->addRightIfNotNull($this->model->createMenuAction());
     $split->addRightIfNotNull($this->model->getActiveMilestoneComponent());
     
     $split->echoBody();
+  }
+  
+  public function createIssueTable(): TableComponent{
+    $req = $this->model->getReq();
+    
+    $table = new TableComponent();
+    $table->ifEmpty('No issues found.');
+    
+    $table->addColumn('')->tight()->collapsed();
+    $table->addColumn('ID')->sort('id')->tight()->collapsed()->right()->bold();
+    $table->addColumn('Title')->sort('title')->width(70)->collapsed()->wrap()->bold();
+    $table->addColumn('Priority')->sort('priority')->tight();
+    $table->addColumn('Scale')->sort('scale')->tight();
+    $table->addColumn('Status')->tight();
+    $table->addColumn('Progress')->sort('progress')->width(30);
+    $table->addColumn('Last Update')->sort('date_updated')->tight()->right();
+    
+    $filter = $this->model->setupIssueTableFilter($table);
+    
+    foreach($this->model->getIssues($filter) as $issue){
+      $issue_id = $issue->getId();
+      
+      $row = $table->addRow([$issue->getType()->getViewable(true),
+                             '<span class="issue-id">#'.$issue_id.'</span>',
+                             $issue->getTitleSafe(),
+                             $issue->getPriority(),
+                             $issue->getScale(),
+                             $issue->getStatus(),
+                             new ProgressBarComponent($issue->getProgress()),
+                             new DateTimeComponent($issue->getLastUpdateDate())]);
+      
+      $row->link(Link::fromBase($req, 'issues', $issue_id));
+    }
+    
+    return $table;
   }
 }
 

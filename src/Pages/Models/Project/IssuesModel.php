@@ -9,19 +9,17 @@ use Data\IssueStatus;
 use Data\IssueType;
 use Database\DB;
 use Database\Filters\Types\IssueFilter;
+use Database\Objects\IssueInfo;
 use Database\Objects\ProjectInfo;
 use Database\Tables\IssueTable;
 use Database\Tables\MilestoneTable;
-use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\Elements\FormSelectMultiple;
 use Pages\Components\Html;
 use Pages\Components\Issues\IIssueTag;
-use Pages\Components\ProgressBarComponent;
 use Pages\Components\Sidemenu\SidemenuComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Pages\Models\BasicProjectPageModel;
-use Routing\Link;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
 use Session\Session;
@@ -55,45 +53,16 @@ class IssuesModel extends BasicProjectPageModel{
     return $menu->getIfNotEmpty();
   }
   
-  public function createIssueTable(): TableComponent{
+  public function setupIssueTableFilter(TableComponent $table): IssueFilter{
     $req = $this->getReq();
-    $project = $this->getProject();
-    $logon_user_id = Session::get()->getLogonUserId();
-    
-    $table = new TableComponent();
-    $table->ifEmpty('No issues found.');
-    
-    $table->addColumn('')->tight()->collapsed();
-    $table->addColumn('ID')->sort('id')->tight()->collapsed()->right()->bold();
-    $table->addColumn('Title')->sort('title')->width(70)->collapsed()->wrap()->bold();
-    $table->addColumn('Priority')->sort('priority')->tight();
-    $table->addColumn('Scale')->sort('scale')->tight();
-    $table->addColumn('Status')->tight();
-    $table->addColumn('Progress')->sort('progress')->width(30);
-    $table->addColumn('Last Update')->sort('date_updated')->tight()->right();
     
     $filter = new IssueFilter();
-    $issues = new IssueTable(DB::get(), $project);
+    $issues = new IssueTable(DB::get(), $this->getProject());
     
     $filtering = $filter->filter();
     $total_count = $issues->countIssues($filter);
     $pagination = $filter->page($total_count);
     $sorting = $filter->sort($req);
-    
-    foreach($issues->listIssues($filter) as $issue){
-      $issue_id = $issue->getId();
-      
-      $row = $table->addRow([$issue->getType()->getViewable(true),
-                             '<span class="issue-id">#'.$issue_id.'</span>',
-                             $issue->getTitleSafe(),
-                             $issue->getPriority(),
-                             $issue->getScale(),
-                             $issue->getStatus(),
-                             new ProgressBarComponent($issue->getProgress()),
-                             new DateTimeComponent($issue->getLastUpdateDate())]);
-      
-      $row->link(Link::fromBase($req, 'issues', $issue_id));
-    }
     
     $table->setupColumnSorting($sorting);
     $table->setPaginationFooter($req, $pagination)->elementName('issues');
@@ -108,7 +77,7 @@ class IssuesModel extends BasicProjectPageModel{
     $filtering_milestone = $header->addMultiSelect('milestone')->label('Milestone');
     $filtering_milestone->addOption('', Text::missing('None'));
     
-    foreach((new MilestoneTable(DB::get(), $project))->listMilestones() as $milestone){
+    foreach((new MilestoneTable(DB::get(), $this->getProject()))->listMilestones() as $milestone){
       $filtering_milestone->addOption((string)$milestone->getMilestoneId(), Text::plain($milestone->getTitle()));
     }
     
@@ -117,6 +86,8 @@ class IssuesModel extends BasicProjectPageModel{
     
     $filtering_assignee = $header->addMultiSelect('assignee')->label('Assignee');
     $filtering_assignee->addOption('', Text::missing('Nobody'));
+    
+    $logon_user_id = Session::get()->getLogonUserId();
     
     if ($logon_user_id !== null){
       $filtering_author->addOption($logon_user_id->raw(), Text::missing('You'));
@@ -138,7 +109,15 @@ class IssuesModel extends BasicProjectPageModel{
       }
     }
     
-    return $table;
+    return $filter;
+  }
+  
+  /**
+   * @param IssueFilter $filter
+   * @return IssueInfo[]
+   */
+  public function getIssues(IssueFilter $filter): array{
+    return (new IssueTable(DB::get(), $this->getProject()))->listIssues($filter);
   }
 }
 

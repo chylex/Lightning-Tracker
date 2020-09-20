@@ -5,19 +5,16 @@ namespace Pages\Models\Root;
 
 use Database\DB;
 use Database\Filters\Types\UserFilter;
-use Database\Objects\RoleInfo;
+use Database\Objects\UserInfo;
 use Database\Tables\SystemRoleTable;
 use Database\Tables\UserTable;
 use Database\Validation\UserFields;
 use Exception;
-use Pages\Components\DateTimeComponent;
 use Pages\Components\Forms\FormComponent;
-use Pages\Components\Forms\IconButtonFormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Pages\Models\BasicRootPageModel;
 use Pages\Models\Mixed\RegisterModel;
-use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
 use Session\Session;
@@ -51,29 +48,25 @@ class UsersModel extends BasicRootPageModel{
     }
   }
   
-  public function createUserTable(): TableComponent{
+  public function canManageUsers(): bool{
+    return $this->perms->check(SystemPermissions::MANAGE_USERS);
+  }
+  
+  public function canSeeEmail(): bool{
+    return $this->perms->check(SystemPermissions::SEE_USER_EMAILS);
+  }
+  
+  public function canEditUser(UserInfo $user): bool{
+    return (
+        $this->canManageUsers() &&
+        !$user->getId()->equals(Session::get()->getLogonUserId()) &&
+        ($user->getRoleId() === null || array_key_exists($user->getRoleId(), $this->editable_roles))
+    );
+  }
+  
+  public function setupUserTableFilter(TableComponent $table): UserFilter{
     $req = $this->getReq();
-    
-    $logon_user_id = Session::get()->getLogonUserId();
-    $can_see_email = $this->perms->check(SystemPermissions::SEE_USER_EMAILS);
-    
-    $table = new TableComponent();
-    $table->ifEmpty('No users found.');
-    
-    if ($can_see_email){
-      $table->addColumn('Username')->sort('name')->width(40)->wrap()->bold();
-      $table->addColumn('Email')->width(40)->wrap();
-    }
-    else{
-      $table->addColumn('Username')->sort('name')->width(80)->wrap()->bold();
-    }
-    
-    $table->addColumn('Role')->sort('role_order')->width(20);
-    $table->addColumn('Registration Time')->sort('date_registered')->tight()->right();
-    
-    if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
-      $table->addColumn('Actions')->tight()->right();
-    }
+    $can_see_email = $this->canSeeEmail();
     
     $filter = new UserFilter($can_see_email);
     $users = new UserTable(DB::get());
@@ -82,54 +75,6 @@ class UsersModel extends BasicRootPageModel{
     $total_count = $users->countUsers($filter);
     $pagination = $filter->page($total_count);
     $sorting = $filter->sort($req);
-    
-    foreach($users->listUsers($filter) as $user){
-      $user_id = $user->getId();
-      $user_id_formatted = $user_id->formatted();
-      
-      $row = [$user->getNameSafe()];
-      
-      if ($can_see_email){
-        $row[] = $user->getEmailSafe();
-      }
-      
-      switch($user->getRoleType()){
-        case RoleInfo::SYSTEM_ADMIN:
-          $row[] = Text::missing('Admin');
-          break;
-        
-        default:
-          /** @noinspection ProperNullCoalescingOperatorUsageInspection */
-          $row[] = $user->getRoleTitleSafe() ?? Text::missing('Default');
-          break;
-      }
-      
-      $row[] = new DateTimeComponent($user->getRegistrationDate());
-      
-      $can_edit = (
-          $this->perms->check(SystemPermissions::MANAGE_USERS) &&
-          !$user_id->equals($logon_user_id) &&
-          ($user->getRoleId() === null || array_key_exists($user->getRoleId(), $this->editable_roles))
-      );
-      
-      if ($this->perms->check(SystemPermissions::MANAGE_USERS)){
-        if ($can_edit){
-          $link_delete = Link::fromBase($req, 'users', $user_id_formatted, 'delete');
-          $btn_delete = new IconButtonFormComponent($link_delete, 'circle-cross');
-          $btn_delete->color('red');
-          $row[] = $btn_delete;
-        }
-        else{
-          $row[] = '';
-        }
-      }
-      
-      $row = $table->addRow($row);
-      
-      if ($can_edit){
-        $row->link(Link::fromBase($req, 'users', $user_id_formatted));
-      }
-    }
     
     $table->setupColumnSorting($sorting);
     $table->setPaginationFooter($req, $pagination)->elementName('users');
@@ -149,7 +94,15 @@ class UsersModel extends BasicRootPageModel{
       $filtering_role->addOption($title, Text::plain($title));
     }
     
-    return $table;
+    return $filter;
+  }
+  
+  /**
+   * @param UserFilter $filter
+   * @return UserInfo[]
+   */
+  public function getUserList(UserFilter $filter): array{
+    return (new UserTable(DB::get()))->listUsers($filter);
   }
   
   public function getCreateForm(): ?FormComponent{

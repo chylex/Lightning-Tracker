@@ -6,6 +6,7 @@ namespace Pages\Models\Root;
 use Database\DB;
 use Database\Filters\General\Pagination;
 use Database\Filters\Types\ProjectFilter;
+use Database\Objects\ProjectInfo;
 use Database\Objects\UserProfile;
 use Database\Tables\ProjectTable;
 use Database\Validation\ProjectFields;
@@ -13,7 +14,6 @@ use Exception;
 use Pages\Components\Forms\FormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Models\BasicRootPageModel;
-use Routing\Link;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
 use Session\Session;
@@ -32,56 +32,56 @@ class ProjectModel extends BasicRootPageModel{
     $this->perms = $perms;
   }
   
-  public function createProjectTable(): TableComponent{
-    $table = new TableComponent();
-    $table->ifEmpty('No projects found. Some projects may not be visible to your account.');
+  public function canViewPubliclyVisibleProjects(): bool{
+    return $this->perms->check(SystemPermissions::LIST_VISIBLE_PROJECTS);
+  }
+  
+  public function canManageProjects(): bool{
+    return $this->perms->check(SystemPermissions::MANAGE_PROJECTS);
+  }
+  
+  public function setupProjectTableFilter(TableComponent $table): ProjectFilter{
+    $req = $this->getReq();
     
-    $table->addColumn('Name')->sort('name')->width(50)->wrap()->bold();
-    $table->addColumn('Link')->width(50);
+    $filter = new ProjectFilter();
     
-    if ($this->perms->check(SystemPermissions::MANAGE_PROJECTS)){
-      $table->addColumn('Actions')->tight()->right();
+    if (!$this->canViewPubliclyVisibleProjects()){
+      $table->setPaginationFooter($req, Pagination::empty())->elementName('projects');
+      return $filter;
     }
     
-    if ($this->perms->check(SystemPermissions::LIST_VISIBLE_PROJECTS)){
-      $filter = new ProjectFilter();
-      
-      if (!$this->perms->check(SystemPermissions::LIST_ALL_PROJECTS)){
-        $filter = $filter->visibleTo(Session::get()->getLogonUser());
-      }
-      
-      $projects = new ProjectTable(DB::get());
-      
-      $filtering = $filter->filter();
-      $total_count = $projects->countProjects($filter);
-      $pagination = $filter->page($total_count);
-      $sorting = $filter->sort($this->getReq());
-      
-      foreach($projects->listProjects($filter) as $project){
-        $url_enc = rawurlencode($project->getUrl());
-        $link = '<a href="'.Link::fromRoot('project', $url_enc).'" class="plain">'.$project->getUrlSafe().' <span class="icon icon-out"></span></a>';
-        
-        $row = [$project->getNameSafe(), $link];
-        
-        if ($this->perms->check(SystemPermissions::MANAGE_PROJECTS)){
-          $row[] = '<a href="'.Link::fromRoot('project', $url_enc, 'delete').'" class="icon"><span class="icon icon-circle-cross icon-color-red"></span></a>';
-        }
-        
-        $table->addRow($row);
-      }
-      
-      $table->setupColumnSorting($sorting);
-      $table->setPaginationFooter($this->getReq(), $pagination)->elementName('projects');
-      
-      $header = $table->setFilteringHeader($filtering);
-      $header->addTextField('name')->label('Name');
-      $header->addTextField('url')->label('Link');
+    if (!$this->perms->check(SystemPermissions::LIST_ALL_PROJECTS)){
+      $filter = $filter->visibleTo(Session::get()->getLogonUser());
+    }
+    
+    $projects = new ProjectTable(DB::get());
+    
+    $filtering = $filter->filter();
+    $total_count = $projects->countProjects($filter);
+    $pagination = $filter->page($total_count);
+    $sorting = $filter->sort($req);
+    
+    $table->setupColumnSorting($sorting);
+    $table->setPaginationFooter($req, $pagination)->elementName('projects');
+    
+    $header = $table->setFilteringHeader($filtering);
+    $header->addTextField('name')->label('Name');
+    $header->addTextField('url')->label('Link');
+    
+    return $filter;
+  }
+  
+  /**
+   * @param ProjectFilter $filter
+   * @return ProjectInfo[]
+   */
+  public function getProjectList(ProjectFilter $filter): array{
+    if ($this->canViewPubliclyVisibleProjects()){
+      return (new ProjectTable(DB::get()))->listProjects($filter);
     }
     else{
-      $table->setPaginationFooter($this->getReq(), Pagination::empty())->elementName('projects');
+      return [];
     }
-    
-    return $table;
   }
   
   public function getCreateForm(): ?FormComponent{

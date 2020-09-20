@@ -5,15 +5,12 @@ namespace Pages\Models\Root;
 
 use Database\DB;
 use Database\Objects\RoleInfo;
+use Database\Objects\RoleManagementInfo;
 use Database\Tables\SystemRolePermTable;
 use Database\Tables\SystemRoleTable;
 use Database\Validation\RoleFields;
 use Exception;
-use Pages\Components\CompositeComponent;
 use Pages\Components\Forms\FormComponent;
-use Pages\Components\Table\TableComponent;
-use Pages\Components\Text;
-use Routing\Link;
 use Session\Permissions\SystemPermissions;
 use Validation\FormValidator;
 use Validation\ValidationException;
@@ -23,8 +20,8 @@ class SettingsRolesModel extends AbstractSettingsModel{
   public const ACTION_MOVE = 'Move';
   public const ACTION_DELETE = 'Delete';
   
-  private const ACTION_MOVE_UP = 'Up';
-  private const ACTION_MOVE_DOWN = 'Down';
+  private const BUTTON_MOVE_UP = 'Up';
+  private const BUTTON_MOVE_DOWN = 'Down';
   
   public const PERM_NAMES = [
       SystemPermissions::MANAGE_SETTINGS       => 'Manage Settings',
@@ -49,72 +46,19 @@ class SettingsRolesModel extends AbstractSettingsModel{
   
   private FormComponent $create_form;
   
-  public function createRoleTable(): TableComponent{
-    $table = new TableComponent();
-    $table->ifEmpty('No roles found.');
-    
-    $table->addColumn('Title')->width(20)->bold();
-    $table->addColumn('Permissions')->width(80)->wrap();
-    $table->addColumn('Actions')->tight()->right();
-    
+  public function canEditRole(RoleInfo $role): bool{
+    return $role->getType() === RoleInfo::SYSTEM_NORMAL;
+  }
+  
+  /**
+   * @return RoleManagementInfo[]
+   */
+  public function getRoles(): array{
     $roles = new SystemRoleTable(DB::get());
     $perms = new SystemRolePermTable(DB::get());
+    
     $ordering_limit = $roles->findMaxOrdering();
-    
-    foreach($roles->listRoles() as $role){
-      $role_id = $role->getId();
-      $role_id_str = (string)$role_id;
-      
-      $perm_list = implode(', ', array_map(static fn($perm): string => self::PERM_NAMES[$perm], $perms->listRolePerms($role_id)));
-      
-      switch($role->getType()){
-        case RoleInfo::SYSTEM_ADMIN:
-          $perm_list_str = Text::missing('All');
-          break;
-        
-        default:
-          $perm_list_str = empty($perm_list) ? Text::missing('None') : $perm_list;
-          break;
-      }
-      
-      $row = [$role->getTitleSafe(), $perm_list_str];
-      
-      if ($role->getType() === RoleInfo::SYSTEM_NORMAL){
-        $form_move = new FormComponent(self::ACTION_MOVE);
-        $form_move->addHidden('Ordering', (string)$role->getOrdering());
-        
-        $btn_move_up = $form_move->addIconButton('submit', 'circle-up')->color('blue')->value(self::ACTION_MOVE_UP);
-        $btn_move_down = $form_move->addIconButton('submit', 'circle-down')->color('blue')->value(self::ACTION_MOVE_DOWN);
-        
-        $ordering = $role->getOrdering();
-        
-        if ($ordering === 0 || $ordering === 1){
-          $btn_move_up->disabled();
-        }
-        
-        if ($ordering === 0 || $ordering === $ordering_limit){
-          $btn_move_down->disabled();
-        }
-        
-        $form_delete = new FormComponent(self::ACTION_DELETE);
-        $form_delete->requireConfirmation('This action cannot be reversed. Do you want to continue?');
-        $form_delete->addHidden('Role', $role_id_str);
-        $form_delete->addIconButton('submit', 'circle-cross')->color('red');
-        
-        $row[] = new CompositeComponent($form_move, $form_delete);
-      }
-      else{
-        $row[] = '';
-      }
-      
-      $row = $table->addRow($row);
-      
-      if ($role->getType() === RoleInfo::SYSTEM_NORMAL){
-        $row->link(Link::fromBase($this->getReq(), 'settings', 'roles', $role_id_str));
-      }
-    }
-    
-    return $table;
+    return array_map(fn(RoleInfo $v): RoleManagementInfo => new RoleManagementInfo($v, $perms->listRolePerms($v->getId()), $ordering_limit), $roles->listRoles());
   }
   
   public function getCreateForm(): FormComponent{
@@ -127,6 +71,41 @@ class SettingsRolesModel extends AbstractSettingsModel{
     $form->addButton('submit', 'Create Role')->icon('pencil');
     
     return $this->create_form = $form;
+  }
+  
+  public function createMoveForm(RoleManagementInfo $info): ?FormComponent{
+    if (!$this->canEditRole($info->getRole())){
+      return null;
+    }
+    
+    $form = new FormComponent(self::ACTION_MOVE);
+    $form->addHidden('Ordering', (string)$info->getRole()->getOrdering());
+    
+    $btn_move_up = $form->addIconButton('submit', 'circle-up')->color('blue')->value(self::BUTTON_MOVE_UP);
+    $btn_move_down = $form->addIconButton('submit', 'circle-down')->color('blue')->value(self::BUTTON_MOVE_DOWN);
+    
+    if (!$info->canMoveUp()){
+      $btn_move_up->disabled();
+    }
+    
+    if (!$info->canMoveDown()){
+      $btn_move_down->disabled();
+    }
+    
+    return $form;
+  }
+  
+  public function createDeleteForm(RoleInfo $role): ?FormComponent{
+    if (!$this->canEditRole($role)){
+      return null;
+    }
+    
+    $form = new FormComponent(self::ACTION_DELETE);
+    $form->requireConfirmation('This action cannot be reversed. Do you want to continue?');
+    $form->addHidden('Role', (string)$role->getId());
+    $form->addIconButton('submit', 'circle-cross')->color('red');
+    
+    return $form;
   }
   
   public function createRole(array $data): bool{
@@ -163,17 +142,17 @@ class SettingsRolesModel extends AbstractSettingsModel{
     $button = $data[FormComponent::BUTTON_KEY] ?? null;
     $ordering = get_int($data, 'Ordering');
     
-    if (($button !== self::ACTION_MOVE_UP && $button !== self::ACTION_MOVE_DOWN) || $ordering === null){
+    if (($button !== self::BUTTON_MOVE_UP && $button !== self::BUTTON_MOVE_DOWN) || $ordering === null){
       return false;
     }
     
     $roles = new SystemRoleTable(DB::get());
     
-    if ($button === self::ACTION_MOVE_UP){
+    if ($button === self::BUTTON_MOVE_UP){
       $roles->swapRolesIfNormal($ordering, $ordering - 1);
       return true;
     }
-    elseif ($button === self::ACTION_MOVE_DOWN){
+    elseif ($button === self::BUTTON_MOVE_DOWN){
       $roles->swapRolesIfNormal($ordering, $ordering + 1);
       return true;
     }

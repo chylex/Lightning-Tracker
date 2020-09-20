@@ -6,16 +6,15 @@ namespace Pages\Models\Project;
 use Database\DB;
 use Database\Filters\Types\ProjectMemberFilter;
 use Database\Objects\ProjectInfo;
+use Database\Objects\ProjectMember;
 use Database\Tables\ProjectMemberTable;
 use Database\Tables\ProjectRoleTable;
 use Database\Tables\UserTable;
 use Exception;
 use Pages\Components\Forms\FormComponent;
-use Pages\Components\Forms\IconButtonFormComponent;
 use Pages\Components\Table\TableComponent;
 use Pages\Components\Text;
 use Pages\Models\BasicProjectPageModel;
-use Routing\Link;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
 use Session\Session;
@@ -47,64 +46,29 @@ class MembersModel extends BasicProjectPageModel{
     }
   }
   
-  public function createMemberTable(): TableComponent{
-    $req = $this->getReq();
-    $project = $this->getProject();
-    $logon_user_id = Session::get()->getLogonUserId();
+  public function canManageMembers(): bool{
+    return $this->perms->check(ProjectPermissions::MANAGE_MEMBERS);
+  }
+  
+  public function canEditMember(ProjectMember $member): bool{
+    $user_id = $member->getUserId();
     
-    $table = new TableComponent();
-    $table->ifEmpty('No members found.');
-    
-    $table->addColumn('Username')->sort('name')->width(60)->wrap()->bold();
-    $table->addColumn('Role')->sort('role_order')->width(40);
-    
-    if ($this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
-      $table->addColumn('Actions')->right()->tight();
-    }
-    
-    $owner_id = $project->getOwnerId();
-    
+    return (
+        $this->perms->check(ProjectPermissions::MANAGE_MEMBERS) &&
+        !$user_id->equals(Session::get()->getLogonUserId()) &&
+        !$user_id->equals($this->getProject()->getOwnerId()) &&
+        ($member->getRoleId() === null || array_key_exists($member->getRoleId(), $this->editable_roles))
+    );
+  }
+  
+  public function setupProjectMemberFilter(TableComponent $table): ProjectMemberFilter{
     $filter = new ProjectMemberFilter();
-    $members = new ProjectMemberTable(DB::get(), $project);
+    $members = new ProjectMemberTable(DB::get(), $this->getProject());
     
     $filtering = $filter->filter();
     $total_count = $members->countMembers($filter);
     $pagination = $filter->page($total_count);
     $sorting = $filter->sort($this->getReq());
-    
-    foreach($members->listMembers($filter) as $member){
-      /** @noinspection ProperNullCoalescingOperatorUsageInspection */
-      $row = [$member->getUserNameSafe(),
-              $member->getRoleTitleSafe() ?? Text::missing('Default')];
-      
-      $user_id = $member->getUserId();
-      $user_id_str = $user_id->formatted();
-      
-      $can_edit = (
-          $this->perms->check(ProjectPermissions::MANAGE_MEMBERS) &&
-          !$user_id->equals($logon_user_id) &&
-          !$user_id->equals($owner_id) &&
-          ($member->getRoleId() === null || array_key_exists($member->getRoleId(), $this->editable_roles))
-      );
-      
-      if ($this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
-        if ($can_edit){
-          $link_delete = Link::fromBase($req, 'members', $user_id_str, 'remove');
-          $btn_delete = new IconButtonFormComponent($link_delete, 'circle-cross');
-          $btn_delete->color('red');
-          $row[] = $btn_delete;
-        }
-        else{
-          $row[] = '';
-        }
-      }
-      
-      $row = $table->addRow($row);
-      
-      if ($can_edit){
-        $row->link(Link::fromBase($this->getReq(), 'members', $user_id_str));
-      }
-    }
     
     $table->setupColumnSorting($sorting);
     $table->setPaginationFooter($this->getReq(), $pagination)->elementName('members');
@@ -115,12 +79,20 @@ class MembersModel extends BasicProjectPageModel{
     $filtering_role = $header->addMultiSelect('role')->label('Role');
     $filtering_role->addOption('', Text::missing('Default'));
     
-    foreach((new ProjectRoleTable(DB::get(), $project))->listRoles() as $role){
+    foreach((new ProjectRoleTable(DB::get(), $this->getProject()))->listRoles() as $role){
       $title = $role->getTitle();
       $filtering_role->addOption($title, Text::plain($title));
     }
     
-    return $table;
+    return $filter;
+  }
+  
+  /**
+   * @param ProjectMemberFilter $filter
+   * @return ProjectMember[]
+   */
+  public function getMemberList(ProjectMemberFilter $filter): array{
+    return (new ProjectMemberTable(DB::get(), $this->getProject()))->listMembers($filter);
   }
   
   public function getInviteForm(): ?FormComponent{

@@ -9,6 +9,7 @@ use Pages\Components\Table\TableComponent;
 use Pages\Components\TitledSectionComponent;
 use Pages\Models\Root\ProjectModel;
 use Pages\Views\AbstractPage;
+use Routing\Link;
 
 class ProjectsPage extends AbstractPage{
   private ProjectModel $model;
@@ -41,10 +42,41 @@ class ProjectsPage extends AbstractPage{
     $split->collapseAt(800, true);
     $split->setRightWidthLimits(250, 500);
     
-    $split->addLeft($this->model->createProjectTable());
+    $split->addLeft($this->createProjectTable());
     $split->addRightIfNotNull(TitledSectionComponent::wrap('Create Project', $this->model->getCreateForm()));
     
     $split->echoBody();
+  }
+  
+  private function createProjectTable(): TableComponent{
+    $can_manage_projects = $this->model->canManageProjects();
+    
+    $table = new TableComponent();
+    $table->ifEmpty('No projects found. Some projects may not be visible to your account.');
+    
+    $table->addColumn('Name')->sort('name')->width(50)->wrap()->bold();
+    $table->addColumn('Link')->width(50);
+    
+    if ($can_manage_projects){
+      $table->addColumn('Actions')->tight()->right();
+    }
+    
+    $filter = $this->model->setupProjectTableFilter($table);
+    
+    foreach($this->model->getProjectList($filter) as $project){
+      $url_enc = rawurlencode($project->getUrl());
+      $link = '<a href="'.Link::fromRoot('project', $url_enc).'" class="plain">'.$project->getUrlSafe().' <span class="icon icon-out"></span></a>';
+      
+      $row = [$project->getNameSafe(), $link];
+      
+      if ($can_manage_projects){
+        $row[] = '<a href="'.Link::fromRoot('project', $url_enc, 'delete').'" class="icon"><span class="icon icon-circle-cross icon-color-red"></span></a>';
+      }
+      
+      $table->addRow($row);
+    }
+    
+    return $table;
   }
 }
 
