@@ -49,11 +49,11 @@ class T103_CreateIssues_Cest{
   
   /**
    * @example [null, null]
-   * @exammple ["feature", "Feature"]
-   * @exammple ["enhancement", "Enhancement"]
-   * @exammple ["bug", "Bug"]
-   * @exammple ["crash", "Crash"]
-   * @exammple ["task", "Task"]
+   * @example ["feature", "Feature"]
+   * @example ["enhancement", "Enhancement"]
+   * @example ["bug", "Bug"]
+   * @example ["crash", "Crash"]
+   * @example ["task", "Task"]
    */
   public function fieldsArePrefilledCorrectly(AcceptanceTester $I, Example $example): void{
     $I->amLoggedIn('User1');
