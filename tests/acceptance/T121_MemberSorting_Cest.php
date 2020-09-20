@@ -11,7 +11,7 @@ class T121_MemberSorting_Cest{
     $I->amOnPage('/project/p'.$project.'/members');
   }
   
-  public function testMembersOrderedByRoleAscThenNameAscIsDefaultInProject1(AcceptanceTester $I): void{
+  public function sortByRoleAscThenNameAscIsDefaultInProject1(AcceptanceTester $I): void{
     $this->viewProject($I, 1);
     
     $I->seeTableRowOrder(['User1',
@@ -22,7 +22,7 @@ class T121_MemberSorting_Cest{
                           'User3']);
   }
   
-  public function testMembersOrderedByRoleAscThenNameAscIsDefaultInProject2(AcceptanceTester $I): void{
+  public function sortByRoleAscThenNameAscIsDefaultInProject2(AcceptanceTester $I): void{
     $this->viewProject($I, 2);
     
     $I->seeTableRowOrder(['User2',
@@ -31,7 +31,7 @@ class T121_MemberSorting_Cest{
                           'User1']);
   }
   
-  public function testMembersOrderedByNameInProject1(AcceptanceTester $I): void{
+  public function sortByNameInProject1(AcceptanceTester $I): void{
     $order = [
         'Manager1',
         'Manager2',
@@ -50,7 +50,7 @@ class T121_MemberSorting_Cest{
     $I->seeTableRowOrder(array_reverse($order));
   }
   
-  public function testMembersOrderedByNameInProject2(AcceptanceTester $I): void{
+  public function sortByNameInProject2(AcceptanceTester $I): void{
     $order = [
         'Manager1',
         'Manager2',
@@ -67,7 +67,7 @@ class T121_MemberSorting_Cest{
     $I->seeTableRowOrder(array_reverse($order));
   }
   
-  public function testMembersOrderedByRoleInProject1(AcceptanceTester $I): void{
+  public function sortByRoleInProject1(AcceptanceTester $I): void{
     $this->viewProject($I, 1);
     
     $I->click('thead tr:first-child th:nth-child(2) > a');
@@ -89,7 +89,7 @@ class T121_MemberSorting_Cest{
                           'User1']);  // owner role
   }
   
-  public function testMembersOrderedByRoleInProject2(AcceptanceTester $I): void{
+  public function sortByRoleInProject2(AcceptanceTester $I): void{
     $this->viewProject($I, 2);
     
     $I->click('thead tr:first-child th:nth-child(2) > a');
@@ -108,9 +108,9 @@ class T121_MemberSorting_Cest{
   }
   
   /**
-   * @depends testMembersOrderedByRoleInProject2
+   * @depends sortByRoleInProject2
    */
-  public function testMembersOrderedByRoleThenNameInProject2(AcceptanceTester $I): void{
+  public function sortByRoleThenNameInProject2(AcceptanceTester $I): void{
     $this->viewProject($I, 2);
     
     $I->click('thead tr:first-child th:nth-child(2) > a');

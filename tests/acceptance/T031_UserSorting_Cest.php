@@ -18,7 +18,7 @@ class T031_UserSorting_Cest{
   /**
    * @depends registerTestUser
    */
-  public function testUsersOrderedByRegistrationDateAscIsDefault(AcceptanceTester $I): void{
+  public function sortByRegistrationDateAscIsDefault(AcceptanceTester $I): void{
     $I->seeTableRowOrder(['Admin',
                           'Moderator',
                           'Manager1',
@@ -33,7 +33,7 @@ class T031_UserSorting_Cest{
   /**
    * @depends registerTestUser
    */
-  public function testUsersOrderedByName(AcceptanceTester $I): void{
+  public function sortByName(AcceptanceTester $I): void{
     $order = [
         'Admin',
         'Manager1',
@@ -56,7 +56,7 @@ class T031_UserSorting_Cest{
   /**
    * @depends registerTestUser
    */
-  public function testUsersOrderedByRole(AcceptanceTester $I): void{
+  public function sortByRole(AcceptanceTester $I): void{
     $I->click('thead tr:first-child th:nth-child(3) > a');
     
     $I->seeTableRowOrder(['Admin',     // implied admin role
@@ -85,7 +85,7 @@ class T031_UserSorting_Cest{
   /**
    * @depends registerTestUser
    */
-  public function testUsersOrderedByRoleThenName(AcceptanceTester $I): void{
+  public function sortByRoleThenName(AcceptanceTester $I): void{
     $I->click('thead tr:first-child th:nth-child(3) > a');
     $I->click('thead tr:first-child th:nth-child(1) > a');
     
@@ -141,7 +141,7 @@ class T031_UserSorting_Cest{
   /**
    * @depends registerTestUser
    */
-  public function testUsersOrderedByRoleThenRegistrationDate(AcceptanceTester $I): void{
+  public function sortByRoleThenRegistrationDate(AcceptanceTester $I): void{
     $I->click('thead tr:first-child th:nth-child(3) > a');
     
     $I->seeTableRowOrder(['Admin',     // implied admin role
@@ -170,7 +170,7 @@ class T031_UserSorting_Cest{
   /**
    * @depends registerTestUser
    */
-  public function testUsersOrderedByRegistrationDate(AcceptanceTester $I): void{
+  public function sortByRegistrationDate(AcceptanceTester $I): void{
     $order = [
         'Admin',
         'Moderator',
@@ -191,12 +191,12 @@ class T031_UserSorting_Cest{
   }
   
   /**
-   * @depends testUsersOrderedByRegistrationDateAscIsDefault
-   * @depends testUsersOrderedByName
-   * @depends testUsersOrderedByRole
-   * @depends testUsersOrderedByRoleThenName
-   * @depends testUsersOrderedByRoleThenRegistrationDate
-   * @depends testUsersOrderedByRegistrationDate
+   * @depends sortByRegistrationDateAscIsDefault
+   * @depends sortByName
+   * @depends sortByRole
+   * @depends sortByRoleThenName
+   * @depends sortByRoleThenRegistrationDate
+   * @depends sortByRegistrationDate
    */
   public function removeTestUser(): void{
     (new T030_UserCreation_Cest())->removeTestUser();

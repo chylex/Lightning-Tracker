@@ -11,7 +11,7 @@ class T131_MilestoneSorting_Cest{
     $I->amOnPage('/project/p'.$project.'/milestones');
   }
   
-  public function testMilestonesOrderedByNameInProject1(AcceptanceTester $I): void{
+  public function sortByNameInProject1(AcceptanceTester $I): void{
     $order = [
         'Milestone',
         'Milestone 2',
@@ -28,7 +28,7 @@ class T131_MilestoneSorting_Cest{
     $I->seeTableRowOrder(array_reverse($order));
   }
   
-  public function testMilestonesOrderedByNameInProject2(AcceptanceTester $I): void{
+  public function sortByNameInProject2(AcceptanceTester $I): void{
     $order = [
         'Fourth Milestone',
         'Milestone',
@@ -45,7 +45,7 @@ class T131_MilestoneSorting_Cest{
     $I->seeTableRowOrder(array_reverse($order));
   }
   
-  public function testMilestonesOrderedByProgressInProject1(AcceptanceTester $I): void{
+  public function sortByProgressInProject1(AcceptanceTester $I): void{
     $order = [
         'Milestone 3',
         'Milestone 4',
@@ -62,7 +62,7 @@ class T131_MilestoneSorting_Cest{
     $I->seeTableRowOrder(array_reverse($order));
   }
   
-  public function testMilestonesOrderedByLastUpdatedInProject1(AcceptanceTester $I): void{
+  public function sortByLastUpdatedInProject1(AcceptanceTester $I): void{
     $order = [
         'Milestone 4',
         'Milestone 3',
