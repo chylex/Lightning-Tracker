@@ -117,10 +117,26 @@ The project uses the [Codeception](https://codeception.com/) test framework. Bef
 1. Run `composer install` in the repository root folder to install dependencies
 2. Setup a web server as outlined in the **Test Server** section above
 3. Create a MySQL database named `tracker_test` and grant the `lt` user all privileges:
-    * `GRANT ALL PRIVILEGES ON tracker_test.* to 'lt'@'localhost';`
+   * `GRANT ALL PRIVILEGES ON tracker_test.* to 'lt'@'localhost';`
 4. Run the `gulp prepareTests` task in the `/build/` folder
 5. Run the tests by running the following command in the repository root folder:
    * Windows: `codecept run`
    * (Otherwise): `php vendor/codeception/codeception/codecept run`
 
 If you use PhpStorm, steps 4 and 5 are included under the provided `Test` run configuration. You may also use the `Test (Debug)` configuration which runs in debug mode.
+
+While developing tests, it is inconvenient to have to re-run the entire test suite which takes several minutes to complete. Instead, you can edit `tests/acceptance.suite.yml` and include a test into the `core` group, then only run the specified tests (after the pre-defined setup test) using `codecept run -g core` or the provided `Test (Core)` run configuration.
+
+#### Code Coverage
+
+In order to run the test suite with coverage enabled, first ensure you can run the tests normally by following the **Automated Testing** section.
+
+1. Ensure code coverage is enabled on your test server
+   * Note that Xdebug coverage is slow and the tests will take about 15 times longer to complete
+   * Alternative coverage engines exist (such as [PCOV](https://github.com/krakjoe/pcov)) and may be worth looking into, but I have not tested them with the current setup
+2. Run the `gulp prepareCoverage` task in the `/build/` folder
+3. Run the tests using `codecept run --coverage --coverage-html` or the provided `Test (Cover)` run configuration
+4. View the results
+   * Browser: open `/tests/_output/acceptance.remote.coverage/index.html`
+   * PhpStorm: import `/tests/_output/acceptance.remote.coverage.xml` (you will first need to replace file paths pointing to `/server/www/` with `/src/`)
+5. The original `/server/www/` folder was backed up under `/server/www-backup/`, when running code coverage you will have to restore the backup manually by deleting `www` and renaming `www-backup`
