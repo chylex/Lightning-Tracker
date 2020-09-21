@@ -30,11 +30,6 @@ SQL;
     
     return $db;
   }
-  
-  public static function close(): void{
-    static $db;
-    unset($db);
-  }
 }
 
 ?>

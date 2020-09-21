@@ -81,8 +81,7 @@ class BasicProjectPageModel extends AbstractPageModel{
       }
     }
     
-    $this->active_milestone = $milestone;
-    return $this->active_milestone;
+    return $this->active_milestone = $milestone;
   }
   
   public function getActiveMilestoneComponent(): ?IViewable{

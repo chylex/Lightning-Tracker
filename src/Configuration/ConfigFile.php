@@ -20,10 +20,6 @@ final class ConfigFile{
                           $data['DbPassword']);
   }
   
-  public static function fromCurrentInstallation(): ConfigFile{
-    return new ConfigFile(SYS_ENABLE_REGISTRATION, BASE_URL, DB_NAME, DB_HOST, DB_USER, DB_PASSWORD);
-  }
-  
   private bool $sys_enable_registration;
   private string $base_url;
   private string $db_name;
