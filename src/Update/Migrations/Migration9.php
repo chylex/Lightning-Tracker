@@ -3,9 +3,7 @@ declare(strict_types = 1);
 
 namespace Update\Migrations;
 
-use PDO;
 use Update\AbstractMigrationProcess;
-use Update\AbstractMigrationTask;
 
 final class Migration9 extends AbstractMigrationProcess{
   /** @noinspection SqlResolve */
@@ -21,15 +19,8 @@ final class Migration9 extends AbstractMigrationProcess{
         self::sql('ALTER TABLE system_roles ADD UNIQUE KEY (`type`, `ordering`)'),
         self::sql('ALTER TABLE project_roles ADD UNIQUE KEY (`project_id`, `type`, `ordering`)'),
         
-        new class extends AbstractMigrationTask{
-          /** @noinspection SqlResolve */
-          public function execute(PDO $db): void{
-            $db->beginTransaction();
-            $db->exec('INSERT INTO `system_roles` (type, title, ordering) VALUES (\'admin\', \'Admin\', 0)');
-            $db->exec('UPDATE users SET role_id = LAST_INSERT_ID() WHERE admin = TRUE');
-            $db->commit();
-          }
-        },
+        self::transaction('INSERT INTO `system_roles` (type, title, ordering) VALUES (\'admin\', \'Admin\', 0)',
+                          'UPDATE users SET role_id = LAST_INSERT_ID() WHERE admin = TRUE'),
         
         self::sql('ALTER TABLE users DROP COLUMN admin'),
     ];
