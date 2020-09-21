@@ -11,4 +11,14 @@ extensions:
 coverage:
   enabled: true
   remote: true
-  c3_url: 'http://localhost'
+  include:
+    - './*'
+  exclude:
+    - 'c3.php'
+    - 'codeception.yml'
+    - 'composer.json'
+    - 'composer.lock'
+    - '~database/*'
+    - '~resources/*'
+    - 'tests/*'
+    - 'vendor/*'

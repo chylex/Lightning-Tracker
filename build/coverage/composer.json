@@ -1,0 +1,6 @@
+{
+  "require-dev": {
+    "codeception/codeception": "4.1.7",
+    "codeception/c3": "2.4"
+  }
+}

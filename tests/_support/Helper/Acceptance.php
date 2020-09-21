@@ -69,8 +69,9 @@ class Acceptance extends Module{
     $dir_backup = __DIR__.'/../../../server/www-backup';
     $dir_www = __DIR__.'/../../../server/www';
     $dir_tmp = $dir_www.'-tmp';
+    $dir_c3 = $dir_www.'/tests/_output/c3tmp';
     
-    if (is_dir($dir_backup)){
+    if (is_dir($dir_backup) && !is_dir($dir_c3)){
       $delete = new RecursiveDirectoryIterator($dir_www, FilesystemIterator::SKIP_DOTS);
       
       foreach(new RecursiveIteratorIterator($delete, RecursiveIteratorIterator::CHILD_FIRST) as $path){

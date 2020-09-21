@@ -7,6 +7,7 @@ const del = require("del");
 const glob = require("glob");
 const merge = require("merge-stream");
 
+const childProcess = require("child_process");
 const crypto = require("crypto");
 const fs = require("fs");
 const fse = require("fs-extra");
@@ -109,8 +110,12 @@ function taskPrepareTests(cb){
     
     if (fs.existsSync(output)){
         for(const file of fs.readdirSync(output)){
-            if (file !== ".gitignore"){
-                fs.unlinkSync(path.join(output, file));
+            if (file !== ".gitignore" && !file.endsWith("coverage.serialized") && !file.endsWith("coverage.xml")){
+                const fullPath = path.join(output, file);
+                
+                if (fs.lstatSync(fullPath).isFile()){
+                    fs.unlinkSync(fullPath);
+                }
             }
         }
     }
@@ -118,6 +123,24 @@ function taskPrepareTests(cb){
     cb();
 }
 
+function taskPrepareCoverage(cb){
+    const tests = "../tests";
+    const www = "../server/www";
+    const wwwtests = www + "/tests";
+    
+    fse.copySync("./coverage", www);
+    fs.mkdirSync(wwwtests);
+    
+    for(const file of glob.sync(tests + "/*.yml")){
+        fs.copyFileSync(file, wwwtests + "/" + path.basename(file));
+    }
+    
+    childProcess.execSync("composer install", { cwd: www });
+    cb();
+}
+
 exports.default = series(taskClean, taskCopy, taskCSS, taskHash);
 // noinspection JSUnusedGlobalSymbols
 exports.prepareTests = series(taskClean, taskCopy, taskCSS, taskHash, taskPrepareTests);
+// noinspection JSUnusedGlobalSymbols
+exports.prepareCoverage = series(taskClean, taskCopy, taskCSS, taskHash, taskPrepareTests, taskPrepareCoverage);
