@@ -20,11 +20,11 @@
   .split-collapse-640 {
     flex-wrap: wrap;
   }
-
+  
   .split-collapse-640.split-collapse-reversed {
     flex-wrap: wrap-reverse;
   }
-
+  
   .split-collapse-640 > div {
     flex: 1 1 100%;
     margin-left: 0 !important;
@@ -32,11 +32,11 @@
     padding: 0 !important;
     max-width: unset;
   }
-
+  
   .split-collapse-640:not(.split-collapse-reversed) > div:first-child {
     margin-bottom: 25px;
   }
-
+  
   .split-collapse-640.split-collapse-reversed > div:last-child {
     margin-bottom: 25px;
   }
@@ -46,11 +46,11 @@
   .split-collapse-800 {
     flex-wrap: wrap;
   }
-
+  
   .split-collapse-800.split-collapse-reversed {
     flex-wrap: wrap-reverse;
   }
-
+  
   .split-collapse-800 > div {
     flex: 1 1 100%;
     margin-left: 0 !important;
@@ -58,11 +58,11 @@
     padding: 0 !important;
     max-width: unset;
   }
-
+  
   .split-collapse-800:not(.split-collapse-reversed) > div:first-child {
     margin-bottom: 25px;
   }
-
+  
   .split-collapse-800.split-collapse-reversed > div:last-child {
     margin-bottom: 25px;
   }
@@ -72,11 +72,11 @@
   .split-collapse-1024 {
     flex-wrap: wrap;
   }
-
+  
   .split-collapse-1024.split-collapse-reversed {
     flex-wrap: wrap-reverse;
   }
-
+  
   .split-collapse-1024 > div {
     flex: 1 1 100%;
     margin-left: 0 !important;
@@ -84,11 +84,11 @@
     padding: 0 !important;
     max-width: unset;
   }
-
+  
   .split-collapse-1024:not(.split-collapse-reversed) > div:first-child {
     margin-bottom: 25px;
   }
-
+  
   .split-collapse-1024.split-collapse-reversed > div:last-child {
     margin-bottom: 25px;
   }

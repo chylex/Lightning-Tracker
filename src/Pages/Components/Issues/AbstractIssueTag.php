@@ -22,8 +22,10 @@ abstract class AbstractIssueTag implements IIssueTag, IViewable{
   
   /** @noinspection PhpUnused */
   public static abstract function init(): void;
+  
   /** @noinspection PhpUnused */
   public static abstract function get(string $id): self;
+  
   /** @noinspection PhpUnused */
   public static abstract function exists(string $id): bool;
   

@@ -24,6 +24,7 @@ abstract class AbstractHandlerController implements IController{
   }
   
   protected abstract function prerequisites(): Generator;
+  
   protected abstract function finally(Request $req, Session $sess): IAction;
 }
 

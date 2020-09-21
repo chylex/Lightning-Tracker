@@ -177,7 +177,7 @@ option.issue-tag:before {
   #New-Issue-Types {
     flex-wrap: wrap;
   }
-
+  
   #New-Issue-Types > a {
     flex: 0 0 175px;
   }

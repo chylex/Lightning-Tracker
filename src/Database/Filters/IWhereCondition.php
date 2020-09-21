@@ -7,6 +7,7 @@ use PDOStatement;
 
 interface IWhereCondition{
   public function getSql(): string;
+  
   public function prepareStatement(PDOStatement $stmt): void;
 }
 

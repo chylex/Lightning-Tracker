@@ -5,7 +5,9 @@ namespace Pages\Components\Issues;
 
 interface IIssueTag{
   public function getId(): string;
+  
   public function getTitle(): string;
+  
   public function getTagClass(): string;
 }
 

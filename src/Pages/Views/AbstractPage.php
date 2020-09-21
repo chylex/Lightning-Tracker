@@ -35,10 +35,10 @@ abstract class AbstractPage implements IViewable{
   }
   
   protected abstract function getHeading(): string;
+  
   protected abstract function getLayout(): string;
   
-  protected function echoPageHead(): void{
-  }
+  protected function echoPageHead(): void{ }
   
   protected abstract function echoPageBody(): void;
   

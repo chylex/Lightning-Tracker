@@ -70,8 +70,7 @@ final class Session{
   
   private ?SessionLoginInfo $login = null;
   
-  private function __construct(){
-  }
+  private function __construct(){ }
   
   private function getLogin(): SessionLoginInfo{
     if ($this->login === null){

@@ -65,6 +65,7 @@ class SystemRolePermTable extends AbstractTable{
     $perms = $stmt->fetchAll(PDO::FETCH_COLUMN);
     return $perms === false ? [] : $perms;
   }
+  
   /**
    * @param ?UserProfile $user
    * @return string[]

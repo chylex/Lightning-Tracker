@@ -5,7 +5,6 @@ use Codeception\Actor;
 use Codeception\Test\Test;
 use PHPUnit\Framework\TestResult;
 
-
 /**
  * Inherited Methods
  * @method void wantToTest($text)

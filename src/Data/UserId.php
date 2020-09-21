@@ -45,6 +45,7 @@ final class UserId{
   private function __construct(string $id){
     $this->id = $id;
   }
+  
   public function equals(?UserId $other): bool{
     return $other !== null && $this->id === $other->id;
   }

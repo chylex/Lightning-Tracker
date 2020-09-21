@@ -22,7 +22,9 @@ abstract class AbstractPageModel implements IModel{
   }
   
   protected abstract function createNavigation(): NavigationComponent;
+  
   protected abstract function setupNavigation(NavigationComponent $nav, PermissionManager $perms): void;
+  
   protected abstract function getLoginReturnQuery(): string;
   
   public function load(): IModel{

@@ -13,9 +13,11 @@ interface IModel{
    * @return $this
    */
   public function load(): IModel;
+  
   public function ensureLoaded(): void;
   
   public function getReq(): Request;
+  
   public function getNav(): NavigationComponent;
 }
 
