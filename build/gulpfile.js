@@ -10,6 +10,7 @@ const merge = require("merge-stream");
 const crypto = require("crypto");
 const fs = require("fs");
 const fse = require("fs-extra");
+const path = require("path");
 
 const php = "../src";
 const res = "../res";
@@ -94,6 +95,7 @@ function taskHash(){
 function taskPrepareTests(cb){
     const www = "../server/www";
     const backup = "../server/www-backup";
+    const output = "../tests/_output";
     
     if (!fs.existsSync(backup)){
         fs.renameSync(www, backup);
@@ -104,6 +106,15 @@ function taskPrepareTests(cb){
     
     fs.mkdirSync(www);
     fse.copySync(out, www);
+    
+    if (fs.existsSync(output)){
+        for(const file of fs.readdirSync(output)){
+            if (file !== ".gitignore"){
+                fs.unlinkSync(path.join(output, file));
+            }
+        }
+    }
+    
     cb();
 }
 
