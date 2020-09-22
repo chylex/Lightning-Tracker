@@ -28,6 +28,8 @@ class T040_SystemSettingsGeneral_Cest{
     $I->amOnPage('/');
     $I->see('Login', 'a[href="http://localhost/login"]');
     $I->dontSee('Register', 'a[href="http://localhost/register"]');
+    $I->amOnPage('/register');
+    $I->see('Registration Error', 'h2');
   }
   
   /**

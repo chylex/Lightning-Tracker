@@ -63,8 +63,7 @@ SQL
   }
   
   private function ensureCanOnlyManage(AcceptanceTester $I, array $rows, array $users): void{
-    $db = Acceptance::getDB();
-    $user_ids = $db->query('SELECT name, id FROM users')->fetchAll(PDO::FETCH_KEY_PAIR);
+    $user_ids = Acceptance::getDB()->query('SELECT name, id FROM users')->fetchAll(PDO::FETCH_KEY_PAIR);
     
     foreach($users as $user){
       $I->seeElement('tbody tr:nth-child('.$rows[$user].') a[href^="http://localhost/project/p1/members/"]');

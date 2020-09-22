@@ -51,8 +51,7 @@ class T030_UserCreation_Cest{
    * @depends registerTestUser
    */
   public function removeTestUser(): void{
-    $db = Acceptance::getDB();
-    $db->exec('DELETE FROM users WHERE name = \'Test\'');
+    Acceptance::getDB()->exec('DELETE FROM users WHERE name = \'Test\'');
   }
 }
 

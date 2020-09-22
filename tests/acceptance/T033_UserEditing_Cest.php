@@ -17,8 +17,7 @@ class T033_UserEditing_Cest{
   ];
   
   private function startEditingAs(AcceptanceTester $I, string $editor, string $user): void{
-    $db = Acceptance::getDB();
-    $stmt = $db->prepare('SELECT id FROM users WHERE name = ?');
+    $stmt = Acceptance::getDB()->prepare('SELECT id FROM users WHERE name = ?');
     $stmt->execute([$user]);
     
     $id = $stmt->fetchColumn();
@@ -51,6 +50,12 @@ class T033_UserEditing_Cest{
       $I->dontSeeCurrentUrlEquals('/users');
       $I->seeElement('#Confirm-1-Role + .error');
     }
+  }
+  
+  public function nonExistentUser(AcceptanceTester $I): void{
+    $I->amLoggedIn('Admin');
+    $I->amOnPage('/users/000-000-000');
+    $I->see('User not found');
   }
   
   /**

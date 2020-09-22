@@ -122,6 +122,8 @@ class T103_CreateIssues_Cest{
     $this->createIssueLimited($I, 2, 'Manager1', 'Task', 'Issue 7 (Task)', 'GGG [Tsk]');
     $this->createIssueLimited($I, 2, 'User1', 'Task', 'Issue 8 (Task)', 'HHH [Tsk]');
     $this->createIssueLimited($I, 2, 'Manager2', 'Task', 'Issue 9 (Task)', 'III [Tsk]');
+    
+    $this->createIssueFull($I, 2, 'User2', 'Task', 'Issue 10 (Task)', '', 'Medium', 'Medium', 'Blocked', 50, 'Milestone', 'Manager1');
   }
   
   /**
@@ -130,8 +132,7 @@ class T103_CreateIssues_Cest{
    * @noinspection SqlWithoutWhere
    */
   public function setupCreationDateOrder(): void{
-    $db = Acceptance::getDB();
-    $db->exec('UPDATE issues SET date_created = DATE_SUB(NOW(), INTERVAL issue_id SECOND), date_updated = date_created');
+    Acceptance::getDB()->exec('UPDATE issues SET date_created = DATE_SUB(NOW(), INTERVAL issue_id SECOND), date_updated = date_created');
   }
 }
 

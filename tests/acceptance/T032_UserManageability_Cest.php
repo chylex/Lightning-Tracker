@@ -28,8 +28,7 @@ class T032_UserManageability_Cest{
   }
   
   private function ensureCanOnlyManage(AcceptanceTester $I, array $users): void{
-    $db = Acceptance::getDB();
-    $user_ids = $db->query('SELECT name, id FROM users')->fetchAll(PDO::FETCH_KEY_PAIR);
+    $user_ids = Acceptance::getDB()->query('SELECT name, id FROM users')->fetchAll(PDO::FETCH_KEY_PAIR);
     
     foreach($users as $user){
       $I->seeElement('tbody tr:nth-child('.self::ROWS[$user].') a[href^="http://localhost/users/"]');
@@ -147,8 +146,7 @@ SQL
    * @depends manager2CanOnlyManageLowerRoles
    */
   public function removeTemporaryUsers(): void{
-    $db = Acceptance::getDB();
-    $db->exec('DELETE FROM users WHERE email IN (\'a\', \'b\')');
+    Acceptance::getDB()->exec('DELETE FROM users WHERE email IN (\'a\', \'b\')');
   }
 }
 

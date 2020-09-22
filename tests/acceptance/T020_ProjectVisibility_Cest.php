@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace acceptance;
 
 use AcceptanceTester;
+use Codeception\Example;
 
 class T020_ProjectVisibility_Cest{
   private function ensureCanSee(AcceptanceTester $I, array $projects): void{
@@ -82,8 +83,18 @@ class T020_ProjectVisibility_Cest{
     ]);
   }
   
-  public function canSeeSomeProjectsAsRoleLess(AcceptanceTester $I): void{
-    $I->amLoggedIn('RoleLess');
+  /**
+   * @example ["Manager1"]
+   * @example ["RoleLess"]
+   * @example [null]
+   */
+  public function canSeeOnlyPubliclyVisibleProjects(AcceptanceTester $I, Example $example): void{
+    if ($example[0] === null){
+      $I->amNotLoggedIn();
+    }
+    else{
+      $I->amLoggedIn($example[0]);
+    }
     
     $this->ensureCanSee($I, [
         'AdminVisible',

@@ -17,8 +17,7 @@ class T123_MemberEditing_Cest{
   ];
   
   private function startEditingAs(AcceptanceTester $I, string $editor, string $user): void{
-    $db = Acceptance::getDB();
-    $stmt = $db->prepare('SELECT id FROM users WHERE name = ?');
+    $stmt = Acceptance::getDB()->prepare('SELECT id FROM users WHERE name = ?');
     $stmt->execute([$user]);
     
     $id = $stmt->fetchColumn();

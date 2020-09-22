@@ -47,8 +47,7 @@ class T043_SystemSettingsRoleEditing_Cest{
   }
   
   private function startEditing(AcceptanceTester $I, string $title): void{
-    $db = Acceptance::getDB();
-    $stmt = $db->prepare('SELECT id FROM system_roles WHERE title = ?');
+    $stmt = Acceptance::getDB()->prepare('SELECT id FROM system_roles WHERE title = ?');
     $stmt->execute([$title]);
     
     $id = $stmt->fetchColumn();
@@ -146,8 +145,7 @@ class T043_SystemSettingsRoleEditing_Cest{
    * @depends setSomePermissionsForRole2
    */
   public function cleanupTestRoles(): void{
-    $db = Acceptance::getDB();
-    $db->exec('DELETE FROM system_roles WHERE title = \'Test1\' OR title = \'Test2\'');
+    Acceptance::getDB()->exec('DELETE FROM system_roles WHERE title = \'Test1\' OR title = \'Test2\'');
   }
 }
 

@@ -14,23 +14,34 @@ class T001_Install_Cest{
     $I->terminate();
   }
   
-  private function fill(AcceptanceTester $I, string $email): void{
-    $I->fillField('BaseUrl', 'http://localhost');
-    $I->fillField('AdminName', 'Admin');
-    $I->fillField('AdminPassword', '123456789');
-    $I->fillField('AdminPasswordRepeated', '123456789');
-    $I->fillField('AdminEmail', $email);
-    $I->fillField('DbName', 'tracker_test');
-    $I->fillField('DbHost', 'localhost');
-    $I->fillField('DbUser', 'lt');
-    $I->fillField('DbPassword', 'test');
+  private function fillWithOverride(AcceptanceTester $I, string $override_field, string $override_value): void{
+    $fields = [
+        'BaseUrl'               => 'http://localhost',
+        'AdminName'             => 'Admin',
+        'AdminPassword'         => '123456789',
+        'AdminPasswordRepeated' => '123456789',
+        'AdminEmail'            => 'admin@example.com',
+        'DbName'                => 'tracker_test',
+        'DbHost'                => 'localhost',
+        'DbUser'                => 'lt',
+        'DbPassword'            => 'test',
+    ];
+    
+    foreach($fields as $field => $value){
+      $I->fillField($field, $field === $override_field ? $override_value : $value);
+    }
+  }
+  
+  private function submitExpectingError(AcceptanceTester $I, string $error): void{
+    $I->click('button[value=""]');
+    $I->see($error, '.error');
   }
   
   private function reinstall(AcceptanceTester $I, string $conflict_resolution, string $input_email, string $result_email): void{
     $I->assertTrue(unlink(__DIR__.'/../../server/www/config.php'));
     $I->amOnPage('/');
     
-    $this->fill($I, $input_email);
+    $this->fillWithOverride($I, 'AdminEmail', $input_email);
     $I->click('button[value=""]');
     
     $I->seeElement('#form-install-section[style="display:none"]');
@@ -47,10 +58,91 @@ class T001_Install_Cest{
     ]);
   }
   
+  public function baseUrlMissingProtocol(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'BaseUrl', 'localhost');
+    $this->submitExpectingError($I, 'Base URL');
+  }
+  
+  public function baseUrlProhibitedProtocol(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'BaseUrl', 'ftp://localhost');
+    $this->submitExpectingError($I, 'Base URL');
+  }
+  
+  public function baseUrlInvalidDomain(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'BaseUrl', 'http://');
+    $this->submitExpectingError($I, 'Base URL');
+  }
+  
+  public function databaseNameEmpty(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'DbName', '');
+    $this->submitExpectingError($I, 'Database name');
+  }
+  
+  public function databaseHostEmpty(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'DbHost', '');
+    $this->submitExpectingError($I, 'Database host');
+  }
+  
+  public function databaseUserEmpty(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'DbUser', '');
+    $this->submitExpectingError($I, 'Database user');
+  }
+  
+  public function databasePasswordEmpty(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'DbPassword', '');
+    $this->submitExpectingError($I, 'Database password');
+  }
+  
+  public function databaseNameInvalid(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'DbName', 'tracker_test_invalid');
+    $this->submitExpectingError($I, 'invalid credentials or database name');
+  }
+  
+  public function databaseCredentialsInvalid(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'DbPassword', '123');
+    $this->submitExpectingError($I, 'invalid credentials or database name');
+  }
+  
+  public function adminNameEmpty(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'AdminName', '');
+    $this->submitExpectingError($I, 'Administrator account name');
+  }
+  
+  public function adminPasswordNotLongEnough(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'AdminPassword', '123456');
+    $I->fillField('AdminPasswordRepeated', '123456');
+    $this->submitExpectingError($I, 'Administrator password ');
+  }
+  
+  public function adminPasswordDoesNotMatch(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'AdminPasswordRepeated', '123455789');
+    $this->submitExpectingError($I, 'Administrator passwords');
+  }
+  
+  public function adminEmailInvalid(AcceptanceTester $I): void{
+    $this->fillWithOverride($I, 'AdminEmail', 'example.com');
+    $this->submitExpectingError($I, 'Administrator email');
+  }
+  
+  /**
+   * @depends baseUrlMissingProtocol
+   * @depends baseUrlProhibitedProtocol
+   * @depends baseUrlInvalidDomain
+   * @depends databaseNameEmpty
+   * @depends databaseHostEmpty
+   * @depends databaseUserEmpty
+   * @depends databasePasswordEmpty
+   * @depends databaseNameInvalid
+   * @depends databaseCredentialsInvalid
+   * @depends adminNameEmpty
+   * @depends adminPasswordNotLongEnough
+   * @depends adminPasswordDoesNotMatch
+   * @depends adminEmailInvalid
+   */
   public function install(AcceptanceTester $I, bool $skipReinstall = false): void{
     $email = $skipReinstall ? 'admin@example.com' : 'firstadmin@example.com';
     
-    $this->fill($I, $email);
+    $this->fillWithOverride($I, 'AdminEmail', $email);
     $I->click('button[value=""]');
     
     $I->see('Register', 'a[href="http://localhost/register"]');

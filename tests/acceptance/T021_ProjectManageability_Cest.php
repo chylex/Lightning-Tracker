@@ -7,8 +7,6 @@ use AcceptanceTester;
 
 class T021_ProjectManageability_Cest{
   private function ensureCanManage(AcceptanceTester $I, array $projects): void{
-    $I->amOnPage('/');
-    
     foreach($projects as $project){
       $I->amOnPage('/project/'.$project);
       $I->seeElement('#navigation a[href="http://localhost/project/'.$project.'/settings"]');
@@ -16,8 +14,6 @@ class T021_ProjectManageability_Cest{
   }
   
   private function ensureCannotManage(AcceptanceTester $I, array $projects): void{
-    $I->amOnPage('/');
-    
     foreach($projects as $project){
       $I->amOnPage('/project/'.$project);
       $I->seeElement('#navigation a[href="http://localhost/project/'.$project.'/issues"]');
@@ -42,6 +38,16 @@ class T021_ProjectManageability_Cest{
         'AdminVisible', 'AdminHidden',
         'User1Visible', 'User1Hidden',
         'User2Visible', 'User2Hidden',
+    ]);
+  }
+  
+  public function canManagePubliclyVisibleProjectsAsManager1(AcceptanceTester $I): void{
+    $I->amLoggedIn('Manager1');
+    
+    $this->ensureCanManage($I, [
+        'AdminVisible',
+        'User1Visible',
+        'User2Visible',
     ]);
   }
   

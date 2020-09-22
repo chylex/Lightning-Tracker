@@ -160,9 +160,11 @@ class T004_RegisterAccounts_Cest{
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (3, \'users.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (3, \'users.manage\')');
     
-    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'settings\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.list\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'projects.manage\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'users.manage\')');
+    $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (4, \'settings\')');
     
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.list\')');
     $db->exec('INSERT INTO system_role_permissions (role_id, permission) VALUES (5, \'projects.list.all\')');
