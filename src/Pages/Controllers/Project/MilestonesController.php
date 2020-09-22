@@ -18,7 +18,7 @@ class MilestonesController extends AbstractProjectController{
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
     $action = $req->getAction();
     $perms = $sess->getPermissions()->project($project);
-    $model = new MilestonesModel($req, $project, $perms);
+    $model = new MilestonesModel($req, $project, $perms, $sess->getLogonUserId());
     
     if ($action !== null){
       $data = $req->getData();

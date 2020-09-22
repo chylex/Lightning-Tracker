@@ -66,15 +66,15 @@ class BasicProjectPageModel extends AbstractPageModel{
     }
     
     $this->loaded_active_milestone = true;
-    $logon_user = Session::get()->getLogonUser();
+    $logon_user_id = Session::get()->getLogonUserId();
     
-    if ($logon_user === null){
+    if ($logon_user_id === null){
       $milestone = null;
     }
     else{
       try{
         $settings = new ProjectUserSettingsTable(DB::get(), $this->getProject());
-        $milestone = $settings->getActiveMilestoneProgress($logon_user);
+        $milestone = $settings->getActiveMilestoneProgress($logon_user_id);
       }catch(Exception $e){
         Log::critical($e);
         $milestone = null;

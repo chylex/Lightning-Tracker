@@ -7,6 +7,7 @@ use Data\IssuePriority;
 use Data\IssueScale;
 use Data\IssueStatus;
 use Data\IssueType;
+use Data\UserId;
 use Database\DB;
 use Database\Filters\Types\IssueFilter;
 use Database\Objects\IssueInfo;
@@ -22,7 +23,6 @@ use Pages\Components\Text;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
-use Session\Session;
 
 class IssuesModel extends BasicProjectPageModel{
   /**
@@ -36,10 +36,12 @@ class IssuesModel extends BasicProjectPageModel{
   }
   
   private ProjectPermissions $perms;
+  private UserId $logon_user_id;
   
-  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms){
+  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, UserId $logon_user_id){
     parent::__construct($req, $project);
     $this->perms = $perms;
+    $this->logon_user_id = $logon_user_id;
   }
   
   public function createMenuAction(): ?SidemenuComponent{
@@ -87,11 +89,9 @@ class IssuesModel extends BasicProjectPageModel{
     $filtering_assignee = $header->addMultiSelect('assignee')->label('Assignee');
     $filtering_assignee->addOption('', Text::missing('Nobody'));
     
-    $logon_user_id = Session::get()->getLogonUserId();
-    
-    if ($logon_user_id !== null){
-      $filtering_author->addOption($logon_user_id->raw(), Text::missing('You'));
-      $filtering_assignee->addOption($logon_user_id->raw(), Text::missing('You'));
+    if ($this->logon_user_id !== null){
+      $filtering_author->addOption($this->logon_user_id->raw(), Text::missing('You'));
+      $filtering_assignee->addOption($this->logon_user_id->raw(), Text::missing('You'));
       
       $groups = [
           [$filtering_author, $issues->listAuthors()],
@@ -102,7 +102,7 @@ class IssuesModel extends BasicProjectPageModel{
         foreach($users as $user){
           $user_id = $user->getId();
           
-          if (!$user_id->equals($logon_user_id)){
+          if (!$user_id->equals($this->logon_user_id)){
             $select->addOption($user_id->raw(), Text::plain($user->getName()));
           }
         }

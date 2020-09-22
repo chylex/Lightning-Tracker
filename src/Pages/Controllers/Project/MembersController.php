@@ -26,7 +26,7 @@ class MembersController extends AbstractProjectController{
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
     $action = $req->getAction();
     $perms = $sess->getPermissions()->project($project);
-    $model = new MembersModel($req, $project, $perms);
+    $model = new MembersModel($req, $project, $perms, $sess->getLogonUserId());
     
     if ($action === $model::ACTION_INVITE && $perms->require(ProjectPermissions::MANAGE_MEMBERS) && $model->inviteUser($req->getData())){
       return reload();

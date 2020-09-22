@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Root;
 
+use Data\UserId;
 use Database\DB;
 use Database\Filters\General\Pagination;
 use Database\Filters\Types\ProjectFilter;
@@ -16,7 +17,6 @@ use Pages\Components\Table\TableComponent;
 use Pages\Models\BasicRootPageModel;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
-use Session\Session;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
@@ -24,12 +24,14 @@ class ProjectModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
   
   private SystemPermissions $perms;
+  private ?UserId $logon_user_id;
   
   private FormComponent $create_form;
   
-  public function __construct(Request $req, SystemPermissions $perms){
+  public function __construct(Request $req, SystemPermissions $perms, ?UserId $logon_user_id){
     parent::__construct($req);
     $this->perms = $perms;
+    $this->logon_user_id = $logon_user_id;
   }
   
   public function canViewPubliclyVisibleProjects(): bool{
@@ -51,7 +53,7 @@ class ProjectModel extends BasicRootPageModel{
     }
     
     if (!$this->perms->check(SystemPermissions::LIST_ALL_PROJECTS)){
-      $filter = $filter->visibleTo(Session::get()->getLogonUser());
+      $filter = $filter->visibleTo($this->logon_user_id);
     }
     
     $projects = new ProjectTable(DB::get());

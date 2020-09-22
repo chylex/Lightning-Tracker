@@ -20,7 +20,7 @@ class IssuesController extends AbstractProjectController{
   }
   
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
-    return view(new IssuesPage((new IssuesModel($req, $project, $sess->getPermissions()->project($project)))->load()));
+    return view(new IssuesPage((new IssuesModel($req, $project, $sess->getPermissions()->project($project), $sess->getLogonUserId()))->load()));
   }
 }
 

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Pages\Models\Project;
 
 use Data\IssueStatus;
+use Data\UserId;
 use Database\DB;
 use Database\Objects\IssueDetail;
 use Database\Objects\ProjectInfo;
@@ -14,7 +15,6 @@ use Pages\Components\Text;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
-use Session\Session;
 
 class IssueDetailModel extends BasicProjectPageModel{
   public const ACTION_UPDATE_TASKS = 'Update';
@@ -29,7 +29,7 @@ class IssueDetailModel extends BasicProjectPageModel{
   private ?IssueDetail $issue;
   private int $edit_level;
   
-  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, int $issue_id){
+  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, UserId $logon_user_id, int $issue_id){
     parent::__construct($req, $project);
     $this->perms = $perms;
     $this->issue_id = $issue_id;
@@ -41,7 +41,7 @@ class IssueDetailModel extends BasicProjectPageModel{
       $this->edit_level = IssueDetail::EDIT_FORBIDDEN;
     }
     else{
-      $this->edit_level = $this->issue->getEditLevel(Session::get()->getLogonUser(), $perms);
+      $this->edit_level = $this->issue->getEditLevel($logon_user_id, $perms);
     }
   }
   

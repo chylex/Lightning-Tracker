@@ -41,7 +41,7 @@ class IssueEditController extends AbstractProjectController{
       $model = new IssueEditModel($req, $project, $perms, $logon_user, CreateOrEditIssue::edit($this->issue_id));
       $issue = $model->getIssue();
       
-      if ($issue === null || $issue->getEditLevel($logon_user, $perms) === IssueDetail::EDIT_FORBIDDEN){
+      if ($issue === null || $issue->getEditLevel($logon_user->getId(), $perms) === IssueDetail::EDIT_FORBIDDEN){
         return message($req, 'Permission Error', 'You do not have permission to edit this issue.', $project);
       }
     }

@@ -24,7 +24,7 @@ class ProjectsController extends AbstractHandlerController{
   
   protected function finally(Request $req, Session $sess): IAction{
     $perms = $sess->getPermissions()->system();
-    $model = new ProjectModel($req, $perms);
+    $model = new ProjectModel($req, $perms, $sess->getLogonUserId());
     
     if ($req->getAction() === $model::ACTION_CREATE){
       $logon_user = $sess->getLogonUser();

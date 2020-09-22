@@ -38,7 +38,7 @@ class LoadProject implements IControlHandler{
     }
     
     $projects = new ProjectTable(DB::get());
-    $info = $projects->getInfoFromUrl($url, $sess->getLogonUser(), $sess->getPermissions()->system());
+    $info = $projects->getInfoFromUrl($url, $sess->getLogonUserId(), $sess->getPermissions()->system());
     
     if ($info === null || !$info->isVisible()){
       return message($req, 'Project Error', 'Project was not found.');

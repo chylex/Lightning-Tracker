@@ -121,13 +121,13 @@ final class ProjectTable extends AbstractTable{
     return $this->fetchMap($stmt, fn($v): ProjectInfo => new ProjectInfo($v['id'], $v['name'], $v['url'], $user_id));
   }
   
-  public function getInfoFromUrl(string $url, ?UserProfile $profile, SystemPermissions $perms): ?ProjectVisibilityInfo{
-    $user_visibility_clause = $profile === null ? '' : ProjectFilter::getUserVisibilityClause();
+  public function getInfoFromUrl(string $url, ?UserId $logon_user_id, SystemPermissions $perms): ?ProjectVisibilityInfo{
+    $user_visibility_clause = $logon_user_id === null ? '' : ProjectFilter::getUserVisibilityClause();
     $stmt = $this->db->prepare('SELECT id, name, owner_id, (hidden = FALSE'.$user_visibility_clause.') AS visible FROM projects WHERE url = :url');
     $stmt->bindValue('url', $url);
     
-    if ($profile !== null){
-      ProjectFilter::bindUserVisibility($stmt, $profile);
+    if ($logon_user_id !== null){
+      ProjectFilter::bindUserVisibility($stmt, $logon_user_id);
     }
     
     $stmt->execute();

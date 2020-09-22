@@ -26,7 +26,7 @@ class UsersController extends AbstractHandlerController{
   
   protected function finally(Request $req, Session $sess): IAction{
     $perms = $sess->getPermissions()->system();
-    $model = new UsersModel($req, $perms);
+    $model = new UsersModel($req, $perms, $sess->getLogonUserId());
     
     if ($req->getAction() === $model::ACTION_CREATE && $perms->require(SystemPermissions::CREATE_USER) && $model->createUser($req->getData())){
       return reload();

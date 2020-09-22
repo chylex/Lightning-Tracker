@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\UserId;
 use Database\DB;
 use Database\Filters\Types\MilestoneFilter;
 use Database\Objects\MilestoneInfo;
@@ -17,7 +18,6 @@ use Pages\Components\Table\TableComponent;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
-use Session\Session;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
@@ -30,12 +30,14 @@ class MilestonesModel extends BasicProjectPageModel{
   private const BUTTON_MOVE_DOWN = 'Down';
   
   private ProjectPermissions $perms;
+  private ?UserId $logon_user_id;
   
   private FormComponent $create_form;
   
-  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms){
+  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, ?UserId $logon_user_id){
     parent::__construct($req, $project);
     $this->perms = $perms;
+    $this->logon_user_id = $logon_user_id;
   }
   
   public function canManageMilestones(): bool{
@@ -167,18 +169,12 @@ class MilestonesModel extends BasicProjectPageModel{
   public function toggleActiveMilestone(array $data): bool{
     $milestone = get_int($data, 'Milestone');
     
-    if ($milestone === null){
-      return false;
-    }
-    
-    $logon_user = Session::get()->getLogonUser();
-    
-    if ($logon_user === null){
+    if ($milestone === null || $this->logon_user_id === null){
       return false;
     }
     
     $settings = new ProjectUserSettingsTable(DB::get(), $this->getProject());
-    $settings->toggleActiveMilestone($logon_user, (int)$data['Milestone']);
+    $settings->toggleActiveMilestone($this->logon_user_id, (int)$data['Milestone']);
     return true;
   }
 }

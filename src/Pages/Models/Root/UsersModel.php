@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Root;
 
+use Data\UserId;
 use Database\DB;
 use Database\Filters\Types\UserFilter;
 use Database\Objects\UserInfo;
@@ -17,7 +18,6 @@ use Pages\Models\BasicRootPageModel;
 use Pages\Models\Mixed\RegisterModel;
 use Routing\Request;
 use Session\Permissions\SystemPermissions;
-use Session\Session;
 use Validation\FormValidator;
 use Validation\ValidationException;
 
@@ -25,6 +25,7 @@ class UsersModel extends BasicRootPageModel{
   public const ACTION_CREATE = 'Create';
   
   private SystemPermissions $perms;
+  private ?UserId $logon_user_id;
   
   private FormComponent $create_form;
   
@@ -33,17 +34,14 @@ class UsersModel extends BasicRootPageModel{
    */
   private array $editable_roles = [];
   
-  public function __construct(Request $req, SystemPermissions $perms){
+  public function __construct(Request $req, SystemPermissions $perms, ?UserId $logon_user_id){
     parent::__construct($req);
     $this->perms = $perms;
+    $this->logon_user_id = $logon_user_id;
     
-    if ($perms->check(SystemPermissions::MANAGE_USERS)){
-      $logon_user_id = Session::get()->getLogonUserId();
-      
-      if ($logon_user_id !== null){
-        foreach((new SystemRoleTable(DB::get()))->listRolesAssignableBy($logon_user_id) as $role){
-          $this->editable_roles[$role->getId()] = $role->getTitle();
-        }
+    if ($perms->check(SystemPermissions::MANAGE_USERS) && $logon_user_id !== null){
+      foreach((new SystemRoleTable(DB::get()))->listRolesAssignableBy($logon_user_id) as $role){
+        $this->editable_roles[$role->getId()] = $role->getTitle();
       }
     }
   }
@@ -59,7 +57,7 @@ class UsersModel extends BasicRootPageModel{
   public function canEditUser(UserInfo $user): bool{
     return (
         $this->canManageUsers() &&
-        !$user->getId()->equals(Session::get()->getLogonUserId()) &&
+        !$user->getId()->equals($this->logon_user_id) &&
         ($user->getRoleId() === null || array_key_exists($user->getRoleId(), $this->editable_roles))
     );
   }

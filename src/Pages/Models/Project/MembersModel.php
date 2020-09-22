@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Pages\Models\Project;
 
+use Data\UserId;
 use Database\DB;
 use Database\Filters\Types\ProjectMemberFilter;
 use Database\Objects\ProjectInfo;
@@ -17,12 +18,12 @@ use Pages\Components\Text;
 use Pages\Models\BasicProjectPageModel;
 use Routing\Request;
 use Session\Permissions\ProjectPermissions;
-use Session\Session;
 
 class MembersModel extends BasicProjectPageModel{
   public const ACTION_INVITE = 'Invite';
   
   private ProjectPermissions $perms;
+  private ?UserId $logon_user_id;
   
   private FormComponent $invite_form;
   
@@ -31,17 +32,14 @@ class MembersModel extends BasicProjectPageModel{
    */
   private array $editable_roles = [];
   
-  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms){
+  public function __construct(Request $req, ProjectInfo $project, ProjectPermissions $perms, ?UserId $logon_user_id){
     parent::__construct($req, $project);
     $this->perms = $perms;
+    $this->logon_user_id = $logon_user_id;
     
-    if ($perms->check(ProjectPermissions::MANAGE_MEMBERS)){
-      $logon_user_id = Session::get()->getLogonUserId();
-      
-      if ($logon_user_id !== null){
-        foreach((new ProjectRoleTable(DB::get(), $project))->listRolesAssignableBy($logon_user_id) as $role){
-          $this->editable_roles[$role->getId()] = $role->getTitle();
-        }
+    if ($perms->check(ProjectPermissions::MANAGE_MEMBERS) && $logon_user_id !== null){
+      foreach((new ProjectRoleTable(DB::get(), $project))->listRolesAssignableBy($logon_user_id) as $role){
+        $this->editable_roles[$role->getId()] = $role->getTitle();
       }
     }
   }
@@ -55,7 +53,7 @@ class MembersModel extends BasicProjectPageModel{
     
     return (
         $this->perms->check(ProjectPermissions::MANAGE_MEMBERS) &&
-        !$user_id->equals(Session::get()->getLogonUserId()) &&
+        !$user_id->equals($this->logon_user_id) &&
         !$user_id->equals($this->getProject()->getOwnerId()) &&
         ($member->getRoleId() === null || array_key_exists($member->getRoleId(), $this->editable_roles))
     );
@@ -96,7 +94,7 @@ class MembersModel extends BasicProjectPageModel{
   }
   
   public function getInviteForm(): ?FormComponent{
-    if (!$this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
+    if ($this->logon_user_id === null || !$this->perms->check(ProjectPermissions::MANAGE_MEMBERS)){
       return null;
     }
     
@@ -164,7 +162,7 @@ class MembersModel extends BasicProjectPageModel{
         return false;
       }
       
-      if ($role_id !== null && !(new ProjectRoleTable($db, $project))->isRoleAssignableBy($role_id, Session::get()->getLogonUserIdOrThrow())){
+      if ($role_id !== null && !(new ProjectRoleTable($db, $project))->isRoleAssignableBy($role_id, $this->logon_user_id)){
         $form->invalidateField('Role', 'Invalid role.');
         return false;
       }

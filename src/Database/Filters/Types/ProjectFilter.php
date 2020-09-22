@@ -3,13 +3,13 @@ declare(strict_types = 1);
 
 namespace Database\Filters\Types;
 
+use Data\UserId;
 use Database\Filters\AbstractFilter;
 use Database\Filters\Conditions\FieldLike;
 use Database\Filters\Field;
 use Database\Filters\General\Filtering;
 use Database\Filters\General\Sorting;
 use Database\Filters\IWhereCondition;
-use Database\Objects\UserProfile;
 use PDOStatement;
 
 final class ProjectFilter extends AbstractFilter{
@@ -19,19 +19,19 @@ final class ProjectFilter extends AbstractFilter{
         ' OR EXISTS(SELECT 1 FROM project_members pm WHERE pm.project_id = '.Field::sql('id', $table_name).' AND pm.user_id = :user_id_2)';
   }
   
-  public static function bindUserVisibility(PDOStatement $stmt, UserProfile $user): void{
-    bind($stmt, 'user_id_1', $user->getId());
-    bind($stmt, 'user_id_2', $user->getId());
+  public static function bindUserVisibility(PDOStatement $stmt, UserId $user_id): void{
+    bind($stmt, 'user_id_1', $user_id);
+    bind($stmt, 'user_id_2', $user_id);
   }
   
   public static function empty(): self{
     return new self();
   }
   
-  private ?UserProfile $visible_to = null;
+  private ?UserId $visible_to = null;
   private bool $visible_to_set = false;
   
-  public function visibleTo(?UserProfile $visible_to): self{
+  public function visibleTo(?UserId $visible_to): self{
     $this->visible_to = $visible_to;
     $this->visible_to_set = true;
     return $this;
@@ -42,9 +42,9 @@ final class ProjectFilter extends AbstractFilter{
     
     if ($this->visible_to_set){
       $conditions[] = new class($this->visible_to) implements IWhereCondition{
-        private ?UserProfile $visible_to;
+        private ?UserId $visible_to;
         
-        public function __construct(?UserProfile $visible_to){
+        public function __construct(?UserId $visible_to){
           $this->visible_to = $visible_to;
         }
         

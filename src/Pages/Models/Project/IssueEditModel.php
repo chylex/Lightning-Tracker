@@ -85,7 +85,7 @@ class IssueEditModel extends BasicProjectPageModel{
     else{
       $this->issue_id = $edit_request->getIssueId();
       $this->issue = (new IssueTable(DB::get(), $project))->getIssueDetail($this->issue_id);
-      $this->edit_level = $this->issue === null ? IssueDetail::EDIT_FORBIDDEN : $this->issue->getEditLevel($editor, $perms);
+      $this->edit_level = $this->issue === null ? IssueDetail::EDIT_FORBIDDEN : $this->issue->getEditLevel($editor->getId(), $perms);
     }
   }
   

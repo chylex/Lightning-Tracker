@@ -27,7 +27,7 @@ class IssueDetailController extends AbstractProjectController{
   protected function projectFinally(Request $req, Session $sess, ProjectInfo $project): IAction{
     $action = $req->getAction();
     $perms = $sess->getPermissions()->project($project);
-    $model = new IssueDetailModel($req, $project, $perms, $this->issue_id);
+    $model = new IssueDetailModel($req, $project, $perms, $sess->getLogonUserId(), $this->issue_id);
     
     if ($action !== null){
       if (!$model->canEditStatus()){

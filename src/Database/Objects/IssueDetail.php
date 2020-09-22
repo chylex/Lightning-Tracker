@@ -7,6 +7,7 @@ use Data\IssuePriority;
 use Data\IssueScale;
 use Data\IssueStatus;
 use Data\IssueType;
+use Data\UserId;
 use Pages\Components\Markup\LightMarkComponent;
 use Session\Permissions\ProjectPermissions;
 
@@ -64,26 +65,25 @@ final class IssueDetail extends IssueInfo{
     return $this->assignee;
   }
   
-  public function isAuthorOrAssignee(UserProfile $user): bool{
-    $user_id = $user->getId();
+  public function isAuthorOrAssignee(UserId $user_id): bool{
     $author = $this->author;
     $assignee = $this->assignee;
     
     return ($author !== null && $user_id->equals($author->getId())) || ($assignee !== null && $user_id->equals($assignee->getId()));
   }
   
-  public function isAssignee(UserProfile $user): bool{
-    return $this->assignee !== null && $user->getId()->equals($this->assignee->getId());
+  public function isAssignee(UserId $user_id): bool{
+    return $this->assignee !== null && $user_id->equals($this->assignee->getId());
   }
   
-  public function getEditLevel(?UserProfile $user, ProjectPermissions $perms): int{
-    $can_edit = ($user !== null && $this->isAuthorOrAssignee($user)) || $perms->check(ProjectPermissions::EDIT_ALL_ISSUES);
+  public function getEditLevel(?UserId $user_id, ProjectPermissions $perms): int{
+    $can_edit = ($user_id !== null && $this->isAuthorOrAssignee($user_id)) || $perms->check(ProjectPermissions::EDIT_ALL_ISSUES);
     
     if (!$can_edit){
       return self::EDIT_FORBIDDEN;
     }
     
-    $all_fields = ($user !== null && $this->isAssignee($user)) || $perms->check(ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS);
+    $all_fields = ($user_id !== null && $this->isAssignee($user_id)) || $perms->check(ProjectPermissions::MODIFY_ALL_ISSUE_FIELDS);
     return $all_fields ? self::EDIT_ALL_FIELDS : self::EDIT_BASIC_FIELDS;
   }
 }

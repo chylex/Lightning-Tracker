@@ -84,19 +84,23 @@ final class Session{
     return $this->getLogin()->getLogonUser();
   }
   
-  public function getLogonUserId(): ?UserId{
-    $logon_user = $this->getLogonUser();
-    return $logon_user === null ? null : $logon_user->getId();
-  }
-  
-  public function getLogonUserIdOrThrow(): UserId{
+  public function getLogonUserOrThrow(): ?UserProfile{
     $logon_user = $this->getLogonUser();
     
     if ($logon_user === null){
       throw new LogicException('Expected a logged in user.');
     }
     
-    return $logon_user->getId();
+    return $logon_user;
+  }
+  
+  public function getLogonUserId(): ?UserId{
+    $logon_user = $this->getLogonUser();
+    return $logon_user === null ? null : $logon_user->getId();
+  }
+  
+  public function getLogonUserIdOrThrow(): UserId{
+    return $this->getLogonUserOrThrow()->getId();
   }
   
   public function getPermissions(): PermissionManager{
