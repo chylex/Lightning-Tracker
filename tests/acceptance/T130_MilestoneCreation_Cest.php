@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace acceptance;
 
 use AcceptanceTester;
+use Helper\Acceptance;
 
 class T130_MilestoneCreation_Cest{
   public function _before(AcceptanceTester $I): void{
@@ -31,19 +32,8 @@ class T130_MilestoneCreation_Cest{
                           'Milestone 4',
                           'Test Duplicate',
                           'Test Duplicate']);
-  }
-  
-  /**
-   * @depends duplicateTitlesWork
-   */
-  public function deleteDuplicateTestTitles(AcceptanceTester $I): void{
-    $I->click('form[action$="/milestones/6/delete"] button[type="submit"]');
-    $I->click('form[action$="/milestones/5/delete"] button[type="submit"]');
     
-    $I->seeTableRowOrder(['Milestone',
-                          'Milestone 2',
-                          'Milestone 3',
-                          'Milestone 4']);
+    Acceptance::getDB()->exec('DELETE FROM milestones WHERE title = \'Test Duplicate\'');
   }
 }
 
