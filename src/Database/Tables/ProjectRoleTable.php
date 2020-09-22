@@ -104,13 +104,18 @@ SELECT 1
 FROM project_roles pr
 WHERE role_id = ? AND project_id = ?
   AND type = 'normal'
-  AND ordering > IFNULL((SELECT ordering
-                         FROM project_roles pr2
-                         JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
-                         WHERE pm.user_id = ? AND pm.project_id = pr.project_id), ~0)
+  AND ordering > COALESCE((SELECT 0
+                           FROM users u
+                           JOIN system_roles sr ON sr.id = u.role_id
+                           WHERE u.id = ? AND sr.type = 'admin'),
+                          (SELECT ordering
+                           FROM project_roles pr2
+                           JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
+                           WHERE pm.user_id = ? AND pm.project_id = pr.project_id),
+                          ~0)
 SQL;
     
-    $stmt = $this->execute($sql, 'IIS', [$role_id, $this->getProjectId(), $user_id]);
+    $stmt = $this->execute($sql, 'IISS', [$role_id, $this->getProjectId(), $user_id, $user_id]);
     return $this->fetchOneInt($stmt) !== null;
   }
   
@@ -134,14 +139,19 @@ SELECT role_id, type, title, ordering
 FROM project_roles pr
 WHERE project_id = ?
   AND type = 'normal'
-  AND ordering > IFNULL((SELECT ordering
-                         FROM project_roles pr2
-                         JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
-                         WHERE pm.user_id = ? AND pm.project_id = pr.project_id), ~0)
+  AND ordering > COALESCE((SELECT 0
+                           FROM users u
+                           JOIN system_roles sr ON sr.id = u.role_id
+                           WHERE u.id = ? AND sr.type = 'admin'),
+                          (SELECT ordering
+                           FROM project_roles pr2
+                           JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
+                           WHERE pm.user_id = ? AND pm.project_id = pr.project_id),
+                          ~0)
 ORDER BY ordering ASC
 SQL;
     
-    $stmt = $this->execute($sql, 'IS', [$this->getProjectId(), $user_id]);
+    $stmt = $this->execute($sql, 'ISS', [$this->getProjectId(), $user_id, $user_id]);
     return $this->fetchMap($stmt, fn($v): RoleInfo => new RoleInfo($v['role_id'], $v['type'], $v['title'], (int)$v['ordering']));
   }
   
