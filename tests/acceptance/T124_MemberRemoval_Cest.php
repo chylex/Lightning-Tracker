@@ -84,13 +84,23 @@ class T124_MemberRemoval_Cest{
     $I->see('Member not found');
   }
   
-  public function adminCanRemoveAllButOwnerRoleDespiteNotBeingAMember(AcceptanceTester $I): void{
+  public function trackerAdminCanRemoveAllButOwnerRoleDespiteNotBeingAMember(AcceptanceTester $I): void{
     $this->ensureCannotRemove($I, 'Admin', 'User1');
     $this->ensureCanRemoveWithConfirmation($I, 'Admin', 'Manager1');
     $this->ensureCanRemoveWithConfirmation($I, 'Admin', 'Manager2');
     $this->ensureCanRemoveWithoutConfirmation($I, 'Admin', 'User2');
     $this->ensureCanRemoveWithConfirmation($I, 'Admin', 'RoleLess');
     $this->ensureCanRemoveWithoutConfirmation($I, 'Admin', 'User3');
+    $this->restoreMembers();
+  }
+  
+  public function trackerModeratorCanRemoveAllButOwnerRoleDespiteNotBeingAMember(AcceptanceTester $I): void{
+    $this->ensureCannotRemove($I, 'Moderator', 'User1');
+    $this->ensureCanRemoveWithConfirmation($I, 'Moderator', 'Manager1');
+    $this->ensureCanRemoveWithConfirmation($I, 'Moderator', 'Manager2');
+    $this->ensureCanRemoveWithoutConfirmation($I, 'Moderator', 'User2');
+    $this->ensureCanRemoveWithConfirmation($I, 'Moderator', 'RoleLess');
+    $this->ensureCanRemoveWithoutConfirmation($I, 'Moderator', 'User3');
     $this->restoreMembers();
   }
   

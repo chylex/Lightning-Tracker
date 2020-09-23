@@ -35,6 +35,10 @@ class T122_MemberManageability_Cest{
       'RoleLess' => 6,
   ];
   
+  public function _after(): void{
+    Acceptance::assignUser3Role('p1', null);
+  }
+  
   private function startManagingAs(AcceptanceTester $I, string $user): void{
     $I->amLoggedIn($user);
     $I->amOnPage('/project/p1/members');
@@ -71,10 +75,22 @@ class T122_MemberManageability_Cest{
     }
   }
   
-  public function adminCanManageAllButOwnerDespiteNotBeingAMember(AcceptanceTester $I): void{
-    // TODO currently failing because the role check doesn't work for system admins
+  public function trackerAdminCanManageAllButOwnerDespiteNotBeingAMember(AcceptanceTester $I): void{
     $this->startManagingAs($I, 'Admin');
     $I->dontSee('Admin', 'table td:first-child');
+    
+    $this->ensureCanOnlyManage($I, self::ROWS_USER3_ROLELESS, [
+        'Manager1',
+        'Manager2',
+        'User2',
+        'RoleLess',
+        'User3',
+    ]);
+  }
+  
+  public function trackerModeratorCanManageAllButOwnerDespiteNotBeingAMember(AcceptanceTester $I): void{
+    $this->startManagingAs($I, 'Moderator');
+    $I->dontSee('Moderator', 'table td:first-child');
     
     $this->ensureCanOnlyManage($I, self::ROWS_USER3_ROLELESS, [
         'Manager1',
@@ -99,7 +115,7 @@ class T122_MemberManageability_Cest{
   
   public function memberWithAdministratorRoleCanOnlyManageLowerRoles(AcceptanceTester $I): void{
     Acceptance::assignUser3Role('p1', 'Administrator');
-    $this->startManagingAs($I, 'Manager1');
+    $this->startManagingAs($I, 'User3');
     
     $this->ensureCanOnlyManage($I, self::ROWS_USER3_ADMINISTRATOR, [
         'Manager2',
@@ -110,7 +126,7 @@ class T122_MemberManageability_Cest{
   
   public function memberWithModeratorRoleCanOnlyManageLowerRoles(AcceptanceTester $I): void{
     Acceptance::assignUser3Role('p1', 'Moderator');
-    $this->startManagingAs($I, 'Manager2');
+    $this->startManagingAs($I, 'User3');
     
     $this->ensureCanOnlyManage($I, self::ROWS_USER3_MODERATOR_OR_DEVELOPER, [
         'User2',
@@ -122,15 +138,6 @@ class T122_MemberManageability_Cest{
     Acceptance::assignUser3Role('p1', 'Developer');
     $this->startManagingAs($I, 'User3');
     $this->ensureCanOnlyManage($I, self::ROWS_USER3_MODERATOR_OR_DEVELOPER, []);
-  }
-  
-  /**
-   * @depends memberWithAdministratorRoleCanOnlyManageLowerRoles
-   * @depends memberWithModeratorRoleCanOnlyManageLowerRoles
-   * @depends memberWithDeveloperRoleCannotManageAnyone
-   */
-  public function resetUser3Role(): void{
-    Acceptance::assignUser3Role('p1', null);
   }
 }
 

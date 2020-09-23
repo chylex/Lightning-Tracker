@@ -16,6 +16,10 @@ class T123_MemberEditing_Cest{
       'Reporter'      => 5,
   ];
   
+  public function _after(): void{
+    Acceptance::assignUser3Role('p1', null);
+  }
+  
   private function startEditingAs(AcceptanceTester $I, string $editor, string $user): void{
     $stmt = Acceptance::getDB()->prepare('SELECT id FROM users WHERE name = ?');
     $stmt->execute([$user]);
@@ -63,8 +67,17 @@ class T123_MemberEditing_Cest{
     $I->seeOptionIsSelected('Role', $example[2]);
   }
   
-  public function adminCanSetAllButOwnerRoleDespiteNotBeingAMember(AcceptanceTester $I): void{
+  public function trackerAdminCanSetAllButOwnerRoleDespiteNotBeingAMember(AcceptanceTester $I): void{
     $this->startEditingAs($I, 'Admin', 'RoleLess');
+    
+    $this->ensureCanOnlySetRoles($I, ['Administrator',
+                                      'Moderator',
+                                      'Developer',
+                                      'Reporter']);
+  }
+  
+  public function trackerModeratorCanSetAllButOwnerRoleDespiteNotBeingAMember(AcceptanceTester $I): void{
+    $this->startEditingAs($I, 'Moderator', 'RoleLess');
     
     $this->ensureCanOnlySetRoles($I, ['Administrator',
                                       'Moderator',
@@ -82,7 +95,8 @@ class T123_MemberEditing_Cest{
   }
   
   public function memberWithAdministratorRoleCanOnlySetLowerRoles(AcceptanceTester $I): void{
-    $this->startEditingAs($I, 'Manager1', 'RoleLess');
+    Acceptance::assignUser3Role('p1', 'Administrator');
+    $this->startEditingAs($I, 'User3', 'RoleLess');
     
     $this->ensureCanOnlySetRoles($I, ['Moderator',
                                       'Developer',
@@ -90,7 +104,8 @@ class T123_MemberEditing_Cest{
   }
   
   public function memberWithModeratorRoleCanOnlySetLowerRoles(AcceptanceTester $I): void{
-    $this->startEditingAs($I, 'Manager2', 'RoleLess');
+    Acceptance::assignUser3Role('p1', 'Moderator');
+    $this->startEditingAs($I, 'User3', 'RoleLess');
     
     $this->ensureCanOnlySetRoles($I, ['Developer',
                                       'Reporter']);
