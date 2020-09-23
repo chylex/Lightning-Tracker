@@ -107,7 +107,8 @@ WHERE role_id = ? AND project_id = ?
   AND ordering > COALESCE((SELECT 0
                            FROM users u
                            JOIN system_roles sr ON sr.id = u.role_id
-                           WHERE u.id = ? AND sr.type = 'admin'),
+                           WHERE u.id = ?
+                             AND (sr.type = 'admin' OR EXISTS(SELECT 1 FROM system_role_permissions srp WHERE srp.role_id = sr.id AND srp.permission = 'projects.manage'))),
                           (SELECT ordering
                            FROM project_roles pr2
                            JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
@@ -142,7 +143,8 @@ WHERE project_id = ?
   AND ordering > COALESCE((SELECT 0
                            FROM users u
                            JOIN system_roles sr ON sr.id = u.role_id
-                           WHERE u.id = ? AND sr.type = 'admin'),
+                           WHERE u.id = ?
+                             AND (sr.type = 'admin' OR EXISTS(SELECT 1 FROM system_role_permissions srp WHERE srp.role_id = sr.id AND srp.permission = 'projects.manage'))),
                           (SELECT ordering
                            FROM project_roles pr2
                            JOIN project_members pm ON pr2.role_id = pm.role_id AND pr2.project_id = pm.project_id
