@@ -35,27 +35,6 @@ class T122_MemberManageability_Cest{
       'RoleLess' => 6,
   ];
   
-  private function assignUser3Role(?string $role): void{
-    $db = Acceptance::getDB();
-    
-    if ($role === null){
-      $db->exec(<<<SQL
-UPDATE project_members
-SET role_id = NULL
-WHERE user_id = 'user3test' AND project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1')
-SQL
-      );
-    }
-    else{
-      $db->exec(<<<SQL
-UPDATE project_members
-SET role_id = (SELECT pr.role_id FROM project_roles pr WHERE pr.title = '$role' AND pr.project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1'))
-WHERE user_id = 'user3test' AND project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1')
-SQL
-      );
-    }
-  }
-  
   private function startManagingAs(AcceptanceTester $I, string $user): void{
     $I->amLoggedIn($user);
     $I->amOnPage('/project/p1/members');
@@ -119,7 +98,7 @@ SQL
   }
   
   public function memberWithAdministratorRoleCanOnlyManageLowerRoles(AcceptanceTester $I): void{
-    $this->assignUser3Role('Administrator');
+    Acceptance::assignUser3Role('p1', 'Administrator');
     $this->startManagingAs($I, 'Manager1');
     
     $this->ensureCanOnlyManage($I, self::ROWS_USER3_ADMINISTRATOR, [
@@ -130,7 +109,7 @@ SQL
   }
   
   public function memberWithModeratorRoleCanOnlyManageLowerRoles(AcceptanceTester $I): void{
-    $this->assignUser3Role('Moderator');
+    Acceptance::assignUser3Role('p1', 'Moderator');
     $this->startManagingAs($I, 'Manager2');
     
     $this->ensureCanOnlyManage($I, self::ROWS_USER3_MODERATOR_OR_DEVELOPER, [
@@ -140,7 +119,7 @@ SQL
   }
   
   public function memberWithDeveloperRoleCannotManageAnyone(AcceptanceTester $I): void{
-    $this->assignUser3Role('Developer');
+    Acceptance::assignUser3Role('p1', 'Developer');
     $this->startManagingAs($I, 'User3');
     $this->ensureCanOnlyManage($I, self::ROWS_USER3_MODERATOR_OR_DEVELOPER, []);
   }
@@ -151,7 +130,7 @@ SQL
    * @depends memberWithDeveloperRoleCannotManageAnyone
    */
   public function resetUser3Role(): void{
-    $this->assignUser3Role(null);
+    Acceptance::assignUser3Role('p1', null);
   }
 }
 

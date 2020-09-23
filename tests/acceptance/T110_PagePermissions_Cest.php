@@ -53,27 +53,6 @@ class T110_PagePermissions_Cest{
     $I->see('Project Error', 'h2');
   }
   
-  private function assignUser3Role(?string $role): void{
-    $db = Acceptance::getDB();
-    
-    if ($role === null){
-      $db->exec(<<<SQL
-UPDATE project_members
-SET role_id = NULL
-WHERE user_id = 'user3test' AND project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1')
-SQL
-      );
-    }
-    else{
-      $db->exec(<<<SQL
-UPDATE project_members
-SET role_id = (SELECT pr.role_id FROM project_roles pr WHERE pr.title = '$role' AND pr.project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1'))
-WHERE user_id = 'user3test' AND project_id = (SELECT p.id FROM projects p WHERE p.url = 'p1')
-SQL
-      );
-    }
-  }
-  
   /**
    * @example [null]
    * @example ["Admin"]
@@ -135,7 +114,7 @@ SQL
   }
   
   public function checkReporterRoleForProject1(AcceptanceTester $I): void{
-    $this->assignUser3Role('Reporter');
+    Acceptance::assignUser3Role('p1', 'Reporter');
     
     $this->ensureCanAccessPageAs($I, 'User3', 'p1', '');
     $this->ensureCanAccessPageAs($I, 'User3', 'p1', 'issues');
@@ -156,7 +135,7 @@ SQL
   }
   
   public function checkDeveloperRoleForProject1(AcceptanceTester $I): void{
-    $this->assignUser3Role('Developer');
+    Acceptance::assignUser3Role('p1', 'Developer');
     
     $this->ensureCanAccessPageAs($I, 'User3', 'p1', '');
     $this->ensureCanAccessPageAs($I, 'User3', 'p1', 'issues');
@@ -177,7 +156,7 @@ SQL
   }
   
   public function checkModeratorRoleForProject1(AcceptanceTester $I): void{
-    $this->assignUser3Role('Moderator');
+    Acceptance::assignUser3Role('p1', 'Moderator');
     
     $this->ensureCanAccessPageAs($I, 'User3', 'p1', '');
     $this->ensureCanAccessPageAs($I, 'User3', 'p1', 'issues');
@@ -198,7 +177,7 @@ SQL
   }
   
   public function checkAdministratorRoleForProject1(AcceptanceTester $I): void{
-    $this->assignUser3Role('Administrator');
+    Acceptance::assignUser3Role('p1', 'Administrator');
     
     $this->ensureCanAccessPageAs($I, 'User3', 'p1', '');
     $this->ensureCanAccessPageAs($I, 'User3', 'p1', 'issues');
@@ -256,7 +235,7 @@ SQL
    * @depends checkAdministratorRoleForProject1
    */
   public function resetUser3Role(): void{
-    $this->assignUser3Role(null);
+    Acceptance::assignUser3Role('p1', null);
   }
 }
 

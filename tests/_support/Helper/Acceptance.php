@@ -42,6 +42,27 @@ class Acceptance extends Module{
     return $k !== false && $argv[$k + 1] === $group;
   }
   
+  public static function assignUser3Role(string $project, ?string $role): void{
+    $db = self::getDB();
+    
+    if ($role === null){
+      $db->exec(<<<SQL
+UPDATE project_members
+SET role_id = NULL
+WHERE user_id = 'user3test' AND project_id = (SELECT p.id FROM projects p WHERE p.url = '$project')
+SQL
+      );
+    }
+    else{
+      $db->exec(<<<SQL
+UPDATE project_members
+SET role_id = (SELECT pr.role_id FROM project_roles pr WHERE pr.title = '$role' AND pr.project_id = (SELECT p.id FROM projects p WHERE p.url = '$project'))
+WHERE user_id = 'user3test' AND project_id = (SELECT p.id FROM projects p WHERE p.url = '$project')
+SQL
+      );
+    }
+  }
+  
   public function _beforeSuite($settings = []): void{
     $db = self::getDB();
     
