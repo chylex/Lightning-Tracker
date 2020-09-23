@@ -32,7 +32,7 @@ class T134_MilestoneDeletion_Cest{
   }
   
   public function deleteUnassignedMilestoneWithoutConfirmation(AcceptanceTester $I): void{
-    $I->click('tr:last-child form[action$="/delete"] button[type="submit"]');
+    $I->click('tbody tr:last-child form[action$="/delete"] button[type="submit"]');
     $I->seeCurrentUrlEquals('/project/p2/milestones');
     
     $I->seeTableRowOrder(['Milestone',

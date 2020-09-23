@@ -6,6 +6,7 @@ namespace Helper;
 // here you can define custom actions
 // all public methods declared in helper class will be available in $I
 
+use AcceptanceTester;
 use Codeception\Module;
 use Database\DB;
 use FilesystemIterator;
@@ -40,6 +41,17 @@ class Acceptance extends Module{
     }
     
     return $k !== false && $argv[$k + 1] === $group;
+  }
+  
+  public static function getIssueId(AcceptanceTester $I, string $project, string $title): int{
+    $stmt = self::getDB()->prepare('SELECT issue_id FROM issues WHERE title = ? AND project_id = (SELECT p.id FROM projects p WHERE p.url = ?)');
+    $stmt->execute([$title, $project]);
+    
+    $id = $stmt->fetchColumn();
+    $I->assertNotFalse($id);
+    $I->assertIsNumeric($id);
+    
+    return (int)$id;
   }
   
   public static function assignUser3Role(string $project, ?string $role): void{

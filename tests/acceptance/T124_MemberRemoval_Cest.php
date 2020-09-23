@@ -90,7 +90,7 @@ class T124_MemberRemoval_Cest{
     $this->ensureCanRemoveWithConfirmation($I, 'Admin', 'Manager2');
     $this->ensureCanRemoveWithoutConfirmation($I, 'Admin', 'User2');
     $this->ensureCanRemoveWithConfirmation($I, 'Admin', 'RoleLess');
-    $this->ensureCanRemoveWithoutConfirmation($I, 'Admin', 'User3');
+    $this->ensureCanRemoveWithConfirmation($I, 'Admin', 'User3');
     $this->restoreMembers();
   }
   
@@ -100,7 +100,7 @@ class T124_MemberRemoval_Cest{
     $this->ensureCanRemoveWithConfirmation($I, 'Moderator', 'Manager2');
     $this->ensureCanRemoveWithoutConfirmation($I, 'Moderator', 'User2');
     $this->ensureCanRemoveWithConfirmation($I, 'Moderator', 'RoleLess');
-    $this->ensureCanRemoveWithoutConfirmation($I, 'Moderator', 'User3');
+    $this->ensureCanRemoveWithConfirmation($I, 'Moderator', 'User3');
     $this->restoreMembers();
   }
   
@@ -110,7 +110,7 @@ class T124_MemberRemoval_Cest{
     $this->ensureCanRemoveWithConfirmation($I, 'User1', 'Manager2');
     $this->ensureCanRemoveWithoutConfirmation($I, 'User1', 'User2');
     $this->ensureCanRemoveWithConfirmation($I, 'User1', 'RoleLess');
-    $this->ensureCanRemoveWithoutConfirmation($I, 'User1', 'User3');
+    $this->ensureCanRemoveWithConfirmation($I, 'User1', 'User3');
     $this->restoreMembers();
   }
   
@@ -120,7 +120,7 @@ class T124_MemberRemoval_Cest{
     $this->ensureCanRemoveWithConfirmation($I, 'Manager1', 'Manager2');
     $this->ensureCanRemoveWithoutConfirmation($I, 'Manager1', 'User2');
     $this->ensureCanRemoveWithConfirmation($I, 'Manager1', 'RoleLess');
-    $this->ensureCanRemoveWithoutConfirmation($I, 'Manager1', 'User3');
+    $this->ensureCanRemoveWithConfirmation($I, 'Manager1', 'User3');
     $this->restoreMembers();
   }
   
@@ -130,7 +130,7 @@ class T124_MemberRemoval_Cest{
     $this->ensureCannotRemove($I, 'Manager2', 'Manager2');
     $this->ensureCanRemoveWithoutConfirmation($I, 'Manager2', 'User2');
     $this->ensureCanRemoveWithConfirmation($I, 'Manager2', 'RoleLess');
-    $this->ensureCanRemoveWithoutConfirmation($I, 'Manager2', 'User3');
+    $this->ensureCanRemoveWithConfirmation($I, 'Manager2', 'User3');
     $this->restoreMembers();
   }
   

@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace acceptance;
 
 use AcceptanceTester;
-use Codeception\Example;
 use Helper\Acceptance;
 
 class T103_CreateIssues_Cest{
@@ -47,30 +46,6 @@ class T103_CreateIssues_Cest{
     $I->click('button[type="submit"]');
   }
   
-  /**
-   * @example [null, null]
-   * @example ["feature", "Feature"]
-   * @example ["enhancement", "Enhancement"]
-   * @example ["bug", "Bug"]
-   * @example ["crash", "Crash"]
-   * @example ["task", "Task"]
-   */
-  public function fieldsArePrefilledCorrectly(AcceptanceTester $I, Example $example): void{
-    $I->amLoggedIn('User1');
-    $I->amOnPage('/project/p1/issues/new'.($example[0] === null ? '' : '/'.$example[0]));
-    
-    if ($example[1] !== null){
-      $I->seeOptionIsSelected('Type', $example[1]);
-    }
-    
-    $I->seeOptionIsSelected('Priority', 'Medium');
-    $I->seeOptionIsSelected('Scale', 'Medium');
-    $I->seeOptionIsSelected('Status', 'Open');
-    $I->seeInField('Progress', '0');
-    $I->seeOptionIsSelected('Milestone', '(None)');
-    $I->seeOptionIsSelected('Assignee', '(None)');
-  }
-  
   public function createIssuesInProject1(AcceptanceTester $I): void{
     $this->createIssueFull($I, 1, 'User1', 'Feature', 'Status Test Issue 1 (Feature)', 'All default field values.');
     $this->createIssueFull($I, 1, 'User1', 'Feature', 'Status Test Issue 2 (Feature)', 'Low priority and tiny scale.', 'Low', 'Tiny');
@@ -90,6 +65,8 @@ class T103_CreateIssues_Cest{
     $this->createIssueFull($I, 1, 'User1', 'Feature', 'Milestone 1 Test Issue 1 (Feature)', '', 'Medium', 'Small', 'Finished', 100, 'Milestone');
     $this->createIssueFull($I, 1, 'User1', 'Bug', 'Milestone 1 Test Issue 2 (Bug)', '', 'High', 'Small', 'In Progress', 25, 'Milestone');
     
+    Acceptance::getDB()->exec('UPDATE issues SET author_id = \'user3test\' WHERE title = \'Milestone 1 Test Issue 1 (Feature)\'');
+    
     $this->createIssueFull($I, 1, 'User1', 'Enhancement', 'Milestone 2 Test Issue 1 (Enhancement)', '', 'High', 'Tiny', 'Finished', 100, 'Milestone 2');
     $this->createIssueFull($I, 1, 'User1', 'Enhancement', 'Milestone 2 Test Issue 2 (Enhancement)', '', 'High', 'Medium', 'Finished', 100, 'Milestone 2');
     $this->createIssueFull($I, 1, 'User1', 'Enhancement', 'Milestone 2 Test Issue 3 (Enhancement)', '', 'Medium', 'Medium', 'Finished', 100, 'Milestone 2');
@@ -98,7 +75,7 @@ class T103_CreateIssues_Cest{
     $this->createIssueFull($I, 1, 'User1', 'Enhancement', 'Milestone 3 Test Issue 2 (Enhancement)', '', 'Low', 'Massive', 'Open', 0, 'Milestone 3');
     $this->createIssueFull($I, 1, 'User1', 'Bug', 'Milestone 3 Test Issue 3 (Bug)', '', 'High', 'Massive', 'Blocked', 20, 'Milestone 3');
     
-    $this->createIssueFull($I, 1, 'User1', 'Task', 'Assigned Test Issue 1 (Task)', '', 'Medium', 'Medium', 'Open', 0, 'Milestone 4', 'User1');
+    $this->createIssueFull($I, 1, 'User1', 'Task', 'Assigned Test Issue 1 (Task)', '', 'Medium', 'Medium', 'Open', 0, 'Milestone 4', 'User3');
     $this->createIssueFull($I, 1, 'User1', 'Task', 'Assigned Test Issue 2 (Task)', '', 'Medium', 'Medium', 'In Progress', 0, 'Milestone 4', 'User1');
     $this->createIssueFull($I, 1, 'User1', 'Task', 'Assigned Test Issue 3 (Task)', '', 'High', 'Medium', 'In Progress', 33, 'Milestone 4', 'User1');
     $this->createIssueFull($I, 1, 'User1', 'Task', 'Assigned Test Issue 4 (Task)', '', 'High', 'Medium', 'Ready To Test', 100, '(None)', 'User1');
