@@ -296,7 +296,7 @@ class IssueEditModel extends BasicProjectPageModel{
                   $status = IssueStatus::get(IssueStatus::READY_TO_TEST);
                 }
               }
-              elseif ($progress > 0 && $prev_status === IssueStatus::OPEN){
+              elseif (($progress > 0 && $prev_status === IssueStatus::OPEN) || $prev_status === IssueStatus::READY_TO_TEST){
                 $status = IssueStatus::get(IssueStatus::IN_PROGRESS);
               }
             }

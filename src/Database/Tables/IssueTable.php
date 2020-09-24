@@ -150,7 +150,11 @@ SQL;
       $auto_status = IssueStatus::READY_TO_TEST;
     }
     elseif ($progress > 0){
-      $condition = 'status = \''.IssueStatus::OPEN.'\'';
+      $condition = 'status = \''.IssueStatus::OPEN.'\' OR status = \''.IssueStatus::READY_TO_TEST.'\'';
+      $auto_status = IssueStatus::IN_PROGRESS;
+    }
+    elseif ($progress == 0){
+      $condition = 'status = \''.IssueStatus::READY_TO_TEST.'\'';
       $auto_status = IssueStatus::IN_PROGRESS;
     }
     else{
