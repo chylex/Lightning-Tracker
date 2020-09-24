@@ -269,7 +269,7 @@ class IssueEditModel extends BasicProjectPageModel{
       $prev_assignee = $this->issue === null ? null : $this->issue->getAssignee();
       $prev_assignee_id = $prev_assignee === null ? null : $prev_assignee->getId();
       
-      if ($assignee !== null && $assignee !== $prev_assignee_id && !(new ProjectMemberTable(DB::get(), $project))->checkMembershipExists($assignee)){
+      if ($assignee !== null && !$assignee->equals($prev_assignee_id) && !(new ProjectMemberTable(DB::get(), $project))->checkMembershipExists($assignee)){
         $form->invalidateField('Assignee', 'Assignee must be a member of the project.');
         $form->fill(['Assignee' => $prev_assignee_id === null ? '' : $prev_assignee_id->raw()]);
         $this->fillFormWithCurrentIssue();
