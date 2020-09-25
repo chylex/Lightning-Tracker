@@ -132,6 +132,7 @@ class T004_RegisterAccounts_Cest{
     $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 2 SECOND) WHERE name = \'User2\'');
     $db->exec('UPDATE users SET date_registered = DATE_SUB(NOW(), INTERVAL 1 SECOND) WHERE name = \'RoleLess\'');
     
+    $db->exec('UPDATE users SET id = \'admintest\' WHERE name = \'Admin\'');
     $db->exec('UPDATE users SET id = \'user1test\' WHERE name = \'User1\'');
     $db->exec('UPDATE users SET id = \'user2test\' WHERE name = \'User2\'');
     $db->exec('UPDATE users SET id = \'user3test\' WHERE name = \'User3\'');

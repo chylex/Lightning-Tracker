@@ -6,7 +6,7 @@ namespace acceptance;
 use AcceptanceTester;
 use Helper\Acceptance;
 
-class T144_IssueDeletion_Cest{
+class T146_IssueDeletion_Cest{
   public function _before(AcceptanceTester $I): void{
     $I->amLoggedIn('User1');
   }

@@ -7,7 +7,7 @@ use AcceptanceTester;
 
 class T051_AccountSettingsAppearance_Cest{
   public function _before(AcceptanceTester $I): void{
-    $I->amLoggedIn('User3');
+    $I->amLoggedIn('Manager2');
     $I->amOnPage('/account/appearance');
   }
   
@@ -27,6 +27,17 @@ class T051_AccountSettingsAppearance_Cest{
     $I->click('button[type="submit"]');
     $I->seeElement('#ChangeAppearance-1-TablePaginationElements + .error');
     $I->seeInField('#ChangeAppearance-1-TablePaginationElements', 50);
+  }
+  
+  public function changeTablePagination(AcceptanceTester $I): void{
+    $I->fillField('#ChangeAppearance-1-TablePaginationElements', 6);
+    $I->click('button[type="submit"]');
+    $I->seeElement('form .success');
+    $I->seeCookie('pagination_elements');
+    $I->assertEquals(6, $I->grabCookie('pagination_elements'));
+    
+    $I->amOnPage('/users');
+    $I->see('1 to 6 out of 8', 'tfoot .element-info');
   }
 }
 

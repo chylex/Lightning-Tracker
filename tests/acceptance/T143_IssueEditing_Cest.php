@@ -99,6 +99,59 @@ class T143_IssueEditing_Cest{
     $I->dontSee('RoleLess', '#Confirm-1-Assignee option');
   }
   
+  public function assigneeDoesNotExist(AcceptanceTester $I): void{
+    $I->amLoggedIn('User1');
+    $I->amOnPage('/project/p1/issues/1/edit');
+  
+    $I->submitForm('#Confirm-1', [
+        'Assignee' => '000000000'
+    ]);
+  
+    $I->seeElement('#Confirm-1-Assignee + .error');
+  }
+  
+  public function assigneeIsNotAMember(AcceptanceTester $I): void{
+    $I->amLoggedIn('User1');
+    $I->amOnPage('/project/p1/issues/1/edit');
+    $I->dontSee('Admin', '#Confirm-1-Assignee option');
+    
+    $I->submitForm('#Confirm-1', [
+        'Assignee' => 'admintest'
+    ]);
+    
+    $I->seeElement('#Confirm-1-Assignee + .error');
+  }
+  
+  public function assigneeIsAFormerMember(AcceptanceTester $I): void{
+    Acceptance::getDB()->exec('UPDATE issues SET assignee_id = \'admintest\' WHERE project_id = '.Acceptance::getProjectId($I, 'p1').' AND issue_id = 1');
+    
+    $I->amLoggedIn('User1');
+    $I->amOnPage('/project/p1/issues/1/edit');
+    $I->see('Admin', '#Confirm-1-Assignee option');
+    $I->click('button[type="submit"]');
+    
+    $I->seeCurrentUrlEquals('/project/p1/issues/1');
+    $I->see('Admin', '[data-title="Assignee"]');
+    
+    Acceptance::getDB()->exec('UPDATE issues SET assignee_id = NULL WHERE project_id = '.Acceptance::getProjectId($I, 'p1').' AND issue_id = 1');
+  }
+  
+  public function assigneeIsAFormerMemberAndGetsReassigned(AcceptanceTester $I): void{
+    Acceptance::getDB()->exec('UPDATE issues SET assignee_id = \'admintest\' WHERE project_id = '.Acceptance::getProjectId($I, 'p1').' AND issue_id = 1');
+    
+    $I->amLoggedIn('User1');
+    $I->amOnPage('/project/p1/issues/1/edit');
+    $I->see('Admin', '#Confirm-1-Assignee option');
+    $I->selectOption('Assignee', '(None)');
+    $I->click('button[type="submit"]');
+    
+    $I->seeCurrentUrlEquals('/project/p1/issues/1');
+    $I->see('Nobody', '[data-title="Assignee"]');
+    
+    $I->amOnPage('/project/p1/issues/1/edit');
+    $I->dontSee('Admin', '#Confirm-1-Assignee option');
+  }
+  
   /**
    * @example ["#MarkReadyToTest", "Ready to Test"]
    * @example ["#MarkFinished", "Finished"]
