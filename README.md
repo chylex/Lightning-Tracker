@@ -2,7 +2,7 @@
 
 Its primary purpose is to help developers — individuals or teams — keep track of their work, but it also supports public-facing projects where any registered user can file an issue.
 
-The application is still work-in-progress, but the first official release should be available soon. You can also build the application from source at your own risk. Please read the installation instructions carefully, and see the Roadmap below to find out which features are currently missing and planned for a future release.
+The application is still work-in-progress, but you can start using [official alpha releases](https://github.com/chylex/Lightning-Tracker/releases) now. You can also build the application from source at your own risk. Please read the installation instructions carefully, and see the Roadmap below to find out which features are currently missing and planned for a future release.
 
 ---
 
@@ -72,7 +72,7 @@ You should be able to install Lightning Tracker on other server software, such a
 
 #### From Source
 
-**Be warned that until the first official release, the update process might fail between certain commits, and require manual intervention.**
+**Be warned that the update process might fail between certain commits, and require manual intervention.**
 
 1. Clone the repository
 2. Run the `gulp` task inside the `/build/` folder
