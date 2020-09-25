@@ -47,7 +47,7 @@ class T154_ProjectSettingsRoleEditing_Cest{
   }
   
   private function startEditing(AcceptanceTester $I, string $title): void{
-    $stmt = Acceptance::getDB()->prepare('SELECT role_id FROM project_roles WHERE title = ? AND project_id = (SELECT id FROM projects WHERE url = \'p1\')');
+    $stmt = Acceptance::getDB()->prepare('SELECT role_id FROM project_roles WHERE title = ? AND project_id = '.Acceptance::getProjectId($I, 'p1'));
     $stmt->execute([$title]);
     
     $id = $stmt->fetchColumn();

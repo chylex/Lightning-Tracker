@@ -43,6 +43,17 @@ class Acceptance extends Module{
     return $k !== false && $argv[$k + 1] === $group;
   }
   
+  public static function getProjectId(AcceptanceTester $I, string $url): int{
+    $stmt = self::getDB()->prepare('SELECT id FROM projects WHERE url = ?');
+    $stmt->execute([$url]);
+    
+    $id = $stmt->fetchColumn();
+    $I->assertNotFalse($id);
+    $I->assertIsNumeric($id);
+    
+    return (int)$id;
+  }
+  
   public static function getIssueId(AcceptanceTester $I, string $project, string $title): int{
     $stmt = self::getDB()->prepare('SELECT issue_id FROM issues WHERE title = ? AND project_id = (SELECT p.id FROM projects p WHERE p.url = ?)');
     $stmt->execute([$title, $project]);

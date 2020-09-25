@@ -9,9 +9,9 @@ use Helper\Acceptance;
 class T124_MemberRemoval_Cest{
   private array $members;
   
-  public function _before(): void{
+  public function _before(AcceptanceTester $I): void{
     if (!isset($this->members)){
-      $this->members = Acceptance::getDB()->query('SELECT * FROM project_members WHERE project_id = (SELECT id FROM projects WHERE url = \'p1\')')->fetchAll();
+      $this->members = Acceptance::getDB()->query('SELECT * FROM project_members WHERE project_id = '.Acceptance::getProjectId($I, 'p1'))->fetchAll();
     }
   }
   

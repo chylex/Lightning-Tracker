@@ -37,7 +37,7 @@ class T144_IssueDeletion_Cest{
   
   public function deleteIssue(AcceptanceTester $I): void{
     $db = Acceptance::getDB();
-    $data = $db->query('SELECT * FROM issues WHERE issue_id = 1 AND project_id = (SELECT p.id FROM projects p WHERE p.url = \'p1\')')->fetchAll()[0];
+    $data = $db->query('SELECT * FROM issues WHERE issue_id = 1 AND project_id = '.Acceptance::getProjectId($I, 'p1'))->fetchAll()[0];
     
     $I->amOnPage('/project/p1/issues/1/delete');
     $I->fillField('Id', '1');

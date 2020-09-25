@@ -111,7 +111,7 @@ class T143_IssueEditing_Cest{
     $I->submitForm($example[0], []);
     $this->checkIssueDetailStatus($I, $example[1], 100);
     
-    Acceptance::getDB()->exec('UPDATE issues SET status = \'open\', progress = 0 WHERE project_id = (SELECT p.id FROM projects p WHERE p.url = \'p1\') AND issue_id = 1');
+    Acceptance::getDB()->exec('UPDATE issues SET status = \'open\', progress = 0 WHERE project_id = '.Acceptance::getProjectId($I, 'p1').' AND issue_id = 1');
   }
   
   /**
@@ -120,7 +120,7 @@ class T143_IssueEditing_Cest{
    * @example ["#MarkRejected", "Rejected"]
    */
   public function markIssueStatusFromSomeProgress(AcceptanceTester $I, Example $example): void{
-    Acceptance::getDB()->exec('UPDATE issues SET status = \'in-progress\', progress = 30 WHERE project_id = (SELECT p.id FROM projects p WHERE p.url = \'p1\') AND issue_id = 1');
+    Acceptance::getDB()->exec('UPDATE issues SET status = \'in-progress\', progress = 30 WHERE project_id = '.Acceptance::getProjectId($I, 'p1').' AND issue_id = 1');
     
     $I->amLoggedIn('User1');
     $I->amOnPage('/project/p1/issues/1');
@@ -128,7 +128,7 @@ class T143_IssueEditing_Cest{
     $I->submitForm($example[0], []);
     $this->checkIssueDetailStatus($I, $example[1], 100);
     
-    Acceptance::getDB()->exec('UPDATE issues SET status = \'open\', progress = 0 WHERE project_id = (SELECT p.id FROM projects p WHERE p.url = \'p1\') AND issue_id = 1');
+    Acceptance::getDB()->exec('UPDATE issues SET status = \'open\', progress = 0 WHERE project_id = '.Acceptance::getProjectId($I, 'p1').' AND issue_id = 1');
   }
   
   public function editIssue(AcceptanceTester $I): void{
