@@ -131,12 +131,28 @@ While developing tests, it is inconvenient to have to re-run the entire test sui
 
 In order to run the test suite with coverage enabled, first ensure you can run the tests normally by following the **Automated Testing** section.
 
-1. Ensure code coverage is enabled on your test server
-   * Note that Xdebug coverage is slow and the tests will take about 15 times longer to complete
-   * Alternative coverage engines exist (such as [PCOV](https://github.com/krakjoe/pcov)) and may be worth looking into, but I have not tested them with the current setup
-2. Run the `gulp prepareCoverage` task in the `/build/` folder
-3. Run the tests using `codecept run --coverage --coverage-html` or the provided `Test (Cover)` run configuration
-4. View the results
+Then, ensure code coverage is enabled on your test server. Personally I recommend [PCOV](https://github.com/krakjoe/pcov) over [Xdebug](https://xdebug.org/) because it runs much faster and also has slightly better accuracy, but you can use either. Put the following into your `php.ini` and uncomment one of the lines to specify which extension to use:
+
+```ini
+[xdebug]
+;zend_extension=xdebug
+xdebug.remote_autostart=on
+xdebug.remote_enable=on
+xdebug.remote_host=127.0.0.1
+xdebug.remote_port=9000
+xdebug.remote_handler=dbgp
+xdebug.remote_mode=req
+xdebug.coverage_enable=on
+
+[pcov]
+;extension=pcov
+pcov.enabled=1
+pcov.directory=./
+```
+
+1. Run the `gulp prepareCoverage` task in the `/build/` folder
+2. Run the tests using `codecept run --coverage --coverage-xml --coverage-html` or the provided `Test (Cover)` run configuration
+3. View the results
    * Browser: open `/tests/_output/acceptance.remote.coverage/index.html`
-   * PhpStorm: import `/tests/_output/acceptance.remote.coverage.xml` (you will first need to replace file paths pointing to `/server/www/` with `/src/`)
-5. The original `/server/www/` folder was backed up under `/server/www-backup/`, when running code coverage you will have to restore the backup manually by deleting `www` and renaming `www-backup`
+   * PhpStorm: edit `/tests/_output/acceptance.remote.coverage.xml` to replace all paths pointing to `/server/www/` with `/src/`, then import using the **Show Code Coverage Data** dialog
+4. The original `/server/www/` folder was backed up under `/server/www-backup/`, when running code coverage you will have to restore the backup manually by deleting `www` and renaming `www-backup`
